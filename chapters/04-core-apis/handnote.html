@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<!-- PLACEHOLDER (Phase 2). A complete, self-contained page loaded in the shell's iframe. -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Core APIs — Handnote</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Inter:wght@400;500&family=JetBrains+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+        font-family: "Inter", system-ui, sans-serif;
+        color: #2b2b29;
+        line-height: 1.7;
+        max-width: 680px;
+      }
+      h1 {
+        font-family: "Merriweather", Georgia, serif;
+        font-size: 30px;
+        margin: 0 0 18px;
+      }
+      p { color: #57564f; }
+      code {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.88em;
+        background: #f1efe7;
+        color: #3f6b4c;
+        padding: 1px 5px;
+        border-radius: 4px;
+      }
+      pre {
+        background: #f1efe7;
+        border: 1px solid #efece3;
+        border-radius: 8px;
+        padding: 18px 20px;
+        overflow-x: auto;
+      }
+      pre code { background: none; color: #57564f; padding: 0; font-size: 13.5px; }
+      .note { border-top: 1px solid #e6e2d7; margin-top: 28px; padding-top: 18px; }
+      .note-label {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #4e7d5b;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Working with Core APIs</h1>
+    <p>
+      Strings in Java are <em>immutable</em> — once a <code>String</code> is created, the
+      character data behind it never changes. Every method that looks like it edits a
+      string actually returns a brand-new object, which is exactly why the compiler can
+      safely pool identical literals.
+    </p>
+    <pre><code>var name = "OCP";
+String greeting = "Hello, " + name;
+
+System.out.println(greeting.length());      // 12
+System.out.println(greeting.indexOf("O"));  // 7</code></pre>
+    <div class="note">
+      <span class="note-label">NOTE · মনে রাখুন</span>
+      <p>
+        Prefer <code>StringBuilder</code> when concatenating inside a loop — it mutates one
+        buffer instead of allocating a fresh String each pass.
+      </p>
+    </div>
+  </body>
+</html>

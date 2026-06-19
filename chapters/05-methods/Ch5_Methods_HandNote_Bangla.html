@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 — অধ্যায় ৫: Methods (স্টাডি নোট)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --page:#f4f6f8; --card:#ffffff; --ink:#33373d; --muted:#6b7079;
+    --accent:#c96442; --accent2:#d4845e;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --shadow:0 4px 18px rgba(40,44,52,.07);
+    --shadow-hover:0 10px 30px rgba(40,44,52,.13);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--page); color:var(--ink);
+    font-family:'Noto Sans Bengali',system-ui,sans-serif; font-size:16.5px; line-height:1.85;
+    padding:0 0 80px;
+  }
+  .wrap{max-width:920px; margin:0 auto; padding:0 22px;}
+  h1,h2,h3,h4{font-family:'Noto Sans Bengali',sans-serif; line-height:1.5; color:#2a2d33; font-weight:700;}
+  a{color:var(--accent); text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  p{margin:.6em 0;}
+
+  /* HEADER */
+  header{
+    background:linear-gradient(135deg,#ffffff 0%,#fbf7f4 100%);
+    box-shadow:var(--shadow); border-radius:0 0 26px 26px; padding:42px 22px 34px;
+    margin-bottom:30px;
+  }
+  .badge{
+    display:inline-block; background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#fff; font-weight:700; font-size:.8rem; letter-spacing:.4px;
+    padding:7px 16px; border-radius:999px; box-shadow:0 3px 10px rgba(201,100,66,.28);
+  }
+  header h1{font-size:2.05rem; margin:.45em 0 .15em; font-weight:800;}
+  header .subtitle{color:var(--muted); font-size:1.05rem; margin:0 0 18px; max-width:660px;}
+  .objectives{
+    background:linear-gradient(135deg,#f0f9f3,#f7fcf8); border-left:5px solid #5aab7b;
+    border-radius:12px; padding:14px 18px; font-size:.96rem;
+  }
+  .objectives strong{display:block; margin-bottom:5px; color:#3b7d57;}
+  .objectives ul{margin:.3em 0; padding-left:20px;}
+
+  /* TOC */
+  .toc{
+    background:var(--card); border-radius:14px; box-shadow:var(--shadow);
+    padding:22px 26px; margin-bottom:34px; transition:box-shadow .25s;
+  }
+  .toc:hover{box-shadow:var(--shadow-hover);}
+  .toc h2{font-size:1.15rem; margin:0 0 12px; border:none;}
+  .toc ol{margin:0; padding-left:22px; columns:2; column-gap:34px;}
+  .toc li{margin:5px 0; break-inside:avoid;}
+  @media(max-width:640px){.toc ol{columns:1;}}
+
+  /* SECTIONS */
+  section{margin-bottom:42px;}
+  .sec-num{font-family:'JetBrains Mono',monospace; color:var(--accent); font-weight:700; font-size:.95rem; letter-spacing:1px;}
+  section > h2{font-size:1.45rem; margin:.1em 0 .7em; padding-bottom:10px; border-bottom:2px solid #ece3da;}
+  h3{font-size:1.15rem; margin:1.3em 0 .4em;}
+  h4{font-size:1.02rem; margin:1em 0 .3em; color:#444;}
+
+  /* CODE */
+  pre{
+    background:#fdfaf7; border-radius:12px; box-shadow:inset 0 2px 8px rgba(120,90,60,.09);
+    padding:16px 18px; overflow-x:auto; margin:14px 0;
+    font-family:'JetBrains Mono',monospace; font-size:.85rem; line-height:1.6; color:#3a3a42;
+  }
+  code.inline{
+    background:#f3ece4; color:#9a5030; font-family:'JetBrains Mono',monospace;
+    font-size:.84em; padding:2px 6px; border-radius:6px;
+  }
+  .kw{color:var(--kw); font-weight:500;}
+  .str{color:var(--str);}
+  .num{color:var(--num);}
+  .err{color:var(--err); font-weight:700;}
+  .cm{color:var(--cm); font-style:italic;}
+
+  /* TABLES */
+  .tbl-wrap{overflow-x:auto; margin:16px 0;}
+  table{
+    width:100%; border-collapse:separate; border-spacing:0; background:var(--card);
+    border-radius:12px; overflow:hidden; box-shadow:var(--shadow); font-size:.92rem;
+  }
+  th,td{padding:10px 14px; text-align:left; border-bottom:1px solid #f0ece6; vertical-align:top;}
+  th{background:#f0e8de; font-weight:700; font-size:.9rem; color:#5a4f43;}
+  tr:last-child td{border-bottom:none;}
+  td .yes{color:#3b7d57; font-weight:700;}
+  td .no{color:var(--err); font-weight:700;}
+
+  /* CARDS */
+  .exam-trap,.key-rule,.remember{border-radius:14px; padding:15px 20px 15px 22px; margin:16px 0; box-shadow:var(--shadow); transition:box-shadow .25s;}
+  .exam-trap:hover,.key-rule:hover,.remember:hover{box-shadow:var(--shadow-hover);}
+  .exam-trap .label,.key-rule .label,.remember .label{font-weight:700; font-size:.82rem; letter-spacing:.4px; display:block; margin-bottom:5px;}
+  .exam-trap p,.key-rule p,.remember p{margin:.35em 0;}
+  .exam-trap{background:linear-gradient(135deg,#fef2f0,#fff8f7); border-left:5px solid #e06b5e;}
+  .exam-trap .label{color:#c0453a;}
+  .key-rule{background:linear-gradient(135deg,#f0f9f3,#f7fcf8); border-left:5px solid #5aab7b;}
+  .key-rule .label{color:#3b7d57;}
+  .remember{background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c;}
+  .remember .label{color:#a9772a;}
+
+  /* RULES BOX */
+  .rules-box{
+    background:linear-gradient(135deg,#eef9f1,#f6fcf8); border-top:4px solid #5aab7b;
+    border-radius:14px; padding:18px 22px; margin:18px 0; box-shadow:var(--shadow);
+  }
+  .rules-box h4{margin-top:0; color:#3b7d57;}
+  .rules-box ol,.rules-box ul{margin:.4em 0; padding-left:22px;}
+  .rules-box li{margin:6px 0;}
+
+  /* VS GRID */
+  .vs-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0;}
+  @media(max-width:640px){.vs-grid{grid-template-columns:1fr;}}
+  .vs-grid .vs-card{background:var(--card); border-radius:14px; box-shadow:var(--shadow); padding:16px 18px; transition:box-shadow .25s;}
+  .vs-grid .vs-card:hover{box-shadow:var(--shadow-hover);}
+  .vs-grid .vs-card h4{margin:0 0 8px; font-size:1rem;}
+  .vs-grid .vs-card.left h4{color:var(--kw);}
+  .vs-grid .vs-card.right h4{color:#3b7d57;}
+  .vs-grid ul{margin:.3em 0; padding-left:18px; font-size:.93rem;}
+
+  .footnote{text-align:center; color:var(--muted); font-size:.85rem; margin-top:40px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <span class="badge">OCP Java SE 21 Developer — Exam 1Z0-830</span>
+    <h1>অধ্যায় ৫ · Methods</h1>
+    <p class="subtitle">স্টাডি হ্যান্ডনোট — method declaration, access modifiers, static data, varargs, pass-by-value, autoboxing আর overloading। শুধু সেই পয়েন্টগুলোতে ফোকাস যেগুলো MCQ trap হিসেবে আসে।</p>
+    <div class="objectives">
+      <strong>Exam Objectives (এই অধ্যায়ে যা কভার হয়)</strong>
+      Using Object-Oriented Concepts in Java:
+      <ul>
+        <li>Classes ও records তৈরি করা; instance ও static fields, methods, constructors, এবং instance/static initializers ডিফাইন ও ব্যবহার করা।</li>
+        <li>Overloaded methods ইমপ্লিমেন্ট করা, var-arg methods সহ।</li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- TOC -->
+  <nav class="toc">
+    <h2>সূচিপত্র</h2>
+    <ol>
+      <li><a href="#s1">Method ডিজাইন করা</a></li>
+      <li><a href="#s2">Local ও Instance Variables</a></li>
+      <li><a href="#s3">Varargs নিয়ে কাজ</a></li>
+      <li><a href="#s4">Access Modifiers প্রয়োগ</a></li>
+      <li><a href="#s5">Static Data অ্যাক্সেস</a></li>
+      <li><a href="#s6">Method-এর মধ্যে ডেটা পাঠানো</a></li>
+      <li><a href="#s7">Method Overloading</a></li>
+      <li><a href="#traps">Exam Traps চিট-শিট</a></li>
+    </ol>
+  </nav>
+
+  <!-- SECTION 1 -->
+  <section id="s1">
+    <div class="sec-num">SECTION 01</div>
+    <h2>Method ডিজাইন করা</h2>
+    <p>একটা <b>method declaration</b>-এর অংশগুলোর একটা নির্দিষ্ট ক্রম আছে। Access modifier আর optional specifier গুলো return type-এর <b>আগে যেকোনো ক্রমে</b> আসতে পারে; কিন্তু return type-এর পরে ক্রম ফিক্সড — <b>name → parameter list → exception list → body</b>।</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>অংশ (Element)</th><th>উদাহরণ</th><th>আবশ্যক?</th></tr></thead>
+      <tbody>
+        <tr><td>Access modifier</td><td><code class="inline">public</code></td><td><span class="no">না</span></td></tr>
+        <tr><td>Optional specifier</td><td><code class="inline">final</code> / <code class="inline">static</code></td><td><span class="no">না</span></td></tr>
+        <tr><td>Return type</td><td><code class="inline">void</code></td><td><span class="yes">হ্যাঁ</span></td></tr>
+        <tr><td>Method name</td><td><code class="inline">nap</code></td><td><span class="yes">হ্যাঁ</span></td></tr>
+        <tr><td>Parameter list</td><td><code class="inline">(int minutes)</code></td><td><span class="yes">হ্যাঁ</span> (খালি হতে পারে)</td></tr>
+        <tr><td>Exception list</td><td><code class="inline">throws InterruptedException</code></td><td><span class="no">না</span></td></tr>
+        <tr><td>Method body</td><td><code class="inline">{ ... }</code></td><td><span class="yes">হ্যাঁ</span> (<code class="inline">abstract</code> ছাড়া)</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3>Access modifier ও optional specifier</h3>
+<pre><span class="kw">public class</span> ParkTrip {
+  <span class="kw">public void</span> skip1() {}
+  <span class="kw">default void</span> skip2() {} <span class="cm">// DOES NOT COMPILE — default কোনো access modifier নয়</span>
+  <span class="kw">void public</span> skip3() {} <span class="cm">// DOES NOT COMPILE — modifier return type-এর পরে</span>
+  <span class="kw">void</span> skip4() {}          <span class="cm">// OK — package (default) access</span>
+}</pre>
+
+    <div class="exam-trap">
+      <span class="label">⚠ EXAM TRAP</span>
+      <p><code class="inline">default</code> একটা keyword (switch / interface-এ ব্যবহার হয়), কিন্তু এটা <b>কখনোই access modifier নয়</b>। Package access-এর জন্য কোনো keyword নেই — শুধু modifier বাদ দিলেই হয়।</p>
+    </div>
+
+<pre><span class="kw">public static final void</span> bike3() {}  <span class="cm">// OK</span>
+<span class="kw">public final static void</span> bike4() {}  <span class="cm">// OK — specifier-এর ক্রম যেকোনো হতে পারে</span>
+<span class="kw">public</span> modifier <span class="kw">void</span> bike5() {}     <span class="cm">// DOES NOT COMPILE — modifier আসল specifier নয়</span>
+<span class="kw">public void final</span> bike6() {}        <span class="cm">// DOES NOT COMPILE — specifier return type-এর পরে</span>
+<span class="kw">final public void</span> bike7() {}        <span class="cm">// OK (অদ্ভুত হলেও বৈধ: specifier আগে, access পরে)</span></pre>
+
+    <h3>Return type ও return statement</h3>
+    <div class="key-rule">
+      <span class="label">✓ KEY RULE</span>
+      <p>প্রতিটা method-এর একটা return type <b>থাকতেই হবে</b> — কিছু রিটার্ন না করলে <code class="inline">void</code>। Non-<code class="inline">void</code> method-এ অবশ্যই একটা reachable <code class="inline">return</code> থাকতে হবে যা assignable একটা value রিটার্ন করে।</p>
+    </div>
+<pre><span class="kw">public</span> String hike4() {}            <span class="cm">// DOES NOT COMPILE — return নেই</span>
+<span class="kw">public</span> hike5() {}                   <span class="cm">// DOES NOT COMPILE — return type নেই</span>
+<span class="kw">public</span> String <span class="kw">int</span> hike6() {}        <span class="cm">// DOES NOT COMPILE — দুটো return type</span>
+String hike7(<span class="kw">int</span> a) {              <span class="cm">// DOES NOT COMPILE — return শুধু if-এর ভেতরে</span>
+  <span class="kw">if</span> (<span class="num">1</span> &lt; <span class="num">2</span>) <span class="kw">return</span> <span class="str">"orange"</span>;
+}
+
+<span class="kw">int</span> getHeight2() { <span class="kw">int</span> t = <span class="num">9L</span>; <span class="kw">return</span> t; }  <span class="cm">// DOES NOT COMPILE — long→int assign</span>
+<span class="kw">int</span> getHeight3() { <span class="kw">long</span> t = <span class="num">9L</span>; <span class="kw">return</span> t; } <span class="cm">// DOES NOT COMPILE — long value int হিসেবে return</span></pre>
+
+    <div class="remember">
+      <span class="label">★ REMEMBER</span>
+      <p>Compiler <code class="inline">if(1&lt;2)</code>-কে "সবসময় true" হিসেবে ধরে না; তাই গ্যারান্টিড return লাগবেই। আর reachable return-এর পরে dead code থাকলে সেটা শুধু <em>warning</em> দেয়, error নয়।</p>
+    </div>
+
+    <h3>Method name ও parameter list</h3>
+<pre><span class="kw">public void</span> jog1() {}    <span class="cm">// OK</span>
+<span class="kw">public void</span> 2jog() {}    <span class="cm">// DOES NOT COMPILE — digit দিয়ে শুরু</span>
+<span class="kw">public void</span> Jog_$() {}   <span class="cm">// OK — খারাপ স্টাইল, তবু বৈধ</span>
+<span class="kw">public</span> _() {}            <span class="cm">// DOES NOT COMPILE — শুধু একটা underscore নিষিদ্ধ</span>
+
+<span class="kw">public void</span> run4(<span class="kw">int</span> a; <span class="kw">int</span> b) {} <span class="cm">// DOES NOT COMPILE — ';' নয়, ',' লাগবে</span></pre>
+
+    <h3>Method signature</h3>
+    <p><b>Signature</b> = method name + parameter list। Parameter-এর <b>নাম signature-এর অংশ নয়</b>; শুধু type আর তাদের ক্রম গণনা হয়।</p>
+<pre><span class="cm">// DOES NOT COMPILE — একই signature (নাম গণনা হয় না)</span>
+<span class="kw">public void</span> visitZoo(String name, <span class="kw">int</span> waitTime) {}
+<span class="kw">public void</span> visitZoo(String attraction, <span class="kw">int</span> rainFall) {}
+
+<span class="cm">// OK — type-এর ক্রম আলাদা</span>
+<span class="kw">public void</span> visitZoo(String name, <span class="kw">int</span> waitTime) {}
+<span class="kw">public void</span> visitZoo(<span class="kw">int</span> rainFall, String attraction) {}</pre>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section id="s2">
+    <div class="sec-num">SECTION 02</div>
+    <h2>Local ও Instance Variables</h2>
+
+    <div class="vs-grid">
+      <div class="vs-card left">
+        <h4>Local variables</h4>
+        <ul>
+          <li>Method/block-এর ভেতরে declare হয়</li>
+          <li>একমাত্র modifier: <code class="inline">final</code></li>
+          <li>কোনো default value নেই — ব্যবহারের আগে assign করতেই হবে</li>
+          <li>Block শেষ হলে reference ধ্বংস হয়</li>
+        </ul>
+      </div>
+      <div class="vs-card right">
+        <h4>Instance variables</h4>
+        <ul>
+          <li>Class-এর member</li>
+          <li>Modifiers: <code class="inline">final</code>, <code class="inline">volatile</code>, <code class="inline">transient</code> (+ access)</li>
+          <li>Default value পায় (0, null, false...)</li>
+          <li><code class="inline">final</code> instance var কোনো default পায় <b>না</b></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="exam-trap">
+      <span class="label">⚠ EXAM TRAP — final reference বনাম contents</span>
+      <p><code class="inline">final</code> শুধু <b>reference</b> লক করে, object নয়। তাই <code class="inline">giraffe.setName("George")</code> বা <code class="inline">friends[2]=2</code> ঠিক আছে; কিন্তু <code class="inline">giraffe</code> বা <code class="inline">friends</code>-কে আবার reassign করা যাবে না।</p>
+    </div>
+
+<pre><span class="kw">final int</span> rest;
+<span class="kw">if</span>(isWeekend) rest = <span class="num">5</span>;
+System.out.print(rest); <span class="cm">// DOES NOT COMPILE — হয়তো assign-ই হয়নি</span></pre>
+
+    <h3>Effectively final</h3>
+    <div class="key-rule">
+      <span class="label">✓ KEY RULE</span>
+      <p>যে local variable assign হওয়ার পরে আর reassign হয় না, সেটা <b>effectively final</b>। দ্রুত টেস্ট: <code class="inline">final</code> যোগ করে দেখুন — তাও compile হলে এটা effectively final ছিল।</p>
+    </div>
+<pre>String name = <span class="str">"Harry the Hippo"</span>; <span class="cm">// effectively final</span>
+<span class="kw">var</span> size = <span class="num">10</span>;                  <span class="cm">// নয় — নিচে increment হয়</span>
+<span class="kw">boolean</span> wet;
+<span class="kw">if</span>(size &gt; <span class="num">100</span>) size++;          <span class="cm">// size reassign করছে</span>
+name.substring(<span class="num">0</span>);              <span class="cm">// result বাদ; name অপরিবর্তিত (immutable)</span>
+wet = <span class="kw">true</span>;                     <span class="cm">// effectively final (একবার assign)</span></pre>
+
+    <div class="remember">
+      <span class="label">★ REMEMBER</span>
+      <p>Method/constructor-এর <b>parameter</b>গুলো আসলে pre-initialized local variable। Final / effectively-final ব্যাপারটা <b>lambda ও local class</b>-এ (Ch. 7–8) গুরুত্বপূর্ণ — সেগুলো শুধু final বা effectively-final local capture করতে পারে।</p>
+    </div>
+
+    <h3>Final instance variables</h3>
+<pre><span class="kw">final int</span> age = <span class="num">10</span>;        <span class="cm">// declaration-এ</span>
+<span class="kw">final int</span> fishEaten;        <span class="cm">// instance initializer-এ</span>
+<span class="kw">final</span> String name;          <span class="cm">// constructor-এ</span>
+{ fishEaten = <span class="num">10</span>; }
+<span class="kw">public</span> PolarBear() { name = <span class="str">"Robert"</span>; }</pre>
+    <p>একটা <code class="inline">final</code> instance variable-কে <b>ঠিক একবার</b> assign করতে হবে: declaration-এ, instance initializer-এ, অথবা <b>প্রতিটা</b> constructor-এ। কোনো জায়গায় assign না হলে compiler error।</p>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section id="s3">
+    <div class="sec-num">SECTION 03</div>
+    <h2>Varargs নিয়ে কাজ</h2>
+
+    <div class="rules-box">
+      <h4>Varargs parameter তৈরির নিয়ম</h4>
+      <ol>
+        <li>একটা method-এ <b>সর্বোচ্চ একটি</b> varargs parameter থাকতে পারে।</li>
+        <li>Varargs parameter অবশ্যই parameter list-এর <b>সবশেষে</b> থাকতে হবে।</li>
+      </ol>
+    </div>
+
+<pre><span class="kw">public void</span> walk1(<span class="kw">int</span>... steps) {}            <span class="cm">// OK</span>
+<span class="kw">public void</span> walk2(<span class="kw">int</span> start, <span class="kw">int</span>... steps) {} <span class="cm">// OK</span>
+<span class="kw">public void</span> walk3(<span class="kw">int</span>... steps, <span class="kw">int</span> start) {} <span class="cm">// DOES NOT COMPILE — শেষে নেই</span>
+<span class="kw">public void</span> walk4(<span class="kw">int</span>... a, <span class="kw">int</span>... b) {}      <span class="cm">// DOES NOT COMPILE — দুটো varargs</span></pre>
+
+    <h3>Varargs কল করা</h3>
+    <p>আপনি হয় <b>একটা array</b> পাঠাতে পারেন, নয় <b>আলাদা আলাদা value</b> (Java নিজে array বানিয়ে নেয়)। কিছু না পাঠালে <b>length-0 array</b> তৈরি হয়, <code class="inline">null</code> নয়।</p>
+<pre><span class="kw">public static void</span> walkDog(<span class="kw">int</span> start, <span class="kw">int</span>... steps) {
+  System.out.println(steps.length);
+}
+walkDog(<span class="num">1</span>);                  <span class="cm">// 0</span>
+walkDog(<span class="num">1</span>, <span class="num">2</span>);               <span class="cm">// 1</span>
+walkDog(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>);            <span class="cm">// 2</span>
+walkDog(<span class="num">1</span>, <span class="kw">new int</span>[]{<span class="num">4</span>,<span class="num">5</span>});  <span class="cm">// 2</span>
+walkDog(<span class="num">1</span>, <span class="kw">null</span>);            <span class="cm">// compile হয়, পরে NullPointerException</span></pre>
+
+    <div class="exam-trap">
+      <span class="label">⚠ EXAM TRAP — null পাঠানো</span>
+      <p><code class="inline">null</code> তো <code class="inline">int</code> নয়, তাই Java একে <b>array reference</b> ধরে নেয় (যেটা null)। পরে <code class="inline">steps.length</code> কল করতে গিয়ে runtime-এ <b>NullPointerException</b> হয় — কিন্তু compile ঠিকই হয়ে যায়।</p>
+    </div>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section id="s4">
+    <div class="sec-num">SECTION 04</div>
+    <h2>Access Modifiers প্রয়োগ</h2>
+    <p>সবচেয়ে restrictive থেকে কম restrictive ক্রমে: <code class="inline">private</code> → package (keyword নেই) → <code class="inline">protected</code> → <code class="inline">public</code>।</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>যে class থেকে অ্যাক্সেস</th><th>private</th><th>package</th><th>protected</th><th>public</th></tr></thead>
+      <tbody>
+        <tr><td>একই class</td><td><span class="yes">হ্যাঁ</span></td><td><span class="yes">হ্যাঁ</span></td><td><span class="yes">হ্যাঁ</span></td><td><span class="yes">হ্যাঁ</span></td></tr>
+        <tr><td>একই package, অন্য class</td><td><span class="no">না</span></td><td><span class="yes">হ্যাঁ</span></td><td><span class="yes">হ্যাঁ</span></td><td><span class="yes">হ্যাঁ</span></td></tr>
+        <tr><td>অন্য package, subclass</td><td><span class="no">না</span></td><td><span class="no">না</span></td><td><span class="yes">হ্যাঁ</span></td><td><span class="yes">হ্যাঁ</span></td></tr>
+        <tr><td>অন্য package, unrelated class</td><td><span class="no">না</span></td><td><span class="no">না</span></td><td><span class="no">না</span></td><td><span class="yes">হ্যাঁ</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3>protected-এর "two-phase" ফাঁদ</h3>
+    <div class="exam-trap">
+      <span class="label">⚠ EXAM TRAP — এই অধ্যায়ের সবচেয়ে কঠিন পয়েন্ট</span>
+      <p><b>ভিন্ন</b> package-এর একটা subclass থেকে <code class="inline">protected</code> অ্যাক্সেস নির্ভর করে member-টা <b>কীভাবে</b> ছোঁয়া হচ্ছে তার উপর:</p>
+      <ul>
+        <li><b>Variable ছাড়া</b> (inherited / <code class="inline">this</code> দিয়ে): allowed।</li>
+        <li><b>Variable দিয়ে</b>: তখনই allowed যখন <b>reference type</b> একই class বা তার subclass — parent type হলে <em>নয়</em>।</li>
+      </ul>
+    </div>
+<pre><span class="kw">package</span> pond.swan;
+<span class="kw">public class</span> Swan <span class="kw">extends</span> Bird {     <span class="cm">// Bird আছে pond.shore-এ</span>
+  <span class="kw">public void</span> swim() {
+    floatInWater();              <span class="cm">// OK — inherited, variable নেই</span>
+    Swan other = <span class="kw">new</span> Swan();
+    other.floatInWater();        <span class="cm">// OK — reference type Swan</span>
+    Bird b = <span class="kw">new</span> Bird();
+    b.floatInWater();            <span class="cm">// DOES NOT COMPILE — Bird ref, ভিন্ন package</span>
+  }
+}</pre>
+    <p>একইভাবে <code class="inline">Bird other = new Goose();</code> তারপর <code class="inline">other.floatInWater();</code> fail করে — কারণ চেক হয় <b>reference type Bird</b>, runtime-এর Goose নয়।</p>
+  </section>
+
+  <!-- SECTION 5 -->
+  <section id="s5">
+    <div class="sec-num">SECTION 05</div>
+    <h2>Static Data অ্যাক্সেস</h2>
+    <p><code class="inline">static</code> member কোনো নির্দিষ্ট instance-এর নয়, পুরো <b>class</b>-এর — সব instance-এর মধ্যে শেয়ার্ড। <code class="inline">main()</code> static বলেই JVM object ছাড়াই একে কল করতে পারে।</p>
+
+    <h3>Reference দিয়ে static অ্যাক্সেস (null ফাঁদ)</h3>
+    <div class="exam-trap">
+      <span class="label">⚠ EXAM TRAP — কোনো NullPointerException হয় না</span>
+      <p>Instance দিয়ে static member অ্যাক্সেস করলে object নয়, <b>reference type</b> দেখা হয়। তাই <code class="inline">null</code> reference হলেও কাজ করে — Java কখনো null-কে dereference করে না।</p>
+    </div>
+<pre>Snake s = <span class="kw">new</span> Snake();
+System.out.println(s.hiss);  <span class="cm">// 2</span>
+s = <span class="kw">null</span>;
+System.out.println(s.hiss);  <span class="cm">// 2 — তাও ঠিক, hiss static</span>
+
+<span class="cm">// একটাই শেয়ার্ড hiss: 4 → 6 → 5</span>
+Snake.hiss = <span class="num">4</span>;
+Snake a = <span class="kw">new</span> Snake(); a.hiss = <span class="num">6</span>;
+Snake b = <span class="kw">new</span> Snake(); b.hiss = <span class="num">5</span>;
+System.out.println(Snake.hiss); <span class="cm">// 5</span></pre>
+
+    <h3>Class বনাম instance membership</h3>
+    <div class="key-rule">
+      <span class="label">✓ KEY RULE</span>
+      <p>একটা <b>static</b> member কোনো object reference ছাড়া <b>instance</b> member-কে ছুঁতে পারে <b>না</b>। কিন্তু instance member অনায়াসে static member ব্যবহার করতে পারে।</p>
+    </div>
+<pre><span class="kw">public static int</span> count;
+<span class="kw">public static void</span> addGorilla() { count++; }        <span class="cm">// OK</span>
+<span class="kw">public void</span> babyGorilla() { count++; }              <span class="cm">// OK</span>
+<span class="kw">public static void</span> announceToEveryone() {
+  addGorilla();
+  babyGorilla();   <span class="cm">// DOES NOT COMPILE — static → instance method</span>
+}
+<span class="kw">public int</span> total;
+<span class="kw">public static double</span> average = total / count; <span class="cm">// DOES NOT COMPILE — static-এ instance var</span></pre>
+
+    <h3>Constants ও static final</h3>
+<pre><span class="kw">private static final int</span> NUM_BUCKETS = <span class="num">45</span>;
+NUM_BUCKETS = <span class="num">5</span>;  <span class="cm">// DOES NOT COMPILE — final reassign করা যায় না</span>
+
+<span class="kw">private static final</span> String[] treats = <span class="kw">new</span> String[<span class="num">10</span>];
+treats[<span class="num">0</span>] = <span class="str">"popcorn"</span>;  <span class="cm">// OK — contents বদলানো যায়, reference নয়</span></pre>
+
+    <h3>Static initializers</h3>
+<pre><span class="num">14:</span> <span class="kw">private static int</span> one;
+<span class="num">15:</span> <span class="kw">private static final int</span> two;
+<span class="num">16:</span> <span class="kw">private static final int</span> three = <span class="num">3</span>;
+<span class="num">17:</span> <span class="kw">private static final int</span> four;  <span class="cm">// DOES NOT COMPILE — কখনো initialize হয়নি</span>
+<span class="num">18:</span> <span class="kw">static</span> {
+<span class="num">19:</span>   one = <span class="num">1</span>;
+<span class="num">20:</span>   two = <span class="num">2</span>;
+<span class="num">21:</span>   three = <span class="num">3</span>;   <span class="cm">// DOES NOT COMPILE — line 16-এ আগেই initialize</span>
+<span class="num">22:</span>   two = <span class="num">4</span>;     <span class="cm">// DOES NOT COMPILE — দ্বিতীয়বার assign</span>
+<span class="num">23:</span> }</pre>
+    <div class="remember">
+      <span class="label">★ REMEMBER</span>
+      <p>একটা <code class="inline">final</code> static var-কে static initializer-এ <b>একবার</b> assign করা যায় (ওটাই <em>সেই</em> assignment)। Static initializer গুলো class প্রথম লোড হওয়ার সময়, declaration-এর ক্রমে চলে।</p>
+    </div>
+
+    <h3>Static imports</h3>
+<pre><span class="kw">import static</span> java.util.Arrays;        <span class="cm">// DOES NOT COMPILE — static import member-এর জন্য</span>
+<span class="kw">import static</span> java.util.Arrays.asList; <span class="cm">// OK</span>
+<span class="kw">static import</span> java.util.Arrays.*;      <span class="cm">// DOES NOT COMPILE — এটা "import static"</span>
+...
+Arrays.asList(<span class="str">"one"</span>); <span class="cm">// DOES NOT COMPILE — Arrays class import করা হয়নি</span></pre>
+    <div class="exam-trap">
+      <span class="label">⚠ EXAM TRAP</span>
+      <p>সঠিক ক্রম <code class="inline">import static</code> (<code class="inline">static import</code> নয়)। Static import দিয়ে <b>member</b> আনা যায়, class কখনোই নয়। দুটো আলাদা class থেকে একই নামের member static-import করলে error।</p>
+    </div>
+  </section>
+
+  <!-- SECTION 6 -->
+  <section id="s6">
+    <div class="sec-num">SECTION 06</div>
+    <h2>Method-এর মধ্যে ডেটা পাঠানো</h2>
+    <p>Java পুরোপুরি <b>pass-by-value</b>। Method variable-এর একটা <b>কপি</b> পায়। Parameter-কে reassign করলে caller-এর উপর কোনো প্রভাব পড়ে না — কিন্তু শেয়ার্ড object-এর উপর <b>mutating method</b> কল করলে পড়ে।</p>
+
+    <div class="vs-grid">
+      <div class="vs-card left">
+        <h4>Parameter reassign</h4>
+<pre><span class="kw">int</span> num = <span class="num">4</span>;
+newNumber(num);
+<span class="cm">// num এখনো 4</span>
+String name = <span class="str">"Webby"</span>;
+speak(name); <span class="cm">// ভেতরে reassign</span>
+<span class="cm">// name এখনো "Webby"</span></pre>
+      </div>
+      <div class="vs-card right">
+        <h4>শেয়ার্ড object mutate</h4>
+<pre><span class="kw">var</span> name = <span class="kw">new</span> StringBuilder(<span class="str">"Webby"</span>);
+speak(name); <span class="cm">// s.append("Georgette")</span>
+<span class="cm">// প্রিন্ট হবে WebbyGeorgette</span></pre>
+      </div>
+    </div>
+
+    <div class="exam-trap">
+      <span class="label">⚠ EXAM TRAP — ignored return value</span>
+      <p>Return করা value <b>assign</b> না করলে কিছুই বদলায় না। <code class="inline">addTickets(tickets)</code> বাদ পড়ে; <code class="inline">guests = addGuests(guests)</code> রাখা হয়।</p>
+    </div>
+<pre><span class="kw">int</span> tickets = <span class="num">2</span>;
+String guests = <span class="str">"abc"</span>;
+addTickets(tickets);            <span class="cm">// return বাদ → tickets = 2</span>
+guests = addGuests(guests);     <span class="cm">// guests = "abcd"</span>
+System.out.println(tickets + guests); <span class="cm">// 2abcd</span></pre>
+
+    <h3>Autoboxing ও unboxing</h3>
+    <div class="key-rule">
+      <span class="label">✓ KEY RULE — একবারে একটাই রূপান্তর</span>
+      <p>Java হয় primitive widen করবে, নয় autobox করবে — কিন্তু এক ধাপে <b>দুটো একসাথে নয়</b>।</p>
+    </div>
+<pre><span class="kw">long</span> ears = e;             <span class="cm">// OK — Integer→int unbox, তারপর int→long widen</span>
+Long badGorilla = <span class="num">8</span>;     <span class="cm">// DOES NOT COMPILE — একসাথে widen+box</span>
+
+Character elephant = <span class="kw">null</span>;
+<span class="kw">char</span> bad = elephant;       <span class="cm">// NullPointerException — null unbox</span>
+
+c.jump(<span class="num">123L</span>);  <span class="cm">// DOES NOT COMPILE — long→int narrowing</span>
+g.rest(<span class="num">8</span>);     <span class="cm">// DOES NOT COMPILE — rest(Long): int→Long মানে widen+box</span>
+
+Integer[] winterHours = { <span class="num">10.5</span>, <span class="num">17.0</span> }; <span class="cm">// DOES NOT COMPILE — double≠Integer</span></pre>
+  </section>
+
+  <!-- SECTION 7 -->
+  <section id="s7">
+    <div class="sec-num">SECTION 07</div>
+    <h2>Method Overloading</h2>
+    <p>Overloading = একই নাম, কিন্তু <b>আলাদা parameter list</b>। Return type, access modifier, specifier আর exception list overloading-এর জন্য <b>অপ্রাসঙ্গিক</b>।</p>
+
+<pre><span class="kw">public void</span> fly(<span class="kw">int</span> n) {}
+<span class="kw">public int</span> fly(<span class="kw">int</span> n) { <span class="kw">return</span> <span class="num">1</span>; } <span class="cm">// DOES NOT COMPILE — শুধু return type আলাদা</span>
+
+<span class="kw">public void</span> fly(<span class="kw">int</span> n) {}
+<span class="kw">public static void</span> fly(<span class="kw">int</span> n) {}        <span class="cm">// DOES NOT COMPILE — একই signature</span>
+<span class="kw">public void</span> fly(<span class="kw">int</span> km) {}              <span class="cm">// DOES NOT COMPILE — একই signature</span>
+
+<span class="kw">public void</span> fly(<span class="kw">int</span>[] lengths) {}
+<span class="kw">public void</span> fly(<span class="kw">int</span>... lengths) {}        <span class="cm">// DOES NOT COMPILE — varargs = array signature</span></pre>
+
+    <h3>Resolution-এর ক্রম</h3>
+    <div class="rules-box">
+      <h4>Java কীভাবে overload বাছে (বেশি → কম specific)</h4>
+      <ol>
+        <li>Type অনুযায়ী exact match</li>
+        <li>বড় primitive type (widening)</li>
+        <li>Autoboxed type</li>
+        <li>Varargs</li>
+      </ol>
+      <p style="margin-bottom:0;">Backward compatibility-র জন্য autoboxing ও varargs <b>সবশেষে</b> বিবেচিত হয়।</p>
+    </div>
+
+<pre><span class="cm">// Pelican: fly(String) vs fly(Object) → "string-object"</span>
+<span class="cm">// Parrot: print(List&lt;Integer&gt;), print(CharSequence), print(Object) → "CIO"</span>
+<span class="cm">// Ostrich: fly(int) vs fly(long) ; fly(123), fly(123L) → "int-long"</span>
+
+<span class="cm">// Glider: প্রতি কলে most-specific জেতে → প্রিন্ট হয় "142"</span>
+glide(<span class="str">"a"</span>);          <span class="cm">// 1  → glide(String)</span>
+glide(<span class="str">"a"</span>,<span class="str">"b"</span>);      <span class="cm">// 4  → glide(String,String), varargs নয়</span>
+glide(<span class="str">"a"</span>,<span class="str">"b"</span>,<span class="str">"c"</span>);  <span class="cm">// 2  → এখন শুধু glide(String...) ম্যাচ করে</span></pre>
+
+    <div class="remember">
+      <span class="label">★ REMEMBER</span>
+      <p>যখন একটা primitive overload (<code class="inline">fly(int)</code>) আর একটা wrapper overload (<code class="inline">fly(Integer)</code>) দুটোই থাকে, <code class="inline">fly(3)</code> <b>primitive</b>-টা বাছে — Java অযথা autoboxing-এর ঝামেলা এড়ায়।</p>
+    </div>
+  </section>
+
+  <!-- CHEAT SHEET -->
+  <section id="traps">
+    <div class="sec-num">CHEAT SHEET</div>
+    <h2>Exam Traps — সব গোছানো গোটচা একসাথে</h2>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>পরিস্থিতি (Scenario)</th><th>কী টেস্ট করা হয়</th><th>রায় (Verdict)</th></tr></thead>
+      <tbody>
+        <tr><td><code class="inline">default void m(){}</code></td><td><code class="inline">default</code> access modifier হিসেবে</td><td><span class="no">Compile হয় না</span></td></tr>
+        <tr><td><code class="inline">void public m(){}</code></td><td>access modifier return type-এর পরে</td><td><span class="no">Compile হয় না</span></td></tr>
+        <tr><td><code class="inline">final public void m(){}</code></td><td>specifier access modifier-এর আগে</td><td><span class="yes">Compile হয় (বৈধ)</span></td></tr>
+        <tr><td>non-void method, <code class="inline">return</code> নেই</td><td>missing / unreachable return</td><td><span class="no">Compile হয় না</span></td></tr>
+        <tr><td>method name <code class="inline">2jog</code> / <code class="inline">_</code></td><td>identifier নিয়ম</td><td><span class="no">Compile হয় না</span></td></tr>
+        <tr><td>parameter <code class="inline">;</code> দিয়ে আলাদা</td><td>comma বনাম semicolon</td><td><span class="no">Compile হয় না</span></td></tr>
+        <tr><td>দুই method, একই type, আলাদা নাম</td><td>নাম signature-এর অংশ নয়</td><td><span class="no">Compile হয় না</span></td></tr>
+        <tr><td>varargs শেষে নয় / দুটো varargs</td><td>varargs placement</td><td><span class="no">Compile হয় না</span></td></tr>
+        <tr><td><code class="inline">walkDog(1)</code> → <code class="inline">steps.length</code></td><td>খালি varargs = length 0</td><td><span class="yes">0</span></td></tr>
+        <tr><td><code class="inline">walkDog(1, null)</code></td><td>null array reference হিসেবে</td><td>compile → <span class="no">NPE</span></td></tr>
+        <tr><td>subclass-এ <code class="inline">Bird b; b.protectedM()</code> (ভিন্ন pkg)</td><td>parent-type ref দিয়ে protected</td><td><span class="no">Compile হয় না</span></td></tr>
+        <tr><td><code class="inline">s=null; s.staticVar</code></td><td>null reference দিয়ে static</td><td><span class="yes">NPE হয় না</span></td></tr>
+        <tr><td>static method → instance method</td><td>class বনাম instance membership</td><td><span class="no">Compile হয় না</span></td></tr>
+        <tr><td><code class="inline">final</code> static array, element edit</td><td>reference বনাম contents</td><td><span class="yes">Compile হয়</span></td></tr>
+        <tr><td>initializer-এ <code class="inline">final</code> static আবার assign</td><td>দ্বিতীয় assignment</td><td><span class="no">Compile হয় না</span></td></tr>
+        <tr><td><code class="inline">import static</code> দিয়ে class</td><td>শুধু member আনা যায়</td><td><span class="no">Compile হয় না</span></td></tr>
+        <tr><td>param reassign বনাম object mutate</td><td>pass-by-value</td><td>caller অপরিবর্তিত / পরিবর্তিত</td></tr>
+        <tr><td><code class="inline">Long x = 8;</code></td><td>একসাথে widen + box</td><td><span class="no">Compile হয় না</span></td></tr>
+        <tr><td>primitive-এ <code class="inline">null</code> unbox</td><td>NPE</td><td>compile → <span class="no">NPE</span></td></tr>
+        <tr><td>overload শুধু return type-এ আলাদা</td><td>এটা overloading নয়</td><td><span class="no">Compile হয় না</span></td></tr>
+        <tr><td><code class="inline">m(int[])</code> + <code class="inline">m(int...)</code></td><td>একই signature</td><td><span class="no">Compile হয় না</span></td></tr>
+        <tr><td>overload: exact &gt; widen &gt; autobox &gt; varargs</td><td>resolution ক্রম</td><td>most-specific জেতে</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <p class="footnote">সূত্র: <i>OCP Java SE 21 Developer Study Guide</i> (Boyarsky &amp; Selikoff), অধ্যায় ৫: Methods · Exam 1Z0-830।</p>
+
+</div>
+</body>
+</html>

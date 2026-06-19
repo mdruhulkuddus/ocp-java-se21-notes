@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 — Chapter 5: Methods · MCQ Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --page:#f4f6f8; --ink:#33373d; --muted:#6b7079;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --shadow:0 4px 18px rgba(40,44,52,.07);
+    --shadow-hover:0 10px 28px rgba(70,55,110,.16);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--page); color:var(--ink);
+    font-family:'Source Sans 3',system-ui,sans-serif; font-size:16.5px; line-height:1.65; padding:0 0 70px;}
+  .wrap{max-width:860px; margin:0 auto; padding:0 20px;}
+  h1{font-family:'Merriweather',serif; line-height:1.3; color:#2a2d33;}
+  code,pre{font-family:'JetBrains Mono',monospace;}
+
+  /* HEADER */
+  header{position:relative; overflow:hidden; margin:26px 0 30px;
+    background:linear-gradient(135deg,#ffffff 0%,#fdf8f3 100%);
+    border-radius:18px; box-shadow:var(--shadow); padding:34px 32px 30px;}
+  header::after{content:""; position:absolute; top:-90px; right:-70px; width:260px; height:260px;
+    background:radial-gradient(circle,rgba(201,100,66,.16),rgba(201,100,66,0) 70%); pointer-events:none;}
+  .badge{display:inline-block; background:linear-gradient(135deg,#c96442,#d4845e);
+    color:#fff; font-weight:700; font-size:.72rem; letter-spacing:1px; text-transform:uppercase;
+    font-family:'JetBrains Mono',monospace; padding:6px 14px; border-radius:999px; box-shadow:0 3px 10px rgba(201,100,66,.28);}
+  header h1{font-size:1.95rem; margin:.5em 0 .12em; font-weight:900;}
+  header .subtitle{color:var(--muted); font-style:italic; font-size:1.02rem; margin:0 0 16px;}
+  .pills{display:flex; flex-wrap:wrap; gap:8px;}
+  .pill{background:#f3ece4; color:#9a5030; font-family:'JetBrains Mono',monospace; font-size:.74rem;
+    padding:4px 11px; border-radius:999px; font-weight:500;}
+
+  /* QUESTION CARD */
+  .q-card{position:relative; background:linear-gradient(135deg,#f4f0fa,#f9f6fd);
+    border-top:4px solid #9b7fd4; border-radius:14px; box-shadow:var(--shadow);
+    padding:20px 24px 18px; margin:18px 0; transition:box-shadow .25s, transform .25s;}
+  .q-card:hover{box-shadow:var(--shadow-hover); transform:translateY(-2px);}
+  .q-head{display:flex; align-items:center; gap:11px; margin-bottom:9px;}
+  .q-num{font-family:'JetBrains Mono',monospace; font-weight:700; color:#7a5cb8; font-size:1rem;}
+  .q-tag{background:#b29ad9; color:#fff; font-size:.66rem; font-weight:700; letter-spacing:.6px;
+    text-transform:uppercase; padding:3px 9px; border-radius:999px; font-family:'Source Sans 3',sans-serif;}
+  .q-text{font-weight:600; margin:.1em 0 .2em;}
+  .q-text .all{color:#7a5cb8; font-weight:700;}
+
+  pre{background:#fbf9fe; border-radius:12px; box-shadow:inset 0 2px 7px rgba(110,90,150,.10);
+    padding:14px 16px; overflow-x:auto; margin:12px 0; font-size:.84rem; line-height:1.55; color:#3a3a42;}
+  .kw{color:var(--kw); font-weight:500;} .str{color:var(--str);} .num{color:var(--num);}
+  .err{color:var(--err); font-weight:700;} .cm{color:var(--cm); font-style:italic;}
+
+  .opts{list-style:none; margin:.4em 0 0; padding:0;}
+  .opts li{margin:7px 0; padding-left:4px; line-height:1.5;}
+  .opt{font-family:'JetBrains Mono',monospace; font-weight:700; color:#7a5cb8; margin-right:9px;}
+  .opts code{background:#f3ece4; color:#9a5030; font-size:.85em; padding:1px 6px; border-radius:6px;}
+
+  /* ANSWER */
+  details{margin-top:14px; border-top:1px dashed #cbb9e6; padding-top:10px;}
+  summary{cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:.82rem; font-weight:700;
+    color:#7a5cb8; list-style:none; user-select:none; display:inline-block; padding:3px 0;}
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸ "; }
+  details[open] summary::before{content:"▾ "; }
+  .ans-key{display:inline-block; background:#eef8f1; color:#3d8a5e; font-family:'JetBrains Mono',monospace;
+    font-weight:700; font-size:.82rem; padding:4px 11px; border-radius:8px; margin:8px 0 6px;}
+  .ans-exp{font-size:.95rem; color:#3f434a; margin:.2em 0;}
+  .ans-exp code{background:#f3ece4; color:#9a5030; font-family:'JetBrains Mono',monospace; font-size:.86em; padding:1px 5px; border-radius:5px;}
+
+  /* QUICK REVISION */
+  .revision{background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c;
+    border-radius:14px; box-shadow:var(--shadow); padding:8px 26px 20px; margin:32px 0 0;}
+  .revision h2{font-family:'Merriweather',serif; font-size:1.2rem; color:#a9772a; margin:.8em 0 .3em;}
+  .revision ul{margin:.3em 0; padding-left:20px;}
+  .revision li{margin:6px 0; font-size:.96rem;}
+  .revision code{background:#f3ece4; color:#9a5030; font-family:'JetBrains Mono',monospace; font-size:.86em; padding:1px 5px; border-radius:5px;}
+
+  .footnote{text-align:center; color:var(--muted); font-size:.84rem; margin-top:34px;}
+  @media(max-width:600px){ header{padding:26px 20px;} .q-card{padding:18px 18px 16px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="badge">OCP Java SE 21 · 1Z0-830</span>
+    <h1>Chapter 5 — Methods · MCQ Practice</h1>
+    <p class="subtitle">29 exam-style questions across the whole chapter — output prediction, compile-error detection, runtime exceptions, and edge-case rules. Reveal each answer below the question.</p>
+    <div class="pills">
+      <span class="pill">designing methods</span>
+      <span class="pill">local &amp; instance vars</span>
+      <span class="pill">varargs</span>
+      <span class="pill">access modifiers</span>
+      <span class="pill">static data</span>
+      <span class="pill">pass-by-value</span>
+      <span class="pill">autoboxing</span>
+      <span class="pill">overloading</span>
+    </div>
+  </header>
+
+  <!-- ============ DESIGNING METHODS ============ -->
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q1</span><span class="q-tag">Designing</span></div>
+    <p class="q-text">Which method declaration does <b>not</b> compile?</p>
+    <ul class="opts">
+      <li><span class="opt">A</span> <code>public final void run() {}</code></li>
+      <li><span class="opt">B</span> <code>final public void run() {}</code></li>
+      <li><span class="opt">C</span> <code>public void final run() {}</code></li>
+      <li><span class="opt">D</span> <code>void run() {}</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">C · Does not compile</div>
+      <p class="ans-exp">Optional specifiers (like <code>final</code>) must come <b>before</b> the return type. In C, <code>final</code> appears after <code>void</code>. B is legal — a specifier may precede the access modifier; D uses package access, which is fine.</p>
+    </details>
+  </div>
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q2</span><span class="q-tag">Designing</span></div>
+    <p class="q-text">How many of these methods compile?</p>
+<pre><span class="kw">public</span> String a() {}
+<span class="kw">public void</span> b() { <span class="kw">return</span>; }
+<span class="kw">public</span> String c() { <span class="kw">return</span> <span class="str">""</span>; }
+String d(<span class="kw">int</span> x) { <span class="kw">if</span>(<span class="num">1</span> &lt; <span class="num">2</span>) <span class="kw">return</span> <span class="str">"hi"</span>; }</pre>
+    <ul class="opts">
+      <li><span class="opt">A</span> 1</li>
+      <li><span class="opt">B</span> 2</li>
+      <li><span class="opt">C</span> 3</li>
+      <li><span class="opt">D</span> 4</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">B · 2</div>
+      <p class="ans-exp">Only <code>b()</code> and <code>c()</code> compile. <code>a()</code> declares <code>String</code> but returns nothing. <code>d()</code> returns only inside the <code>if</code> — the compiler requires a guaranteed return on every path and won't pre-evaluate <code>1&lt;2</code>.</p>
+    </details>
+  </div>
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q3</span><span class="q-tag">Designing</span></div>
+    <p class="q-text">Which pair of methods has the <b>same signature</b> (so they can't coexist in one class)?</p>
+    <ul class="opts">
+      <li><span class="opt">A</span> <code>void fly(int a, int b)</code> &amp; <code>void fly(int b, int a)</code></li>
+      <li><span class="opt">B</span> <code>void fly(int a)</code> &amp; <code>void fly(long a)</code></li>
+      <li><span class="opt">C</span> <code>void fly(int a)</code> &amp; <code>void fly(int... a)</code></li>
+      <li><span class="opt">D</span> <code>void fly(String a)</code> &amp; <code>void fly(int a)</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">A · same signature</div>
+      <p class="ans-exp">A signature is the name plus parameter <b>types and order</b>; names are irrelevant. A has identical types <code>(int, int)</code>, so it's a duplicate. B/D differ by type, and C differs too (<code>int</code> vs <code>int[]</code>).</p>
+    </details>
+  </div>
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q4</span><span class="q-tag">Designing</span></div>
+    <p class="q-text">Which method declaration is <b>legal</b>?</p>
+    <ul class="opts">
+      <li><span class="opt">A</span> <code>public void 2start() {}</code></li>
+      <li><span class="opt">B</span> <code>public void _() {}</code></li>
+      <li><span class="opt">C</span> <code>public void my$Method() {}</code></li>
+      <li><span class="opt">D</span> <code>public int go() {}</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">C · legal</div>
+      <p class="ans-exp">Identifiers may contain <code>$</code> and underscores, so <code>my$Method</code> is fine. A starts with a digit; a single underscore <code>_</code> is reserved (B); D declares <code>int</code> but never returns a value.</p>
+    </details>
+  </div>
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q5</span><span class="q-tag">Designing</span></div>
+    <p class="q-text">Why does this fail to compile?</p>
+<pre><span class="kw">public void</span> run(<span class="kw">int</span> a; <span class="kw">int</span> b) {}</pre>
+    <ul class="opts">
+      <li><span class="opt">A</span> It compiles fine</li>
+      <li><span class="opt">B</span> Parameters must be separated by commas, not semicolons</li>
+      <li><span class="opt">C</span> <code>void</code> methods can't take parameters</li>
+      <li><span class="opt">D</span> The two parameters must have different types</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">B · comma, not semicolon</div>
+      <p class="ans-exp">Parameters in a list are comma-separated. A semicolon is a syntax error. <code>void</code> methods can take parameters, and parameters may share a type.</p>
+    </details>
+  </div>
+
+  <!-- ============ LOCAL & INSTANCE VARIABLES ============ -->
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q6</span><span class="q-tag">Variables</span></div>
+    <p class="q-text"><span class="all">Choose all that apply.</span> Which variables are <b>effectively final</b>?</p>
+<pre>String name = <span class="str">"Hippo"</span>;
+<span class="kw">var</span> size = <span class="num">10</span>;
+<span class="kw">boolean</span> wet;
+<span class="kw">if</span>(size &gt; <span class="num">100</span>) size++;
+name.substring(<span class="num">0</span>);
+wet = <span class="kw">true</span>;</pre>
+    <ul class="opts">
+      <li><span class="opt">A</span> <code>name</code></li>
+      <li><span class="opt">B</span> <code>size</code></li>
+      <li><span class="opt">C</span> <code>wet</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">A, C · name and wet</div>
+      <p class="ans-exp"><code>name</code> is assigned once (<code>substring</code> returns a new String that's discarded — String is immutable). <code>wet</code> is assigned once. <code>size</code> may be reassigned by <code>size++</code>, so it's not effectively final.</p>
+    </details>
+  </div>
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q7</span><span class="q-tag">Variables</span></div>
+    <p class="q-text">What is the result?</p>
+<pre><span class="kw">final int</span> rest;
+<span class="kw">if</span>(isWeekend) rest = <span class="num">5</span>;
+System.out.print(rest);</pre>
+    <ul class="opts">
+      <li><span class="opt">A</span> Compiles and prints <code>5</code></li>
+      <li><span class="opt">B</span> Compiles and prints <code>0</code></li>
+      <li><span class="opt">C</span> Does not compile — <code>rest</code> may be unassigned</li>
+      <li><span class="opt">D</span> Does not compile — a local can't be <code>final</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">C · Does not compile</div>
+      <p class="ans-exp">If <code>isWeekend</code> is false, <code>rest</code> is never assigned, and a <code>final</code> variable has no default. The compiler rejects use of a possibly-unassigned variable. (Locals may absolutely be <code>final</code>.)</p>
+    </details>
+  </div>
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q8</span><span class="q-tag">Variables</span></div>
+    <p class="q-text">What happens with these two lines?</p>
+<pre><span class="kw">final int</span>[] nums = <span class="kw">new int</span>[<span class="num">3</span>];
+nums[<span class="num">0</span>] = <span class="num">1</span>;        <span class="cm">// line A</span>
+nums = <span class="kw">new int</span>[<span class="num">5</span>];  <span class="cm">// line B</span></pre>
+    <ul class="opts">
+      <li><span class="opt">A</span> Both lines compile</li>
+      <li><span class="opt">B</span> Line A compiles; line B does not</li>
+      <li><span class="opt">C</span> Line B compiles; line A does not</li>
+      <li><span class="opt">D</span> Neither compiles</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">B · contents OK, reassign fails</div>
+      <p class="ans-exp"><code>final</code> locks the reference, not the contents. Writing <code>nums[0]</code> mutates the array (fine); reassigning <code>nums</code> to a new array repoints the reference (not allowed).</p>
+    </details>
+  </div>
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q9</span><span class="q-tag">Variables</span></div>
+    <p class="q-text">What is the result?</p>
+<pre><span class="kw">public class</span> Bear {
+  <span class="kw">final int</span> age;
+  <span class="kw">public</span> Bear() { }
+}</pre>
+    <ul class="opts">
+      <li><span class="opt">A</span> Compiles; <code>age</code> defaults to <code>0</code></li>
+      <li><span class="opt">B</span> Compiles; <code>age</code> is <code>null</code></li>
+      <li><span class="opt">C</span> Does not compile — <code>final</code> field is never assigned</li>
+      <li><span class="opt">D</span> Throws an exception at runtime</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">C · Does not compile</div>
+      <p class="ans-exp">A <code>final</code> instance field gets <b>no</b> default and must be assigned at declaration, in an instance initializer, or in <b>every</b> constructor. The empty constructor leaves <code>age</code> unassigned.</p>
+    </details>
+  </div>
+
+  <!-- ============ VARARGS ============ -->
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q10</span><span class="q-tag">Varargs</span></div>
+    <p class="q-text">Which method declaration does <b>not</b> compile?</p>
+    <ul class="opts">
+      <li><span class="opt">A</span> <code>void m(int... a)</code></li>
+      <li><span class="opt">B</span> <code>void m(String s, int... a)</code></li>
+      <li><span class="opt">C</span> <code>void m(int... a, String s)</code></li>
+      <li><span class="opt">D</span> <code>void m(int[] a, String s)</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">C · varargs not last</div>
+      <p class="ans-exp">A varargs parameter must be the last one. D is fine — a plain array parameter has no positional restriction.</p>
+    </details>
+  </div>
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q11</span><span class="q-tag">Varargs</span></div>
+    <p class="q-text">What is printed?</p>
+<pre><span class="kw">static void</span> go(<span class="kw">int</span> x, <span class="kw">int</span>... nums) {
+  System.out.print(nums.length);
+}
+go(<span class="num">1</span>); go(<span class="num">1</span>,<span class="num">2</span>); go(<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>);</pre>
+    <ul class="opts">
+      <li><span class="opt">A</span> <code>012</code></li>
+      <li><span class="opt">B</span> <code>123</code></li>
+      <li><span class="opt">C</span> <code>122</code></li>
+      <li><span class="opt">D</span> <code>111</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">A · 012</div>
+      <p class="ans-exp">The first argument fills <code>x</code>; the rest form the array. So the lengths are 0, 1, and 2. An absent varargs becomes a length-0 array, not null.</p>
+    </details>
+  </div>
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q12</span><span class="q-tag">Varargs</span></div>
+    <p class="q-text">What is the result?</p>
+<pre><span class="kw">static void</span> go(<span class="kw">int</span> x, <span class="kw">int</span>... nums) {
+  System.out.print(nums.length);
+}
+go(<span class="num">1</span>, <span class="kw">null</span>);</pre>
+    <ul class="opts">
+      <li><span class="opt">A</span> Prints <code>0</code></li>
+      <li><span class="opt">B</span> Prints <code>1</code></li>
+      <li><span class="opt">C</span> Does not compile</li>
+      <li><span class="opt">D</span> Throws <code>NullPointerException</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">D · NullPointerException</div>
+      <p class="ans-exp"><code>null</code> isn't an <code>int</code>, so Java passes it as the array reference itself (which is null). It compiles; then <code>nums.length</code> dereferences null at runtime.</p>
+    </details>
+  </div>
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q13</span><span class="q-tag">Varargs</span></div>
+    <p class="q-text">Given <code>void m(int... a)</code>, which call(s) make <code>a</code> a length-0 array?</p>
+    <ul class="opts">
+      <li><span class="opt">A</span> <code>m()</code></li>
+      <li><span class="opt">B</span> <code>m(null)</code></li>
+      <li><span class="opt">C</span> <code>m(new int[0])</code></li>
+      <li><span class="opt">D</span> Both A and C</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">D · both A and C</div>
+      <p class="ans-exp">Passing no values (<code>m()</code>) or an explicit empty array (<code>m(new int[0])</code>) both yield a length-0 array. <code>m(null)</code> makes <code>a</code> null, not empty.</p>
+    </details>
+  </div>
+
+  <!-- ============ ACCESS MODIFIERS ============ -->
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q14</span><span class="q-tag">Access</span></div>
+    <p class="q-text"><code>Bird</code> is in package <code>a</code> with <code>protected void fly()</code>. Which lines compile inside <code>Swan</code> (package <code>b</code>)?</p>
+<pre><span class="kw">package</span> b;
+<span class="kw">public class</span> Swan <span class="kw">extends</span> Bird {
+  <span class="kw">void</span> test() {
+    Bird bird = <span class="kw">new</span> Bird();
+    bird.fly();      <span class="cm">// line X</span>
+    Swan s = <span class="kw">new</span> Swan();
+    s.fly();         <span class="cm">// line Y</span>
+  }
+}</pre>
+    <ul class="opts">
+      <li><span class="opt">A</span> Both X and Y</li>
+      <li><span class="opt">B</span> Only Y</li>
+      <li><span class="opt">C</span> Only X</li>
+      <li><span class="opt">D</span> Neither</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">B · only Y</div>
+      <p class="ans-exp">From a subclass in another package, <code>protected</code> access through a variable requires the reference type to be the subclass (or lower). <code>s</code> is a <code>Swan</code> (OK); <code>bird</code> is a <code>Bird</code> parent reference (denied).</p>
+    </details>
+  </div>
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q15</span><span class="q-tag">Access</span></div>
+    <p class="q-text"><span class="all">Choose all that apply.</span> A method with <b>package (default)</b> access can be called from…</p>
+    <ul class="opts">
+      <li><span class="opt">A</span> the same class</li>
+      <li><span class="opt">B</span> a different class in the same package</li>
+      <li><span class="opt">C</span> a subclass in a different package</li>
+      <li><span class="opt">D</span> an unrelated class in a different package</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">A, B · same class &amp; same package</div>
+      <p class="ans-exp">Package access reaches the same class and any class in the same package — and stops there. Crossing package boundaries (C and D) needs <code>protected</code> or <code>public</code>.</p>
+    </details>
+  </div>
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q16</span><span class="q-tag">Access</span></div>
+    <p class="q-text"><code>A</code> and <code>B</code> are both in package <code>zoo</code>. What is the result?</p>
+<pre><span class="kw">public class</span> A { <span class="kw">private int</span> x = <span class="num">5</span>; }
+
+<span class="kw">public class</span> B {
+  <span class="kw">void</span> test() {
+    A a = <span class="kw">new</span> A();
+    System.out.print(a.x);
+  }
+}</pre>
+    <ul class="opts">
+      <li><span class="opt">A</span> Prints <code>5</code></li>
+      <li><span class="opt">B</span> Does not compile — <code>x</code> is private</li>
+      <li><span class="opt">C</span> Prints <code>0</code></li>
+      <li><span class="opt">D</span> Throws an exception</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">B · private is class-only</div>
+      <p class="ans-exp"><code>private</code> restricts access to the same class — being in the same package doesn't help. <code>B</code> cannot read <code>A.x</code>.</p>
+    </details>
+  </div>
+
+  <!-- ============ STATIC DATA ============ -->
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q17</span><span class="q-tag">Static</span></div>
+    <p class="q-text">What is printed?</p>
+<pre><span class="kw">public class</span> Snake {
+  <span class="kw">static int</span> hiss = <span class="num">2</span>;
+  <span class="kw">public static void</span> main(String[] a) {
+    Snake s = <span class="kw">new</span> Snake();
+    s = <span class="kw">null</span>;
+    System.out.println(s.hiss);
+  }
+}</pre>
+    <ul class="opts">
+      <li><span class="opt">A</span> <code>2</code></li>
+      <li><span class="opt">B</span> <code>0</code></li>
+      <li><span class="opt">C</span> <code>NullPointerException</code></li>
+      <li><span class="opt">D</span> Does not compile</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">A · 2 (no NPE)</div>
+      <p class="ans-exp">A static member accessed through a reference uses the reference's <b>type</b>, not the object — so the null reference is never dereferenced. It reads <code>Snake.hiss</code>, which is 2.</p>
+    </details>
+  </div>
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q18</span><span class="q-tag">Static</span></div>
+    <p class="q-text">What is printed?</p>
+<pre><span class="kw">public class</span> Counter {
+  <span class="kw">static int</span> count;
+  <span class="kw">public</span> Counter() { count++; }
+  <span class="kw">public static void</span> main(String[] a) {
+    <span class="kw">new</span> Counter(); <span class="kw">new</span> Counter(); <span class="kw">new</span> Counter();
+    System.out.print(count);
+  }
+}</pre>
+    <ul class="opts">
+      <li><span class="opt">A</span> <code>0</code></li>
+      <li><span class="opt">B</span> <code>1</code></li>
+      <li><span class="opt">C</span> <code>3</code></li>
+      <li><span class="opt">D</span> Does not compile</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">C · 3</div>
+      <p class="ans-exp">There's one shared <code>count</code> for the whole class. Each constructor call increments the same variable, so after three objects it's 3.</p>
+    </details>
+  </div>
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q19</span><span class="q-tag">Static</span></div>
+    <p class="q-text">What is the result?</p>
+<pre><span class="kw">public class</span> Zoo {
+  <span class="kw">private</span> String name = <span class="str">"Leo"</span>;
+  <span class="kw">public static void</span> main(String[] a) {
+    System.out.print(name);
+  }
+}</pre>
+    <ul class="opts">
+      <li><span class="opt">A</span> Prints <code>Leo</code></li>
+      <li><span class="opt">B</span> Prints <code>null</code></li>
+      <li><span class="opt">C</span> Does not compile — static <code>main</code> can't use instance variable <code>name</code></li>
+      <li><span class="opt">D</span> Throws an exception</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">C · Does not compile</div>
+      <p class="ans-exp">A static method has no implicit object, so it can't reference the instance variable <code>name</code> without a reference. Either make <code>name</code> static or access it via <code>new Zoo().name</code>.</p>
+    </details>
+  </div>
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q20</span><span class="q-tag">Static</span></div>
+    <p class="q-text">Which line(s) cause a compile error?</p>
+<pre><span class="num">1:</span> <span class="kw">static final int</span> a;
+<span class="num">2:</span> <span class="kw">static final int</span> b = <span class="num">2</span>;
+<span class="num">3:</span> <span class="kw">static</span> { a = <span class="num">1</span>; b = <span class="num">3</span>; }</pre>
+    <ul class="opts">
+      <li><span class="opt">A</span> Only <code>b = 3</code> on line 3</li>
+      <li><span class="opt">B</span> Lines 2 and 3</li>
+      <li><span class="opt">C</span> Lines 1 and 3</li>
+      <li><span class="opt">D</span> Nothing — it all compiles</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">A · only b = 3</div>
+      <p class="ans-exp"><code>a</code> is final-but-unassigned, so the static initializer setting <code>a = 1</code> is its one valid assignment. <code>b</code> was already assigned on line 2, so <code>b = 3</code> is a forbidden second assignment.</p>
+    </details>
+  </div>
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q21</span><span class="q-tag">Static</span></div>
+    <p class="q-text">Which import statement is valid?</p>
+    <ul class="opts">
+      <li><span class="opt">A</span> <code>import static java.util.Arrays;</code></li>
+      <li><span class="opt">B</span> <code>static import java.util.Arrays.asList;</code></li>
+      <li><span class="opt">C</span> <code>import static java.util.Arrays.asList;</code></li>
+      <li><span class="opt">D</span> <code>import java.util.Arrays.* static;</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">C · valid</div>
+      <p class="ans-exp">The keyword order is <code>import static</code>, and it must target a member, not a class. A imports a class (invalid for static import); B has the keywords reversed; D is malformed.</p>
+    </details>
+  </div>
+
+  <!-- ============ PASSING DATA / AUTOBOXING ============ -->
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q22</span><span class="q-tag">Pass-by-value</span></div>
+    <p class="q-text">What is printed?</p>
+<pre><span class="kw">public static void</span> main(String[] a) {
+  <span class="kw">int</span> x = <span class="num">5</span>;
+  StringBuilder sb = <span class="kw">new</span> StringBuilder(<span class="str">"Hi"</span>);
+  modify(x, sb);
+  System.out.println(x + sb);
+}
+<span class="kw">static void</span> modify(<span class="kw">int</span> x, StringBuilder sb) {
+  x = <span class="num">10</span>;
+  sb.append(<span class="str">"There"</span>);
+}</pre>
+    <ul class="opts">
+      <li><span class="opt">A</span> <code>5HiThere</code></li>
+      <li><span class="opt">B</span> <code>10HiThere</code></li>
+      <li><span class="opt">C</span> <code>5Hi</code></li>
+      <li><span class="opt">D</span> <code>10Hi</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">A · 5HiThere</div>
+      <p class="ans-exp">Java is pass-by-value. Reassigning the <code>int</code> parameter doesn't touch the caller's <code>x</code> (stays 5). But <code>append</code> mutates the shared <code>StringBuilder</code>, so it becomes <code>HiThere</code>.</p>
+    </details>
+  </div>
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q23</span><span class="q-tag">Pass-by-value</span></div>
+    <p class="q-text">What is printed?</p>
+<pre>String s = <span class="str">"abc"</span>;
+s.concat(<span class="str">"d"</span>);
+s.toUpperCase();
+System.out.println(s);</pre>
+    <ul class="opts">
+      <li><span class="opt">A</span> <code>abc</code></li>
+      <li><span class="opt">B</span> <code>abcd</code></li>
+      <li><span class="opt">C</span> <code>ABCD</code></li>
+      <li><span class="opt">D</span> <code>ABC</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">A · abc</div>
+      <p class="ans-exp">String is immutable: <code>concat</code> and <code>toUpperCase</code> each return a <b>new</b> String that is discarded because the return value isn't assigned. The original <code>s</code> is unchanged.</p>
+    </details>
+  </div>
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q24</span><span class="q-tag">Autoboxing</span></div>
+    <p class="q-text">Which assignment does <b>not</b> compile?</p>
+    <ul class="opts">
+      <li><span class="opt">A</span> <code>long x = Integer.valueOf(5);</code></li>
+      <li><span class="opt">B</span> <code>Long y = 5L;</code></li>
+      <li><span class="opt">C</span> <code>Long z = 5;</code></li>
+      <li><span class="opt">D</span> <code>Integer w = 5;</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">C · widen + box at once</div>
+      <p class="ans-exp"><code>5</code> is an <code>int</code>; assigning it to <code>Long</code> needs widening (<code>int</code>→<code>long</code>) <b>and</b> boxing in one step, which Java won't do. A unboxes then widens (allowed); B and D are plain autoboxing.</p>
+    </details>
+  </div>
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q25</span><span class="q-tag">Autoboxing</span></div>
+    <p class="q-text">What is the result?</p>
+<pre>Integer count = <span class="kw">null</span>;
+<span class="kw">int</span> x = count;
+System.out.println(x);</pre>
+    <ul class="opts">
+      <li><span class="opt">A</span> Prints <code>0</code></li>
+      <li><span class="opt">B</span> Prints <code>null</code></li>
+      <li><span class="opt">C</span> Does not compile</li>
+      <li><span class="opt">D</span> Throws <code>NullPointerException</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">D · NullPointerException</div>
+      <p class="ans-exp">Assigning a <code>null</code> wrapper to a primitive requires unboxing <code>null</code>, which throws <code>NullPointerException</code> at runtime. It compiles fine — that's the trap.</p>
+    </details>
+  </div>
+
+  <!-- ============ OVERLOADING ============ -->
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q26</span><span class="q-tag">Overloading</span></div>
+    <p class="q-text">What is printed?</p>
+<pre><span class="kw">static void</span> p(<span class="kw">int</span> i)    { System.out.print(<span class="str">"int"</span>); }
+<span class="kw">static void</span> p(<span class="kw">long</span> l)   { System.out.print(<span class="str">"long"</span>); }
+<span class="kw">static void</span> p(Object o) { System.out.print(<span class="str">"obj"</span>); }
+<span class="kw">public static void</span> main(String[] a) { p(<span class="num">5</span>); }</pre>
+    <ul class="opts">
+      <li><span class="opt">A</span> <code>int</code></li>
+      <li><span class="opt">B</span> <code>long</code></li>
+      <li><span class="opt">C</span> <code>obj</code></li>
+      <li><span class="opt">D</span> Does not compile</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">A · int</div>
+      <p class="ans-exp"><code>5</code> is an <code>int</code> literal, so the exact-match <code>p(int)</code> wins. Widening to <code>long</code> or boxing to <code>Object</code> are only considered when no exact match exists.</p>
+    </details>
+  </div>
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q27</span><span class="q-tag">Overloading</span></div>
+    <p class="q-text">What is printed?</p>
+<pre><span class="kw">static void</span> p(Integer i) { System.out.print(<span class="str">"Integer"</span>); }
+<span class="kw">static void</span> p(<span class="kw">long</span> l)    { System.out.print(<span class="str">"long"</span>); }
+<span class="kw">public static void</span> main(String[] a) {
+  <span class="kw">int</span> x = <span class="num">5</span>;
+  p(x);
+}</pre>
+    <ul class="opts">
+      <li><span class="opt">A</span> <code>Integer</code></li>
+      <li><span class="opt">B</span> <code>long</code></li>
+      <li><span class="opt">C</span> Does not compile</li>
+      <li><span class="opt">D</span> Ambiguous — won't compile</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">B · long</div>
+      <p class="ans-exp">For an <code>int</code> argument, widening to <code>long</code> is preferred over autoboxing to <code>Integer</code>. Boxing is a later step in the resolution order, so <code>p(long)</code> wins.</p>
+    </details>
+  </div>
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q28</span><span class="q-tag">Overloading</span></div>
+    <p class="q-text">Which pair does <b>not</b> compile together?</p>
+    <ul class="opts">
+      <li><span class="opt">A</span> <code>void m(int a)</code> &amp; <code>void m(int a, int b)</code></li>
+      <li><span class="opt">B</span> <code>void m(int a)</code> &amp; <code>long m(int a)</code></li>
+      <li><span class="opt">C</span> <code>void m(int a)</code> &amp; <code>void m(double a)</code></li>
+      <li><span class="opt">D</span> <code>void m(String a)</code> &amp; <code>void m(StringBuilder a)</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">B · differ only by return type</div>
+      <p class="ans-exp">B has the same name and the same parameter list, differing only in return type — that's not overloading, it's a duplicate method. The others have distinct parameter lists.</p>
+    </details>
+  </div>
+
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q29</span><span class="q-tag">Overloading</span></div>
+    <p class="q-text">What is printed?</p>
+<pre><span class="kw">static void</span> g(<span class="kw">int</span>... a)      { System.out.print(<span class="str">"var"</span>); }
+<span class="kw">static void</span> g(<span class="kw">int</span> a, <span class="kw">int</span> b) { System.out.print(<span class="str">"two"</span>); }
+<span class="kw">public static void</span> main(String[] x) { g(<span class="num">1</span>, <span class="num">2</span>); }</pre>
+    <ul class="opts">
+      <li><span class="opt">A</span> <code>var</code></li>
+      <li><span class="opt">B</span> <code>two</code></li>
+      <li><span class="opt">C</span> Does not compile</li>
+      <li><span class="opt">D</span> Ambiguous — won't compile</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-key">B · two</div>
+      <p class="ans-exp">An exact fixed-arity match (<code>g(int, int)</code>) always beats a varargs method. Varargs is the last resort in overload resolution.</p>
+    </details>
+  </div>
+
+  <!-- ============ QUICK REVISION ============ -->
+  <div class="revision">
+    <h2>Quick Revision — core traps</h2>
+    <ul>
+      <li><b>Declarations:</b> modifiers/specifiers go before the return type; <code>default</code> isn't an access modifier; signature = name + parameter types &amp; order (names don't count).</li>
+      <li><b>final:</b> locks the reference, not the contents; a <code>final</code> field/local has no default and must be assigned before use. Effectively final = never reassigned.</li>
+      <li><b>Varargs:</b> at most one, must be last; no args → length-0 array; passing <code>null</code> compiles, then throws NPE.</li>
+      <li><b>Access:</b> <code>private</code> is class-only even in the same package; package access has no keyword; <code>protected</code> through a variable checks the declared reference type.</li>
+      <li><b>Static:</b> belongs to the class; access via a null reference gives no NPE; a static member can't reach instance members without a reference; <code>final</code> static may be assigned once.</li>
+      <li><b>Pass-by-value:</b> reassigning a parameter never affects the caller; mutating a shared object does; ignored return values change nothing (immutability of String).</li>
+      <li><b>Autoboxing:</b> widen <em>or</em> box, never both at once (<code>Long x = 8;</code> fails); unboxing <code>null</code> → NPE.</li>
+      <li><b>Overloading:</b> resolution order is exact → widening → autoboxing → varargs; differing only by return type is a duplicate method.</li>
+    </ul>
+  </div>
+
+  <p class="footnote">Based on <i>OCP Java SE 21 Developer Study Guide</i> (Boyarsky &amp; Selikoff), Chapter 5: Methods · Exam 1Z0-830.</p>
+
+</div>
+</body>
+</html>

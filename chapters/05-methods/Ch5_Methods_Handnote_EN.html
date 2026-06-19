@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 — Chapter 5: Methods (Complete Handnote)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --page:#f4f6f8; --card:#ffffff; --ink:#33373d; --muted:#6b7079;
+    --accent:#c96442; --accent2:#d4845e;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --shadow:0 4px 18px rgba(40,44,52,.07);
+    --shadow-hover:0 10px 30px rgba(40,44,52,.13);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--page); color:var(--ink);
+    font-family:'Source Sans 3',system-ui,sans-serif; font-size:16.5px; line-height:1.72; padding:0 0 80px;}
+  .wrap{max-width:920px; margin:0 auto; padding:0 22px;}
+  h1,h2,h3,h4{font-family:'Merriweather',serif; line-height:1.35; color:#2a2d33;}
+  a{color:var(--accent); text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  p{margin:.6em 0;}
+
+  header{background:linear-gradient(135deg,#ffffff 0%,#fbf7f4 100%);
+    box-shadow:var(--shadow); border-radius:0 0 26px 26px; padding:42px 22px 34px; margin-bottom:30px;}
+  .badge{display:inline-block; background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#fff; font-weight:700; font-size:.8rem; letter-spacing:.4px; padding:7px 16px; border-radius:999px; box-shadow:0 3px 10px rgba(201,100,66,.28);}
+  header h1{font-size:2.1rem; margin:.45em 0 .15em; font-weight:900;}
+  header .subtitle{color:var(--muted); font-size:1.06rem; margin:0 0 18px; max-width:680px;}
+  .objectives{background:linear-gradient(135deg,#f0f9f3,#f7fcf8); border-left:5px solid #5aab7b;
+    border-radius:12px; padding:14px 18px; font-size:.96rem;}
+  .objectives strong{font-family:'Merriweather',serif; display:block; margin-bottom:5px; color:#3b7d57;}
+  .objectives ul{margin:.3em 0; padding-left:20px;}
+
+  .toc{background:var(--card); border-radius:14px; box-shadow:var(--shadow); padding:22px 26px; margin-bottom:34px; transition:box-shadow .25s;}
+  .toc:hover{box-shadow:var(--shadow-hover);}
+  .toc h2{font-size:1.15rem; margin:0 0 12px; border:none;}
+  .toc ol{margin:0; padding-left:22px; columns:2; column-gap:34px;}
+  .toc li{margin:5px 0; break-inside:avoid;}
+  @media(max-width:640px){.toc ol{columns:1;}}
+
+  section{margin-bottom:46px;}
+  .sec-num{font-family:'JetBrains Mono',monospace; color:var(--accent); font-weight:700; font-size:.95rem; letter-spacing:1px;}
+  section > h2{font-size:1.5rem; margin:.1em 0 .7em; padding-bottom:10px; border-bottom:2px solid #ece3da;}
+  h3{font-size:1.18rem; margin:1.5em 0 .4em;}
+  h4{font-size:1.02rem; margin:1.1em 0 .3em; color:#444;}
+
+  pre{background:#fdfaf7; border-radius:12px; box-shadow:inset 0 2px 8px rgba(120,90,60,.09);
+    padding:16px 18px; overflow-x:auto; margin:14px 0;
+    font-family:'JetBrains Mono',monospace; font-size:.86rem; line-height:1.6; color:#3a3a42;}
+  code.inline{background:#f3ece4; color:#9a5030; font-family:'JetBrains Mono',monospace; font-size:.86em; padding:2px 6px; border-radius:6px;}
+  .kw{color:var(--kw); font-weight:500;}
+  .str{color:var(--str);}
+  .num{color:var(--num);}
+  .err{color:var(--err); font-weight:700;}
+  .cm{color:var(--cm); font-style:italic;}
+
+  .tbl-wrap{overflow-x:auto; margin:16px 0;}
+  table{width:100%; border-collapse:separate; border-spacing:0; background:var(--card);
+    border-radius:12px; overflow:hidden; box-shadow:var(--shadow); font-size:.92rem;}
+  th,td{padding:10px 14px; text-align:left; border-bottom:1px solid #f0ece6; vertical-align:top;}
+  th{background:#f0e8de; font-family:'Merriweather',serif; font-weight:700; font-size:.88rem; color:#5a4f43;}
+  tr:last-child td{border-bottom:none;}
+  td .yes{color:#3b7d57; font-weight:700;}
+  td .no{color:var(--err); font-weight:700;}
+
+  .exam-trap,.key-rule,.remember{border-radius:14px; padding:15px 20px 15px 22px; margin:16px 0; box-shadow:var(--shadow); transition:box-shadow .25s;}
+  .exam-trap:hover,.key-rule:hover,.remember:hover{box-shadow:var(--shadow-hover);}
+  .exam-trap .label,.key-rule .label,.remember .label{font-family:'Merriweather',serif; font-weight:700; font-size:.8rem; letter-spacing:.5px; text-transform:uppercase; display:block; margin-bottom:5px;}
+  .exam-trap p,.key-rule p,.remember p{margin:.35em 0;}
+  .exam-trap{background:linear-gradient(135deg,#fef2f0,#fff8f7); border-left:5px solid #e06b5e;}
+  .exam-trap .label{color:#c0453a;}
+  .key-rule{background:linear-gradient(135deg,#f0f9f3,#f7fcf8); border-left:5px solid #5aab7b;}
+  .key-rule .label{color:#3b7d57;}
+  .remember{background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c;}
+  .remember .label{color:#a9772a;}
+
+  .rules-box{background:linear-gradient(135deg,#eef9f1,#f6fcf8); border-top:4px solid #5aab7b;
+    border-radius:14px; padding:18px 22px; margin:18px 0; box-shadow:var(--shadow);}
+  .rules-box h4{margin-top:0; color:#3b7d57;}
+  .rules-box ol,.rules-box ul{margin:.4em 0; padding-left:22px;}
+  .rules-box li{margin:6px 0;}
+
+  .vs-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0;}
+  @media(max-width:640px){.vs-grid{grid-template-columns:1fr;}}
+  .vs-grid .vs-card{background:var(--card); border-radius:14px; box-shadow:var(--shadow); padding:16px 18px; transition:box-shadow .25s;}
+  .vs-grid .vs-card:hover{box-shadow:var(--shadow-hover);}
+  .vs-grid .vs-card h4{margin:0 0 8px; font-size:1rem;}
+  .vs-grid .vs-card.left h4{color:var(--kw);}
+  .vs-grid .vs-card.right h4{color:#3b7d57;}
+  .vs-grid ul{margin:.3em 0; padding-left:18px; font-size:.93rem;}
+
+  .recap{background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-radius:14px; box-shadow:var(--shadow); padding:6px 24px 18px;}
+  .recap h3{color:#a9772a; font-size:1.05rem; margin:1.1em 0 .2em;}
+  .recap ul{margin:.2em 0 .5em; padding-left:20px;}
+  .recap li{margin:5px 0;}
+
+  .footnote{text-align:center; color:var(--muted); font-size:.85rem; margin-top:40px;}
+  .trace{font-size:.95rem; padding-left:18px;}
+  .trace li{margin:4px 0;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <span class="badge">OCP Java SE 21 Developer — Exam 1Z0-830</span>
+    <h1>Chapter 5 · Methods <span style="font-size:1rem;color:var(--muted);font-weight:400;font-family:'Source Sans 3';">(Complete Handnote)</span></h1>
+    <p class="subtitle">The full chapter, end to end — every section explained step by step with the book's examples traced line by line. Built to learn from and to teach with. Ends with a short recap and a consolidated exam-traps cheat sheet.</p>
+    <div class="objectives">
+      <strong>Full chapter coverage (7 sections)</strong>
+      <ul>
+        <li>Designing Methods · Local &amp; Instance Variables · Varargs</li>
+        <li>Access Modifiers · Static Data · Passing Data among Methods · Overloading</li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <nav class="toc">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#s1">1. Designing Methods</a></li>
+      <li><a href="#s2">2. Local &amp; Instance Variables</a></li>
+      <li><a href="#s3">3. Working with Varargs</a></li>
+      <li><a href="#s4">4. Applying Access Modifiers</a></li>
+      <li><a href="#s5">5. Accessing Static Data</a></li>
+      <li><a href="#s6">6. Passing Data among Methods</a></li>
+      <li><a href="#s7">7. Overloading Methods</a></li>
+      <li><a href="#recap">8. Short Recap</a></li>
+      <li><a href="#traps">9. Exam Traps Cheat Sheet</a></li>
+    </ol>
+  </nav>
+
+  <!-- ================= SECTION 1 : DESIGNING METHODS ================= -->
+  <section id="s1">
+    <div class="sec-num">SECTION 01</div>
+    <h2>Designing Methods</h2>
+    <p>Before anything else, you need to recognize a valid method declaration on sight — the exam constantly shows you slightly-broken ones. A declaration has parts that come in a fixed order once you reach the return type. Here is the full anatomy:</p>
+
+<pre><span class="kw">public final</span> <span class="kw">void</span> nap(<span class="kw">int</span> minutes) <span class="kw">throws</span> InterruptedException { }
+<span class="cm">//  ^access  ^specifier  ^return  ^name  ^params           ^exception list   ^body</span></pre>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Part</th><th>Example</th><th>Required?</th></tr></thead>
+      <tbody>
+        <tr><td>Access modifier</td><td><code class="inline">public</code></td><td><span class="no">No</span></td></tr>
+        <tr><td>Optional specifier</td><td><code class="inline">final</code></td><td><span class="no">No</span></td></tr>
+        <tr><td>Return type</td><td><code class="inline">void</code></td><td><span class="yes">Yes</span></td></tr>
+        <tr><td>Method name</td><td><code class="inline">nap</code></td><td><span class="yes">Yes</span></td></tr>
+        <tr><td>Parameter list</td><td><code class="inline">(int minutes)</code></td><td><span class="yes">Yes</span> (may be empty)</td></tr>
+        <tr><td>Exception list</td><td><code class="inline">throws InterruptedException</code></td><td><span class="no">No</span></td></tr>
+        <tr><td>Method body</td><td><code class="inline">{ }</code></td><td><span class="yes">Yes</span> (except <code class="inline">abstract</code>)</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3>Access modifiers &amp; optional specifiers</h3>
+    <p>The four access levels are <code class="inline">public</code>, <code class="inline">protected</code>, <code class="inline">private</code>, and package (no keyword) — full details in Section 4. The <b>optional specifiers</b> are extra keywords like <code class="inline">static</code>, <code class="inline">abstract</code>, <code class="inline">final</code>, <code class="inline">default</code>, <code class="inline">synchronized</code>, <code class="inline">native</code>, and <code class="inline">strictfp</code>. Only the first few are on the exam.</p>
+
+<pre><span class="kw">public class</span> ParkTrip {
+  <span class="kw">public void</span> skip1() {}
+  <span class="kw">default void</span> skip2() {} <span class="cm">// DOES NOT COMPILE - default is for interfaces, not classes</span>
+  <span class="kw">void public</span> skip3() {} <span class="cm">// DOES NOT COMPILE - access modifier after the return type</span>
+  <span class="kw">void</span> skip4() {}          <span class="cm">// OK - package access (no keyword)</span>
+}</pre>
+
+    <div class="key-rule">
+      <span class="label">Key Rule — ordering</span>
+      <p>Access modifier and optional specifiers may appear in <b>any order</b> relative to each other, and a specifier may even come before the access modifier. But <b>all of them must come before the return type</b>. Nothing extra may appear after the return type except the name.</p>
+    </div>
+
+<pre><span class="kw">public static final void</span> bike3() {}  <span class="cm">// OK</span>
+<span class="kw">public final static void</span> bike4() {}  <span class="cm">// OK - specifier order is free</span>
+<span class="kw">final public void</span> bike7() {}        <span class="cm">// OK - specifier before access modifier (legal!)</span>
+<span class="kw">public</span> modifier <span class="kw">void</span> bike5() {}     <span class="cm">// DOES NOT COMPILE - 'modifier' isn't a real specifier</span>
+<span class="kw">public void final</span> bike6() {}        <span class="cm">// DOES NOT COMPILE - specifier after the return type</span></pre>
+
+    <div class="exam-trap">
+      <span class="label">Exam Trap — default and abstract</span>
+      <p><code class="inline">default</code> is a real keyword (used in <code class="inline">switch</code> and interface methods) but it is <b>never</b> a method access modifier — package access has no keyword. Also, <code class="inline">abstract</code> and <code class="inline">final</code> can't be combined (an abstract method must be overridden; a final one can't be), and an <code class="inline">abstract</code> method has no body.</p>
+    </div>
+
+    <h3>Return type &amp; return statements</h3>
+    <div class="key-rule">
+      <span class="label">Key Rule</span>
+      <p>Every method must declare a return type — use <code class="inline">void</code> if nothing comes back. A non-<code class="inline">void</code> method must have a reachable <code class="inline">return</code> that returns a value assignable to that type.</p>
+    </div>
+<pre><span class="kw">public</span> String hike4() {}            <span class="cm">// DOES NOT COMPILE - missing return</span>
+<span class="kw">public</span> hike5() {}                   <span class="cm">// DOES NOT COMPILE - missing return type</span>
+<span class="kw">public</span> String <span class="kw">int</span> hike6() {}        <span class="cm">// DOES NOT COMPILE - two return types</span>
+String hike7(<span class="kw">int</span> a) {              <span class="cm">// DOES NOT COMPILE - return only inside the if</span>
+  <span class="kw">if</span> (<span class="num">1</span> &lt; <span class="num">2</span>) <span class="kw">return</span> <span class="str">"orange"</span>;
+}
+
+<span class="kw">int</span> getHeight2() { <span class="kw">int</span> t = <span class="num">9L</span>; <span class="kw">return</span> t; }  <span class="cm">// DOES NOT COMPILE - long does not fit int</span>
+<span class="kw">int</span> getHeight3() { <span class="kw">long</span> t = <span class="num">9L</span>; <span class="kw">return</span> t; } <span class="cm">// DOES NOT COMPILE - returning long as int</span></pre>
+    <div class="remember">
+      <span class="label">Remember</span>
+      <p>The compiler will not pre-evaluate <code class="inline">if(1&lt;2)</code> as "always true"; it still demands a guaranteed return on every path. Code <em>after</em> a guaranteed return is a warning (dead code), not an error.</p>
+    </div>
+
+    <h3>Method name</h3>
+    <p>A method name follows the same rules as any identifier: it must start with a letter, <code class="inline">$</code>, or <code class="inline">_</code>; subsequent characters may include digits; it can't be a reserved word; and a single underscore <code class="inline">_</code> is illegal on its own.</p>
+<pre><span class="kw">public void</span> jog1() {}    <span class="cm">// OK</span>
+<span class="kw">public void</span> 2jog() {}    <span class="cm">// DOES NOT COMPILE - starts with a digit</span>
+<span class="kw">public void</span> Jog_$() {}   <span class="cm">// OK - ugly but legal</span>
+<span class="kw">public void</span> _() {}       <span class="cm">// DOES NOT COMPILE - a single underscore is reserved</span></pre>
+
+    <h3>Parameter list, exceptions &amp; body</h3>
+    <p>The parameter list is required but may be empty <code class="inline">()</code>. Multiple parameters are separated by <b>commas</b>. The optional exception list (<code class="inline">throws ...</code>) comes after the parameters — covered in Chapter 11. The body is braces <code class="inline">{ }</code>, required for every method except <code class="inline">abstract</code> ones.</p>
+<pre><span class="kw">public void</span> run4(<span class="kw">int</span> a; <span class="kw">int</span> b) {} <span class="cm">// DOES NOT COMPILE - use ',' not ';'</span></pre>
+
+    <h3>Method signature</h3>
+    <p>The <b>signature</b> is the method name plus the parameter list. Crucially, only the parameter <b>types and their order</b> count — parameter <em>names</em> are not part of the signature. Two methods with the same signature can't coexist.</p>
+<pre><span class="cm">// DOES NOT COMPILE - same signature (names are irrelevant)</span>
+<span class="kw">public void</span> visitZoo(String name, <span class="kw">int</span> waitTime) {}
+<span class="kw">public void</span> visitZoo(String attraction, <span class="kw">int</span> rainFall) {}
+
+<span class="cm">// OK - the type order differs, so the signatures differ</span>
+<span class="kw">public void</span> visitZoo(String name, <span class="kw">int</span> waitTime) {}
+<span class="kw">public void</span> visitZoo(<span class="kw">int</span> rainFall, String attraction) {}</pre>
+  </section>
+
+  <!-- ================= SECTION 2 : LOCAL & INSTANCE VARIABLES ================= -->
+  <section id="s2">
+    <div class="sec-num">SECTION 02</div>
+    <h2>Local &amp; Instance Variables</h2>
+    <p>The variables you use inside a method versus the ones that live on a class behave differently. The two things that set them apart are <b>where</b> they can be seen (scope) and <b>how long</b> they live (lifetime). Look at this <code class="inline">Lion</code> example:</p>
+
+<pre><span class="kw">public class</span> Lion {
+  <span class="kw">int</span> hunger = <span class="num">4</span>;                 <span class="cm">// instance variable</span>
+
+  <span class="kw">public int</span> feedZooAnimals() {
+    <span class="kw">int</span> snack = <span class="num">10</span>;             <span class="cm">// local variable</span>
+    <span class="kw">if</span>(snack &gt; <span class="num">4</span>) {
+      <span class="kw">long</span> dinnerTime = snack++; <span class="cm">// local variable (only in this if-block)</span>
+      hunger--;
+    }
+    <span class="kw">return</span> snack;
+  }
+}</pre>
+
+    <div class="vs-grid">
+      <div class="vs-card left">
+        <h4>Local variable</h4>
+        <ul>
+          <li>Declared inside a method/block</li>
+          <li>Only modifier allowed: <code class="inline">final</code></li>
+          <li>No default value — must be assigned before use</li>
+          <li>Reference destroyed when the block ends</li>
+        </ul>
+      </div>
+      <div class="vs-card right">
+        <h4>Instance variable</h4>
+        <ul>
+          <li>A member of the class, one per object</li>
+          <li>Modifiers: <code class="inline">final</code>, <code class="inline">volatile</code>, <code class="inline">transient</code> (+ access)</li>
+          <li>Gets a default value (0, null, false...)</li>
+          <li>If <code class="inline">final</code>, gets <b>no</b> default</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>The only modifier on a local variable: <code class="inline">final</code></h3>
+<pre><span class="kw">final int</span> rest;
+<span class="kw">if</span>(isWeekend) rest = <span class="num">5</span>; <span class="kw">else</span> rest = <span class="num">20</span>;
+System.out.print(rest);            <span class="cm">// OK - assigned on both paths</span>
+
+<span class="kw">final var</span> giraffe = <span class="kw">new</span> Animal();
+giraffe = <span class="kw">new</span> Animal();           <span class="cm">// DOES NOT COMPILE - reassigning a final</span></pre>
+    <p>Note that <code class="inline">final int rest;</code> needs no value at declaration. The rule is just: assign it exactly once before use. If a path leaves it unassigned, it won't compile.</p>
+
+    <div class="exam-trap">
+      <span class="label">Exam Trap — final reference vs contents</span>
+      <p><code class="inline">final</code> locks the <b>reference</b>, not the object's internals:</p>
+<pre><span class="kw">final int</span>[] friends = <span class="kw">new int</span>[<span class="num">5</span>];
+friends[<span class="num">2</span>] = <span class="num">2</span>;     <span class="cm">// OK - mutate array contents</span>
+friends = <span class="kw">null</span>;      <span class="cm">// DOES NOT COMPILE - repointing the variable</span></pre>
+    </div>
+
+    <h3>Effectively final</h3>
+    <div class="remember">
+      <span class="label">Remember — the quick test</span>
+      <p>A local variable is <b>effectively final</b> if it's never reassigned after its first value. Test: add <code class="inline">final</code>; if it still compiles, it was effectively final.</p>
+    </div>
+<pre><span class="num">12:</span> String name = <span class="str">"Harry the Hippo"</span>;  <span class="cm">// effectively final</span>
+<span class="num">13:</span> <span class="kw">var</span> size = <span class="num">10</span>;
+<span class="num">15:</span> <span class="kw">if</span>(size &gt; <span class="num">100</span>) size++;          <span class="cm">// size CAN change -> NOT effectively final</span>
+<span class="num">16:</span> name.substring(<span class="num">0</span>);              <span class="cm">// returns a new String, discarded; name unchanged</span>
+<span class="num">17:</span> <span class="kw">boolean</span> wet = <span class="kw">true</span>;             <span class="cm">// effectively final</span></pre>
+    <div class="remember">
+      <span class="label">Remember — why it matters</span>
+      <p>Method/constructor <b>parameters</b> are really pre-initialized locals. The final / effectively-final rule becomes important with <b>lambdas and local classes</b> (Ch. 7–8), which may only capture final or effectively-final locals.</p>
+    </div>
+
+    <h3>Final instance variables</h3>
+    <p>A <code class="inline">final</code> instance variable must be assigned exactly once, in one of three spots — at declaration, in an instance initializer, or in a constructor.</p>
+<pre><span class="kw">public class</span> PolarBear {
+  <span class="kw">final int</span> age = <span class="num">10</span>;     <span class="cm">// (1) at declaration</span>
+  <span class="kw">final int</span> fishEaten;     <span class="cm">// (2) in an instance initializer</span>
+  <span class="kw">final</span> String name;       <span class="cm">// (3) in the constructor</span>
+  { fishEaten = <span class="num">10</span>; }
+  <span class="kw">public</span> PolarBear() { name = <span class="str">"Robert"</span>; }
+}</pre>
+    <div class="exam-trap">
+      <span class="label">Exam Trap — final has no default</span>
+      <p>Ordinary fields get a default (<code class="inline">int</code>→0, object→<code class="inline">null</code>). The compiler gives a <code class="inline">final</code> field <b>no default</b>, so an unassigned <code class="inline">final</code> instance/static variable won't compile.</p>
+    </div>
+  </section>
+
+  <!-- ================= SECTION 3 : VARARGS ================= -->
+  <section id="s3">
+    <div class="sec-num">SECTION 03</div>
+    <h2>Working with Varargs</h2>
+    <p>Varargs (variable arguments) is a parameter that lets you pass <b>any number of values</b> — zero or more. Inside the method it behaves like an <b>array</b>. You write it with three dots: <code class="inline">int... steps</code>.</p>
+
+    <div class="rules-box">
+      <h4>Two rules to remember</h4>
+      <ol>
+        <li>A method may have <b>at most one</b> varargs parameter.</li>
+        <li>The varargs parameter must be the <b>last</b> one in the list.</li>
+      </ol>
+    </div>
+
+<pre><span class="kw">public void</span> walk1(<span class="kw">int</span>... steps) {}            <span class="cm">// OK</span>
+<span class="kw">public void</span> walk2(<span class="kw">int</span> start, <span class="kw">int</span>... steps) {} <span class="cm">// OK - varargs is last</span>
+<span class="kw">public void</span> walk3(<span class="kw">int</span>... steps, <span class="kw">int</span> start) {} <span class="cm">// DOES NOT COMPILE - varargs not last</span>
+<span class="kw">public void</span> walk4(<span class="kw">int</span>... a, <span class="kw">int</span>... b) {}      <span class="cm">// DOES NOT COMPILE - two varargs</span></pre>
+
+    <h3>Two ways to call</h3>
+    <p>Pass a ready-made array, or pass individual values (Java builds the array). Pass nothing and you get a <b>length-0 array</b>, never <code class="inline">null</code>.</p>
+<pre><span class="kw">public static void</span> walkDog(<span class="kw">int</span> start, <span class="kw">int</span>... steps) {
+  System.out.println(steps.length);
+}
+walkDog(<span class="num">1</span>);                  <span class="cm">// 0</span>
+walkDog(<span class="num">1</span>, <span class="num">2</span>);               <span class="cm">// 1</span>
+walkDog(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>);            <span class="cm">// 2</span>
+walkDog(<span class="num">1</span>, <span class="kw">new int</span>[]{<span class="num">4</span>,<span class="num">5</span>}); <span class="cm">// 2 - array passed directly</span></pre>
+    <ul class="trace">
+      <li>The first argument fills <code class="inline">start</code>; whatever remains becomes the <code class="inline">steps</code> array.</li>
+      <li>You can read <code class="inline">steps.length</code> and index into it (<code class="inline">steps[1]</code>) just like an array.</li>
+    </ul>
+
+    <div class="exam-trap">
+      <span class="label">Exam Trap — passing null</span>
+<pre>walkDog(<span class="num">1</span>, <span class="kw">null</span>); <span class="cm">// compiles, then NullPointerException</span></pre>
+      <p><code class="inline">null</code> isn't an <code class="inline">int</code>, so Java treats it as the array reference itself (which is null). It compiles; then <code class="inline">steps.length</code> throws <b>NullPointerException</b> at runtime.</p>
+    </div>
+  </section>
+
+  <!-- ================= SECTION 4 : ACCESS MODIFIERS ================= -->
+  <section id="s4">
+    <div class="sec-num">SECTION 04</div>
+    <h2>Applying Access Modifiers</h2>
+    <p>An access modifier is like a security guard — it decides which classes may touch a member. Four levels, strictest to most open:</p>
+    <div class="rules-box">
+      <h4>The four access levels</h4>
+      <ul>
+        <li><b><code class="inline">private</code></b> — only inside the same class.</li>
+        <li><b>package</b> (no keyword) — same class + other classes in the same package.</li>
+        <li><b><code class="inline">protected</code></b> — package access + subclasses in a different package.</li>
+        <li><b><code class="inline">public</code></b> — from anywhere.</li>
+      </ul>
+    </div>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Accessing a member from…</th><th>private</th><th>package</th><th>protected</th><th>public</th></tr></thead>
+      <tbody>
+        <tr><td>the same class</td><td><span class="yes">Yes</span></td><td><span class="yes">Yes</span></td><td><span class="yes">Yes</span></td><td><span class="yes">Yes</span></td></tr>
+        <tr><td>another class, same package</td><td><span class="no">No</span></td><td><span class="yes">Yes</span></td><td><span class="yes">Yes</span></td><td><span class="yes">Yes</span></td></tr>
+        <tr><td>a subclass, different package</td><td><span class="no">No</span></td><td><span class="no">No</span></td><td><span class="yes">Yes</span></td><td><span class="yes">Yes</span></td></tr>
+        <tr><td>unrelated class, different package</td><td><span class="no">No</span></td><td><span class="no">No</span></td><td><span class="no">No</span></td><td><span class="yes">Yes</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3>The tricky protected gotcha</h3>
+    <p>From a subclass in a different package, <code class="inline">protected</code> access depends on <b>how</b> you reach the member:</p>
+<pre><span class="num">1:</span> <span class="kw">package</span> pond.swan;          <span class="cm">// different package from Bird</span>
+<span class="num">3:</span> <span class="kw">public class</span> Swan <span class="kw">extends</span> Bird {
+<span class="num">5:</span>   floatInWater();           <span class="cm">// OK - inheritance, no variable</span>
+<span class="num">10:</span>  Swan s = <span class="kw">new</span> Swan();
+<span class="num">11:</span>  s.floatInWater();         <span class="cm">// OK - reference type is Swan (a subclass)</span>
+<span class="num">15:</span>  Bird b = <span class="kw">new</span> Bird();
+<span class="num">16:</span>  b.floatInWater();         <span class="cm">// DOES NOT COMPILE - reference type is Bird</span>
+<span class="num">18:</span> }</pre>
+    <div class="exam-trap">
+      <span class="label">Exam Trap — two scenarios</span>
+      <p><b>No variable (inheritance):</b> allowed. <b>Through a variable:</b> the <b>reference type</b> must be the same class or a subclass — a parent (<code class="inline">Bird</code>) reference is denied, even if the object is actually a <code class="inline">Swan</code>. It's the declared type that's checked, not the runtime object.</p>
+    </div>
+  </section>
+
+  <!-- ================= SECTION 5 : STATIC DATA ================= -->
+  <section id="s5">
+    <div class="sec-num">SECTION 05</div>
+    <h2>Accessing Static Data</h2>
+    <p>The <code class="inline">static</code> keyword makes a variable, method, or nested class belong to the <b>class</b> rather than any single instance. All objects share one copy. <code class="inline">main()</code> is static, which is why the JVM can call it without an object.</p>
+
+<pre><span class="kw">class</span> Penguin {
+  String name;                       <span class="cm">// per object</span>
+  <span class="kw">static</span> String nameOfTallestPenguin; <span class="cm">// shared by all</span>
+}
+p1.nameOfTallestPenguin = <span class="str">"Lilly"</span>;
+p2.nameOfTallestPenguin = <span class="str">"Willy"</span>;
+System.out.println(p1.nameOfTallestPenguin); <span class="cm">// Willy - shared, last value wins</span></pre>
+
+    <h3>Static access via a reference — the null trick</h3>
+    <div class="exam-trap">
+      <span class="label">Exam Trap — no NullPointerException</span>
+<pre>Snake s = <span class="kw">new</span> Snake();
+System.out.println(s.hiss); <span class="cm">// 2</span>
+s = <span class="kw">null</span>;
+System.out.println(s.hiss); <span class="cm">// 2 - still works, hiss is static</span></pre>
+      <p>Accessing a static member through an instance uses the reference's <b>type</b>, not the object — so even a <code class="inline">null</code> reference works. Java never dereferences it.</p>
+    </div>
+    <p>And there is only ever one shared copy:</p>
+<pre>Snake.hiss = <span class="num">4</span>;
+Snake a = <span class="kw">new</span> Snake(); a.hiss = <span class="num">6</span>;
+Snake b = <span class="kw">new</span> Snake(); b.hiss = <span class="num">5</span>;
+System.out.println(Snake.hiss); <span class="cm">// 5  (4 -> 6 -> 5)</span></pre>
+
+    <h3>Class vs. instance membership</h3>
+    <div class="key-rule">
+      <span class="label">Key Rule</span>
+      <p>A <b>static</b> member can't reach an <b>instance</b> member without an object reference. An instance member can freely use static members.</p>
+    </div>
+<pre><span class="kw">public static void</span> announceToEveryone() {
+  addGorilla();   <span class="cm">// OK - static method</span>
+  babyGorilla();  <span class="cm">// DOES NOT COMPILE - static -> instance method</span>
+}
+<span class="kw">public static double</span> average = total / count; <span class="cm">// DOES NOT COMPILE - static uses instance var</span></pre>
+
+    <h3>Constants &amp; static final</h3>
+<pre><span class="kw">private static final int</span> NUM_BUCKETS = <span class="num">45</span>;
+NUM_BUCKETS = <span class="num">5</span>;  <span class="cm">// DOES NOT COMPILE - reassigning a final</span>
+
+<span class="kw">private static final</span> String[] treats = <span class="kw">new</span> String[<span class="num">10</span>];
+treats[<span class="num">0</span>] = <span class="str">"popcorn"</span>;  <span class="cm">// OK - reference final, contents mutable</span></pre>
+
+    <h3>Static initializers</h3>
+<pre><span class="num">15:</span> <span class="kw">private static final int</span> two;
+<span class="num">16:</span> <span class="kw">private static final int</span> three = <span class="num">3</span>;
+<span class="num">17:</span> <span class="kw">private static final int</span> four;  <span class="cm">// DOES NOT COMPILE - never initialized</span>
+<span class="num">18:</span> <span class="kw">static</span> {
+<span class="num">20:</span>   two = <span class="num">2</span>;     <span class="cm">// OK - first assignment of a final</span>
+<span class="num">21:</span>   three = <span class="num">3</span>;   <span class="cm">// DOES NOT COMPILE - already assigned on line 16</span>
+<span class="num">22:</span>   two = <span class="num">4</span>;     <span class="cm">// DOES NOT COMPILE - second assignment of two</span>
+<span class="num">23:</span> }</pre>
+    <div class="remember">
+      <span class="label">Remember</span>
+      <p>A <code class="inline">final</code> static may be assigned <b>once</b> in a static initializer (that counts as its assignment). Static initializers run when the class first loads, in declaration order.</p>
+    </div>
+
+    <h3>Static imports</h3>
+<pre><span class="kw">import static</span> java.util.Arrays.asList; <span class="cm">// OK</span>
+<span class="kw">import static</span> java.util.Arrays;        <span class="cm">// DOES NOT COMPILE - members only, not a class</span>
+<span class="kw">static import</span> java.util.Arrays.*;      <span class="cm">// DOES NOT COMPILE - it's "import static"</span>
+Arrays.asList(<span class="str">"one"</span>); <span class="cm">// DOES NOT COMPILE - the Arrays class itself wasn't imported</span></pre>
+    <div class="exam-trap">
+      <span class="label">Exam Trap</span>
+      <p>The order is always <code class="inline">import static</code>. A static import brings in <b>members</b>, never a class. Importing two same-named members from different classes is an error.</p>
+    </div>
+  </section>
+
+  <!-- ================= SECTION 6 : PASSING DATA AMONG METHODS ================= -->
+  <section id="s6">
+    <div class="sec-num">SECTION 06</div>
+    <h2>Passing Data among Methods</h2>
+    <p>Java is strictly <b>pass-by-value</b>: a method always receives a <b>copy</b> of the variable. This one idea explains every "what is printed?" puzzle in this section.</p>
+
+    <h3>Primitives — the copy is obvious</h3>
+<pre><span class="kw">public static void</span> main(String[] a) {
+  <span class="kw">int</span> num = <span class="num">4</span>;
+  newNumber(num);
+  System.out.print(num); <span class="cm">// 4 - caller is untouched</span>
+}
+<span class="kw">public static void</span> newNumber(<span class="kw">int</span> num) { num = <span class="num">8</span>; }</pre>
+    <p>The method gets a copy of <code class="inline">4</code>. Reassigning the parameter changes only the copy, so the caller's <code class="inline">num</code> stays <code class="inline">4</code>.</p>
+
+    <h3>Objects — the reference is copied too</h3>
+    <p>With objects, the <em>reference</em> is passed by value. The copy points at the same object, so two behaviors differ sharply:</p>
+    <div class="vs-grid">
+      <div class="vs-card left">
+        <h4>Reassigning the parameter</h4>
+<pre><span class="kw">var</span> name = <span class="str">"Webby"</span>;
+speak(name);
+<span class="cm">// name still "Webby"</span>
+
+<span class="kw">void</span> speak(String s){
+  s = <span class="str">"Georgette"</span>; <span class="cm">// only the copy</span>
+}</pre>
+      </div>
+      <div class="vs-card right">
+        <h4>Mutating the shared object</h4>
+<pre><span class="kw">var</span> sb = <span class="kw">new</span> StringBuilder(<span class="str">"Webby"</span>);
+speak(sb);
+<span class="cm">// prints WebbyGeorgette</span>
+
+<span class="kw">void</span> speak(StringBuilder s){
+  s.append(<span class="str">"Georgette"</span>); <span class="cm">// same object</span>
+}</pre>
+      </div>
+    </div>
+    <div class="key-rule">
+      <span class="label">Key Rule</span>
+      <p>Reassigning a parameter never affects the caller. <b>Calling a mutating method</b> on the shared object does, because both references point to the same object.</p>
+    </div>
+
+    <h3>Returning data — you must use the result</h3>
+    <div class="exam-trap">
+      <span class="label">Exam Trap — ignored return values</span>
+      <p>A returned value changes nothing unless you <b>assign</b> it.</p>
+<pre><span class="kw">int</span> tickets = <span class="num">2</span>;
+String guests = <span class="str">"abc"</span>;
+addTickets(tickets);            <span class="cm">// return ignored -> tickets stays 2</span>
+guests = addGuests(guests);     <span class="cm">// assigned -> guests = "abcd"</span>
+System.out.println(tickets + guests); <span class="cm">// 2abcd</span></pre>
+    </div>
+
+    <h3>Autoboxing &amp; unboxing</h3>
+    <p><b>Autoboxing</b> converts a primitive to its wrapper (<code class="inline">int</code>→<code class="inline">Integer</code>) automatically; <b>unboxing</b> goes the other way. The rule that traps everyone:</p>
+    <div class="key-rule">
+      <span class="label">Key Rule — one conversion at a time</span>
+      <p>Java will widen a primitive <b>or</b> autobox it, but <b>not both</b> in a single step.</p>
+    </div>
+<pre><span class="kw">long</span> ears = e;          <span class="cm">// OK - unbox Integer->int, then widen int->long</span>
+Long badGorilla = <span class="num">8</span>;  <span class="cm">// DOES NOT COMPILE - would widen AND box at once</span>
+
+Character elephant = <span class="kw">null</span>;
+<span class="kw">char</span> bad = elephant;    <span class="cm">// NullPointerException - unboxing null</span>
+
+c.jump(<span class="num">123L</span>); <span class="cm">// DOES NOT COMPILE - jump(int): long->int is narrowing</span>
+g.rest(<span class="num">8</span>);    <span class="cm">// DOES NOT COMPILE - rest(Long): int->Long needs widen + box</span>
+
+Integer[] winterHours = { <span class="num">10.5</span>, <span class="num">17.0</span> }; <span class="cm">// DOES NOT COMPILE - double is not Integer</span></pre>
+    <div class="remember">
+      <span class="label">Remember</span>
+      <p>Unboxing a <code class="inline">null</code> wrapper into a primitive always throws <b>NullPointerException</b> at runtime — it compiles fine, which is exactly what makes it a trap.</p>
+    </div>
+  </section>
+
+  <!-- ================= SECTION 7 : OVERLOADING ================= -->
+  <section id="s7">
+    <div class="sec-num">SECTION 07</div>
+    <h2>Overloading Methods</h2>
+    <p>Overloading means several methods with the <b>same name</b> in one class but <b>different parameter lists</b>. (Different from overriding — Chapter 6.) <code class="inline">println()</code> and StringBuilder's <code class="inline">append()</code> are heavily overloaded, which is why they accept almost any type.</p>
+
+    <div class="key-rule">
+      <span class="label">Key Rule</span>
+      <p>Everything except the method name and parameter list may differ — return type, access modifier, specifier, exceptions. But to be an overload, the parameter list must differ.</p>
+    </div>
+
+<pre><span class="kw">public void</span> fly(<span class="kw">int</span> n) {}
+<span class="kw">public int</span> fly(<span class="kw">int</span> n) { <span class="kw">return</span> <span class="num">1</span>; } <span class="cm">// DOES NOT COMPILE - only return type differs</span>
+<span class="kw">public static void</span> fly(<span class="kw">int</span> n) {}     <span class="cm">// DOES NOT COMPILE - same signature</span>
+<span class="kw">public void</span> fly(<span class="kw">int</span> km) {}           <span class="cm">// DOES NOT COMPILE - param name doesn't count</span>
+
+<span class="kw">public void</span> fly(<span class="kw">int</span>[] lengths) {}
+<span class="kw">public void</span> fly(<span class="kw">int</span>... lengths) {}     <span class="cm">// DOES NOT COMPILE - varargs = array signature</span></pre>
+
+    <h3>How Java picks the overload</h3>
+    <div class="rules-box">
+      <h4>Resolution order (most → least specific)</h4>
+      <ol>
+        <li>Exact match by type</li>
+        <li>Larger primitive type (widening)</li>
+        <li>Autoboxed type</li>
+        <li>Varargs</li>
+      </ol>
+      <p style="margin-bottom:0;">Autoboxing and varargs come last for backward compatibility.</p>
+    </div>
+
+<pre><span class="cm">// reference types:  fly(String) vs fly(Object)</span>
+p.fly(<span class="str">"test"</span>); <span class="cm">// "string" - String matches directly</span>
+p.fly(<span class="num">56</span>);     <span class="cm">// "object" - int boxes to Integer, not a String</span>
+
+<span class="cm">// primitives:  fly(int) vs fly(long)</span>
+p.fly(<span class="num">123</span>);  <span class="cm">// "int"  - exact</span>
+p.fly(<span class="num">123L</span>); <span class="cm">// "long" - exact</span>
+
+<span class="cm">// glide(String), glide(String...), glide(String,String)</span>
+glide(<span class="str">"a"</span>);          <span class="cm">// 1 - single String, most specific</span>
+glide(<span class="str">"a"</span>,<span class="str">"b"</span>);      <span class="cm">// 4 - two-String beats varargs</span>
+glide(<span class="str">"a"</span>,<span class="str">"b"</span>,<span class="str">"c"</span>);  <span class="cm">// 2 - only varargs matches => prints 142</span></pre>
+
+    <div class="remember">
+      <span class="label">Remember</span>
+      <p>When both <code class="inline">fly(int)</code> and <code class="inline">fly(Integer)</code> exist, <code class="inline">fly(3)</code> picks the <b>primitive</b> — Java avoids needless autoboxing. Arrays of primitives and wrappers (<code class="inline">int[]</code> vs <code class="inline">Integer[]</code>) are distinct, with no autoboxing between them.</p>
+    </div>
+  </section>
+
+  <!-- ================= SHORT RECAP ================= -->
+  <section id="recap">
+    <div class="sec-num">SECTION 08</div>
+    <h2>Short Recap</h2>
+    <div class="recap">
+      <h3>Designing Methods</h3>
+      <ul>
+        <li>Order after the return type is fixed: <b>return type → name → params → exceptions → body</b>. Modifiers/specifiers go before the return type, in any order.</li>
+        <li><code class="inline">default</code> isn't an access modifier; package access has no keyword. Signature = name + parameter types &amp; order (names don't count).</li>
+      </ul>
+      <h3>Local &amp; Instance Variables</h3>
+      <ul>
+        <li>Local: only <code class="inline">final</code>, no default, must assign before use. Instance: gets a default — unless <code class="inline">final</code>, which gets none.</li>
+        <li><code class="inline">final</code> locks the reference, not the contents. Effectively final = never reassigned (matters for lambdas).</li>
+      </ul>
+      <h3>Varargs</h3>
+      <ul>
+        <li>At most one, and last. Acts like an array inside. No args → length-0 array; <code class="inline">null</code> → compiles then NPE.</li>
+      </ul>
+      <h3>Access Modifiers</h3>
+      <ul>
+        <li>private → package → protected → public, widening reach. protected through a <em>variable</em> checks the declared reference type, not the object.</li>
+      </ul>
+      <h3>Static Data</h3>
+      <ul>
+        <li>Belongs to the class, one shared copy. Static via a null reference → no NPE. Static can't reach instance members without a reference. <code class="inline">final</code> static = constant; assign once.</li>
+      </ul>
+      <h3>Passing Data among Methods</h3>
+      <ul>
+        <li>Pass-by-value always. Reassigning a parameter never affects the caller; mutating a shared object does. Ignored return values change nothing.</li>
+        <li>One conversion at a time (widen OR box, not both). Unboxing <code class="inline">null</code> → NPE.</li>
+      </ul>
+      <h3>Overloading</h3>
+      <ul>
+        <li>Same name, different parameter list. Return type / static alone don't overload. Resolution: exact → widen → autobox → varargs; most-specific wins.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= CHEAT SHEET ================= -->
+  <section id="traps">
+    <div class="sec-num">SECTION 09</div>
+    <h2>Exam Traps — Consolidated Cheat Sheet</h2>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Scenario</th><th>What it tests</th><th>Verdict</th></tr></thead>
+      <tbody>
+        <tr><td><code class="inline">default void m(){}</code> in a class</td><td><code class="inline">default</code> as access modifier</td><td><span class="no">Does not compile</span></td></tr>
+        <tr><td><code class="inline">void public m(){}</code> / <code class="inline">public void final m(){}</code></td><td>modifier/specifier after return type</td><td><span class="no">Does not compile</span></td></tr>
+        <tr><td><code class="inline">final public void m(){}</code></td><td>specifier before access modifier</td><td><span class="yes">Compiles</span></td></tr>
+        <tr><td>non-void method, no reachable <code class="inline">return</code></td><td>missing/unreachable return</td><td><span class="no">Does not compile</span></td></tr>
+        <tr><td><code class="inline">return 9L;</code> from an <code class="inline">int</code> method</td><td>long doesn't fit int</td><td><span class="no">Does not compile</span></td></tr>
+        <tr><td>method name <code class="inline">2jog</code> / <code class="inline">_</code></td><td>identifier rules</td><td><span class="no">Does not compile</span></td></tr>
+        <tr><td>params separated by <code class="inline">;</code></td><td>comma vs semicolon</td><td><span class="no">Does not compile</span></td></tr>
+        <tr><td>two methods, same types, different param names</td><td>names aren't in the signature</td><td><span class="no">Does not compile</span></td></tr>
+        <tr><td><code class="inline">final int x;</code> assigned on only one path, then used</td><td>assign before use</td><td><span class="no">Does not compile</span></td></tr>
+        <tr><td><code class="inline">final</code> object's <code class="inline">setName()</code> / array element edit</td><td>reference vs contents</td><td><span class="yes">Compiles</span></td></tr>
+        <tr><td>variable changed in a loop, captured in a lambda</td><td>effectively final</td><td><span class="no">Does not compile</span></td></tr>
+        <tr><td><code class="inline">final</code> instance/static var with no value</td><td>final has no default</td><td><span class="no">Does not compile</span></td></tr>
+        <tr><td>varargs not last / two varargs</td><td>varargs placement</td><td><span class="no">Does not compile</span></td></tr>
+        <tr><td><code class="inline">walkDog(1)</code> → <code class="inline">steps.length</code></td><td>empty varargs = length 0</td><td><span class="yes">0</span></td></tr>
+        <tr><td><code class="inline">walkDog(1, null)</code></td><td>null = the array reference</td><td>compiles → <span class="no">NPE</span></td></tr>
+        <tr><td>subclass <code class="inline">Bird b = new Swan(); b.protectedM()</code> (diff pkg)</td><td>protected via parent-type ref</td><td><span class="no">Does not compile</span></td></tr>
+        <tr><td>subclass <code class="inline">Swan s; s.protectedM()</code></td><td>protected via subclass-type ref</td><td><span class="yes">Compiles</span></td></tr>
+        <tr><td>unrelated class, protected member (diff pkg)</td><td>neither subclass nor same pkg</td><td><span class="no">Does not compile</span></td></tr>
+        <tr><td><code class="inline">s = null; s.staticVar</code></td><td>static via null reference</td><td><span class="yes">No NPE</span></td></tr>
+        <tr><td>static method → instance method/variable</td><td>class vs instance membership</td><td><span class="no">Does not compile</span></td></tr>
+        <tr><td>instance method → static member</td><td>allowed the other way</td><td><span class="yes">Compiles</span></td></tr>
+        <tr><td>static initializer assigns a <code class="inline">final</code> twice</td><td>second assignment</td><td><span class="no">Does not compile</span></td></tr>
+        <tr><td><code class="inline">import static</code> a class / wrong order <code class="inline">static import</code></td><td>members only; keyword order</td><td><span class="no">Does not compile</span></td></tr>
+        <tr><td>reassign a parameter vs mutate the object</td><td>pass-by-value</td><td>caller unchanged / changed</td></tr>
+        <tr><td>ignored return value</td><td>result must be assigned</td><td>no effect</td></tr>
+        <tr><td><code class="inline">Long x = 8;</code></td><td>widen + box at once</td><td><span class="no">Does not compile</span></td></tr>
+        <tr><td>unbox a <code class="inline">null</code> wrapper to a primitive</td><td>NPE</td><td>compiles → <span class="no">NPE</span></td></tr>
+        <tr><td><code class="inline">Integer[] a = {10.5, 17.0};</code></td><td>double is not Integer</td><td><span class="no">Does not compile</span></td></tr>
+        <tr><td>overloads differ only by return type, or static vs instance</td><td>same signature</td><td><span class="no">Does not compile</span></td></tr>
+        <tr><td><code class="inline">m(int[])</code> + <code class="inline">m(int...)</code></td><td>varargs = array signature</td><td><span class="no">Does not compile</span></td></tr>
+        <tr><td>overload resolution</td><td>exact &gt; widen &gt; autobox &gt; varargs</td><td>most-specific wins</td></tr>
+        <tr><td><code class="inline">fly(int)</code> &amp; <code class="inline">fly(Integer)</code>, call <code class="inline">fly(3)</code></td><td>primitive vs wrapper</td><td><span class="yes">picks primitive</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <p class="footnote">Based on <i>OCP Java SE 21 Developer Study Guide</i> (Boyarsky &amp; Selikoff), Chapter 5: Methods · Exam 1Z0-830.</p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<!-- PLACEHOLDER (Phase 2). A complete, self-contained page loaded in the shell's iframe. -->
+<html lang="bn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Core APIs — BanglaView</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600&family=JetBrains+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+        font-family: "Noto Sans Bengali", system-ui, sans-serif;
+        color: #2b2b29;
+        line-height: 1.85;
+        max-width: 680px;
+      }
+      h1 { font-size: 26px; margin: 0 0 18px; }
+      p { color: #57564f; }
+      code {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.88em;
+        background: #f1efe7;
+        color: #3f6b4c;
+        padding: 1px 5px;
+        border-radius: 4px;
+      }
+      pre {
+        background: #f1efe7;
+        border: 1px solid #efece3;
+        border-radius: 8px;
+        padding: 18px 20px;
+        overflow-x: auto;
+      }
+      pre code { background: none; color: #57564f; padding: 0; font-size: 13.5px; }
+      .note { border-top: 1px solid #e6e2d7; margin-top: 28px; padding-top: 18px; }
+      .note-label {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #4e7d5b;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>কোর API নিয়ে কাজ</h1>
+    <p>
+      জাভাতে <code>String</code> হলো <em>immutable</em> — একবার তৈরি হলে এর ভেতরের
+      ক্যারেক্টার ডেটা আর বদলায় না। যেসব মেথড দেখে মনে হয় স্ট্রিং বদলে দিচ্ছে, সেগুলো আসলে
+      একটি নতুন অবজেক্ট রিটার্ন করে — এই কারণেই কম্পাইলার নিরাপদে একই লিটারেল পুল করতে পারে।
+    </p>
+    <pre><code>var name = "OCP";
+String greeting = "Hello, " + name;
+
+System.out.println(greeting.length());      // 12</code></pre>
+    <div class="note">
+      <span class="note-label">নোট</span>
+      <p>
+        লুপের ভেতরে স্ট্রিং জোড়া দেওয়ার সময় <code>StringBuilder</code> ব্যবহার করুন — এটি
+        প্রতিবার নতুন String না বানিয়ে একটিমাত্র বাফার পরিবর্তন করে।
+      </p>
+    </div>
+  </body>
+</html>
