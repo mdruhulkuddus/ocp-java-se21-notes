@@ -40,9 +40,9 @@ const chapters = [
     number: 4,
     title: "Core APIs",
     titleBn: "",
-    handnoteFile: "chapters/04-core-apis/handnote.html",
-    banglaFile: "chapters/04-core-apis/bangla.html",
-    questionsFile: "chapters/04-core-apis/questions.html",
+    handnoteFile: "chapters/04-core-apis/Ch4_CoreAPIs_Handnote_EN.html",
+    banglaFile: "chapters/04-core-apis/Ch4_CoreAPIs_HandNote_Bangla.html",
+    questionsFile: "chapters/04-core-apis/Ch4_CoreAPIs_MCQ_Practice.html",
   },
   {
     id: "methods",
@@ -188,6 +188,10 @@ function autosizeFrame(frame) {
   try {
     const doc = frame.contentDocument;
     if (!doc) return;
+    // The shell scrolls as one via .reading-scroll, so the frame's own
+    // document must never show its own scrollbar (sub-pixel rounding can
+    // otherwise leave a residual bar even when the height is right).
+    doc.documentElement.style.overflow = "hidden";
     const h = Math.max(
       doc.documentElement.scrollHeight,
       doc.body ? doc.body.scrollHeight : 0
@@ -214,6 +218,20 @@ async function showView(path) {
     frame.addEventListener("load", () => {
       if (token !== loadToken) return;
       autosizeFrame(frame);
+      // Web fonts (Merriweather / Bengali) swap in after load and reflow the
+      // text taller than what we measured, leaving the frame's own scrollbar.
+      // Re-fit once fonts settle, and keep fitting if content height changes.
+      const doc = frame.contentDocument;
+      if (doc && doc.fonts && doc.fonts.ready) {
+        doc.fonts.ready.then(() => {
+          if (token === loadToken) autosizeFrame(frame);
+        });
+      }
+      if (doc && doc.body && "ResizeObserver" in window) {
+        new ResizeObserver(() => {
+          if (token === loadToken) autosizeFrame(frame);
+        }).observe(doc.body);
+      }
     });
     frame.src = path;
 
