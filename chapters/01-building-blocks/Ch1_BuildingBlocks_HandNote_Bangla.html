@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 · অধ্যায় ১ — Building Blocks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --ink:#2c2a28; --muted:#6f6a64; --line:#ece3da;
+    --sect:#c96442; --inlinebg:#f3ece4; --inlineink:#9a5030;
+    --yes:#3b7d57; --no:#c44d3e; --purple:#7c5cbf;
+    --shadow:0 4px 18px rgba(60,50,40,.07); --shadow-h:0 10px 30px rgba(60,50,40,.13);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Noto Sans Bengali',system-ui,sans-serif;font-size:17px;line-height:1.8;}
+  .wrap{max-width:1000px;margin:0 auto;padding:32px 20px 80px;}
+  h1,h2,h3,h4{font-family:'Noto Sans Bengali',sans-serif;color:var(--ink);line-height:1.5;}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+  a{color:var(--sect);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+
+  .header{background:linear-gradient(135deg,#ffffff,#fbf7f4);border-radius:18px;
+    padding:34px 34px 30px;box-shadow:var(--shadow);margin-bottom:26px;}
+  .badge{display:inline-block;background:linear-gradient(90deg,#c96442,#d4845e);
+    color:#fff;font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:600;
+    letter-spacing:.4px;padding:7px 14px;border-radius:999px;margin-bottom:16px;}
+  .header h1{font-size:32px;margin:6px 0 4px;font-weight:900;}
+  .header h1 .muted{color:var(--muted);font-weight:400;font-size:22px;}
+  .subtitle{color:var(--muted);margin:6px 0 20px;font-size:18px;}
+  .obj{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:5px solid #5aab7b;
+    border-radius:12px;padding:16px 20px;}
+  .obj h4{margin:0 0 8px;color:#3b7d57;font-size:16px;}
+  .obj ul{margin:0;padding-left:20px;}
+  .obj li{margin:3px 0;}
+
+  .toc{background:var(--card);border-radius:14px;padding:22px 26px;box-shadow:var(--shadow);margin-bottom:30px;}
+  .toc h3{margin:0 0 12px;font-size:19px;}
+  .toc-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 28px;}
+  .toc-grid a{display:flex;gap:10px;padding:5px 0;border-bottom:1px dashed #eee5db;color:var(--ink);}
+  .toc-grid a:hover{color:var(--sect);text-decoration:none;}
+  .toc-grid .n{font-family:'JetBrains Mono',monospace;color:var(--sect);font-weight:600;font-size:14px;min-width:26px;}
+
+  section{background:var(--card);border-radius:16px;padding:28px 30px;box-shadow:var(--shadow);margin-bottom:26px;}
+  .secnum{font-family:'JetBrains Mono',monospace;color:var(--sect);font-weight:700;font-size:14px;letter-spacing:1px;}
+  section h2{font-size:25px;margin:4px 0 18px;padding-bottom:12px;border-bottom:2px solid var(--line);}
+  section h3{font-size:20px;margin:26px 0 8px;color:#39332e;}
+  section h4{font-size:17px;margin:18px 0 6px;color:#4a443e;}
+  p{margin:10px 0;}
+  ul,ol{margin:10px 0;padding-left:24px;}
+  li{margin:5px 0;}
+
+  p code,li code,td code,h4 code,.obj code,.card code,.rules-box code,.vs-col code,.trace code{
+    background:var(--inlinebg);color:var(--inlineink);padding:1.5px 6px;border-radius:6px;font-size:14.5px;}
+
+  pre{background:#fdfaf7;border-radius:12px;padding:16px 18px;overflow-x:auto;
+    box-shadow:inset 0 2px 8px rgba(70,55,40,.08);margin:14px 0;font-size:14px;line-height:1.6;}
+  pre code{background:none;padding:0;color:#3a352f;font-size:14px;}
+  .kw{color:var(--kw);font-weight:500;} .str{color:var(--str);} .num{color:var(--num);}
+  .err{color:var(--err);font-weight:700;} .cm{color:var(--cm);font-style:italic;}
+
+  .card{border-radius:14px;padding:15px 18px 15px 20px;margin:16px 0;box-shadow:var(--shadow);
+    transition:box-shadow .22s ease, transform .22s ease;}
+  .card:hover{box-shadow:var(--shadow-h);transform:translateY(-2px);}
+  .card .label{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;
+    letter-spacing:.6px;display:block;margin-bottom:5px;}
+  .card p,.card ul{margin:5px 0;}
+  .exam-trap{background:linear-gradient(135deg,#fef2f0,#fff8f7);border-left:5px solid #e06b5e;}
+  .exam-trap .label{color:#c0453a;}
+  .key-rule{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:5px solid #5aab7b;}
+  .key-rule .label{color:#3b7d57;}
+  .remember{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:5px solid #d4a24c;}
+  .remember .label{color:#a9772a;}
+
+  .rules-box{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-top:4px solid #5aab7b;
+    border-radius:12px;padding:16px 20px;margin:18px 0;box-shadow:var(--shadow);}
+  .rules-box h4{margin:0 0 8px;color:#3b7d57;}
+  .rules-box ol,.rules-box ul{margin:6px 0;}
+
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;}
+  .vs-col{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);}
+  .vs-col h4{margin:0 0 8px;font-size:16px;}
+  .vs-col.left h4{color:var(--purple);}
+  .vs-col.right h4{color:var(--yes);}
+  .vs-col ul{padding-left:18px;margin:6px 0;}
+
+  .tbl-wrap{overflow-x:auto;margin:16px 0;}
+  table{width:100%;border-collapse:separate;border-spacing:0;background:var(--card);
+    border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:15px;}
+  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid #f0eae2;vertical-align:top;}
+  th{background:#f0e8de;font-family:'Noto Sans Bengali',sans-serif;font-weight:700;color:#4a423a;}
+  tr:last-child td{border-bottom:none;}
+  td code{font-size:13.5px;}
+  .yes{color:var(--yes);font-weight:700;} .no{color:var(--no);font-weight:700;}
+
+  .trace{background:#fdfaf7;border-radius:12px;padding:14px 18px 14px 20px;
+    box-shadow:inset 0 2px 8px rgba(70,55,40,.06);margin:14px 0;border-left:4px solid #d4845e;}
+  .trace ul{list-style:none;padding-left:0;margin:0;}
+  .trace li{padding:3px 0;border-bottom:1px dashed #eee5db;font-size:15px;}
+  .trace li:last-child{border-bottom:none;}
+  .trace .out{font-family:'JetBrains Mono',monospace;color:var(--inlineink);background:var(--inlinebg);
+    padding:1px 6px;border-radius:5px;}
+
+  .recap{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:5px solid #d4a24c;}
+  .recap h3{color:#a9772a;margin-top:18px;}
+  .recap h3:first-of-type{margin-top:4px;}
+
+  @media(max-width:720px){
+    body{font-size:16px;}
+    .toc-grid,.vs-grid{grid-template-columns:1fr;}
+    .header h1{font-size:25px;} .header h1 .muted{font-size:17px;}
+    section{padding:20px 18px;} .header{padding:24px 20px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="header">
+    <span class="badge">OCP Java SE 21 Developer — Exam 1Z0-830</span>
+    <h1>অধ্যায় ১ · Building Blocks <span class="muted"></span></h1>
+    <p class="subtitle">Java environment, class structure, main() method, package ও import, object ও initialization, primitive ও reference, variable declaration, scope, এবং garbage collection — পরীক্ষায় আসা প্রতিটি common MCQ trap, বই ধরে যাচাই করা।</p>
+    <div class="obj">
+      <h4>যে exam objective-গুলো কভার হচ্ছে</h4>
+      <ul>
+        <li>primitive ও wrapper class ব্যবহার; precedence, type conversion ও casting দিয়ে arithmetic ও boolean expression মূল্যায়ন।</li>
+        <li>Java object (nested class object সহ) declare ও instantiate করা, এবং object-এর life-cycle বোঝা: creation, reference reassign, ও garbage collection।</li>
+        <li>variable scope বোঝা, encapsulation প্রয়োগ, immutable object তৈরি, এবং local variable type inference (<code>var</code>) ব্যবহার।</li>
+      </ul>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <h3>সূচিপত্র</h3>
+    <div class="toc-grid">
+      <a href="#s1"><span class="n">01</span><span>Environment ও Class Structure</span></a>
+      <a href="#s2"><span class="n">02</span><span>main() Method ও কোড চালানো</span></a>
+      <a href="#s3"><span class="n">03</span><span>Package, Import ও Class Order</span></a>
+      <a href="#s4"><span class="n">04</span><span>Object তৈরি ও Initialization</span></a>
+      <a href="#s5"><span class="n">05</span><span>Data Type: Primitive ও Reference</span></a>
+      <a href="#s6"><span class="n">06</span><span>Variable Declaration ও var</span></a>
+      <a href="#s7"><span class="n">07</span><span>Scope ও Garbage Collection</span></a>
+      <a href="#recap"><span class="n">★</span><span>সংক্ষিপ্ত রিভিউ</span></a>
+      <a href="#cheat"><span class="n">⚑</span><span>Exam Traps চিট-শিট</span></a>
+    </div>
+  </nav>
+
+  <!-- SECTION 01 -->
+  <section id="s1">
+    <div class="secnum">SECTION 01</div>
+    <h2>Environment ও Class Structure</h2>
+
+    <h3>Java-র প্রধান component</h3>
+    <p><strong>JDK</strong> (Java Development Kit) হলো Java development-এর জন্য ন্যূনতম software। গুরুত্বপূর্ণ command:</p>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Command</th><th>কাজ</th></tr>
+      <tr><td><code>javac</code></td><td><code>.java</code> source file-কে <code>.class</code> bytecode-এ রূপান্তর করে।</td></tr>
+      <tr><td><code>java</code></td><td>প্রোগ্রাম চালায়।</td></tr>
+      <tr><td><code>jar</code></td><td>file-গুলো একসাথে package করে।</td></tr>
+      <tr><td><code>javadoc</code></td><td>documentation তৈরি করে।</td></tr>
+    </table>
+    </div>
+    <p><code>javac</code> <strong>bytecode</strong> তৈরি করে; <code>java</code> <strong>JVM</strong> চালু করে, যেটা সেই bytecode আসল machine-এ কীভাবে চালাতে হয় জানে। Java 11 থেকে আলাদা JRE নেই — প্রোগ্রাম চালাতেও পূর্ণ JDK ব্যবহার হয়।</p>
+    <div class="card remember"><span class="label">★ REMEMBER</span>
+      <p>Java class file JVM-এ চলে, তাই Java আছে এমন <em>যেকোনো</em> machine-এ চলে — শুধু যেখানে compile হয়েছিল সেখানে নয়। Java 21 বের হয়েছিল সেপ্টেম্বর ২০২৩-এ।</p>
+    </div>
+
+    <h3>Field ও method</h3>
+    <p>একটা class-এর দুটো প্রধান উপাদান: <strong>method</strong> (function/procedure) এবং <strong>field</strong> (variable)। দুটো মিলে class-এর <strong>member</strong>। সবচেয়ে সহজ class হলো শুধু <code>public class Animal { }</code>।</p>
+<pre><code><span class="kw">public</span> <span class="kw">class</span> Animal {
+   <span class="kw">String</span> name;                       <span class="cm">// a field</span>
+   <span class="kw">public</span> <span class="kw">String</span> getName() {           <span class="cm">// method with String return type</span>
+      <span class="kw">return</span> name;
+   }
+   <span class="kw">public</span> <span class="kw">void</span> setName(<span class="kw">String</span> newName) { <span class="cm">// void = returns nothing</span>
+      name = newName;                  <span class="cm">// newName is a parameter</span>
+   }
+}</code></pre>
+    <div class="card key-rule"><span class="label">✓ KEY RULE — method signature</span>
+      <p><strong>method signature</strong> হলো method-এর নাম + parameter-এর <em>type</em> (নাম নয়, return type নয়)। <code>public int numberVisitors(int month)</code>-এর signature হলো <code>numberVisitors(int)</code>।</p>
+    </div>
+
+    <h3>Comment</h3>
+    <p>তিন রকম comment: single-line <code>//</code>, multiline <code>/* ... */</code>, এবং Javadoc <code>/** ... */</code>। Comment কোডের <strong>যেকোনো</strong> জায়গায় বসতে পারে।</p>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — nested multiline comment</span>
+      <p>প্রথম <code>/*</code> থেকে প্রথম <code>*/</code> পর্যন্ত সবটা একটাই comment, ভেতরে <code>//</code> বা আরেকটা <code>/*</code> থাকলেও। নিচের line টা compile হয় <strong>না</strong>, কারণ একটা extra <code>*/</code> থেকে যায়:</p>
+<pre><code><span class="cm">/*
+ * /* ferret */
+ */</code></pre>
+      <p>compiler ভেতরের <code>*/</code>-এ comment শেষ ধরে, ফলে একটা বাড়তি <code>*/</code> থেকে যায় — invalid syntax।</p>
+    </div>
+
+    <h3>Class ও source file</h3>
+    <div class="rules-box">
+      <h4>Top-level type-এর নিয়ম</h4>
+      <ul>
+        <li>top-level type-কে <code>public</code> হতে <strong>হবে না</strong>; <code>class Animal { }</code> ঠিক আছে।</li>
+        <li>এক file-এ একাধিক top-level type থাকতে পারে, কিন্তু <strong>সর্বোচ্চ একটা</strong> <code>public</code> হতে পারে।</li>
+        <li>type <code>public</code> হলে তার নাম <strong>filename-এর সাথে মিলতে হবে</strong>। <code>Animal.java</code> file-এ <code>public class Animal2</code> → <span class="err">DOES NOT COMPILE</span>।</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- SECTION 02 -->
+  <section id="s2">
+    <div class="secnum">SECTION 02</div>
+    <h2>main() Method ও কোড চালানো</h2>
+    <p>execution শুরু হয় <code>main()</code> দিয়ে — প্রোগ্রামের <strong>entry point</strong>, যেটা JVM খুঁজে নেয়।</p>
+<pre><code><span class="kw">public</span> <span class="kw">class</span> Zoo {
+   <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="kw">String</span>[] args) {
+      System.out.println(<span class="str">"Hello World"</span>);
+   }
+}</code></pre>
+    <p>Compile ও run (খেয়াল: run করার সময় <code>.class</code> বাদ দিতে হয়):</p>
+<pre><code>javac Zoo.java   <span class="cm">// produces Zoo.class</span>
+java Zoo         <span class="cm">// runs it (no .class extension)</span></code></pre>
+
+    <h3>Signature-এর শব্দগুলো</h3>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Keyword</th><th>অর্থ</th></tr>
+      <tr><td><code>public</code></td><td>access modifier — যেকোনো জায়গা থেকে পূর্ণ access।</td></tr>
+      <tr><td><code>static</code></td><td>method-কে class-এর সাথে বাঁধে, তাই object ছাড়া <code>Zoo.main()</code> হিসেবে call করা যায়।</td></tr>
+      <tr><td><code>void</code></td><td>return type — কোনো data ফেরায় না।</td></tr>
+      <tr><td><code>String[] args</code></td><td>parameter list — <code>String</code> argument-এর একটা array।</td></tr>
+    </table>
+    </div>
+    <div class="card key-rule"><span class="label">✓ KEY RULE — তিনটা valid parameter form</span>
+      <p>compiler <code>main</code>-এর parameter-এ নিচের যেকোনোটা মেনে নেয় (এবং যেকোনো valid variable নাম):</p>
+<pre><code><span class="kw">String</span>[] args
+<span class="kw">String</span> options[]
+<span class="kw">String</span>... friends   <span class="cm">// varargs</span></code></pre>
+    </div>
+    <div class="card remember"><span class="label">★ REMEMBER — optional modifier</span>
+      <p><code>public</code> ও <code>static</code> required, কিন্তু কয়েকটা optional modifier অনুমোদিত। নিচের দুটো <code>final</code>-ই optional এবং এটা এখনো valid entry point:</p>
+<pre><code><span class="kw">public</span> <span class="kw">final</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="kw">final</span> <span class="kw">String</span>[] args) {}</code></pre>
+    </div>
+
+    <h3>Parameter পাঠানো</h3>
+    <p>Argument class নামের পরে আসে এবং index শুরু হয় <strong>0</strong> থেকে। space দিয়ে argument আলাদা হয়; একটার ভেতরে space চাইলে quote ব্যবহার করুন।</p>
+<pre><code>java Zoo Bronx Zoo        <span class="cm">// args[0]=Bronx, args[1]=Zoo</span>
+java Zoo <span class="str">"San Diego"</span> Zoo   <span class="cm">// args[0]=San Diego</span></code></pre>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — missing argument</span>
+      <p>যে index পাঠানো হয়নি সেটা পড়লে runtime-এ throw হয়। <code>java Zoo Zoo</code> দিয়ে তারপর <code>args[1]</code> পড়লে → <code>ArrayIndexOutOfBoundsException</code> (Index 1 out of bounds for length 1)।</p>
+    </div>
+    <div class="card remember"><span class="label">★ REMEMBER — single-file source-code launch</span>
+      <p>আলাদা compile ধাপ বাদ দেওয়া যায়: <code>java Zoo.java Bronx Zoo</code>। মোচড়টা হলো — এখানে <code>.java</code> extension <strong>রাখতে</strong> হয় (compiled <code>java Zoo</code> form-এর উল্টো)।</p>
+    </div>
+  </section>
+
+  <!-- SECTION 03 -->
+  <section id="s3">
+    <div class="secnum">SECTION 03</div>
+    <h2>Package, Import ও Class Order</h2>
+    <p>Java class-গুলো <strong>package</strong>-এ ভাগ করে। একটা <code>import</code> statement compiler-কে বলে কোন package-এ class খুঁজতে হবে। না দিলে <code>error: cannot find symbol</code> আসে।</p>
+
+    <h3>Wildcard</h3>
+    <p><code>import java.util.*;</code> <code>java.util</code>-এর <em>সরাসরি</em> থাকা প্রতিটা class import করে।</p>
+    <div class="card key-rule"><span class="label">✓ KEY RULE</span>
+      <p>wildcard শুধু সেই package-এর সরাসরি class import করে — child package, field বা method <strong>নয়</strong>। তাই <code>import java.util.*;</code> <code>java.util.concurrent.atomic.AtomicInteger</code> আনে না; তার জন্য <code>import java.util.concurrent.atomic.*;</code> দরকার।</p>
+    </div>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — invalid import form</span>
+<pre><code><span class="kw">import</span> java.nio.*;            <span class="err">// NO GOOD — wildcard matches class names, not "file.Files"</span>
+<span class="kw">import</span> java.nio.*.*;          <span class="err">// NO GOOD — only one wildcard, and it must be last</span>
+<span class="kw">import</span> java.nio.file.Paths.*; <span class="err">// NO GOOD — cannot import methods, only class names</span></code></pre>
+    </div>
+
+    <h3>Redundant import</h3>
+    <p><code>java.lang</code> বিশেষ — এটা <strong>স্বয়ংক্রিয়ভাবে import</strong> হয়। এছাড়া current class-এর একই package-এর class-এর জন্য কোনো import লাগে না।</p>
+<pre><code><span class="num">1</span>: <span class="kw">import</span> java.lang.System;  <span class="cm">// redundant (java.lang auto-imported)</span>
+<span class="num">2</span>: <span class="kw">import</span> java.lang.*;       <span class="cm">// redundant (java.lang auto-imported)</span>
+<span class="num">3</span>: <span class="kw">import</span> java.util.Random;
+<span class="num">4</span>: <span class="kw">import</span> java.util.*;        <span class="cm">// redundant here (Random already imported on line 3)</span></code></pre>
+    <p>চারটার মধ্যে তিনটা redundant। line 3 না থাকলে <code>java.util.*</code> redundant <em>হতো না</em> — তখন সেটাই <code>Random</code> import করত।</p>
+
+    <h3>Naming conflict</h3>
+    <p><code>java.util.Date</code> ও <code>java.sql.Date</code> দুটোই আছে। দুটো wildcard-এ যদি দুই জায়গায় <code>Date</code> থাকে, ব্যবহার ambiguous হয়ে যায় ও compile হয় না।</p>
+    <div class="rules-box">
+      <h4>Conflict সমাধানের নিয়ম</h4>
+      <ul>
+        <li>explicit class import wildcard-এর চেয়ে <strong>অগ্রাধিকার</strong> পায়: <code>import java.util.Date;</code> + <code>import java.sql.*;</code> compile হয়, <code>java.util.Date</code> ব্যবহার করে।</li>
+        <li>একই নামের দুটো explicit import → <span class="err">ambiguous, compile হয় না</span>।</li>
+        <li>দুটোই দরকার হলে একটা import-এ নিন আর অন্যটার <strong>fully qualified name</strong> ব্যবহার করুন (যেমন <code>java.sql.Date sqlDate;</code>)।</li>
+      </ul>
+    </div>
+
+    <h3>Package দিয়ে compile ও run</h3>
+<pre><code>javac packagea/ClassA.java packageb/ClassB.java
+java packageb.ClassB             <span class="cm">// prints "Got it"</span>
+
+javac packagea/*.java            <span class="cm">// wildcard for files in one dir</span>
+<span class="cm">// javac *.java would NOT pick up files inside packages</span>
+
+javac -d classes packagea/ClassA.java <span class="cm">// -> classes/packagea/ClassA.class</span>
+java -cp classes packageb.ClassB
+java -classpath classes packageb.ClassB
+java --class-path classes packageb.ClassB <span class="cm">// note the TWO dashes</span></code></pre>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — case ও dash</span>
+      <p>Java option <strong>case sensitive</strong>: <code>-d</code> চলে, <code>-D</code> নয়। <code>--class-path</code>-এ দুটো dash লাগে আর <code>-cp</code>, <code>-classpath</code>-এ একটা। dash-এর সংখ্যা ভুল হলে প্রোগ্রাম চলবে না। <code>-d</code> option target directory-র নিচে package directory structure ধরে রাখে।</p>
+    </div>
+
+    <h3>Element-এর order — PIC নিয়ম</h3>
+    <div class="card key-rule"><span class="label">✓ KEY RULE — PIC (picture)</span>
+      <p><strong>P</strong>ackage, <strong>I</strong>mport, <strong>C</strong>lass — এই ক্রমে। package প্রথম non-comment line (optional); import package-এর পরে (optional); type import-এর পরে। field ও method class-এর ভেতরে যেকোনো জায়গায়। comment যেকোনো জায়গায়।</p>
+    </div>
+<pre><code><span class="kw">import</span> java.util.*;
+<span class="kw">package</span> structure;        <span class="err">// DOES NOT COMPILE (package must come before import)</span>
+<span class="kw">String</span> name;               <span class="err">// DOES NOT COMPILE (field outside a class)</span>
+<span class="kw">public</span> <span class="kw">class</span> Meerkat { }</code></pre>
+  </section>
+
+  <!-- SECTION 04 -->
+  <section id="s4">
+    <div class="secnum">SECTION 04</div>
+    <h2>Object তৈরি ও Initialization</h2>
+
+    <h3>Constructor call করা</h3>
+    <p>instance তৈরি হয় <code>new</code> + class নাম + parenthesis দিয়ে: <code>Park p = new Park();</code>।</p>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — constructor বনাম method</span>
+      <p>Constructor-এর নাম class-এর সাথে মেলে এবং <strong>return type থাকে না</strong>। constructor-এর মতো দেখতে কিন্তু return type আছে এমনটা আসলে সাধারণ method — compile হয় কিন্তু <code>new</code> দিয়ে call হয় <em>না</em>:</p>
+<pre><code><span class="kw">public</span> <span class="kw">class</span> Chick {
+   <span class="kw">public</span> <span class="kw">void</span> Chick() { }   <span class="cm">// NOT A CONSTRUCTOR (has void return type)</span>
+}</code></pre>
+    </div>
+    <p>কোনো constructor না লিখলে compiler একটা default "do nothing" constructor দেয়।</p>
+
+    <h3>Field পড়া ও লেখা</h3>
+    <p>instance variable সরাসরি পড়া/লেখা যায়: <code>mother.numberEggs = 1;</code>। একই object-এ আরেকটা field initialize করার সময় আগে-initialize হওয়া field পড়া যায়:</p>
+<pre><code><span class="num">2</span>: <span class="kw">String</span> first = <span class="str">"Theodore"</span>;
+<span class="num">3</span>: <span class="kw">String</span> last  = <span class="str">"Moose"</span>;
+<span class="num">4</span>: <span class="kw">String</span> full  = first + last;  <span class="cm">// reads first & last, writes full</span></code></pre>
+
+    <h3>Instance initializer block</h3>
+    <p>method-এর <em>বাইরে</em> থাকা code block হলো <strong>instance initializer</strong>। brace জোড়া গুনে code block গোনা যায়; instance initializer method-এর ভেতরে থাকতে পারে না।</p>
+<pre><code><span class="num">1</span>: <span class="kw">public</span> <span class="kw">class</span> Bird {
+<span class="num">2</span>:    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="kw">String</span>[] args) {
+<span class="num">3</span>:       { System.out.println(<span class="str">"Feathers"</span>); }  <span class="cm">// inner block, NOT an initializer</span>
+<span class="num">4</span>:    }
+<span class="num">5</span>:    { System.out.println(<span class="str">"Snowy"</span>); }        <span class="cm">// instance initializer (outside method)</span>
+<span class="num">6</span>: }</code></pre>
+    <p>এখানে চারটা code block: class, method, inner block, instance initializer। শুধু line 5 instance initializer।</p>
+
+    <h3>Initialization-এর order</h3>
+    <div class="rules-box">
+      <h4>দুটো নিয়ম</h4>
+      <ol>
+        <li>field ও instance initializer block <strong>file-এ যে ক্রমে আছে সেই ক্রমে</strong> চলে।</li>
+        <li>constructor চলে সব field ও instance initializer-এর <strong>পরে</strong>।</li>
+      </ol>
+    </div>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — forward reference</span>
+      <p>define হওয়ার আগে কোনো field পড়া যায় না:</p>
+<pre><code>{ System.out.println(name); } <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">private</span> <span class="kw">String</span> name = <span class="str">"Fluffy"</span>;</code></pre>
+    </div>
+    <div class="trace"><ul>
+      <li><code>private int number = 3;</code> → number = <span class="out">3</span></li>
+      <li><code>{ number = 4; }</code> → number = <span class="out">4</span></li>
+      <li>constructor <code>number = 5;</code> → number = <span class="out">5</span></li>
+      <li>তাই <code>egg.number</code> প্রিন্ট করে <span class="out">5</span></li>
+    </ul></div>
+  </section>
+
+  <!-- SECTION 05 -->
+  <section id="s5">
+    <div class="secnum">SECTION 05</div>
+    <h2>Data Type: Primitive ও Reference</h2>
+    <p>Java-তে দুই রকম data: <strong>primitive type</strong> ও <strong>reference type</strong>। আটটা primitive আছে।</p>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Keyword</th><th>Type</th><th>Bit</th><th>Default</th></tr>
+      <tr><td><code>boolean</code></td><td>true / false</td><td>JVM-নির্ভর</td><td><code>false</code></td></tr>
+      <tr><td><code>byte</code></td><td>integral</td><td>8 (-128..127)</td><td><code>0</code></td></tr>
+      <tr><td><code>short</code></td><td>integral (signed)</td><td>16 (-32,768..32,767)</td><td><code>0</code></td></tr>
+      <tr><td><code>int</code></td><td>integral</td><td>32</td><td><code>0</code></td></tr>
+      <tr><td><code>long</code></td><td>integral</td><td>64</td><td><code>0L</code></td></tr>
+      <tr><td><code>float</code></td><td>floating-point</td><td>32 (<code>f</code>/<code>F</code> লাগে)</td><td><code>0.0f</code></td></tr>
+      <tr><td><code>double</code></td><td>floating-point</td><td>64</td><td><code>0.0</code></td></tr>
+      <tr><td><code>char</code></td><td>Unicode (unsigned)</td><td>16 (0..65,535)</td><td><code>\u0000</code></td></tr>
+    </table>
+    </div>
+    <div class="card remember"><span class="label">★ REMEMBER</span>
+      <p>প্রতিটা numeric type পরের ছোট type-এর দ্বিগুণ bit ব্যবহার করে; সব numeric type signed। <code>short</code> signed আর <code>char</code> unsigned, কিন্তু দুটোই 16-bit, তাই একে অপরে cast করা যায়। <code>String</code> primitive <strong>নয়</strong> — এটা একটা object।</p>
+    </div>
+
+    <h3>Literal লেখা</h3>
+    <p>default-এ একটা numeric literal হলো <code>int</code>। <code>long</code>-এর জন্য <code>L</code>, <code>float</code>-এর জন্য <code>f</code>/<code>F</code> যোগ করুন।</p>
+<pre><code><span class="kw">long</span> max = <span class="num">3123456789</span>;   <span class="err">// DOES NOT COMPILE (too big for int)</span>
+<span class="kw">long</span> max = <span class="num">3123456789L</span>;  <span class="cm">// OK — now it's a long</span></code></pre>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Base</th><th>Digit</th><th>Prefix</th><th>উদাহরণ</th></tr>
+      <tr><td>Octal</td><td>0–7</td><td><code>0</code></td><td><code>017</code></td></tr>
+      <tr><td>Hexadecimal</td><td>0–9, A–F (case-insensitive)</td><td><code>0x</code> / <code>0X</code></td><td><code>0xFF</code>, <code>0XFf</code></td></tr>
+      <tr><td>Binary</td><td>0–1</td><td><code>0b</code> / <code>0B</code></td><td><code>0b10</code></td></tr>
+    </table>
+    </div>
+
+    <h4>Literal-এ underscore</h4>
+    <div class="card key-rule"><span class="label">✓ KEY RULE</span>
+      <p>underscore অনুমোদিত <strong>সর্বত্র, কেবল নয়</strong>: শুরুতে, শেষে, decimal point-এর ঠিক আগে, বা decimal point-এর ঠিক পরে। পাশাপাশি একাধিক underscore-ও চলে।</p>
+    </div>
+<pre><code><span class="kw">double</span> notAtStart   = _1000.00;   <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">double</span> notAtEnd     = 1000.00_;   <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">double</span> notByDecimal = 1000_.00;   <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">double</span> annoyingOK   = 1_00_0.0_0; <span class="cm">// ugly, but compiles</span></code></pre>
+
+    <h3>Reference type</h3>
+    <p>একটা reference heap-এ থাকা object-এর memory address রেখে তাকে "point" করে; address দেখা যায় না। reference method call করতে পারে (<code>null</code> না হলে); primitive পারে না।</p>
+<pre><code><span class="num">4</span>: <span class="kw">String</span> reference = <span class="str">"hello"</span>;
+<span class="num">5</span>: <span class="kw">int</span> len = reference.length();
+<span class="num">6</span>: <span class="kw">int</span> bad = len.length();  <span class="err">// DOES NOT COMPILE (int has no methods)</span></code></pre>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — null</span>
+      <p>reference-কে <code>null</code> দেওয়া যায়; primitive-কে যায় না:</p>
+<pre><code><span class="kw">int</span> value = <span class="kw">null</span>;   <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">String</span> name = <span class="kw">null</span>; <span class="cm">// fine</span></code></pre>
+    </div>
+
+    <h3>Wrapper class</h3>
+    <p>প্রতিটা primitive-এর একটা wrapper class আছে। numeric গুলো <code>Number</code> extend করে; <code>Boolean</code> ও <code>Character</code> করে না।</p>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Primitive</th><th>Wrapper</th><th>Number extend?</th><th>উদাহরণ</th></tr>
+      <tr><td><code>boolean</code></td><td><code>Boolean</code></td><td class="no">না</td><td><code>Boolean.valueOf(true)</code></td></tr>
+      <tr><td><code>int</code></td><td><code>Integer</code></td><td class="yes">হ্যাঁ</td><td><code>Integer.valueOf(1)</code></td></tr>
+      <tr><td><code>double</code></td><td><code>Double</code></td><td class="yes">হ্যাঁ</td><td><code>Double.valueOf(1.0)</code></td></tr>
+      <tr><td><code>char</code></td><td><code>Character</code></td><td class="no">না</td><td><code>Character.valueOf('c')</code></td></tr>
+    </table>
+    </div>
+<pre><code><span class="kw">int</span> primitive   = Integer.parseInt(<span class="str">"123"</span>);  <span class="cm">// String -> int primitive</span>
+Integer wrapper = Integer.valueOf(<span class="str">"123"</span>);   <span class="cm">// String -> Integer wrapper</span>
+Integer.valueOf(<span class="str">"five"</span>);                   <span class="err">// NumberFormatException</span>
+Integer.valueOf(<span class="str">"a"</span>, <span class="num">16</span>);                 <span class="cm">// 10 (base 16)</span></code></pre>
+    <div class="card remember"><span class="label">★ REMEMBER — Boolean.valueOf ও Number helper</span>
+      <p><code>Boolean.valueOf</code> case-insensitive "true"-র জন্য <code>true</code> দেয় (<code>"TrUe"</code>→true), নয়তো <code>false</code> — <code>"kangaroo"</code> ও <code>null</code> সহ। <code>intValue()</code>/<code>byteValue()</code>-র মতো helper precision হারাতে পারে: <code>Double.valueOf("200.99")</code> থেকে <code>byteValue()</code> → <code>-56</code>, <code>intValue()</code> → <code>200</code>।</p>
+    </div>
+
+    <h3>Text block</h3>
+    <p>text block শুরু ও শেষ হয় <code>"""</code> দিয়ে; ভেতরের content escape করতে হয় না, এবং এর type এখনো <code>String</code>।</p>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — line break আবশ্যক</span>
+<pre><code><span class="kw">String</span> block = <span class="str">"""doe"""</span>; <span class="err">// DOES NOT COMPILE (needs a line break after opening """)</span></code></pre>
+    </div>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Sequence</th><th>Regular String</th><th>Text block</th></tr>
+      <tr><td><code>\s</code></td><td>একটা space (trailing রাখে)</td><td>একটা space (trailing রাখে)</td></tr>
+      <tr><td>line-এর শেষে <code>\</code></td><td>n/a — invalid</td><td>ওই line-এর line break বাদ দেয়</td></tr>
+      <tr><td>line-এর শেষে space</td><td>space</td><td>ignored</td></tr>
+    </table>
+    </div>
+    <p><strong>Incidental</strong> whitespace (সবচেয়ে বাঁদিকের non-whitespace character-এর বামের সব) বাদ যায়; <strong>essential</strong> whitespace থাকে। <code>"""\n   doe \\\n   deer"""</code> এক line আউটপুট দেয় (<code>doe deer</code>), কারণ <code>\</code> line break বাদ দেয়।</p>
+  </section>
+
+  <!-- SECTION 06 -->
+  <section id="s6">
+    <div class="secnum">SECTION 06</div>
+    <h2>Variable Declaration ও var</h2>
+
+    <h3>Identifier</h3>
+    <div class="rules-box">
+      <h4>Legal identifier-এর চারটা নিয়ম</h4>
+      <ol>
+        <li>শুরু হতে হবে একটা letter, currency symbol (<code>$</code>, <code>¥</code>, <code>€</code>…), বা <code>_</code> দিয়ে।</li>
+        <li>number থাকতে পারে, কিন্তু number দিয়ে <strong>শুরু</strong> হতে পারে না।</li>
+        <li>শুধু একটা underscore <code>_</code> অনুমোদিত <strong>নয়</strong>।</li>
+        <li>reserved word হতে পারে না। (<code>true</code>, <code>false</code>, <code>null</code> literal, এগুলোও নাম হিসেবে চলে না।)</li>
+      </ol>
+    </div>
+<pre><code><span class="cm">// legal</span>
+<span class="kw">long</span> okidentifier; <span class="kw">float</span> $OK2Identifier; <span class="kw">boolean</span> _alsoOK1d3ntifi3r;
+
+<span class="cm">// illegal</span>
+<span class="kw">int</span> 3DPointClass;    <span class="err">// starts with a number</span>
+<span class="kw">byte</span> hollywood@vine; <span class="err">// @ is not a letter, digit, $ or _</span>
+<span class="kw">double</span> public;       <span class="err">// reserved word</span>
+<span class="kw">short</span> _;             <span class="err">// single underscore not allowed</span></code></pre>
+
+    <h3>একাধিক variable declare করা</h3>
+    <p>এক statement-এ একাধিক variable-কে <strong>একটা</strong> type declaration share করতে হবে। comma দিয়ে আলাদা প্রতিটা অংশ নিজের একটা declaration।</p>
+<pre><code><span class="kw">String</span> s1, s2;                 <span class="cm">// two declared, none initialized</span>
+<span class="kw">String</span> s3 = <span class="str">"yes"</span>, s4 = <span class="str">"no"</span>;  <span class="cm">// two declared & initialized</span>
+<span class="kw">int</span> i1, i2, i3 = <span class="num">0</span>;           <span class="cm">// only i3 is initialized!</span>
+<span class="kw">int</span> num, <span class="kw">String</span> value;        <span class="err">// DOES NOT COMPILE (different types)</span>
+<span class="kw">double</span> d1, <span class="kw">double</span> d2;          <span class="err">// DOES NOT COMPILE (type repeated)</span></code></pre>
+
+    <h3>Variable initialize করা</h3>
+    <div class="vs-grid">
+      <div class="vs-col left"><h4>Local variable</h4>
+        <ul><li>default value নেই</li><li>ব্যবহারের আগে initialize করতেই হবে (নয়তো compiler error)</li><li>declare করে না-ব্যবহার করা ঠিক আছে</li></ul>
+      </div>
+      <div class="vs-col right"><h4>Instance / class variable</h4>
+        <ul><li>স্বয়ংক্রিয়ভাবে default পায়</li><li>object-এ <code>null</code>, number-এ <code>0</code>, boolean-এ <code>false</code>, char-এ <code>\u0000</code></li></ul>
+      </div>
+    </div>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — uninitialized local পড়া</span>
+<pre><code><span class="kw">int</span> x;
+<span class="kw">int</span> reply = x + <span class="num">10</span>;  <span class="err">// DOES NOT COMPILE (x never initialized)</span></code></pre>
+      <p><code>if/else</code>-এর শুধু <em>একটা</em> branch-এ মান সেট হলে পরে পড়লে compile হয় না। <em>দুই</em> branch-এই সেট হলে ঠিক আছে।</p>
+    </div>
+    <div class="card remember"><span class="label">★ REMEMBER — final local</span>
+      <p>local variable-এ <code>final</code> দিলে সেটা constant — reassign করলে compile হয় না। <code>final</code> array reference-এ এখনো <em>content</em> বদলানো যায়, শুধু reference reassign নয়: <code>favoriteNumbers = null;</code> → compile হয় না।</p>
+    </div>
+
+    <h3>Local variable type inference: <code>var</code></h3>
+    <div class="rules-box">
+      <h4>var-এর নিয়ম</h4>
+      <ul>
+        <li>শুধু <strong>local variable</strong>-এর জন্য — instance/class variable নয়, method/constructor parameter নয়।</li>
+        <li>type infer হয় declaration-এর <strong>একই line</strong> থেকে।</li>
+        <li>type fix হয় <strong>compile time</strong>-এ; <em>value</em> runtime-এ বদলাতে পারে কিন্তু type নয়।</li>
+        <li><code>var x = null;</code> একা → compile হয় না (তবে reference-typed <code>var</code> পরে <code>null</code> reassign করা যায়)।</li>
+        <li>multiple-variable declaration চলে না: <code>var a, b = 3;</code> → compile হয় না।</li>
+        <li><code>var</code> একটা <em>reserved type name</em>, reserved word নয় — variable বা method নাম হতে পারে, কিন্তু class/interface/enum নয়।</li>
+      </ul>
+    </div>
+<pre><code><span class="kw">var</span> number = <span class="num">7</span>;
+number = <span class="num">4</span>;
+number = <span class="str">"five"</span>;  <span class="err">// DOES NOT COMPILE (inferred int)</span>
+
+<span class="kw">var</span> question;    <span class="err">// DOES NOT COMPILE (no value on the declaration line)</span>
+<span class="kw">var</span> n = <span class="kw">null</span>;    <span class="err">// DOES NOT COMPILE</span></code></pre>
+  </section>
+
+  <!-- SECTION 07 -->
+  <section id="s7">
+    <div class="secnum">SECTION 07</div>
+    <h2>Scope ও Garbage Collection</h2>
+
+    <h3>Variable scope</h3>
+    <div class="rules-box">
+      <h4>Variable ভেদে scope</h4>
+      <ul>
+        <li><strong>Local variable:</strong> declaration থেকে block-এর শেষ পর্যন্ত।</li>
+        <li><strong>Method parameter:</strong> পুরো method।</li>
+        <li><strong>Instance variable:</strong> declaration থেকে object garbage collection-এর জন্য eligible হওয়া পর্যন্ত।</li>
+        <li><strong>Class (static) variable:</strong> declaration থেকে প্রোগ্রাম শেষ হওয়া পর্যন্ত।</li>
+      </ul>
+    </div>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — out of scope</span>
+<pre><code><span class="num">4</span>: <span class="kw">if</span> (hungry) {
+<span class="num">5</span>:    <span class="kw">int</span> bitesOfCheese = <span class="num">1</span>;
+<span class="num">6</span>: } <span class="cm">// bitesOfCheese goes out of scope here</span>
+<span class="num">7</span>: System.out.println(bitesOfCheese); <span class="err">// DOES NOT COMPILE</span></code></pre>
+      <p>ভেতরের block বাইরের block-এর variable পড়তে পারে, কিন্তু উল্টোটা নয়। scope ট্র্যাক করতে ভেতর থেকে বাইরে brace মেলান।</p>
+    </div>
+
+    <h3>Garbage collection</h3>
+    <p>সব object <strong>heap</strong>-এ ("free store") থাকে। garbage collector আর reachable নয় এমন object মুছে memory খালি করে।</p>
+    <div class="rules-box">
+      <h4>একটা object GC-এর জন্য eligible হয় যখন…</h4>
+      <ul>
+        <li>এর দিকে আর কোনো reference থাকে না, <strong>অথবা</strong></li>
+        <li>এর সব reference scope-এর বাইরে চলে গেছে।</li>
+      </ul>
+    </div>
+    <div class="card remember"><span class="label">★ REMEMBER — System.gc() শুধু একটা suggestion</span>
+      <p><code>System.gc()</code> শুধু collection-এর <em>পরামর্শ</em> দেয়; JVM সেটা উপেক্ষা করতে পারে। GC-eligible ≠ সাথে সাথে collect, আর একটা object eligible হয়েও কখনো collect না-ও হতে পারে (যেমন আগে প্রোগ্রাম শেষ হয়ে গেলে)। একটা variable-কে <code>final</code> করলে তার object-এর garbage collection <strong>আটকায় না</strong>।</p>
+    </div>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — eligibility ট্রেস করা</span>
+<pre><code><span class="num">4</span>: one = <span class="kw">new</span> <span class="kw">String</span>(<span class="str">"a"</span>);
+<span class="num">5</span>: two = <span class="kw">new</span> <span class="kw">String</span>(<span class="str">"b"</span>);
+<span class="num">6</span>: one = two;          <span class="cm">// "a" now has no references -> eligible for GC</span>
+<span class="num">7</span>: <span class="kw">String</span> three = one;
+<span class="num">8</span>: one = <span class="kw">null</span>;          <span class="cm">// "b" still reachable via two & three</span>
+<span class="num">9</span>: }                    <span class="cm">// "b" eligible only when scope ends here</span></code></pre>
+      <p><code>"a"</code> line 6-এ eligible হয়; <code>"b"</code> line 9-এ method শেষ হওয়া পর্যন্ত reachable থাকে।</p>
+    </div>
+  </section>
+
+  <!-- RECAP -->
+  <section id="recap" class="card recap">
+    <div class="secnum">★ SHORT RECAP</div>
+    <h2 style="border-color:#f0e3c8;">সংক্ষিপ্ত রিভিউ</h2>
+    <h3>Environment ও structure</h3>
+    <ul>
+      <li><code>javac</code> <code>.java</code> → <code>.class</code> bytecode compile করে; <code>java</code> JVM-এ চালায়। run করার সময় <code>.class</code> extension বাদ।</li>
+      <li>member = field + method; method signature = নাম + parameter type। public top-level type-এর নাম filename-এর সাথে মিলতে হবে।</li>
+    </ul>
+    <h3>main() ও package</h3>
+    <ul>
+      <li><code>public static void main(String[] args)</code>; তিন parameter form (<code>[]</code> দুই পাশে, বা <code>...</code>); args index 0 থেকে।</li>
+      <li>wildcard শুধু সরাসরি class import করে (child package/field/method নয়); <code>java.lang</code> স্বয়ংক্রিয়; explicit import wildcard-কে হারায়। order হলো <strong>PIC</strong>।</li>
+    </ul>
+    <h3>Object ও initialization</h3>
+    <ul>
+      <li>constructor = class নাম, return type নেই; return type থাকা "constructor" শুধু একটা method। field ও instance initializer source order-এ চলে, তারপর constructor।</li>
+    </ul>
+    <h3>Data type</h3>
+    <ul>
+      <li>আট primitive; literal default <code>int</code> (<code>L</code>/<code>f</code> যোগ); underscore প্রান্তে বা decimal-এর পাশে নয়; <code>String</code> primitive নয়।</li>
+      <li>reference <code>null</code> হতে পারে ও method call করতে পারে; primitive কোনোটাই পারে না। numeric wrapper <code>Number</code> extend করে; খারাপ input-এ <code>valueOf</code> <code>NumberFormatException</code> throw করে।</li>
+    </ul>
+    <h3>Variable, scope ও GC</h3>
+    <ul>
+      <li>local-এর default নেই, ব্যবহারের আগে initialize করতে হবে; instance/class variable default পায়। <code>var</code> শুধু local, একই line থেকে infer, type compile time-এ fix।</li>
+      <li>object unreachable হলে GC-eligible; <code>System.gc()</code> শুধু একটা hint; <code>final</code> collection আটকায় না।</li>
+    </ul>
+  </section>
+
+  <!-- CHEAT SHEET -->
+  <section id="cheat">
+    <div class="secnum">⚑ CHEAT SHEET</div>
+    <h2>Exam Traps চিট-শিট</h2>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>পরিস্থিতি</th><th>কী টেস্ট হয়</th><th>রায়</th></tr>
+      <tr><td><code>Animal.java</code>-এর ভেতরে <code>public class Animal2</code></td><td>public type-এর নাম filename-এর সাথে মিলতে হবে</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>public void Chick() { }</code> <code>new Chick()</code> দিয়ে call</td><td>return type → এটা method, constructor নয়</td><td class="no">new দিয়ে invoke হয় না</td></tr>
+      <tr><td><code>import java.nio.file.Paths.*;</code></td><td>method import করা</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>import java.util.*;</code> + <code>import java.sql.*;</code> তারপর <code>Date</code></td><td>ambiguous wildcard conflict</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>package</code>-এর আগে <code>import</code></td><td>PIC ordering</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td>class-এর বাইরে field declare</td><td>member অবশ্যই class-এ থাকবে</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td>initializer-এ define হওয়ার আগে field পড়া</td><td>forward reference</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>long max = 3123456789;</code> (<code>L</code> ছাড়া)</td><td>int literal range-এর বাইরে</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>1000_.00</code> / <code>_1000.00</code> / <code>1000.00_</code></td><td>underscore প্রান্তে / decimal-এর পাশে</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>int value = null;</code></td><td>primitive-কে null দেওয়া</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>len.length()</code> যেখানে <code>len</code> একটা <code>int</code></td><td>primitive-এ method call</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>Integer.valueOf("five")</code></td><td>invalid numeric String</td><td class="no">NumberFormatException</td></tr>
+      <tr><td><code>String block = """doe""";</code></td><td><code>"""</code>-এর পরে line break লাগে</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>short _;</code></td><td>একক underscore identifier</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>int num, String value;</code></td><td>এক statement-এ একাধিক type</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>double d1, double d2;</code></td><td>multi-declaration-এ type পুনরাবৃত্তি</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>int i1, i2, i3 = 0;</code></td><td>শুধু শেষ variable initialize হয়</td><td class="yes">i1, i2 uninitialized</td></tr>
+      <tr><td>শুধু এক <code>if</code> branch-এ সেট local পড়া</td><td>definite assignment</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td>instance variable হিসেবে <code>var tricky = "Hello";</code></td><td>var শুধু local</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>var n = null;</code> / <code>var x;</code></td><td>var-এর line-এ inferable value লাগে</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td>এক argument-এ <code>args[1]</code> পড়া</td><td>array index out of bounds</td><td class="no">ArrayIndexOutOfBoundsException</td></tr>
+      <tr><td><code>System.gc();</code></td><td>GC guarantee</td><td class="no">শুধু একটা suggestion</td></tr>
+    </table>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

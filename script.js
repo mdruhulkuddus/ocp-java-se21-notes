@@ -24,7 +24,15 @@
    PHASE 3 will fill in the remaining file paths.
 --------------------------------------------------------------- */
 const chapters = [
-  { id: "building-blocks", number: 1, title: "Building Blocks", titleBn: "", handnoteFile: null, banglaFile: null, questionsFile: null },
+  {
+    id: "building-blocks",
+    number: 1,
+    title: "Building Blocks",
+    titleBn: "",
+    handnoteFile: "chapters/01-building-blocks/Ch1_BuildingBlocks_Handnote_EN.html",
+    banglaFile: "chapters/01-building-blocks/Ch1_BuildingBlocks_HandNote_Bangla.html",
+    questionsFile: "chapters/01-building-blocks/Ch1_BuildingBlocks_MCQ_Practice.html",
+  },
   { id: "operators", number: 2, title: "Operators", titleBn: "", handnoteFile: null, banglaFile: null, questionsFile: null },
   { id: "making-decisions", number: 3, title: "Making Decisions", titleBn: "", handnoteFile: null, banglaFile: null, questionsFile: null },
   {
