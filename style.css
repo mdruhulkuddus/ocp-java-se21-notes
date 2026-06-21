@@ -176,12 +176,35 @@ body.header-hidden .site-header {
   display: block;
 }
 
+/* ---- Reading progress bar ----
+   Fixed above the header (higher z-index) so it stays visible even when the
+   header collapses on scroll-down. Width is driven from script.js. */
+.reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: transparent;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.reading-progress__fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+  transition: width 0.1s linear;
+}
+
 /* ---- Layout ---- */
 .layout {
   flex: 1 1 auto;
   min-height: 0; /* let children own the scroll instead of overflowing the flex */
   display: grid;
   grid-template-columns: 230px 1fr;
+  transition: grid-template-columns 0.18s ease;
 }
 
 /* ---- Sidebar (fixed; scrolls internally only if the list is long) ---- */
@@ -274,10 +297,106 @@ body.header-hidden .site-header {
   margin: 0 auto;
 }
 
+/* Tab strip row: active-chapter label + view tabs + focus toggle, sharing
+   one bottom divider. Spans the reading column (left-anchored, not centered). */
+.reading-head-inner {
+  max-width: none;
+  margin: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 28px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Reading body (content + footer): centered, width capped per view. */
+.reading-body-inner {
+  max-width: 860px; /* prose default */
+  margin: 0 auto;
+}
+
+.reading--wide .reading-body-inner {
+  max-width: 1180px;
+}
+
+.reading--prose .reading-body-inner {
+  max-width: 860px;
+}
+
+/* ---- Active-chapter label in the tab strip ---- */
+.strip-chapter {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 1px;
+  padding-bottom: 10px;
+  white-space: nowrap;
+}
+
+.strip-line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.strip-num {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.strip-dot {
+  color: var(--text-muted);
+}
+
+.strip-title {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.strip-title-bn {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
 .tabs {
   display: flex;
   gap: 28px;
-  border-bottom: 1px solid var(--border);
+}
+
+/* ---- Focus toggle (far right of the tab strip) ---- */
+.focus-toggle {
+  margin-left: auto;
+  margin-bottom: 7px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-soft);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.focus-toggle:hover {
+  border-color: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.focus-toggle.active {
+  color: var(--accent-strong);
+  border-color: var(--accent-soft);
+  background: var(--bg-active);
 }
 
 .tab {
@@ -434,27 +553,71 @@ body.header-hidden .site-header {
   color: var(--text-muted);
 }
 
-.footer-credit a {
+/* Left: source attribution. Right: developer credit (the only footer link). */
+.footer-source {
+  color: var(--text-muted);
+}
+
+.footer-source .bn {
+  font-family: var(--font-bn);
+}
+
+.footer-source a {
   color: inherit;
   text-decoration: none;
 }
 
-.footer-credit a:hover,
-.footer-credit a:focus {
+.footer-source a:hover,
+.footer-source a:focus {
   color: var(--accent);
-  text-decoration: underline;
 }
 
-.footer-meta {
-  display: flex;
-  align-items: center;
-  gap: 18px;
+.footer-copy {
+  color: var(--text-muted);
 }
 
-.page-indicator {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
+.footer-copy a {
+  color: var(--accent);
+  text-decoration: none;
 }
+
+.footer-copy a:hover,
+.footer-copy a:focus {
+  color: var(--accent-strong);
+}
+
+/* ---- Focus mode ----
+   <html class="focus-mode"> collapses the sidebar to a numbered rail and
+   centers the reading column. Borders soften for a quieter surface. The
+   sidebar width animates via the .layout grid-template-columns transition. */
+html.focus-mode {
+  --border: var(--border-soft);
+}
+
+html.focus-mode .layout {
+  grid-template-columns: 60px 1fr;
+}
+
+html.focus-mode .sidebar {
+  padding: 24px 6px;
+}
+
+html.focus-mode .sidebar-label {
+  display: none;
+}
+
+html.focus-mode .chapter-item {
+  justify-content: center;
+  gap: 0;
+  padding: 8px 0;
+}
+
+html.focus-mode .chapter-title {
+  display: none;
+}
+
+/* Reading width stays consistent with normal mode (per-view max-width,
+   centered) — focus mode only collapses the sidebar and softens borders. */
 
 /* ---- Responsive ----
    On small screens, drop the app-shell and use normal page scroll. */

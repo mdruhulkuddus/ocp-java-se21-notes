@@ -27,20 +27,21 @@ ocp-book-site/
 ├── CLAUDE.md         # This file
 └── chapters/
     └── <nn>-<slug>/  # One folder per chapter (e.g. 04-core-apis/)
-        ├── handnote   .html   # English handnote fragment
-        ├── bangla     .html   # Bangla handnote fragment
-        └── questions  .html   # MCQ practice fragment
+        ├── Ch<n>_<Slug>_Handnote_EN.html       # English handnote fragment
+        ├── Ch<n>_<Slug>_HandNote_Bangla.html   # Bangla handnote fragment
+        └── Ch<n>_<Slug>_MCQ_Practice.html       # MCQ practice fragment
 ```
 
 Chapter folders currently present: `01-building-blocks`, `04-core-apis`,
 `05-methods`. The rest are declared in `script.js` but have no files yet
 (their tabs show a disabled "(soon)" state).
 
-> Note: filenames are **not** standardized. Chapter 4 uses
-> `handnote.html` / `bangla.html` / `questions.html`, while chapters 1 and 5 use
-> descriptive names like `Ch5_Methods_Handnote_EN.html`. The actual path always
-> comes from the `chapters` array in `script.js` — that array is the source of
-> truth, not any naming convention.
+> Note: fragment files follow a descriptive convention, e.g.
+> `Ch4_CoreAPIs_Handnote_EN.html` / `Ch4_CoreAPIs_HandNote_Bangla.html` /
+> `Ch4_CoreAPIs_MCQ_Practice.html`. Casing is not perfectly uniform (EN uses
+> `Handnote`, Bangla uses `HandNote`), so the actual path always comes from the
+> `chapters` array in `script.js` — that array is the source of truth, not any
+> naming convention.
 
 ## How it works
 
@@ -53,9 +54,9 @@ Chapter folders currently present: `01-building-blocks`, `04-core-apis`,
   number: 4,              // display number / ordering
   title: "Core APIs",     // sidebar + breadcrumb label
   titleBn: "",            // optional Bengali title (unused so far)
-  handnoteFile: "chapters/04-core-apis/handnote.html",  // or null
-  banglaFile:   "chapters/04-core-apis/bangla.html",    // or null
-  questionsFile:"chapters/04-core-apis/questions.html", // or null
+  handnoteFile: "chapters/04-core-apis/Ch4_CoreAPIs_Handnote_EN.html",      // or null
+  banglaFile:   "chapters/04-core-apis/Ch4_CoreAPIs_HandNote_Bangla.html",  // or null
+  questionsFile:"chapters/04-core-apis/Ch4_CoreAPIs_MCQ_Practice.html",     // or null
 }
 ```
 
@@ -76,14 +77,37 @@ Each chapter fragment is a **complete, self-contained HTML document** with its
 own `<head>`/`<style>`. The shell loads it into an **`<iframe>`** so the
 fragment's CSS and JS stay isolated and never leak into the shell. `script.js`
 auto-sizes the iframe to its content height so the page scrolls as one (no nested
-scrollbar), and re-fits on window resize.
+scrollbar). It re-fits on window resize, after the fragment's web fonts finish
+loading (`document.fonts.ready`), and on any later content height change (a
+`ResizeObserver` on the iframe body). It also forces `overflow:hidden` on the
+iframe document so sub-pixel rounding can never leave a residual inner scrollbar
+— the only scrollbar is the shell's `.reading-scroll` region.
 
 Before swapping in the iframe, the shell does a `fetch(path, {method:"HEAD"})`
 probe so a missing file shows a themed error instead of the server's raw 404.
 
 ### Theme
 Light is primary. `data-theme` on `<html>` toggles light/dark; preference is
-persisted in `localStorage` under `ocp-theme`. Theme tokens live in `style.css`.
+persisted in `localStorage` under `ocp-theme`. All theme tokens are CSS custom
+properties defined on `:root` (light) and `[data-theme="dark"]` in `style.css`
+— change colors there, never hard-code hex values in components.
+
+The look is a warm, paper-like reading surface with a muted green accent:
+
+- **Surfaces (light):** `--bg #faf8f3`, `--bg-sidebar #f3f1e9`,
+  `--bg-panel #ffffff`, `--bg-code #f1efe7`, `--bg-active #e7efe7`.
+- **Text (light):** `--text #2b2b29`, `--text-soft #57564f`,
+  `--text-muted #908e84`.
+- **Accent (light):** `--accent #4e7d5b`, `--accent-strong #3f6b4c`,
+  `--accent-soft #6f9a7a`. Dark mode lightens these (`--accent #79b08a`).
+- **Type:** `--font-serif` Merriweather (headings), `--font-sans` Inter
+  (body), `--font-bn` Noto Sans Bengali (Bengali text), `--font-mono`
+  JetBrains Mono (code).
+
+Note the **chapter fragments carry their own independent palette and fonts**
+(e.g. Source Sans 3, a `--sect` terracotta accent) inside their own `<style>`,
+because they render in isolated iframes. The shell tokens above do **not**
+reach into fragments, and fragment styles do not leak out.
 
 ### Header behavior
 The header auto-hides on scroll-down and returns on scroll-up (listens to both
