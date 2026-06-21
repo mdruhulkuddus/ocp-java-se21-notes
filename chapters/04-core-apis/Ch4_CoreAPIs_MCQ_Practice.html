@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 · Chapter 4 — Core APIs (MCQ Practice)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:ital,wght@0,400;0,600;0,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --ink:#2c2a28; --muted:#6f6a64; --line:#ece3da;
+    --sect:#c96442; --inlinebg:#f3ece4; --inlineink:#9a5030;
+    --yes:#3b7d57; --no:#c44d3e;
+    --purple:#7a5cb8; --purple-soft:#b29ad9;
+    --shadow:0 4px 18px rgba(60,50,40,.07); --shadow-h:0 10px 30px rgba(70,55,90,.16);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Source Sans 3',system-ui,sans-serif;font-size:17px;line-height:1.65;}
+  .wrap{max-width:860px;margin:0 auto;padding:32px 20px 80px;}
+  h1{font-family:'Merriweather',serif;line-height:1.3;}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+
+  .header{position:relative;overflow:hidden;background:linear-gradient(135deg,#ffffff,#fdf8f3);
+    border-radius:18px;padding:34px 34px 28px;box-shadow:var(--shadow);margin-bottom:28px;}
+  .header::after{content:"";position:absolute;top:-60px;right:-60px;width:220px;height:220px;
+    background:radial-gradient(circle,rgba(178,154,217,.30),transparent 70%);pointer-events:none;}
+  .pill{display:inline-block;background:linear-gradient(90deg,#7a5cb8,#9b7fd4);
+    color:#fff;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;
+    letter-spacing:.6px;text-transform:uppercase;padding:7px 14px;border-radius:999px;margin-bottom:14px;}
+  .header h1{font-size:31px;margin:4px 0 6px;font-weight:900;}
+  .header .sub{font-style:italic;color:var(--muted);font-size:18px;margin:0 0 18px;}
+  .topics{display:flex;flex-wrap:wrap;gap:8px;}
+  .topics span{background:var(--inlinebg);color:var(--inlineink);font-family:'JetBrains Mono',monospace;
+    font-size:12px;padding:5px 11px;border-radius:8px;}
+
+  .howto{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:5px solid #5aab7b;
+    border-radius:12px;padding:14px 18px;margin-bottom:26px;font-size:15.5px;color:#3a5e49;}
+
+  .q-card{position:relative;background:linear-gradient(135deg,#f4f0fa,#f9f6fd);
+    border-top:4px solid #9b7fd4;border-radius:14px;padding:20px 22px;margin:18px 0;
+    box-shadow:var(--shadow);transition:box-shadow .22s ease, transform .22s ease;}
+  .q-card:hover{box-shadow:var(--shadow-h);transform:translateY(-2px);}
+  .q-head{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap;}
+  .q-num{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--purple);font-size:15px;}
+  .q-tag{background:var(--purple-soft);color:#fff;font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;letter-spacing:.5px;text-transform:uppercase;padding:3px 9px;border-radius:7px;}
+  .q-prompt{font-weight:600;margin:6px 0 12px;}
+  .q-prompt .all{color:var(--purple);font-weight:700;}
+
+  pre{background:#fbf9fe;border-radius:12px;padding:14px 16px;overflow-x:auto;
+    box-shadow:inset 0 2px 8px rgba(80,60,120,.08);margin:12px 0;font-size:13.5px;line-height:1.55;}
+  pre code{background:none;padding:0;color:#3a352f;}
+  .kw{color:var(--kw);font-weight:500;} .str{color:var(--str);} .num{color:var(--num);}
+  .err{color:var(--err);font-weight:700;} .cm{color:var(--cm);font-style:italic;}
+
+  .opts{list-style:none;margin:8px 0 4px;padding:0;}
+  .opts li{margin:5px 0;padding-left:30px;position:relative;}
+  .opts li .ol{position:absolute;left:0;top:0;font-family:'JetBrains Mono',monospace;
+    font-weight:700;color:var(--purple);}
+  .opts code{background:#f3ece4;color:#9a5030;padding:1.5px 6px;border-radius:6px;font-size:14px;}
+
+  details{margin-top:12px;border-top:1px dashed #d8c9ec;padding-top:10px;}
+  summary{cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;
+    color:var(--purple);list-style:none;user-select:none;}
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸ ";}
+  details[open] summary::before{content:"▾ ";}
+  .ans-key{display:inline-block;background:#eef8f1;color:#3d8a5e;font-family:'JetBrains Mono',monospace;
+    font-weight:700;font-size:13px;padding:4px 11px;border-radius:8px;margin:10px 0 8px;}
+  .expl{font-size:15.5px;color:#403a44;margin:4px 0;}
+  .expl code{background:#f3ece4;color:#9a5030;padding:1.5px 6px;border-radius:6px;font-size:14px;}
+
+  .revision{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:5px solid #d4a24c;
+    border-radius:14px;padding:20px 24px;margin:30px 0 0;box-shadow:var(--shadow);}
+  .revision h3{font-family:'Merriweather',serif;color:#a9772a;margin:0 0 10px;font-size:21px;}
+  .revision ul{margin:6px 0;padding-left:22px;}
+  .revision li{margin:6px 0;}
+  .revision code{background:#f3ece4;color:#9a5030;padding:1.5px 6px;border-radius:6px;font-size:14px;}
+
+  @media(max-width:680px){
+    body{font-size:16px;}
+    .header h1{font-size:25px;}
+    .q-card{padding:18px 16px;} .header{padding:24px 20px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="header">
+    <span class="pill">OCP Java SE 21 · 1Z0-830</span>
+    <h1>Chapter 4 · Core APIs — MCQ Practice</h1>
+    <p class="sub">28 exam-style questions on Strings, StringBuilder, equality, arrays, the Math API, and dates &amp; times. Reveal each answer when you're ready.</p>
+    <div class="topics">
+      <span>STRINGS</span><span>STRINGBUILDER</span><span>EQUALITY &amp; POOL</span>
+      <span>ARRAYS</span><span>MATH API</span><span>DATE-TIME</span>
+    </div>
+  </header>
+
+  <div class="howto">Try each one before expanding. A few say <strong>"Choose all that apply"</strong> — read those carefully; the rest have exactly one answer. Every answer is verified line-by-line against the study guide.</div>
+
+  <!-- Q1 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q1</span><span class="q-tag">Strings</span></div>
+    <p class="q-prompt">What is printed?</p>
+<pre><code>System.out.println(<span class="num">1</span> + <span class="num">2</span> + <span class="str">"c"</span> + <span class="num">3</span> + <span class="num">4</span>);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>12c34</code></li>
+      <li><span class="ol">B.</span> <code>3c7</code></li>
+      <li><span class="ol">C.</span> <code>3c34</code></li>
+      <li><span class="ol">D.</span> <code>12c7</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · 3c34</span>
+      <p class="expl">Evaluation is strictly left to right. <code>1 + 2</code> are both numeric → <code>3</code>. Then <code>3 + "c"</code> hits a String → concatenation → <code>"3c"</code>. After a String appears, everything to the right also concatenates: <code>"3c" + 3</code> → <code>"3c3"</code>, then <code>+ 4</code> → <code>"3c34"</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q2</span><span class="q-tag">Strings</span></div>
+    <p class="q-prompt">Given <code>var s = "animals";</code>, which calls throw an exception at runtime? <span class="all">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>s.substring(3, 7)</code></li>
+      <li><span class="ol">B.</span> <code>s.substring(3, 2)</code></li>
+      <li><span class="ol">C.</span> <code>s.charAt(7)</code></li>
+      <li><span class="ol">D.</span> <code>s.indexOf('z')</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B and C</span>
+      <p class="expl"><code>"animals"</code> has length 7 (indexes 0–6). <strong>A</strong> is fine — <code>end == length</code> (7) is allowed and returns <code>"mals"</code>. <strong>B</strong> throws because the end index (2) is before the begin index (3). <strong>C</strong> throws <code>StringIndexOutOfBoundsException</code> — index 7 is past the last valid index 6. <strong>D</strong> simply returns <code>-1</code> (no exception when not found).</p>
+    </details>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q3</span><span class="q-tag">Strings</span></div>
+    <p class="q-prompt">Given <code>String text = " abc\t ";</code> (a leading space, then "abc", a tab, and a trailing space), what does <code>text.stripLeading().length()</code> return?</p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>3</code></li>
+      <li><span class="ol">B.</span> <code>4</code></li>
+      <li><span class="ol">C.</span> <code>5</code></li>
+      <li><span class="ol">D.</span> <code>7</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · 5</span>
+      <p class="expl"><code>stripLeading()</code> removes only the leading whitespace (the first space), leaving <code>abc</code> + tab + trailing space = 5 characters. The tab <code>\t</code> counts as a single character. (For comparison, <code>strip()</code> and <code>trim()</code> would give 3, and <code>stripTrailing()</code> would give 4.)</p>
+    </details>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q4</span><span class="q-tag">Strings</span></div>
+    <p class="q-prompt">What is the result?</p>
+<pre><code>System.out.println(<span class="str">"Food: %d tons"</span>.formatted(<span class="num">2.0</span>));</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>Food: 2 tons</code></li>
+      <li><span class="ol">B.</span> <code>Food: 2.0 tons</code></li>
+      <li><span class="ol">C.</span> It does not compile.</li>
+      <li><span class="ol">D.</span> It throws an exception at runtime.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">D · runtime exception</span>
+      <p class="expl"><code>%d</code> is for integer types, but a <code>double</code> (<code>2.0</code>) is passed. This compiles fine — the mismatch isn't caught until runtime, where it throws <code>IllegalFormatConversionException</code>. (To print a floating-point value you'd use <code>%f</code>.)</p>
+    </details>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q5</span><span class="q-tag">Strings</span></div>
+    <p class="q-prompt">After this runs, what are the values of <code>a</code> and <code>b</code>?</p>
+<pre><code><span class="kw">String</span> a = <span class="str">"abc"</span>;
+<span class="kw">String</span> b = a.toUpperCase();
+b = b.replace(<span class="str">"B"</span>, <span class="str">"2"</span>).replace(<span class="str">'C'</span>, <span class="str">'3'</span>);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>a="abc"</code>, <code>b="A23"</code></li>
+      <li><span class="ol">B.</span> <code>a="A23"</code>, <code>b="A23"</code></li>
+      <li><span class="ol">C.</span> <code>a="abc"</code>, <code>b="ABC"</code></li>
+      <li><span class="ol">D.</span> <code>a="abc"</code>, <code>b="a23"</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A · a="abc", b="A23"</span>
+      <p class="expl">String is immutable, so <code>a</code> never changes. <code>b</code> starts as <code>"ABC"</code>; <code>replace("B","2")</code> → <code>"A2C"</code>; then <code>replace('C','3')</code> → <code>"A23"</code>. The chained calls each return a new String assigned back to <code>b</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q6</span><span class="q-tag">StringBuilder</span></div>
+    <p class="q-prompt">What is printed?</p>
+<pre><code><span class="kw">var</span> sb = <span class="kw">new</span> StringBuilder(<span class="str">"animals"</span>);
+<span class="kw">String</span> sub = sb.substring(sb.indexOf(<span class="str">"a"</span>), sb.indexOf(<span class="str">"al"</span>));
+<span class="kw">int</span> len = sb.length();
+<span class="kw">char</span> ch = sb.charAt(<span class="num">6</span>);
+System.out.println(sub + <span class="str">" "</span> + len + <span class="str">" "</span> + ch);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>anim 4 s</code></li>
+      <li><span class="ol">B.</span> <code>anim 7 s</code></li>
+      <li><span class="ol">C.</span> <code>animal 7 s</code></li>
+      <li><span class="ol">D.</span> <code>anim 7 l</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B · anim 7 s</span>
+      <p class="expl"><code>indexOf("a")</code> is 0, <code>indexOf("al")</code> is 4, so <code>substring(0,4)</code> = <code>"anim"</code>. Crucially, <code>substring()</code> does <em>not</em> modify the StringBuilder, so <code>length()</code> is still 7 and <code>charAt(6)</code> is <code>'s'</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q7</span><span class="q-tag">StringBuilder</span></div>
+    <p class="q-prompt">What does this print?</p>
+<pre><code><span class="kw">var</span> sb = <span class="kw">new</span> StringBuilder()
+    .append(<span class="str">"aaa"</span>)
+    .insert(<span class="num">1</span>, <span class="str">"bb"</span>)
+    .insert(<span class="num">4</span>, <span class="str">"ccc"</span>);
+System.out.println(sb);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>aaabbccc</code></li>
+      <li><span class="ol">B.</span> <code>abbaccca</code></li>
+      <li><span class="ol">C.</span> <code>abbcccaa</code></li>
+      <li><span class="ol">D.</span> <code>abbaaccc</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B · abbaccca</span>
+      <p class="expl">Start: <code>aaa</code>. <code>insert(1,"bb")</code> places "bb" before index 1 → <code>abbaa</code>. <code>insert(4,"ccc")</code> places "ccc" before index 4 → <code>abba</code> + <code>ccc</code> + <code>a</code> = <code>abbaccca</code>. The indexes refer to the string as it exists at each step.</p>
+    </details>
+  </div>
+
+  <!-- Q8 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q8</span><span class="q-tag">StringBuilder</span></div>
+    <p class="q-prompt">Which statement about the following is correct?</p>
+<pre><code><span class="kw">var</span> sb = <span class="kw">new</span> StringBuilder(<span class="str">"abcdef"</span>);
+sb.delete(<span class="num">1</span>, <span class="num">3</span>);
+sb.deleteCharAt(<span class="num">5</span>);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>sb</code> ends up as <code>"adef"</code>.</li>
+      <li><span class="ol">B.</span> <code>sb</code> ends up as <code>"ade"</code>.</li>
+      <li><span class="ol">C.</span> The second line throws an exception at runtime.</li>
+      <li><span class="ol">D.</span> The code does not compile.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · runtime exception</span>
+      <p class="expl"><code>delete(1, 3)</code> removes indexes 1–2, leaving <code>"adef"</code> (4 characters, indexes 0–3). <code>deleteCharAt(5)</code> then references index 5, which no longer exists, throwing <code>StringIndexOutOfBoundsException</code>. Note <code>delete</code> tolerates a too-large end index, but <code>deleteCharAt</code> is strict.</p>
+    </details>
+  </div>
+
+  <!-- Q9 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q9</span><span class="q-tag">StringBuilder</span></div>
+    <p class="q-prompt">What is the value of <code>sb</code> after this runs?</p>
+<pre><code><span class="kw">var</span> sb = <span class="kw">new</span> StringBuilder(<span class="str">"pigeon dirty"</span>);
+sb.replace(<span class="num">3</span>, <span class="num">6</span>, <span class="str">"sty"</span>);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>pigsty dirty</code></li>
+      <li><span class="ol">B.</span> <code>pigstydirty</code></li>
+      <li><span class="ol">C.</span> <code>stydirty</code></li>
+      <li><span class="ol">D.</span> <code>pigsty</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A · pigsty dirty</span>
+      <p class="expl"><code>StringBuilder.replace(start, end, str)</code> deletes <code>[3, 6)</code> — the characters <code>eon</code> — then inserts <code>"sty"</code> in that spot, producing <code>pig</code> + <code>sty</code> + <code>" dirty"</code> = <code>"pigsty dirty"</code>. This is different from <code>String.replace</code>, which swaps matching characters/sequences.</p>
+    </details>
+  </div>
+
+  <!-- Q10 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q10</span><span class="q-tag">Equality</span></div>
+    <p class="q-prompt">What is printed?</p>
+<pre><code><span class="kw">var</span> one = <span class="kw">new</span> StringBuilder();
+<span class="kw">var</span> two = <span class="kw">new</span> StringBuilder();
+<span class="kw">var</span> three = one.append(<span class="str">"a"</span>);
+System.out.println(one == two);
+System.out.println(one == three);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>true</code> then <code>true</code></li>
+      <li><span class="ol">B.</span> <code>false</code> then <code>false</code></li>
+      <li><span class="ol">C.</span> <code>false</code> then <code>true</code></li>
+      <li><span class="ol">D.</span> <code>true</code> then <code>false</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · false then true</span>
+      <p class="expl"><code>one</code> and <code>two</code> are two separate objects, so <code>==</code> is <code>false</code>. <code>append()</code> mutates and returns the <em>same</em> object, so <code>three</code> is just another reference to <code>one</code> → <code>one == three</code> is <code>true</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q11 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q11</span><span class="q-tag">Equality</span></div>
+    <p class="q-prompt">What happens with this code?</p>
+<pre><code><span class="kw">var</span> name = <span class="str">"a"</span>;
+<span class="kw">var</span> builder = <span class="kw">new</span> StringBuilder(<span class="str">"a"</span>);
+System.out.println(name == builder);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> Prints <code>true</code></li>
+      <li><span class="ol">B.</span> Prints <code>false</code></li>
+      <li><span class="ol">C.</span> Does not compile</li>
+      <li><span class="ol">D.</span> Throws at runtime</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · does not compile</span>
+      <p class="expl"><code>String</code> and <code>StringBuilder</code> are unrelated types. The compiler knows references of these two types can never point to the same object, so comparing them with <code>==</code> is a compile-time error.</p>
+    </details>
+  </div>
+
+  <!-- Q12 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q12</span><span class="q-tag">Equality &amp; Pool</span></div>
+    <p class="q-prompt">Which print <code>true</code>? <span class="all">(Choose all that apply.)</span></p>
+<pre><code><span class="kw">var</span> x = <span class="str">"Hello World"</span>;
+<span class="kw">var</span> y = <span class="str">"Hello World"</span>;
+<span class="kw">var</span> z = <span class="str">" Hello World"</span>.trim();
+<span class="kw">var</span> w = <span class="kw">new</span> <span class="kw">String</span>(<span class="str">"Hello World"</span>).intern();</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>x == y</code></li>
+      <li><span class="ol">B.</span> <code>x == z</code></li>
+      <li><span class="ol">C.</span> <code>x == w</code></li>
+      <li><span class="ol">D.</span> <code>x.equals(z)</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A, C, and D</span>
+      <p class="expl"><strong>A</strong>: both are the same pooled literal → <code>true</code>. <strong>B</strong>: <code>trim()</code> runs at runtime and builds a new object outside the pool → <code>false</code>. <strong>C</strong>: <code>intern()</code> returns the pooled reference for <code>"Hello World"</code> → <code>true</code>. <strong>D</strong>: <code>equals</code> compares characters, which match → <code>true</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q13 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q13</span><span class="q-tag">Equality &amp; Pool</span></div>
+    <p class="q-prompt">Given the assignments below, what does <code>first == third</code> print, and what does <code>first == third.intern()</code> print?</p>
+<pre><code><span class="kw">var</span> first  = <span class="str">"rat"</span> + <span class="num">1</span>;
+<span class="kw">var</span> third  = <span class="str">"r"</span> + <span class="str">"a"</span> + <span class="str">"t"</span> + <span class="kw">new</span> <span class="kw">String</span>(<span class="str">"1"</span>);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>true</code>, then <code>true</code></li>
+      <li><span class="ol">B.</span> <code>false</code>, then <code>true</code></li>
+      <li><span class="ol">C.</span> <code>false</code>, then <code>false</code></li>
+      <li><span class="ol">D.</span> <code>true</code>, then <code>false</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B · false, then true</span>
+      <p class="expl"><code>first</code> is a compile-time constant (<code>"rat" + 1</code>) and is pooled as <code>"rat1"</code>. <code>third</code> includes <code>new String("1")</code>, so it is computed at runtime → a separate object → <code>first == third</code> is <code>false</code>. Calling <code>intern()</code> on <code>third</code> returns the pooled <code>"rat1"</code>, which equals <code>first</code> → <code>true</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q14 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q14</span><span class="q-tag">Arrays</span></div>
+    <p class="q-prompt">After <code>int ids[], types;</code>, which is true?</p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> Both <code>ids</code> and <code>types</code> are <code>int[]</code>.</li>
+      <li><span class="ol">B.</span> <code>ids</code> is <code>int[]</code>; <code>types</code> is a plain <code>int</code>.</li>
+      <li><span class="ol">C.</span> Both are plain <code>int</code>.</li>
+      <li><span class="ol">D.</span> The line does not compile.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B · ids is int[], types is int</span>
+      <p class="expl">When the brackets follow the variable name (<code>ids[]</code>), they apply only to that one variable. So <code>ids</code> is an <code>int[]</code> but <code>types</code> is just an <code>int</code>. Contrast with <code>int[] ids, types;</code> where the brackets follow the type and both become <code>int[]</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q15 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q15</span><span class="q-tag">Arrays</span></div>
+    <p class="q-prompt">What is the result?</p>
+<pre><code><span class="kw">String</span>[] strings = {<span class="str">"stringValue"</span>};
+<span class="kw">Object</span>[] objects = strings;
+objects[<span class="num">0</span>] = <span class="kw">new</span> StringBuilder();</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> Compiles and runs with no output.</li>
+      <li><span class="ol">B.</span> Does not compile.</li>
+      <li><span class="ol">C.</span> Throws <code>ArrayStoreException</code> at runtime.</li>
+      <li><span class="ol">D.</span> Throws <code>ClassCastException</code> at runtime.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · ArrayStoreException</span>
+      <p class="expl">Assigning <code>String[]</code> to <code>Object[]</code> is allowed (widening, no cast). The compiler permits <code>objects[0] = new StringBuilder()</code> because the declared type is <code>Object[]</code>. But the actual array is still a <code>String[]</code>, so storing a <code>StringBuilder</code> throws <code>ArrayStoreException</code> at runtime.</p>
+    </details>
+  </div>
+
+  <!-- Q16 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q16</span><span class="q-tag">Arrays</span></div>
+    <p class="q-prompt">Which of these cause a compile error? <span class="all">(Choose all that apply.)</span></p>
+<pre><code><span class="kw">String</span>[] mammals = {<span class="str">"monkey"</span>, <span class="str">"chimp"</span>, <span class="str">"donkey"</span>};
+<span class="cm">// A</span> <span class="kw">int</span> x = mammals.length;
+<span class="cm">// B</span> <span class="kw">int</span> y = mammals.length();
+<span class="cm">// C</span> <span class="kw">int</span> z = <span class="kw">new</span> <span class="kw">String</span>[<span class="num">6</span>].length;
+<span class="cm">// D</span> mammals[<span class="num">3</span>] = <span class="str">"cat"</span>;</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> Line A</li>
+      <li><span class="ol">B.</span> Line B</li>
+      <li><span class="ol">C.</span> Line C</li>
+      <li><span class="ol">D.</span> Line D</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B only</span>
+      <p class="expl"><code>length</code> is a <em>field</em> on arrays, not a method, so <strong>B</strong>'s <code>length()</code> does not compile. <strong>A</strong> and <strong>C</strong> use the field correctly (C is 6). <strong>D</strong> compiles fine — it's only at <em>runtime</em> that index 3 on a length-3 array throws <code>ArrayIndexOutOfBoundsException</code>, which is not a compile error.</p>
+    </details>
+  </div>
+
+  <!-- Q17 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q17</span><span class="q-tag">Arrays</span></div>
+    <p class="q-prompt">What does this print?</p>
+<pre><code>String[] arr = {<span class="str">"10"</span>, <span class="str">"9"</span>, <span class="str">"100"</span>};
+Arrays.sort(arr);
+System.out.println(Arrays.toString(arr));</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>[9, 10, 100]</code></li>
+      <li><span class="ol">B.</span> <code>[10, 100, 9]</code></li>
+      <li><span class="ol">C.</span> <code>[100, 10, 9]</code></li>
+      <li><span class="ol">D.</span> <code>[10, 9, 100]</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B · [10, 100, 9]</span>
+      <p class="expl">These are Strings, so they sort <em>alphabetically</em>, not numerically. Comparing character by character: <code>"100"</code> comes before <code>"10"</code>? No — <code>"10"</code> is a prefix of <code>"100"</code>, so the shorter <code>"10"</code> sorts first, then <code>"100"</code>, then <code>"9"</code> (since <code>'9'</code> &gt; <code>'1'</code>). Result: <code>[10, 100, 9]</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q18 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q18</span><span class="q-tag">Arrays</span></div>
+    <p class="q-prompt">Given <code>int[] n = {2, 4, 6, 8};</code>, what does <code>Arrays.binarySearch(n, 3)</code> return?</p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>1</code></li>
+      <li><span class="ol">B.</span> <code>-1</code></li>
+      <li><span class="ol">C.</span> <code>-2</code></li>
+      <li><span class="ol">D.</span> <code>2</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · -2</span>
+      <p class="expl">3 is not present. It would be inserted at index 1 (between 2 and 4). For a not-found value, the result is <code>-(insertion point) - 1</code> = <code>-(1) - 1</code> = <code>-2</code>. (The array is sorted, so the result is well-defined.)</p>
+    </details>
+  </div>
+
+  <!-- Q19 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q19</span><span class="q-tag">Arrays</span></div>
+    <p class="q-prompt">What does <code>Arrays.mismatch(new int[]{1, 2}, new int[]{1})</code> return?</p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>-1</code></li>
+      <li><span class="ol">B.</span> <code>0</code></li>
+      <li><span class="ol">C.</span> <code>1</code></li>
+      <li><span class="ol">D.</span> <code>2</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · 1</span>
+      <p class="expl">The arrays agree at index 0 (both <code>1</code>). They first differ at index 1, where the first array has <code>2</code> and the second has no element. <code>mismatch</code> returns that first differing index, <code>1</code>. (It returns <code>-1</code> only when the arrays are completely equal.)</p>
+    </details>
+  </div>
+
+  <!-- Q20 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q20</span><span class="q-tag">Arrays</span></div>
+    <p class="q-prompt">Which declaration does <strong>not</strong> compile?</p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>int[][] a = new int[2][];</code></li>
+      <li><span class="ol">B.</span> <code>int[][] b = {{1, 4}, {3}, {9, 8, 7}};</code></li>
+      <li><span class="ol">C.</span> <code>int[][] c = new int[][];</code></li>
+      <li><span class="ol">D.</span> <code>int[] d[], e[][];</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · new int[][]</span>
+      <p class="expl">When using <code>new</code> for a multidimensional array, the <em>first</em> dimension's size is required; later dimensions may be omitted. So <code>new int[2][]</code> (A) is legal but <code>new int[][]</code> (C) is not. B is a valid jagged array, and D declares <code>d</code> as 2D and <code>e</code> as 3D.</p>
+    </details>
+  </div>
+
+  <!-- Q21 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q21</span><span class="q-tag">Math API</span></div>
+    <p class="q-prompt">Which lines do <strong>not</strong> compile? <span class="all">(Choose all that apply.)</span></p>
+<pre><code><span class="cm">// A</span> <span class="kw">double</span> one   = Math.pow(<span class="num">1</span>, <span class="num">2</span>);
+<span class="cm">// B</span> <span class="kw">int</span>    two   = Math.round(<span class="num">1.0</span>);
+<span class="cm">// C</span> <span class="kw">float</span>  three = Math.random();
+<span class="cm">// D</span> <span class="kw">int</span>    four  = Math.round(<span class="num">1.0f</span>);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> Line A</li>
+      <li><span class="ol">B.</span> Line B</li>
+      <li><span class="ol">C.</span> Line C</li>
+      <li><span class="ol">D.</span> Line D</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B and C</span>
+      <p class="expl"><strong>B</strong> fails: <code>round(double)</code> returns a <code>long</code>, which can't be assigned to <code>int</code> without a cast. <strong>C</strong> fails: <code>random()</code> returns a <code>double</code>, not a <code>float</code>. <strong>A</strong> is fine (<code>pow</code> returns <code>double</code>). <strong>D</strong> is fine: <code>round(float)</code> returns an <code>int</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q22 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q22</span><span class="q-tag">Math API</span></div>
+    <p class="q-prompt">What is the value and type of <code>Math.ceil(3.14)</code>?</p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>3</code> as an <code>int</code></li>
+      <li><span class="ol">B.</span> <code>4</code> as an <code>int</code></li>
+      <li><span class="ol">C.</span> <code>4.0</code> as a <code>double</code></li>
+      <li><span class="ol">D.</span> <code>3.0</code> as a <code>double</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · 4.0 (double)</span>
+      <p class="expl"><code>ceil</code> rounds up to the next whole number but still returns a <code>double</code>, so the result is <code>4.0</code>. (<code>Math.floor(3.14)</code> would give <code>3.0</code>, also a <code>double</code>.)</p>
+    </details>
+  </div>
+
+  <!-- Q23 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q23</span><span class="q-tag">Math API</span></div>
+    <p class="q-prompt">Which statement is true about this line?</p>
+<pre><code>System.out.println(<span class="num">12345123451234512345L</span>);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> It prints the number.</li>
+      <li><span class="ol">B.</span> It does not compile.</li>
+      <li><span class="ol">C.</span> It throws an exception at runtime.</li>
+      <li><span class="ol">D.</span> It prints a negative number due to overflow.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B · does not compile</span>
+      <p class="expl">The literal is larger than <code>Long.MAX_VALUE</code>, so even with the <code>L</code> suffix it doesn't fit in a <code>long</code> — that's a compile-time error. To hold a value this large you'd use <code>new BigInteger("12345123451234512345")</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q24 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q24</span><span class="q-tag">Date-Time</span></div>
+    <p class="q-prompt">Which line does <strong>not</strong> compile or throws at runtime, and why?</p>
+<pre><code><span class="cm">// A</span> <span class="kw">var</span> a = <span class="kw">new</span> LocalDate();
+<span class="cm">// B</span> <span class="kw">var</span> b = LocalDate.of(<span class="num">2025</span>, Month.JANUARY, <span class="num">20</span>);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> A does not compile; B is fine.</li>
+      <li><span class="ol">B.</span> B does not compile; A is fine.</li>
+      <li><span class="ol">C.</span> Both compile; A throws at runtime.</li>
+      <li><span class="ol">D.</span> Both are fine.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A · A does not compile</span>
+      <p class="expl">The date-time classes use the factory pattern — their constructors are private. You can't call <code>new LocalDate()</code>, so line A is a compile error. Line B uses the static <code>of()</code> factory correctly. (Passing day 32 <em>would</em> throw <code>DateTimeException</code>, but 20 is valid.)</p>
+    </details>
+  </div>
+
+  <!-- Q25 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q25</span><span class="q-tag">Date-Time</span></div>
+    <p class="q-prompt">What is printed?</p>
+<pre><code><span class="kw">var</span> date = LocalDate.of(<span class="num">2025</span>, Month.JANUARY, <span class="num">20</span>);
+date.plusDays(<span class="num">10</span>);
+System.out.println(date);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>2025-01-30</code></li>
+      <li><span class="ol">B.</span> <code>2025-01-20</code></li>
+      <li><span class="ol">C.</span> It does not compile.</li>
+      <li><span class="ol">D.</span> It throws an exception.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B · 2025-01-20</span>
+      <p class="expl"><code>LocalDate</code> is immutable. <code>plusDays(10)</code> returns a new date but the return value is ignored, so <code>date</code> is unchanged. This "ignored return value" pattern is one of the most common date-time traps.</p>
+    </details>
+  </div>
+
+  <!-- Q26 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q26</span><span class="q-tag">Date-Time</span></div>
+    <p class="q-prompt">Starting from <code>LocalDate.of(2025, Month.JANUARY, 31)</code>, what is the result of <code>plusMonths(1)</code>?</p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>2025-02-31</code></li>
+      <li><span class="ol">B.</span> <code>2025-03-03</code></li>
+      <li><span class="ol">C.</span> <code>2025-02-28</code></li>
+      <li><span class="ol">D.</span> It throws <code>DateTimeException</code>.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · 2025-02-28</span>
+      <p class="expl">February has no 31st, and 2025 is not a leap year (it's not a multiple of 4), so there's no Feb 29 either. The API adjusts to the last valid day of the target month — Feb 28 — rather than overflowing or throwing.</p>
+    </details>
+  </div>
+
+  <!-- Q27 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q27</span><span class="q-tag">Date-Time</span></div>
+    <p class="q-prompt">Which combinations throw <code>UnsupportedTemporalTypeException</code> at runtime? <span class="all">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>LocalDate.now().plus(Period.ofDays(1))</code></li>
+      <li><span class="ol">B.</span> <code>LocalDate.now().plus(Duration.ofHours(6))</code></li>
+      <li><span class="ol">C.</span> <code>LocalTime.now().plus(Period.ofMonths(1))</code></li>
+      <li><span class="ol">D.</span> <code>LocalTime.now().plus(Duration.ofMinutes(30))</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B and C</span>
+      <p class="expl"><code>Period</code> holds date units and <code>Duration</code> holds time units. <strong>B</strong> applies a time-based <code>Duration</code> to a date-only <code>LocalDate</code> → throws. <strong>C</strong> applies a date-based <code>Period</code> to a time-only <code>LocalTime</code> → throws. <strong>A</strong> (Period + LocalDate) and <strong>D</strong> (Duration + LocalTime) are the correct pairings.</p>
+    </details>
+  </div>
+
+  <!-- Q28 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q28</span><span class="q-tag">Date-Time</span></div>
+    <p class="q-prompt">What does <code>ChronoUnit.HOURS.between(LocalTime.of(5, 15), LocalTime.of(6, 55))</code> return?</p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>2</code></li>
+      <li><span class="ol">B.</span> <code>1</code></li>
+      <li><span class="ol">C.</span> <code>100</code></li>
+      <li><span class="ol">D.</span> It throws an exception.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B · 1</span>
+      <p class="expl">The gap is 1 hour 40 minutes. <code>ChronoUnit.between</code> <em>truncates</em> toward the whole unit rather than rounding, so in <code>HOURS</code> it returns <code>1</code>, not 2. (Asked in <code>MINUTES</code>, the same gap would return <code>100</code>.)</p>
+    </details>
+  </div>
+
+  <!-- REVISION -->
+  <div class="revision">
+    <h3>Quick Revision</h3>
+    <ul>
+      <li><strong>Concatenation:</strong> both numeric → add; either a String → concatenate; always left to right. <code>"c" + null</code> → <code>"cnull"</code>.</li>
+      <li><strong>substring(b, e):</strong> b inclusive, e exclusive; <code>e == length</code> is OK; reversed or past-length throws. <code>indexOf</code> returns <code>-1</code> when absent.</li>
+      <li><strong>StringBuilder:</strong> <code>append/insert/delete/replace</code> mutate and return <code>this</code>; <code>substring</code> returns a String and does not mutate. <code>delete</code> tolerates a too-large end; <code>deleteCharAt</code> does not.</li>
+      <li><strong>Equality:</strong> <code>==</code> is reference identity; literals &amp; compile-time constants are pooled; runtime-built strings and <code>new String()</code> are not; <code>intern()</code> pulls from the pool. <code>String == StringBuilder</code> won't compile.</li>
+      <li><strong>Arrays:</strong> <code>length</code> is a field; <code>length()</code> won't compile. Covariant stores throw <code>ArrayStoreException</code>. <code>binarySearch</code> on a sorted array → index or <code>-(insertion point)-1</code>; unsorted is undefined. String sort is alphabetic.</li>
+      <li><strong>Math:</strong> watch return types — <code>round(double)→long</code>, <code>round(float)→int</code>, <code>ceil/floor/pow/random→double</code>. A literal too large for <code>long</code> won't compile.</li>
+      <li><strong>Dates:</strong> private constructors (use <code>of()</code>); immutable (don't ignore the return); months count from 1; <code>Period</code> = date units (not LocalTime), <code>Duration</code> = time units (not LocalDate); <code>ChronoUnit.between</code> truncates.</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

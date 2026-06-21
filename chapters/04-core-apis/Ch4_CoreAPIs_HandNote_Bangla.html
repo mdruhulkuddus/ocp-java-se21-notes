@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 · অধ্যায় ৪ — Core APIs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --ink:#2c2a28; --muted:#6f6a64; --line:#ece3da;
+    --sect:#c96442; --inlinebg:#f3ece4; --inlineink:#9a5030;
+    --yes:#3b7d57; --no:#c44d3e; --purple:#7c5cbf;
+    --shadow:0 4px 18px rgba(60,50,40,.07); --shadow-h:0 10px 30px rgba(60,50,40,.13);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Noto Sans Bengali',system-ui,sans-serif;font-size:17px;line-height:1.8;}
+  .wrap{max-width:1000px;margin:0 auto;padding:32px 20px 80px;}
+  h1,h2,h3,h4{font-family:'Noto Sans Bengali',sans-serif;color:var(--ink);line-height:1.5;}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+  a{color:var(--sect);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+
+  .header{background:linear-gradient(135deg,#ffffff,#fbf7f4);border-radius:18px;
+    padding:34px 34px 30px;box-shadow:var(--shadow);margin-bottom:26px;}
+  .badge{display:inline-block;background:linear-gradient(90deg,#c96442,#d4845e);
+    color:#fff;font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:600;
+    letter-spacing:.4px;padding:7px 14px;border-radius:999px;margin-bottom:16px;}
+  .header h1{font-size:32px;margin:6px 0 4px;font-weight:900;}
+  .header h1 .muted{color:var(--muted);font-weight:400;font-size:22px;}
+  .subtitle{color:var(--muted);margin:6px 0 20px;font-size:18px;}
+  .obj{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:5px solid #5aab7b;
+    border-radius:12px;padding:16px 20px;}
+  .obj h4{margin:0 0 8px;color:#3b7d57;font-size:16px;}
+  .obj ul{margin:0;padding-left:20px;}
+  .obj li{margin:3px 0;}
+
+  .toc{background:var(--card);border-radius:14px;padding:22px 26px;box-shadow:var(--shadow);margin-bottom:30px;}
+  .toc h3{margin:0 0 12px;font-size:19px;}
+  .toc-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 28px;}
+  .toc-grid a{display:flex;gap:10px;padding:5px 0;border-bottom:1px dashed #eee5db;color:var(--ink);}
+  .toc-grid a:hover{color:var(--sect);text-decoration:none;}
+  .toc-grid .n{font-family:'JetBrains Mono',monospace;color:var(--sect);font-weight:600;font-size:14px;min-width:26px;}
+
+  section{background:var(--card);border-radius:16px;padding:28px 30px;box-shadow:var(--shadow);margin-bottom:26px;}
+  .secnum{font-family:'JetBrains Mono',monospace;color:var(--sect);font-weight:700;font-size:14px;letter-spacing:1px;}
+  section h2{font-size:25px;margin:4px 0 18px;padding-bottom:12px;border-bottom:2px solid var(--line);}
+  section h3{font-size:20px;margin:26px 0 8px;color:#39332e;}
+  section h4{font-size:17px;margin:18px 0 6px;color:#4a443e;}
+  p{margin:10px 0;}
+  ul,ol{margin:10px 0;padding-left:24px;}
+  li{margin:5px 0;}
+
+  p code,li code,td code,h4 code,.obj code,.card code,.rules-box code,.vs-col code,.trace code{
+    background:var(--inlinebg);color:var(--inlineink);padding:1.5px 6px;border-radius:6px;font-size:14.5px;}
+
+  pre{background:#fdfaf7;border-radius:12px;padding:16px 18px;overflow-x:auto;
+    box-shadow:inset 0 2px 8px rgba(70,55,40,.08);margin:14px 0;font-size:14px;line-height:1.6;}
+  pre code{background:none;padding:0;color:#3a352f;font-size:14px;}
+  .kw{color:var(--kw);font-weight:500;} .str{color:var(--str);} .num{color:var(--num);}
+  .err{color:var(--err);font-weight:700;} .cm{color:var(--cm);font-style:italic;}
+
+  .card{border-radius:14px;padding:15px 18px 15px 20px;margin:16px 0;box-shadow:var(--shadow);
+    transition:box-shadow .22s ease, transform .22s ease;}
+  .card:hover{box-shadow:var(--shadow-h);transform:translateY(-2px);}
+  .card .label{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;
+    letter-spacing:.6px;display:block;margin-bottom:5px;}
+  .card p,.card ul{margin:5px 0;}
+  .exam-trap{background:linear-gradient(135deg,#fef2f0,#fff8f7);border-left:5px solid #e06b5e;}
+  .exam-trap .label{color:#c0453a;}
+  .key-rule{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:5px solid #5aab7b;}
+  .key-rule .label{color:#3b7d57;}
+  .remember{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:5px solid #d4a24c;}
+  .remember .label{color:#a9772a;}
+
+  .rules-box{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-top:4px solid #5aab7b;
+    border-radius:12px;padding:16px 20px;margin:18px 0;box-shadow:var(--shadow);}
+  .rules-box h4{margin:0 0 8px;color:#3b7d57;}
+  .rules-box ol,.rules-box ul{margin:6px 0;}
+
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;}
+  .vs-col{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);}
+  .vs-col h4{margin:0 0 8px;font-size:16px;}
+  .vs-col.left h4{color:var(--purple);}
+  .vs-col.right h4{color:var(--yes);}
+  .vs-col ul{padding-left:18px;margin:6px 0;}
+
+  .tbl-wrap{overflow-x:auto;margin:16px 0;}
+  table{width:100%;border-collapse:separate;border-spacing:0;background:var(--card);
+    border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:15px;}
+  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid #f0eae2;vertical-align:top;}
+  th{background:#f0e8de;font-family:'Noto Sans Bengali',sans-serif;font-weight:700;color:#4a423a;}
+  tr:last-child td{border-bottom:none;}
+  td code{font-size:13.5px;}
+  .yes{color:var(--yes);font-weight:700;} .no{color:var(--no);font-weight:700;}
+
+  .trace{background:#fdfaf7;border-radius:12px;padding:14px 18px 14px 20px;
+    box-shadow:inset 0 2px 8px rgba(70,55,40,.06);margin:14px 0;border-left:4px solid #d4845e;}
+  .trace ul{list-style:none;padding-left:0;margin:0;}
+  .trace li{padding:3px 0;border-bottom:1px dashed #eee5db;font-size:15px;}
+  .trace li:last-child{border-bottom:none;}
+  .trace .out{font-family:'JetBrains Mono',monospace;color:var(--inlineink);background:var(--inlinebg);
+    padding:1px 6px;border-radius:5px;}
+
+  .recap{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:5px solid #d4a24c;}
+  .recap h3{color:#a9772a;margin-top:18px;}
+  .recap h3:first-of-type{margin-top:4px;}
+
+  @media(max-width:720px){
+    body{font-size:16px;}
+    .toc-grid,.vs-grid{grid-template-columns:1fr;}
+    .header h1{font-size:25px;} .header h1 .muted{font-size:17px;}
+    section{padding:20px 18px;} .header{padding:24px 20px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="header">
+    <span class="badge">OCP Java SE 21 Developer — Exam 1Z0-830</span>
+    <h1>অধ্যায় ৪ · Core APIs <span class="muted"></span></h1>
+    <p class="subtitle">String ও StringBuilder, equality ও string pool, arrays, Math API, এবং Date-Time API — পরীক্ষায় আসা প্রতিটি common MCQ trap, বই ধরে লাইন-বাই-লাইন যাচাই করা।</p>
+    <div class="obj">
+      <h4>যে exam objective-গুলো কভার হচ্ছে</h4>
+      <ul>
+        <li>primitives ও wrapper class ব্যবহার; Math API, precedence, type conversion ও casting দিয়ে arithmetic ও boolean expression মূল্যায়ন।</li>
+        <li><code>String</code> ও <code>StringBuilder</code> class দিয়ে text (text block সহ) নিয়ে কাজ।</li>
+        <li>Date-Time API দিয়ে date, time, duration, period, instant ও time-zone — daylight saving time সহ — হ্যান্ডল করা।</li>
+        <li>array তৈরি করা; element যোগ, বাদ, আপডেট, retrieve ও sort করা।</li>
+      </ul>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <h3>সূচিপত্র</h3>
+    <div class="toc-grid">
+      <a href="#s1"><span class="n">01</span><span>String তৈরি ও পরিবর্তন</span></a>
+      <a href="#s2"><span class="n">02</span><span>StringBuilder Class</span></a>
+      <a href="#s3"><span class="n">03</span><span>Equality বোঝা</span></a>
+      <a href="#s4"><span class="n">04</span><span>Array বোঝা</span></a>
+      <a href="#s5"><span class="n">05</span><span>Math API দিয়ে হিসাব</span></a>
+      <a href="#s6"><span class="n">06</span><span>Date ও Time নিয়ে কাজ</span></a>
+      <a href="#recap"><span class="n">★</span><span>সংক্ষিপ্ত রিভিউ</span></a>
+      <a href="#cheat"><span class="n">⚑</span><span>Exam Traps চিট-শিট</span></a>
+    </div>
+  </nav>
+
+  <!-- SECTION 01 -->
+  <section id="s1">
+    <div class="secnum">SECTION 01</div>
+    <h2>String তৈরি ও পরিবর্তন</h2>
+    <p>একটা <code>String</code> হলো character-এর sequence এবং একটা <em>reference type</em>। এটা বিশেষ — এর জন্য <code>new</code> লাগে না। নিচের তিনটাই "Fluffy" নামের একটা <code>String</code> তৈরি করে:</p>
+<pre><code><span class="kw">String</span> name = <span class="str">"Fluffy"</span>;
+<span class="kw">String</span> name = <span class="kw">new</span> <span class="kw">String</span>(<span class="str">"Fluffy"</span>);
+<span class="kw">String</span> name = <span class="str">"""
+Fluffy"""</span>;  <span class="cm">// text block</span></code></pre>
+    <p><code>String</code> হলো <code>CharSequence</code>-এর implementation (<code>StringBuilder</code>-ও তাই)। String <strong>immutable</strong> — তাই প্রতিটা "modifying" method আসলে একটা <em>নতুন</em> <code>String</code> return করে।</p>
+
+    <h3>Concatenation</h3>
+    <div class="rules-box">
+      <h4>Concatenation-এর তিনটা নিয়ম — মুখস্থ রাখুন</h4>
+      <ol>
+        <li><strong>দুটো</strong> operand-ই numeric হলে <code>+</code> মানে সংখ্যার যোগ।</li>
+        <li>যেকোনো <strong>একটা</strong> operand <code>String</code> হলে <code>+</code> মানে concatenation।</li>
+        <li>Expression-টা <strong>বাঁ থেকে ডানে</strong> মূল্যায়ন হয়।</li>
+      </ol>
+    </div>
+<pre><code>System.out.println(<span class="num">1</span> + <span class="num">2</span>);            <span class="cm">// 3</span>
+System.out.println(<span class="str">"a"</span> + <span class="str">"b"</span>);        <span class="cm">// ab</span>
+System.out.println(<span class="str">"a"</span> + <span class="str">"b"</span> + <span class="num">3</span>);    <span class="cm">// ab3</span>
+System.out.println(<span class="num">1</span> + <span class="num">2</span> + <span class="str">"c"</span>);      <span class="cm">// 3c</span>
+System.out.println(<span class="str">"c"</span> + <span class="num">1</span> + <span class="num">2</span>);      <span class="cm">// c12</span>
+System.out.println(<span class="str">"c"</span> + <span class="kw">null</span>);        <span class="cm">// cnull</span></code></pre>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP</span>
+      <p>mixed expression-এ variable-এর type খেয়াল করুন। যদি <code>int three = 3;</code> আর <code>String four = "4";</code> হয়:</p>
+      <div class="trace"><ul>
+        <li><code>1 + 2 + three + four</code></li>
+        <li><code>1 + 2</code> → দুটোই int → <span class="out">3</span></li>
+        <li><code>3 + three</code> → দুটোই int → <span class="out">6</span></li>
+        <li><code>6 + four</code> → <code>four</code> একটা String → concat-এ চলে যায় → <span class="out">"64"</span></li>
+      </ul></div>
+    </div>
+    <p><code>+=</code> একই নিয়ম মানে: <code>s += "2"</code> মানে <code>s = s + "2"</code>। <code>var s = "1"</code> থেকে শুরু করে <code>s += "2"</code> → "12", তারপর <code>s += 3</code> → "123" (String-এর সাথে যা-ই যোগ হোক → concatenation)।</p>
+
+    <h3>গুরুত্বপূর্ণ String method</h3>
+    <p>Index <strong>zero-based</strong>, কিন্তু <code>length()</code> সাধারণ গোনার নিয়মে চলে। <code>"animals"</code>-এর জন্য: length <code>7</code>, valid index <code>0–6</code>।</p>
+
+    <h4><code>length()</code> ও <code>charAt(int)</code></h4>
+<pre><code><span class="kw">var</span> name = <span class="str">"animals"</span>;
+name.length();    <span class="cm">// 7</span>
+name.charAt(<span class="num">0</span>);   <span class="cm">// a</span>
+name.charAt(<span class="num">6</span>);   <span class="cm">// s</span>
+name.charAt(<span class="num">7</span>);   <span class="err">// StringIndexOutOfBoundsException</span></code></pre>
+
+    <h4><code>indexOf(...)</code> — না পেলে <code>-1</code> ফেরায় (exception দেয় না)</h4>
+    <p>start index <strong>inclusive</strong>, end index <strong>exclusive</strong>। একটা <code>char</code> (<code>int ch</code> হিসেবে) বা একটা <code>String</code> নিতে পারে।</p>
+<pre><code><span class="kw">var</span> name = <span class="str">"animals"</span>;
+name.indexOf(<span class="str">'a'</span>);       <span class="cm">// 0</span>
+name.indexOf(<span class="str">"al"</span>);      <span class="cm">// 4</span>
+name.indexOf(<span class="str">'a'</span>, <span class="num">4</span>);    <span class="cm">// 4</span>
+name.indexOf(<span class="str">"al"</span>, <span class="num">5</span>);   <span class="cm">// -1 (search starts after the match)</span>
+name.indexOf(<span class="str">'a'</span>, <span class="num">2</span>, <span class="num">4</span>); <span class="cm">// -1 (only looks at indexes 2,3)</span>
+name.indexOf(<span class="str">"al"</span>, <span class="num">2</span>, <span class="num">6</span>);<span class="cm">// 4</span></code></pre>
+
+    <h4><code>substring(begin[, end])</code> — পরীক্ষার সবচেয়ে ট্রিকি method</h4>
+    <div class="card key-rule"><span class="label">✓ KEY RULE</span>
+      <p><code>begin</code> (inclusive) থেকে <code>end</code> (exclusive) পর্যন্ত character ফেরায়। end index <strong>length-এর সমান</strong> (অর্থাৎ এক ঘর বেশি) হতে পারে, কিন্তু উল্টানো (reversed) যাবে না, আর length-এর থেকে <strong>একের বেশি</strong> বেশি হওয়া যাবে না।</p>
+    </div>
+<pre><code><span class="kw">var</span> name = <span class="str">"animals"</span>;  <span class="cm">// length 7</span>
+name.substring(<span class="num">3</span>);     <span class="cm">// mals</span>
+name.substring(<span class="num">3</span>, <span class="num">4</span>);  <span class="cm">// m</span>
+name.substring(<span class="num">3</span>, <span class="num">7</span>);  <span class="cm">// mals  (7 == end, allowed)</span>
+name.substring(<span class="num">3</span>, <span class="num">3</span>);  <span class="cm">// "" empty string</span>
+name.substring(<span class="num">3</span>, <span class="num">2</span>);  <span class="err">// exception (reversed)</span>
+name.substring(<span class="num">3</span>, <span class="num">8</span>);  <span class="err">// exception (8 > length)</span></code></pre>
+
+    <h4>Case, search, replace, whitespace</h4>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Method</th><th>আচরণ (উল্লেখ না থাকলে case-sensitive)</th></tr>
+      <tr><td><code>toUpperCase() / toLowerCase()</code></td><td>অক্ষর convert করে; বাকি character অপরিবর্তিত রাখে।</td></tr>
+      <tr><td><code>equals(Object) / equalsIgnoreCase(String)</code></td><td><code>equals</code> একটা <code>Object</code> নেয়; non-String দিলে → <code>false</code>। <code>"ABC".equals(6)</code> → false।</td></tr>
+      <tr><td><code>startsWith(p[,from]) / endsWith(s) / contains(CharSequence)</code></td><td>case-sensitive prefix / suffix / যেকোনো জায়গায় check।</td></tr>
+      <tr><td><code>replace(char,char) / replace(CharSequence,CharSequence)</code></td><td>সহজ search ও replace, নতুন String ফেরায়।</td></tr>
+      <tr><td><code>strip() / trim()</code></td><td>সামনে-পেছনের whitespace বাদ দেয়। <code>strip()</code> Unicode-aware; <code>trim()</code> নয়।</td></tr>
+      <tr><td><code>stripLeading() / stripTrailing()</code></td><td>শুধু এক পাশের whitespace বাদ দেয়।</td></tr>
+    </table>
+    </div>
+    <p><code>String text = " abc\t "</code>-এর জন্য (সামনে space + "abc" + tab + space):</p>
+    <div class="trace"><ul>
+      <li><code>text.trim().length()</code> → <span class="out">3</span></li>
+      <li><code>text.strip().length()</code> → <span class="out">3</span></li>
+      <li><code>text.stripLeading().length()</code> → <span class="out">5</span> (পেছনের tab + space থাকে)</li>
+      <li><code>text.stripTrailing().length()</code> → <span class="out">4</span> (সামনের space থাকে)</li>
+    </ul></div>
+    <div class="card remember"><span class="label">★ REMEMBER</span>
+      <p>পরীক্ষায় whitespace = space, <code>\t</code> (tab), <code>\n</code> (newline) এবং <code>\r</code> (carriage return)। <code>\t</code> হলো <em>একটাই</em> character।</p>
+    </div>
+
+    <h4>Indentation: <code>indent(n)</code> ও <code>stripIndent()</code></h4>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Method</th><th>Indent পরিবর্তন</th><th>আগের line break normalize করে?</th><th>না থাকলে শেষে line break যোগ করে?</th></tr>
+      <tr><td><code>indent(n)</code>, n &gt; 0</td><td>প্রতি line-এ n টা space যোগ</td><td class="yes">হ্যাঁ</td><td class="yes">হ্যাঁ</td></tr>
+      <tr><td><code>indent(n)</code>, n == 0</td><td>পরিবর্তন নেই</td><td class="yes">হ্যাঁ</td><td class="yes">হ্যাঁ</td></tr>
+      <tr><td><code>indent(n)</code>, n &lt; 0</td><td>প্রতি line থেকে n পর্যন্ত space বাদ</td><td class="yes">হ্যাঁ</td><td class="yes">হ্যাঁ</td></tr>
+      <tr><td><code>stripIndent()</code></td><td>সব leading incidental whitespace বাদ</td><td class="yes">হ্যাঁ</td><td class="no">না</td></tr>
+    </table>
+    </div>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — সেই "extra" character</span>
+      <p>যেহেতু <code>indent()</code> line termination normalize করে, trailing newline না থাকা একটা text block একটা newline পেয়ে যায়। একটা 6-character block <code>indent(1)</code>-এর পর 10 হয় (3 টা space যোগ + 1 normalized newline), 9 নয়।</p>
+    </div>
+
+    <h4>Empty বনাম blank</h4>
+<pre><code><span class="str">" "</span>.isEmpty();  <span class="cm">// false (has a space)</span>
+<span class="str">""</span>.isEmpty();   <span class="cm">// true</span>
+<span class="str">" "</span>.isBlank();  <span class="cm">// true (only whitespace)</span>
+<span class="str">""</span>.isBlank();   <span class="cm">// true</span></code></pre>
+
+    <h4>Formatting</h4>
+    <p><code>String.format(...)</code> static; <code>formatted(...)</code> instance method। যে symbol-গুলো জানতেই হবে:</p>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Symbol</th><th>কীসের জন্য</th></tr>
+      <tr><td><code>%s</code></td><td>যেকোনো type (সাধারণত String)</td></tr>
+      <tr><td><code>%d</code></td><td>Integer মান (<code>int</code>, <code>long</code>)</td></tr>
+      <tr><td><code>%f</code></td><td>Floating-point (<code>float</code>, <code>double</code>) — default-এ 6 দশমিক, <strong>round</strong> করে</td></tr>
+      <tr><td><code>%n</code></td><td>system-নির্ভর line break</td></tr>
+    </table>
+    </div>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP</span>
+      <p>type না মিললে <em>runtime</em>-এ exception: <code>"Food: %d tons".formatted(2.0)</code> → <code>IllegalFormatConversionException</code> (একটা double দেওয়া হলো <code>%d</code>-তে)। <code>%.1f</code> দিয়ে <code>90.250000</code> প্রিন্ট হয় <code>90.3</code> (round, truncate নয়)।</p>
+    </div>
+
+    <h3>Method chaining</h3>
+    <p>বাঁ থেকে ডানে পড়ুন; আগের call-এর return value-এর উপর পরের method call হয়। immutable String-এ প্রতিটা call একটা নতুন String বানায়।</p>
+    <div class="trace"><ul>
+      <li><code>"AniMaL ".trim().toLowerCase().replace('a','A')</code></li>
+      <li><code>trim()</code> → <span class="out">"AniMaL"</span></li>
+      <li><code>toLowerCase()</code> → <span class="out">"animal"</span></li>
+      <li><code>replace('a','A')</code> → <span class="out">"AnimAl"</span></li>
+    </ul></div>
+    <p>যেহেতু String immutable, <em>মূল</em> variable কখনো বদলায় না:</p>
+<pre><code><span class="kw">String</span> a = <span class="str">"abc"</span>;
+<span class="kw">String</span> b = a.toUpperCase();          <span class="cm">// b = "ABC", a still "abc"</span>
+b = b.replace(<span class="str">"B"</span>, <span class="str">"2"</span>).replace(<span class="str">'C'</span>, <span class="str">'3'</span>);
+<span class="cm">// "ABC" -> "A2C" -> "A23"; a="abc", b="A23"</span></code></pre>
+  </section>
+
+  <!-- SECTION 02 -->
+  <section id="s2">
+    <div class="secnum">SECTION 02</div>
+    <h2>StringBuilder Class</h2>
+    <p>একটা loop-এ String-এ append করলে অনেক throwaway object তৈরি হয় (<code>""</code> + 26 অক্ষর → 27টা String object)। <code>StringBuilder</code> <strong>mutable</strong> এবং একটাই object বারবার ব্যবহার করে।</p>
+
+    <div class="vs-grid">
+      <div class="vs-col left"><h4>String</h4>
+        <ul><li>Immutable</li><li>Method <strong>নতুন</strong> String ফেরায়</li><li>Chained call নতুন object বানায়</li><li>Pooled (literal/constant)</li></ul>
+      </div>
+      <div class="vs-col right"><h4>StringBuilder</h4>
+        <ul><li>Mutable</li><li>বেশিরভাগ method mutate করে ও <strong>this</strong> ফেরায়</li><li>Chained call একই object-এ কাজ করে</li><li>Pooled নয়; <code>StringBuffer</code> হলো thread-safe (ধীর) cousin — পরীক্ষায় নেই</li></ul>
+      </div>
+    </div>
+
+    <h3>Mutability ও chaining</h3>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP</span>
+      <p><code>StringBuilder</code> chain করলে <strong>নতুন object তৈরি হয় না</strong> — একই object-কে mutate করে এবং তার reference ফেরায়। তাই নিজের উপর assignment করলে "কিছুই হয় না"।</p>
+    </div>
+<pre><code>StringBuilder a = <span class="kw">new</span> StringBuilder(<span class="str">"abc"</span>);
+StringBuilder b = a.append(<span class="str">"de"</span>);       <span class="cm">// a and b -> "abcde"</span>
+b = b.append(<span class="str">"f"</span>).append(<span class="str">"g"</span>);        <span class="cm">// same object -> "abcdefg"</span>
+System.out.println(<span class="str">"a="</span> + a);          <span class="cm">// a=abcdefg</span>
+System.out.println(<span class="str">"b="</span> + b);          <span class="cm">// b=abcdefg</span></code></pre>
+
+    <h3>StringBuilder তৈরি করা</h3>
+<pre><code><span class="kw">new</span> StringBuilder();        <span class="cm">// empty</span>
+<span class="kw">new</span> StringBuilder(<span class="str">"animal"</span>); <span class="cm">// initial value</span>
+<span class="kw">new</span> StringBuilder(<span class="num">10</span>);      <span class="cm">// reserve capacity 10 (not contents!)</span></code></pre>
+
+    <h3>গুরুত্বপূর্ণ method</h3>
+    <h4>String-এর মতোই common method: <code>charAt</code>, <code>indexOf</code>, <code>length</code>, <code>substring</code></h4>
+    <div class="card key-rule"><span class="label">✓ KEY RULE</span>
+      <p><code>substring()</code> একটা <code>String</code> ফেরায় এবং StringBuilder-কে <strong>mutate করে না</strong> — শুধু state সম্পর্কে জানতে চায়। তুলনায় <code>append()</code>, <code>insert()</code>, <code>delete()</code> <em>mutate</em> করে।</p>
+    </div>
+<pre><code><span class="kw">var</span> sb = <span class="kw">new</span> StringBuilder(<span class="str">"animals"</span>);
+<span class="kw">String</span> sub = sb.substring(sb.indexOf(<span class="str">"a"</span>), sb.indexOf(<span class="str">"al"</span>)); <span class="cm">// substring(0,4)="anim"</span>
+<span class="kw">int</span> len = sb.length();   <span class="cm">// 7</span>
+<span class="kw">char</span> ch = sb.charAt(<span class="num">6</span>);  <span class="cm">// s</span>
+System.out.println(sub + <span class="str">" "</span> + len + <span class="str">" "</span> + ch); <span class="cm">// anim 7 s</span></code></pre>
+
+    <h4><code>append</code> — 10+ overload, this ফেরায়</h4>
+<pre><code><span class="kw">var</span> sb = <span class="kw">new</span> StringBuilder().append(<span class="num">1</span>).append(<span class="str">'c'</span>);
+sb.append(<span class="str">"-"</span>).append(<span class="kw">true</span>);
+System.out.println(sb); <span class="cm">// 1c-true</span></code></pre>
+
+    <h4><code>insert(int offset, ...)</code> — যত এগোয় index তত shift হয়</h4>
+<pre><code><span class="kw">var</span> sb = <span class="kw">new</span> StringBuilder(<span class="str">"animals"</span>);
+sb.insert(<span class="num">7</span>, <span class="str">"-"</span>);  <span class="cm">// animals-</span>
+sb.insert(<span class="num">0</span>, <span class="str">"-"</span>);  <span class="cm">// -animals-</span>
+sb.insert(<span class="num">4</span>, <span class="str">"-"</span>);  <span class="cm">// -ani-mals-</span></code></pre>
+
+    <h4><code>delete(start,end)</code> ও <code>deleteCharAt(index)</code></h4>
+    <p><code>delete()</code> উদার: length-এর বেশি <code>end</code> দিলে সেটাকে length ধরে নেয়। <code>deleteCharAt()</code> কড়া।</p>
+<pre><code><span class="kw">var</span> sb = <span class="kw">new</span> StringBuilder(<span class="str">"abcdef"</span>);
+sb.delete(<span class="num">1</span>, <span class="num">3</span>);       <span class="cm">// adef</span>
+sb.deleteCharAt(<span class="num">5</span>);   <span class="err">// exception (only 4 chars left)</span>
+
+<span class="kw">var</span> sb2 = <span class="kw">new</span> StringBuilder(<span class="str">"abcdef"</span>);
+sb2.delete(<span class="num">1</span>, <span class="num">100</span>);    <span class="cm">// a  (end past length is OK)</span></code></pre>
+
+    <h4><code>replace(start,end,str)</code> — String-এর <code>replace</code> থেকে আলাদা!</h4>
+    <p>প্রথমে যুক্তিগতভাবে <code>[start,end)</code> delete করে, তারপর নতুন text insert করে (length মেলার দরকার নেই; length-এর বেশি end = end)।</p>
+<pre><code><span class="kw">var</span> b = <span class="kw">new</span> StringBuilder(<span class="str">"pigeon dirty"</span>);
+b.replace(<span class="num">3</span>, <span class="num">6</span>, <span class="str">"sty"</span>); <span class="cm">// pigsty dirty</span>
+
+<span class="kw">var</span> c = <span class="kw">new</span> StringBuilder(<span class="str">"pigeon dirty"</span>);
+c.replace(<span class="num">3</span>, <span class="num">100</span>, <span class="str">""</span>); <span class="cm">// pig</span></code></pre>
+
+    <h4><code>reverse()</code> ও <code>toString()</code></h4>
+<pre><code><span class="kw">var</span> sb = <span class="kw">new</span> StringBuilder(<span class="str">"ABC"</span>);
+sb.reverse();           <span class="cm">// CBA</span>
+<span class="kw">String</span> s = sb.toString(); <span class="cm">// convert back to String</span></code></pre>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — chained inserts</span>
+      <div class="trace"><ul>
+        <li><code>new StringBuilder().append("aaa").insert(1,"bb").insert(4,"ccc")</code></li>
+        <li>append → <span class="out">aaa</span></li>
+        <li>insert(1,"bb") → <span class="out">abbaa</span></li>
+        <li>insert(4,"ccc") → <span class="out">abbaccca</span></li>
+      </ul></div>
+    </div>
+  </section>
+
+  <!-- SECTION 03 -->
+  <section id="s3">
+    <div class="secnum">SECTION 03</div>
+    <h2>Equality বোঝা</h2>
+    <div class="vs-grid">
+      <div class="vs-col left"><h4>== (reference)</h4>
+        <ul><li>Primitive: মান তুলনা করে</li><li>Object: মেমরিতে একই object কি না?</li><li><code>StringBuilder</code>-এ: reference check</li></ul>
+      </div>
+      <div class="vs-col right"><h4>equals() (logical)</h4>
+        <ul><li>class-এর implementation-এর উপর নির্ভর করে</li><li><code>String.equals</code>: একই character?</li><li><code>StringBuilder</code> equals override <strong>করে না</strong> → reference check</li></ul>
+      </div>
+    </div>
+<pre><code><span class="kw">var</span> one = <span class="kw">new</span> StringBuilder();
+<span class="kw">var</span> two = <span class="kw">new</span> StringBuilder();
+<span class="kw">var</span> three = one.append(<span class="str">"a"</span>);   <span class="cm">// append returns 'one'</span>
+System.out.println(one == two);   <span class="cm">// false (different objects)</span>
+System.out.println(one == three); <span class="cm">// true  (same object)</span></code></pre>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — type mismatch won't compile</span>
+<pre><code><span class="kw">var</span> name = <span class="str">"a"</span>;
+<span class="kw">var</span> builder = <span class="kw">new</span> StringBuilder(<span class="str">"a"</span>);
+System.out.println(name == builder); <span class="err">// DOES NOT COMPILE</span></code></pre>
+      <p>Compiler জানে যে সম্পূর্ণ আলাদা দুটো type কখনো একই object reference করতে পারে না।</p>
+    </div>
+
+    <h3>String pool</h3>
+    <div class="card key-rule"><span class="label">✓ KEY RULE</span>
+      <p>String pool-এ থাকে <strong>literal</strong> এবং <strong>compile-time constant</strong>। runtime-এ হিসাব করা যেকোনো কিছু (<code>trim()</code>-এর মতো method call, <code>+=</code>, বা <code>new String(...)</code>) pool-এর বাইরে একটা নতুন object বানায়।</p>
+    </div>
+<pre><code><span class="kw">var</span> x = <span class="str">"Hello World"</span>;
+<span class="kw">var</span> y = <span class="str">"Hello World"</span>;
+System.out.println(x == y);             <span class="cm">// true  (same pooled literal)</span>
+
+<span class="kw">var</span> z = <span class="str">" Hello World"</span>.trim();
+System.out.println(x == z);             <span class="cm">// false (computed at runtime)</span>
+
+<span class="kw">var</span> concat = <span class="str">"hello "</span>; concat += <span class="str">"world"</span>;
+System.out.println(<span class="str">"hello world"</span> == concat); <span class="cm">// false (+= -> new String)</span>
+
+<span class="kw">var</span> n  = <span class="str">"Hello World"</span>;
+<span class="kw">var</span> n2 = <span class="kw">new</span> <span class="kw">String</span>(<span class="str">"Hello World"</span>).intern();
+System.out.println(n == n2);            <span class="cm">// true  (intern() pulls from pool)</span></code></pre>
+
+    <h4>Compile-time constant বনাম runtime</h4>
+    <div class="trace"><ul>
+      <li><code>first = "rat" + 1</code> → compile-time constant <span class="out">"rat1"</span> (pooled)</li>
+      <li><code>second = "r"+"a"+"t"+"1"</code> → এটাও compile-time constant → একই pool ref</li>
+      <li><code>third = "r"+"a"+"t"+new String("1")</code> → constant <strong>নয়</strong> → নতুন object</li>
+      <li><code>first == second</code> → <span class="out">true</span></li>
+      <li><code>first == second.intern()</code> → <span class="out">true</span></li>
+      <li><code>first == third</code> → <span class="out">false</span></li>
+      <li><code>first == third.intern()</code> → <span class="out">true</span> (intern pool-এ "rat1" খুঁজে পায়)</li>
+    </ul></div>
+    <div class="card remember"><span class="label">★ REMEMBER</span>
+      <p>বাস্তব কোডে String তুলনা করতে <strong>সবসময় <code>equals()</code> ব্যবহার করুন</strong> — কখনো <code>==</code> বা <code>intern()</code> নয়। ওগুলো শুধু পরীক্ষাতেই দরকারি।</p>
+    </div>
+  </section>
+
+  <!-- SECTION 04 -->
+  <section id="s4">
+    <div class="secnum">SECTION 04</div>
+    <h2>Array বোঝা</h2>
+    <p>Array হলো heap-এ থাকা একটা fixed-size, ordered list; এতে duplicate ও যেকোনো Java type রাখা যায়। <code>char[]</code> একটা reference variable; কিন্তু এর element-গুলো <code>char</code> primitive।</p>
+
+    <h3>Primitive-এর array তৈরি</h3>
+<pre><code><span class="kw">int</span>[] numbers = <span class="kw">new</span> <span class="kw">int</span>[<span class="num">3</span>];          <span class="cm">// all default 0</span>
+<span class="kw">int</span>[] more    = <span class="kw">new</span> <span class="kw">int</span>[]{<span class="num">42</span>, <span class="num">55</span>, <span class="num">99</span>};
+<span class="kw">int</span>[] shorter = {<span class="num">42</span>, <span class="num">55</span>, <span class="num">99</span>};         <span class="cm">// anonymous array</span></code></pre>
+    <p>নিচের পাঁচটাই <strong>একই</strong> জিনিস declare করে — bracket আগে বা পরে, space থাকুক বা না থাকুক:</p>
+<pre><code><span class="kw">int</span>[] a;  <span class="kw">int</span> [] b;  <span class="kw">int</span> []c;  <span class="kw">int</span> d[];  <span class="kw">int</span> e [];</code></pre>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — এক line-এ একাধিক variable হলে bracket-এর অবস্থান</span>
+<pre><code><span class="kw">int</span>[] ids, types;  <span class="cm">// BOTH are int[]</span>
+<span class="kw">int</span> ids[], types;  <span class="cm">// ids is int[]; types is a plain int!</span></code></pre>
+    </div>
+
+    <h3>Reference type-এর array</h3>
+    <p>Array হলো object; <code>equals()</code> override করা <em>নেই</em>, তাই এটা reference equality ব্যবহার করে (কখনো element তুলনা করে না)।</p>
+<pre><code><span class="kw">String</span>[] bugs = {<span class="str">"cricket"</span>, <span class="str">"beetle"</span>, <span class="str">"ladybug"</span>};
+<span class="kw">String</span>[] alias = bugs;
+<span class="kw">String</span>[] other = {<span class="str">"cricket"</span>, <span class="str">"beetle"</span>, <span class="str">"ladybug"</span>};
+bugs.equals(alias);  <span class="cm">// true  (same reference)</span>
+bugs.equals(other);  <span class="cm">// false (different object, elements ignored)</span>
+bugs.toString();     <span class="cm">// [Ljava.lang.String;@... (use Arrays.toString instead)</span></code></pre>
+    <p><code>Arrays.toString(bugs)</code> → <code>[cricket, beetle, ladybug]</code>। initialize না করা array field হয় <code>null</code>; <code>new String[2]</code> দিলে দুটো <code>null</code> slot পাওয়া যায়।</p>
+
+    <h4>Array casting ও <code>ArrayStoreException</code></h4>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — compile হয় কিন্তু runtime-এ throw করে</span>
+<pre><code><span class="kw">String</span>[] strings = {<span class="str">"stringValue"</span>};
+<span class="kw">Object</span>[] objects = strings;           <span class="cm">// widening, no cast needed</span>
+<span class="kw">String</span>[] again = (<span class="kw">String</span>[]) objects;   <span class="cm">// narrowing, cast needed</span>
+again[<span class="num">0</span>] = <span class="kw">new</span> StringBuilder();        <span class="err">// DOES NOT COMPILE (String[] needs String)</span>
+objects[<span class="num">0</span>] = <span class="kw">new</span> StringBuilder();      <span class="cm">// compiles, but throws ArrayStoreException at runtime</span></code></pre>
+    </div>
+
+    <h3>Array ব্যবহার — length একটা field</h3>
+<pre><code><span class="kw">String</span>[] mammals = {<span class="str">"monkey"</span>, <span class="str">"chimp"</span>, <span class="str">"donkey"</span>};
+mammals.length;     <span class="cm">// 3 (no parentheses!)</span>
+mammals.length();   <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">new</span> <span class="kw">String</span>[<span class="num">6</span>].length; <span class="cm">// 6 (slots, even if all null)</span></code></pre>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — ArrayIndexOutOfBoundsException</span>
+      <p>size 10-এর একটা array-তে valid index 0–9। নিচের তিনটাই runtime-এ throw করে:</p>
+<pre><code>numbers[<span class="num">10</span>] = <span class="num">3</span>;               <span class="err">// index 10 invalid</span>
+numbers[numbers.length] = <span class="num">5</span>;   <span class="err">// length is one past max index</span>
+<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt;= numbers.length; i++) ... <span class="err">// &lt;= reaches index 10</span></code></pre>
+    </div>
+
+    <h3>Sorting</h3>
+    <p><code>Arrays.sort(array)</code> ascending sort করে। String <strong>alphabetically</strong> sort হয়, তাই digit-string চমকে দিতে পারে।</p>
+<pre><code>Arrays.sort(<span class="kw">new</span> <span class="kw">int</span>[]{<span class="num">6</span>,<span class="num">9</span>,<span class="num">1</span>});         <span class="cm">// 1 6 9</span>
+Arrays.sort(<span class="kw">new</span> <span class="kw">String</span>[]{<span class="str">"10"</span>,<span class="str">"9"</span>,<span class="str">"100"</span>}); <span class="cm">// 10 100 9 (alphabetic!)</span></code></pre>
+    <div class="card remember"><span class="label">★ REMEMBER — "7Up" sort order</span>
+      <p>সংখ্যা (7) আগে sort হয়, তারপর Uppercase (U), তারপর lowercase (p)।</p>
+    </div>
+
+    <h3><code>Arrays.binarySearch</code> দিয়ে search</h3>
+    <div class="rules-box">
+      <h4>Binary search-এর নিয়ম (array অবশ্যই sorted হতে হবে)</h4>
+      <ul>
+        <li><strong>পেলে:</strong> match-এর index ফেরায়।</li>
+        <li><strong>না পেলে:</strong> <code>-(insertion point) - 1</code> ফেরায় (একটা negative সংখ্যা)।</li>
+        <li><strong>Unsorted array:</strong> ফলাফল <strong>undefined</strong> — উত্তর হিসেবে "unpredictable" বেছে নিন।</li>
+      </ul>
+    </div>
+<pre><code><span class="kw">int</span>[] n = {<span class="num">2</span>,<span class="num">4</span>,<span class="num">6</span>,<span class="num">8</span>};
+Arrays.binarySearch(n, <span class="num">2</span>);  <span class="cm">// 0</span>
+Arrays.binarySearch(n, <span class="num">4</span>);  <span class="cm">// 1</span>
+Arrays.binarySearch(n, <span class="num">1</span>);  <span class="cm">// -1  (insert at 0 -> -(0)-1)</span>
+Arrays.binarySearch(n, <span class="num">3</span>);  <span class="cm">// -2  (insert at 1 -> -(1)-1)</span>
+Arrays.binarySearch(n, <span class="num">9</span>);  <span class="cm">// -5  (insert at 4 -> -(4)-1)</span></code></pre>
+
+    <h3>Array তুলনা: equals / compare / mismatch</h3>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Method</th><th>Array-তে একই ডেটা</th><th>Array আলাদা</th></tr>
+      <tr><td><code>Arrays.equals()</code></td><td class="yes">true</td><td class="no">false</td></tr>
+      <tr><td><code>Arrays.compare()</code></td><td><span class="num">0</span></td><td>positive বা negative সংখ্যা</td></tr>
+      <tr><td><code>Arrays.mismatch()</code></td><td><span class="num">-1</span></td><td>প্রথম পার্থক্যের index (≥0)</td></tr>
+    </table>
+    </div>
+    <div class="rules-box">
+      <h4><code>compare()</code>-এর ordering নিয়ম</h4>
+      <ul>
+        <li>Negative = প্রথম array "ছোট"; 0 = সমান; positive = প্রথমটা "বড়"।</li>
+        <li>সব leading element মিললে <strong>ছোট</strong> array-টাই ছোট।</li>
+        <li><code>null</code> &lt; যেকোনো মান; সংখ্যা &lt; অক্ষর; uppercase &lt; lowercase; prefix ছোট।</li>
+        <li><strong>আলাদা type</strong>-এর array তুলনা → <span class="err">DOES NOT COMPILE</span>।</li>
+      </ul>
+    </div>
+<pre><code>Arrays.mismatch(<span class="kw">new</span> <span class="kw">int</span>[]{<span class="num">1</span>}, <span class="kw">new</span> <span class="kw">int</span>[]{<span class="num">1</span>});      <span class="cm">// -1 (equal)</span>
+Arrays.mismatch(<span class="kw">new</span> <span class="kw">String</span>[]{<span class="str">"a"</span>}, <span class="kw">new</span> <span class="kw">String</span>[]{<span class="str">"A"</span>}); <span class="cm">// 0  (differ at index 0)</span>
+Arrays.mismatch(<span class="kw">new</span> <span class="kw">int</span>[]{<span class="num">1</span>,<span class="num">2</span>}, <span class="kw">new</span> <span class="kw">int</span>[]{<span class="num">1</span>});  <span class="cm">// 1  (extra element at index 1)</span></code></pre>
+
+    <h3>Varargs ও multidimensional array</h3>
+    <p>একটা varargs parameter (<code>String... args</code>) method-এর ভিতরে <em>সাধারণ array হিসেবেই</em> ব্যবহার হয় (<code>args.length</code>, <code>args[0]</code>)। তিনটা <code>main</code> signature-ই valid: <code>String[] args</code>, <code>String args[]</code>, <code>String... args</code>।</p>
+<pre><code><span class="kw">int</span>[][] vars1;          <span class="cm">// 2D</span>
+<span class="kw">int</span> vars2[][];          <span class="cm">// 2D</span>
+<span class="kw">int</span>[] vars3[];          <span class="cm">// 2D</span>
+<span class="kw">int</span>[] vars4[], space[][];<span class="cm">// vars4 is 2D, space is 3D</span>
+
+<span class="kw">String</span>[][] rect = <span class="kw">new</span> <span class="kw">String</span>[<span class="num">3</span>][<span class="num">2</span>];        <span class="cm">// rectangular</span>
+<span class="kw">int</span>[][] jagged = {{<span class="num">1</span>,<span class="num">4</span>}, {<span class="num">3</span>}, {<span class="num">9</span>,<span class="num">8</span>,<span class="num">7</span>}};   <span class="cm">// asymmetric</span>
+<span class="kw">int</span>[][] partial = <span class="kw">new</span> <span class="kw">int</span>[<span class="num">2</span>][];          <span class="cm">// first dim only; fill later</span></code></pre>
+    <div class="card key-rule"><span class="label">✓ KEY RULE</span>
+      <p>array-of-array-এ <strong>পরের</strong> dimension-গুলোর size বাদ দেওয়া যায়, কিন্তু <code>new</code> ব্যবহার করলে <strong>প্রথম</strong> dimension-এর size দিতেই হবে (যেমন <code>new int[2][]</code> বৈধ, <code>new int[][]</code> নয়)।</p>
+    </div>
+  </section>
+
+  <!-- SECTION 05 -->
+  <section id="s5">
+    <div class="secnum">SECTION 05</div>
+    <h2>Math API দিয়ে হিসাব</h2>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — trap হলো return type</span>
+      <p>সবসময় Math method-এর <strong>return type</strong> variable-এর type-এর সাথে মিলিয়ে দেখুন। না মিললে <span class="err">DOES NOT COMPILE</span>।</p>
+    </div>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Method</th><th>Signature</th><th>নোট</th></tr>
+      <tr><td><code>min / max</code></td><td><code>double, float, int, long</code>-এর জন্য overloaded</td><td>Return type argument-এর সাথে মেলে।</td></tr>
+      <tr><td><code>round</code></td><td><code>round(double)→long</code>, <code>round(float)→int</code></td><td>.5 বা বেশি হলে উপরে round।</td></tr>
+      <tr><td><code>ceil / floor</code></td><td><code>ceil(double)→double</code>, <code>floor(double)→double</code></td><td>ceil উপরে; floor ভগ্নাংশ বাদ দেয়।</td></tr>
+      <tr><td><code>pow</code></td><td><code>pow(double,double)→double</code></td><td>ফলাফল সবসময় <code>double</code>।</td></tr>
+      <tr><td><code>random</code></td><td><code>random()→double</code></td><td><code>[0.0, 1.0)</code> ফেরায় — কখনো negative নয়, কখনো 1.0 নয়।</td></tr>
+    </table>
+    </div>
+<pre><code>Math.max(<span class="num">3</span>, <span class="num">7</span>);      <span class="cm">// 7  (int)</span>
+Math.min(<span class="num">7</span>, <span class="num">-9</span>);     <span class="cm">// -9 (int)</span>
+Math.round(<span class="num">123.45</span>); <span class="cm">// 123  (long)</span>
+Math.round(<span class="num">123.50</span>); <span class="cm">// 124  (long)</span>
+Math.round(<span class="num">123.45f</span>);<span class="cm">// 123  (int, float overload)</span>
+Math.ceil(<span class="num">3.14</span>);   <span class="cm">// 4.0 (double)</span>
+Math.floor(<span class="num">3.14</span>);  <span class="cm">// 3.0 (double)</span>
+Math.pow(<span class="num">5</span>, <span class="num">2</span>);    <span class="cm">// 25.0 (double, not 25)</span></code></pre>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — ক্লাসিক compile check</span>
+      <div class="trace"><ul>
+        <li><code>double one = Math.pow(1, 2);</code> → pow double ফেরায় → <span class="out">OK</span></li>
+        <li><code>int two = Math.round(1.0);</code> → round(double) ফেরায় <strong>long</strong> → <span class="err">DOES NOT COMPILE</span></li>
+        <li><code>float three = Math.random();</code> → random ফেরায় <strong>double</strong> → <span class="err">DOES NOT COMPILE</span></li>
+      </ul></div>
+    </div>
+
+    <h3>BigInteger ও BigDecimal</h3>
+    <p>মান primitive-এ না আঁটলে বা precision জরুরি হলে (যেমন টাকা) এগুলো ব্যবহার করুন। দুটোই <strong>immutable</strong> — তাই method chain করুন। <code>valueOf()</code> preferable; <code>long</code> দুটোতেই দেওয়া যায়, কিন্তু <code>double</code> শুধু <code>BigDecimal</code>-এ। Constant আছে যেমন <code>BigInteger.ZERO</code>, <code>BigDecimal.ONE</code>।</p>
+<pre><code><span class="kw">var</span> bigInt = BigInteger.valueOf(<span class="num">199</span>)
+    .add(BigInteger.valueOf(<span class="num">1</span>))   <span class="cm">// 200</span>
+    .divide(BigInteger.TEN)        <span class="cm">// 20</span>
+    .max(BigInteger.valueOf(<span class="num">6</span>)); <span class="cm">// 20</span>
+
+System.out.println(<span class="kw">new</span> BigInteger(<span class="str">"12345123451234512345"</span>));
+System.out.println(<span class="num">12345123451234512345L</span>); <span class="err">// DOES NOT COMPILE (too big for long)</span>
+
+<span class="kw">double</span> cents = <span class="num">64.1</span> * <span class="num">100</span>; <span class="cm">// 6409.999999999999 (floating-point error)</span>
+BigDecimal.valueOf(<span class="num">64.1</span>).multiply(BigDecimal.valueOf(<span class="num">100</span>)); <span class="cm">// 6410.0</span></code></pre>
+  </section>
+
+  <!-- SECTION 06 -->
+  <section id="s6">
+    <div class="secnum">SECTION 06</div>
+    <h2>Date ও Time নিয়ে কাজ</h2>
+    <p><code>import java.time.*;</code> দিয়ে import করুন। পুরোনো <code>java.util.Date</code> পরীক্ষায় <strong>নেই</strong>। কতটুকু তথ্য দরকার সেই অনুযায়ী class বেছে নিন:</p>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Class</th><th>কী থাকে</th><th>উদাহরণ</th></tr>
+      <tr><td><code>LocalDate</code></td><td>শুধু date</td><td>এই বছরের আপনার জন্মদিন</td></tr>
+      <tr><td><code>LocalTime</code></td><td>শুধু time</td><td>মধ্যরাত</td></tr>
+      <tr><td><code>LocalDateTime</code></td><td>date + time, zone নেই</td><td>নববর্ষের রাত ঠিক ১২টা</td></tr>
+      <tr><td><code>ZonedDateTime</code></td><td>date + time + zone</td><td>সকাল ৯টা EST-এ একটা কল</td></tr>
+    </table>
+    </div>
+
+    <h3>Date ও time তৈরি</h3>
+    <div class="card key-rule"><span class="label">✓ KEY RULE — মাস 1 থেকে গোনা হয়</span>
+      <p>index-এর মতো নয়, Date-Time API মাস গোনে <strong>1</strong> থেকে (মানুষের মতোই)। <code>Month.JANUARY</code> == 1।</p>
+    </div>
+<pre><code>LocalDate.of(<span class="num">2025</span>, Month.JANUARY, <span class="num">20</span>);  <span class="cm">// same as below</span>
+LocalDate.of(<span class="num">2025</span>, <span class="num">1</span>, <span class="num">20</span>);
+LocalTime.of(<span class="num">6</span>, <span class="num">15</span>);            <span class="cm">// hour, minute</span>
+LocalTime.of(<span class="num">6</span>, <span class="num">15</span>, <span class="num">30</span>);        <span class="cm">// + seconds</span>
+LocalTime.of(<span class="num">6</span>, <span class="num">15</span>, <span class="num">30</span>, <span class="num">200</span>);   <span class="cm">// + nanoseconds</span>
+LocalDateTime.of(date, time);     <span class="cm">// combine</span>
+ZonedDateTime.of(dateTime, ZoneId.of(<span class="str">"US/Eastern"</span>));</code></pre>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — public constructor নেই</span>
+      <p>এই class-গুলো <em>factory pattern</em> ব্যবহার করে (private constructor + static method):</p>
+<pre><code><span class="kw">var</span> d = <span class="kw">new</span> LocalDate();                       <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">var</span> d = LocalDate.of(<span class="num">2025</span>, Month.JANUARY, <span class="num">32</span>); <span class="err">// DateTimeException (no Jan 32)</span></code></pre>
+      <p>আরও খেয়াল: <code>ZonedDateTime.of</code>-এ <code>Month</code> enum নেওয়া কোনো overload <strong>নেই</strong>।</p>
+    </div>
+
+    <h3>পরিবর্তন — immutable, তাই return value ব্যবহার করুন</h3>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — উপেক্ষিত return value</span>
+<pre><code><span class="kw">var</span> date = LocalDate.of(<span class="num">2025</span>, Month.JANUARY, <span class="num">20</span>);
+date.plusDays(<span class="num">10</span>);            <span class="cm">// result thrown away!</span>
+System.out.println(date);    <span class="cm">// still 2025-01-20</span></code></pre>
+    </div>
+    <div class="trace"><ul>
+      <li>শুরু <code>2025-01-20</code></li>
+      <li><code>plusDays(2)</code> → <span class="out">2025-01-22</span></li>
+      <li><code>plusWeeks(1)</code> → <span class="out">2025-01-29</span></li>
+      <li><code>plusMonths(1)</code> → <span class="out">2025-02-28</span> (2025-এ Feb 29 নেই)</li>
+      <li><code>plusYears(5)</code> → <span class="out">2030-02-28</span></li>
+    </ul></div>
+    <div class="card remember"><span class="label">★ REMEMBER — leap year</span>
+      <p>Leap year হলো 4 বা 400-এর গুণিতক, কিন্তু 100-এর অন্য গুণিতক <em>নয়</em>। তাই 2000 ও 2028 leap year; 2100 নয়।</p>
+    </div>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — type-এর জন্য ভুল unit</span>
+<pre><code><span class="kw">var</span> date = LocalDate.of(<span class="num">2025</span>, Month.JANUARY, <span class="num">20</span>);
+date = date.plusMinutes(<span class="num">1</span>); <span class="err">// DOES NOT COMPILE (LocalDate has no time)</span></code></pre>
+      <p>একটা field বদলে copy করতে <code>with...()</code> method (যেমন <code>withYear</code>, <code>withDayOfMonth</code>), আর type পরিবর্তন করতে <code>at...()</code> method (<code>atTime</code>, <code>atStartOfDay</code>, <code>atDate</code>, <code>atZone</code>) ব্যবহার করুন।</p>
+    </div>
+
+    <h3>Period বনাম Duration</h3>
+    <div class="vs-grid">
+      <div class="vs-col left"><h4>Period (date-based)</h4>
+        <ul><li>দিন, মাস, বছর</li><li>Output <code>P</code>y<code>Y</code>m<code>M</code>d<code>D</code> (zero বাদ যায়)</li><li><code>ofYears/ofMonths/ofWeeks/ofDays/of(y,m,d)</code></li><li>LocalDate, LocalDateTime, ZonedDateTime-এ চলে</li><li>LocalTime-এ <strong>নয়</strong></li></ul>
+      </div>
+      <div class="vs-col right"><h4>Duration (time-based)</h4>
+        <ul><li>দিন, ঘণ্টা, মিনিট, সেকেন্ড, nano</li><li>Output <code>PT</code> দিয়ে শুরু</li><li><code>ofDays/ofHours/ofMinutes/ofSeconds/ofMillis/ofNanos</code>, বা <code>of(n, ChronoUnit)</code></li><li>LocalTime, LocalDateTime, ZonedDateTime-এ চলে</li><li>LocalDate-এ <strong>নয়</strong></li></ul>
+      </div>
+    </div>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — Period factory chain করা যায় না</span>
+<pre><code><span class="kw">var</span> wrong = Period.ofYears(<span class="num">1</span>).ofWeeks(<span class="num">1</span>); <span class="cm">// only ofWeeks(1) is used!</span></code></pre>
+      <p>এগুলো <strong>static</strong> method, তাই chain করলে শুধু overwrite হয়। <code>of()</code> শুধু year/month/day নেয়। <code>Period.ofMonths(3)</code> প্রিন্ট করে <code>P3M</code>; <code>Period.between(xmas, newYears)</code> → <code>P7D</code>, উল্টো দিকে → <code>P-7D</code>।</p>
+    </div>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Type</th><th>Period-এ চলে?</th><th>Duration-এ চলে?</th></tr>
+      <tr><td><code>LocalDate</code></td><td class="yes">হ্যাঁ</td><td class="no">না</td></tr>
+      <tr><td><code>LocalTime</code></td><td class="no">না</td><td class="yes">হ্যাঁ</td></tr>
+      <tr><td><code>LocalDateTime</code></td><td class="yes">হ্যাঁ</td><td class="yes">হ্যাঁ</td></tr>
+      <tr><td><code>ZonedDateTime</code></td><td class="yes">হ্যাঁ</td><td class="yes">হ্যাঁ</td></tr>
+    </table>
+    </div>
+    <p>ভুলটা প্রয়োগ করলে runtime-এ <code>UnsupportedTemporalTypeException</code> throw হয়, যেমন <code>LocalTime.plus(Period.ofMonths(-1))</code> বা <code>LocalDate.plus(Duration.ofHours(6))</code>।</p>
+
+    <h4>ChronoUnit ও truncation</h4>
+<pre><code><span class="kw">var</span> one = LocalTime.of(<span class="num">5</span>, <span class="num">15</span>);
+<span class="kw">var</span> two = LocalTime.of(<span class="num">6</span>, <span class="num">55</span>);
+ChronoUnit.HOURS.between(one, two);   <span class="cm">// 1  (truncates, not rounds)</span>
+ChronoUnit.MINUTES.between(one, two); <span class="cm">// 100</span>
+ChronoUnit.MINUTES.between(one, date);<span class="err">// DateTimeException (mixed types)</span>
+
+LocalTime.of(<span class="num">3</span>,<span class="num">12</span>,<span class="num">45</span>).truncatedTo(ChronoUnit.MINUTES); <span class="cm">// 03:12</span></code></pre>
+
+    <h3>Instant ও daylight saving time</h3>
+    <p><code>Instant</code> হলো GMT-তে একটা মুহূর্ত। <code>toInstant()</code> দিয়ে একটা <code>ZonedDateTime</code>-কে <code>Instant</code>-এ রূপান্তর করা যায়, কিন্তু একটা <code>LocalDateTime</code>-কে <strong>যায় না</strong> (time zone নেই → কোনো নির্দিষ্ট মুহূর্ত নেই)।</p>
+    <div class="rules-box">
+      <h4>U.S. daylight saving time (পরীক্ষায় শুধু এটাই আসে)</h4>
+      <ul>
+        <li><strong>Spring forward</strong> (মার্চ, ~2 a.m.): 1:59 a.m. সরাসরি 3:00 a.m.-এ লাফ দেয় — 2:30 a.m. বলে কিছু নেই। Offset বদলায় <code>-05:00</code> → <code>-04:00</code>।</li>
+        <li><strong>Fall back</strong> (নভেম্বর, ~2 a.m.): 1:00–1:59 a.m. ঘণ্টাটা দুবার ঘটে। Offset বদলায় <code>-04:00</code> → <code>-05:00</code>।</li>
+        <li>যে time-টা থাকে না সেটা বানালে (যেমন spring-forward দিনে 2:30) সেটা সোজা <strong>সামনে রোল করে</strong> 3:30-এ যায়।</li>
+      </ul>
+    </div>
+    <div class="trace"><ul>
+      <li>March 9, 2025, 1:30 EST → offset <code>-05:00</code>, hour 1</li>
+      <li><code>plusHours(1)</code> → 3:30, offset <code>-04:00</code>, hour 3</li>
+      <li>GMT check: 1:30 −(−5:00)=6:30 GMT → 3:30 −(−4:00)=7:30 GMT (ঠিক এক ঘণ্টা)</li>
+    </ul></div>
+  </section>
+
+  <!-- RECAP -->
+  <section id="recap" class="card recap">
+    <div class="secnum">★ SHORT RECAP</div>
+    <h2 style="border-color:#f0e3c8;">সংক্ষিপ্ত রিভিউ</h2>
+    <h3>Strings</h3>
+    <ul>
+      <li><code>String</code> immutable; দুটোই numeric হলে <code>+</code> = যোগ, নয়তো concatenation, বাঁ→ডান মূল্যায়ন।</li>
+      <li><code>substring(b,e)</code>: b inclusive, e exclusive; e length-এর সমান হতে পারে কিন্তু বেশি বা reversed নয়; না পেলে <code>indexOf</code> ফেরায় <code>-1</code>।</li>
+    </ul>
+    <h3>StringBuilder</h3>
+    <ul>
+      <li>Mutable; <code>append/insert/delete</code> mutate করে ও <code>this</code> ফেরায়; <code>substring</code> mutate না করে একটা String ফেরায়।</li>
+      <li><code>delete</code>/<code>replace</code> length-এর বেশি end index মেনে নেয়; <code>deleteCharAt</code> নেয় না।</li>
+    </ul>
+    <h3>Equality</h3>
+    <ul>
+      <li><code>==</code> reference equality; <code>String.equals</code> character তুলনা করে; <code>StringBuilder</code> <code>equals</code> override করে না।</li>
+      <li>Literal ও compile-time constant pooled; runtime-এ বানানো string ও <code>new String()</code> নয়; <code>intern()</code> pool থেকে টেনে আনে।</li>
+    </ul>
+    <h3>Arrays</h3>
+    <ul>
+      <li><code>length</code> একটা field (parenthesis নেই); index 0..length-1; array-তে <code>equals</code> reference-ভিত্তিক।</li>
+      <li>sorted array-তে <code>binarySearch</code> index বা <code>-(insertion point)-1</code> ফেরায়; unsorted → undefined।</li>
+    </ul>
+    <h3>Math</h3>
+    <ul>
+      <li>return type খেয়াল করুন: <code>round(double)→long</code>, <code>round(float)→int</code>, <code>pow→double</code>, <code>random→double</code>, <code>ceil/floor→double</code>।</li>
+      <li><code>long</code>-এ না আঁটা literal compile হয় না; <code>BigInteger</code>/<code>BigDecimal</code> ব্যবহার করুন (immutable, <code>valueOf</code>)।</li>
+    </ul>
+    <h3>Dates & Times</h3>
+    <ul>
+      <li>মাস 1 থেকে গোনা; class immutable ও private constructor; উপেক্ষিত return value একটা ক্লাসিক trap।</li>
+      <li><code>Period</code> = date unit (LocalTime নয়); <code>Duration</code> = time unit (LocalDate নয়); ভুল type → <code>UnsupportedTemporalTypeException</code>।</li>
+    </ul>
+  </section>
+
+  <!-- CHEAT SHEET -->
+  <section id="cheat">
+    <div class="secnum">⚑ CHEAT SHEET</div>
+    <h2>Exam Traps চিট-শিট</h2>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>পরিস্থিতি</th><th>কী টেস্ট হয়</th><th>রায়</th></tr>
+      <tr><td><code>String anotherFish = numFish + 1;</code> (দুটোই int)</td><td>int ফলাফল String-এ রাখা</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>"c" + null</code></td><td>concatenation-এ null</td><td class="yes">প্রিন্ট হয় "cnull"</td></tr>
+      <tr><td><code>name.substring(3, 2)</code> / <code>substring(3, 8)</code></td><td>reversed / past-end index</td><td class="no">exception</td></tr>
+      <tr><td>"animals"-এ <code>name.substring(3, 7)</code></td><td>end == length অনুমোদিত</td><td class="yes">"mals"</td></tr>
+      <tr><td><code>"Food: %d tons".formatted(2.0)</code></td><td>%d-তে double দেওয়া</td><td class="no">IllegalFormatConversionException</td></tr>
+      <tr><td><code>name == builder</code> (String বনাম StringBuilder)</td><td>সম্পর্কহীন type-এ ==</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>" Hello World".trim() == "Hello World"</code></td><td>runtime-built বনাম pooled literal</td><td class="no">false</td></tr>
+      <tr><td><code>"r"+"a"+"t"+"1" == "rat"+1</code></td><td>compile-time constant pooled</td><td class="yes">true</td></tr>
+      <tr><td><code>mammals.length()</code></td><td>length method হিসেবে ব্যবহার</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>objects[0] = new StringBuilder();</code> (Object[] দিয়ে String[])</td><td>covariant array store</td><td class="no">ArrayStoreException (runtime)</td></tr>
+      <tr><td><code>for(i=0; i &lt;= arr.length; i++)</code></td><td><code>&lt;=</code> দিয়ে off-by-one</td><td class="no">ArrayIndexOutOfBoundsException</td></tr>
+      <tr><td>unsorted array-তে <code>binarySearch</code></td><td>precondition লঙ্ঘন</td><td class="no">undefined ফলাফল</td></tr>
+      <tr><td><code>Arrays.compare(int[], String[])</code></td><td>আলাদা type-এর array</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>int two = Math.round(1.0);</code></td><td>round(double) ফেরায় long</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>float three = Math.random();</code></td><td>random ফেরায় double</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>12345123451234512345L</code></td><td>long-এর জন্য literal বড়</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>new LocalDate()</code></td><td>private constructor / factory</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>LocalDate.of(2025, Month.JANUARY, 32)</code></td><td>অবৈধ field মান</td><td class="no">DateTimeException</td></tr>
+      <tr><td>reassign ছাড়া <code>date.plusDays(10);</code></td><td>উপেক্ষিত immutable return</td><td class="no">কোনো প্রভাব নেই</td></tr>
+      <tr><td><code>LocalDate.plusMinutes(1)</code></td><td>date type-এ time method</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>LocalTime.plus(Period...)</code> / <code>LocalDate.plus(Duration...)</code></td><td>ভুল Period/Duration target</td><td class="no">UnsupportedTemporalTypeException</td></tr>
+      <tr><td><code>Period.ofYears(1).ofWeeks(1)</code></td><td>static factory "chaining"</td><td class="no">শুধু ofWeeks(1) প্রযোজ্য</td></tr>
+    </table>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>
