@@ -57,7 +57,8 @@
   li{margin:5px 0;}
 
   p code,li code,td code,h4 code,.obj code,.card code,.rules-box code,.vs-col code,.trace code{
-    background:var(--inlinebg);color:var(--inlineink);padding:1.5px 6px;border-radius:6px;font-size:14.5px;}
+    background:var(--inlinebg);color:var(--inlineink);padding:1.5px 6px;border-radius:6px;font-size:14.5px;
+    overflow-wrap:anywhere;}
 
   pre{background:#fdfaf7;border-radius:12px;padding:16px 18px;overflow-x:auto;
     box-shadow:inset 0 2px 8px rgba(70,55,40,.08);margin:14px 0;font-size:14px;line-height:1.6;}
@@ -84,7 +85,7 @@
   .rules-box ol,.rules-box ul{margin:6px 0;}
 
   .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;}
-  .vs-col{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);}
+  .vs-col{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);min-width:0;}
   .vs-col h4{margin:0 0 8px;font-size:16px;}
   .vs-col.left h4{color:var(--purple);}
   .vs-col.right h4{color:var(--yes);}
