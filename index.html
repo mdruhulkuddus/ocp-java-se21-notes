@@ -14,9 +14,29 @@
       rel="stylesheet"
     />
 
+    <!-- Restore theme + focus-mode before first paint to avoid a flash.
+         Mirrors the ocp-theme / ocp-focus localStorage keys used in script.js. -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("ocp-theme");
+          if (t !== "dark" && t !== "light") t = "light";
+          document.documentElement.setAttribute("data-theme", t);
+          if (localStorage.getItem("ocp-focus") === "1") {
+            document.documentElement.classList.add("focus-mode");
+          }
+        } catch (e) {}
+      })();
+    </script>
+
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <!-- ===== Reading progress bar (sits above the header, survives its hide) ===== -->
+    <div class="reading-progress" aria-hidden="true">
+      <span class="reading-progress__fill" id="progress-fill"></span>
+    </div>
+
     <!-- ===== Header ===== -->
     <header class="site-header">
       <div class="brand">
@@ -88,15 +108,31 @@
       <!-- Reading area: a fixed tab bar above a scrolling content region -->
       <main class="reading">
         <div class="reading-head">
-          <div class="reading-inner">
+          <div class="reading-inner reading-head-inner">
+            <div class="strip-chapter" id="strip-chapter" aria-live="polite">
+              <!-- active chapter label injected by script.js -->
+            </div>
             <div class="tabs" id="view-tabs" role="tablist" aria-label="Content views">
               <!-- tabs injected by script.js -->
             </div>
+            <button
+              class="focus-toggle"
+              id="focus-toggle"
+              type="button"
+              aria-pressed="false"
+              title="Toggle focus mode"
+              aria-label="Toggle focus mode"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M3 16v3a2 2 0 0 0 2 2h3" />
+              </svg>
+              <span class="focus-toggle__label">Focus</span>
+            </button>
           </div>
         </div>
 
         <div class="reading-scroll" id="reading-scroll">
-          <div class="reading-inner">
+          <div class="reading-inner reading-body-inner">
             <p class="breadcrumb" id="breadcrumb"></p>
 
             <article class="reading-content" id="reading-content" aria-live="polite">
@@ -105,13 +141,12 @@
 
             <!-- ===== Footer (flows at the end of the reading content) ===== -->
             <footer class="site-footer">
-              <span class="footer-credit"
-                >Original Book — <a href="https://www.amazon.com/Oracle-Certified-Professional-Developer-Study/dp/1394286619">OCP Oracle Certified Professional Java SE 21</a></span
+              <span class="footer-source"
+                ><span class="bn">মূল বই</span> · Original Book — <a href="https://www.amazon.com/Oracle-Certified-Professional-Developer-Study/dp/1394286619" target="_blank" rel="noopener">OCP Oracle Certified Professional Java SE 21</a></span
               >
-              <span class="footer-meta">
-                <span id="page-indicator" class="page-indicator"></span>
-                <span class="footer-copy"> · Built by <a href="https://mdruhulkuddus.github.io/">Ruhul Kuddus</a> · © 2026</span>
-              </span>
+              <span class="footer-copy"
+                >Built by <a href="https://mdruhulkuddus.github.io/">Ruhul Kuddus</a> · © 2026</span
+              >
             </footer>
           </div>
         </div>

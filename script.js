@@ -80,10 +80,12 @@ const els = {
   readingScroll: document.getElementById("reading-scroll"),
   nav: document.getElementById("chapter-nav"),
   tabs: document.getElementById("view-tabs"),
+  stripChapter: document.getElementById("strip-chapter"),
   breadcrumb: document.getElementById("breadcrumb"),
   content: document.getElementById("reading-content"),
-  pageIndicator: document.getElementById("page-indicator"),
+  progressFill: document.getElementById("progress-fill"),
   themeToggle: document.getElementById("theme-toggle"),
+  focusToggle: document.getElementById("focus-toggle"),
   html: document.documentElement,
 };
 
@@ -167,8 +169,19 @@ function renderBreadcrumb(chapter, viewKey) {
     `${pad2(chapter.number)} — ${chapter.title.toUpperCase()} / ${(view ? view.label : "").toUpperCase()}`;
 }
 
-function renderPageIndicator(chapter) {
-  els.pageIndicator.textContent = `${pad2(chapter.number)} / ${pad2(chapters.length)}`;
+/* The persistent tab strip shows the active chapter as "04 · Core APIs",
+   with an optional smaller Bengali subtitle when titleBn is set. */
+function renderStripChapter(chapter) {
+  let html =
+    `<span class="strip-line">` +
+    `<span class="strip-num">${pad2(chapter.number)}</span>` +
+    `<span class="strip-dot">·</span>` +
+    `<span class="strip-title">${chapter.title}</span>` +
+    `</span>`;
+  if (chapter.titleBn) {
+    html += `<span class="strip-title-bn bn">${chapter.titleBn}</span>`;
+  }
+  els.stripChapter.innerHTML = html;
 }
 
 function setStateMessage(text, isError) {
@@ -264,8 +277,24 @@ window.addEventListener("resize", () => {
 let lastScrollY = 0;
 const HIDE_AFTER = 64; // px scrolled before we start hiding
 
+/* Reading progress bar: driven from whichever element actually scrolls
+   (the reading region on desktop, the document on mobile), throttled to
+   one update per frame. 0% when the content is too short to scroll. */
+let progressRaf = 0;
+function updateProgress(el) {
+  const max = el.scrollHeight - el.clientHeight;
+  const pct = max > 0 ? (el.scrollTop / max) * 100 : 0;
+  els.progressFill.style.width = pct + "%";
+}
+
 function onScroll(e) {
   const el = e.target === document ? document.documentElement : e.target;
+  if (!progressRaf) {
+    progressRaf = requestAnimationFrame(() => {
+      progressRaf = 0;
+      updateProgress(el);
+    });
+  }
   const y = el.scrollTop;
   if (Math.abs(y - lastScrollY) < 6) return; // ignore jitter
   if (y > lastScrollY && y > HIDE_AFTER) {
@@ -302,7 +331,14 @@ async function route() {
   renderSidebar(chapter.id);
   renderTabs(chapter, view);
   renderBreadcrumb(chapter, view);
-  renderPageIndicator(chapter);
+  renderStripChapter(chapter);
+
+  // Constrain reading width per view: prose is narrow, MCQ tables are wide.
+  els.readingScroll.classList.toggle("reading--wide", view === "questions");
+  els.readingScroll.classList.toggle("reading--prose", view !== "questions");
+
+  // New chapter/view starts at the top, so the progress bar resets to empty.
+  els.progressFill.style.width = "0%";
 
   const path = viewFileFor(chapter, view);
   if (!path) {
@@ -338,7 +374,38 @@ els.themeToggle.addEventListener("click", () => {
   applyTheme(next);
 });
 
+/* ---- Focus mode ---------------------------------------------
+   A class on <html> (like data-theme) collapses the sidebar to a
+   numbered rail and centers the reading column for distraction-free
+   reading. Restored before paint by the inline boot script in
+   index.html; this just keeps the button state in sync.
+--------------------------------------------------------------- */
+const FOCUS_KEY = "ocp-focus";
+
+function applyFocus(on) {
+  els.html.classList.toggle("focus-mode", on);
+  els.focusToggle.classList.toggle("active", on);
+  els.focusToggle.setAttribute("aria-pressed", on ? "true" : "false");
+}
+
+function initFocus() {
+  applyFocus(localStorage.getItem(FOCUS_KEY) === "1");
+}
+
+els.focusToggle.addEventListener("click", () => {
+  const on = !els.html.classList.contains("focus-mode");
+  localStorage.setItem(FOCUS_KEY, on ? "1" : "0");
+  applyFocus(on);
+  // The reading column width changes; re-fit the frame after the
+  // ~180ms layout transition so its height stays correct.
+  if (currentFrame) {
+    autosizeFrame(currentFrame);
+    setTimeout(() => currentFrame && autosizeFrame(currentFrame), 220);
+  }
+});
+
 /* ---- Boot ---------------------------------------------------- */
 initTheme();
+initFocus();
 window.addEventListener("hashchange", route);
 route();
