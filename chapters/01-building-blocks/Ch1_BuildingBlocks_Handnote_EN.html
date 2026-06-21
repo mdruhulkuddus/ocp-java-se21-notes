@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 · Chapter 1 — Building Blocks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --ink:#2c2a28; --muted:#6f6a64; --line:#ece3da;
+    --sect:#c96442; --inlinebg:#f3ece4; --inlineink:#9a5030;
+    --yes:#3b7d57; --no:#c44d3e; --purple:#7c5cbf;
+    --shadow:0 4px 18px rgba(60,50,40,.07); --shadow-h:0 10px 30px rgba(60,50,40,.13);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Source Sans 3',system-ui,sans-serif;font-size:17px;line-height:1.65;}
+  .wrap{max-width:1000px;margin:0 auto;padding:32px 20px 80px;}
+  h1,h2,h3,h4{font-family:'Merriweather',serif;color:var(--ink);line-height:1.3;}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+  a{color:var(--sect);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+
+  .header{background:linear-gradient(135deg,#ffffff,#fbf7f4);border-radius:18px;
+    padding:34px 34px 30px;box-shadow:var(--shadow);margin-bottom:26px;}
+  .badge{display:inline-block;background:linear-gradient(90deg,#c96442,#d4845e);
+    color:#fff;font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:600;
+    letter-spacing:.4px;padding:7px 14px;border-radius:999px;margin-bottom:16px;}
+  .header h1{font-size:33px;margin:6px 0 4px;font-weight:900;}
+  .header h1 .muted{color:var(--muted);font-weight:400;font-size:23px;}
+  .subtitle{font-style:italic;color:var(--muted);margin:6px 0 20px;font-size:18px;}
+  .obj{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:5px solid #5aab7b;
+    border-radius:12px;padding:16px 20px;}
+  .obj h4{margin:0 0 8px;color:#3b7d57;font-size:16px;}
+  .obj ul{margin:0;padding-left:20px;}
+  .obj li{margin:3px 0;}
+
+  .toc{background:var(--card);border-radius:14px;padding:22px 26px;box-shadow:var(--shadow);margin-bottom:30px;}
+  .toc h3{margin:0 0 12px;font-size:19px;}
+  .toc-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 28px;}
+  .toc-grid a{display:flex;gap:10px;padding:5px 0;border-bottom:1px dashed #eee5db;color:var(--ink);}
+  .toc-grid a:hover{color:var(--sect);text-decoration:none;}
+  .toc-grid .n{font-family:'JetBrains Mono',monospace;color:var(--sect);font-weight:600;font-size:14px;min-width:26px;}
+
+  section{background:var(--card);border-radius:16px;padding:28px 30px;box-shadow:var(--shadow);margin-bottom:26px;}
+  .secnum{font-family:'JetBrains Mono',monospace;color:var(--sect);font-weight:700;font-size:14px;letter-spacing:1px;}
+  section h2{font-size:25px;margin:4px 0 18px;padding-bottom:12px;border-bottom:2px solid var(--line);}
+  section h3{font-size:19.5px;margin:26px 0 8px;color:#39332e;}
+  section h4{font-size:16.5px;margin:18px 0 6px;color:#4a443e;}
+  p{margin:10px 0;}
+  ul,ol{margin:10px 0;padding-left:24px;}
+  li{margin:5px 0;}
+
+  p code,li code,td code,h4 code,.obj code,.card code,.rules-box code,.vs-col code,.trace code{
+    background:var(--inlinebg);color:var(--inlineink);padding:1.5px 6px;border-radius:6px;font-size:14.5px;}
+
+  pre{background:#fdfaf7;border-radius:12px;padding:16px 18px;overflow-x:auto;
+    box-shadow:inset 0 2px 8px rgba(70,55,40,.08);margin:14px 0;font-size:14px;line-height:1.6;}
+  pre code{background:none;padding:0;color:#3a352f;font-size:14px;}
+  .kw{color:var(--kw);font-weight:500;} .str{color:var(--str);} .num{color:var(--num);}
+  .err{color:var(--err);font-weight:700;} .cm{color:var(--cm);font-style:italic;}
+
+  .card{border-radius:14px;padding:15px 18px 15px 20px;margin:16px 0;box-shadow:var(--shadow);
+    transition:box-shadow .22s ease, transform .22s ease;}
+  .card:hover{box-shadow:var(--shadow-h);transform:translateY(-2px);}
+  .card .label{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;
+    letter-spacing:.6px;display:block;margin-bottom:5px;}
+  .card p,.card ul{margin:5px 0;}
+  .exam-trap{background:linear-gradient(135deg,#fef2f0,#fff8f7);border-left:5px solid #e06b5e;}
+  .exam-trap .label{color:#c0453a;}
+  .key-rule{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:5px solid #5aab7b;}
+  .key-rule .label{color:#3b7d57;}
+  .remember{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:5px solid #d4a24c;}
+  .remember .label{color:#a9772a;}
+
+  .rules-box{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-top:4px solid #5aab7b;
+    border-radius:12px;padding:16px 20px;margin:18px 0;box-shadow:var(--shadow);}
+  .rules-box h4{margin:0 0 8px;color:#3b7d57;}
+  .rules-box ol,.rules-box ul{margin:6px 0;}
+
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;}
+  .vs-col{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);}
+  .vs-col h4{margin:0 0 8px;font-size:16px;}
+  .vs-col.left h4{color:var(--purple);}
+  .vs-col.right h4{color:var(--yes);}
+  .vs-col ul{padding-left:18px;margin:6px 0;}
+
+  .tbl-wrap{overflow-x:auto;margin:16px 0;}
+  table{width:100%;border-collapse:separate;border-spacing:0;background:var(--card);
+    border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:15px;}
+  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid #f0eae2;vertical-align:top;}
+  th{background:#f0e8de;font-family:'Source Sans 3',sans-serif;font-weight:700;color:#4a423a;}
+  tr:last-child td{border-bottom:none;}
+  td code{font-size:13.5px;}
+  .yes{color:var(--yes);font-weight:700;} .no{color:var(--no);font-weight:700;}
+
+  .trace{background:#fdfaf7;border-radius:12px;padding:14px 18px 14px 20px;
+    box-shadow:inset 0 2px 8px rgba(70,55,40,.06);margin:14px 0;border-left:4px solid #d4845e;}
+  .trace ul{list-style:none;padding-left:0;margin:0;}
+  .trace li{padding:3px 0;border-bottom:1px dashed #eee5db;font-size:15px;}
+  .trace li:last-child{border-bottom:none;}
+  .trace .out{font-family:'JetBrains Mono',monospace;color:var(--inlineink);background:var(--inlinebg);
+    padding:1px 6px;border-radius:5px;}
+
+  .recap{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:5px solid #d4a24c;}
+  .recap h3{color:#a9772a;margin-top:18px;}
+  .recap h3:first-of-type{margin-top:4px;}
+
+  @media(max-width:720px){
+    body{font-size:16px;}
+    .toc-grid,.vs-grid{grid-template-columns:1fr;}
+    .header h1{font-size:26px;} .header h1 .muted{font-size:18px;}
+    section{padding:20px 18px;} .header{padding:24px 20px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="header">
+    <span class="badge">OCP Java SE 21 Developer — Exam 1Z0-830</span>
+    <h1>Chapter 1 · Building Blocks <span class="muted"></span></h1>
+    <p class="subtitle">The Java environment, class structure, the main() method, packages &amp; imports, objects &amp; initialization, primitives &amp; references, variable declaration, scope, and garbage collection — every common MCQ trap, verified against the book.</p>
+    <div class="obj">
+      <h4>Exam objectives covered</h4>
+      <ul>
+        <li>Use primitives and wrapper classes; evaluate arithmetic and boolean expressions using precedence, type conversions, and casting.</li>
+        <li>Declare and instantiate Java objects including nested class objects, and explain the object life-cycle: creation, reassigning references, and garbage collection.</li>
+        <li>Understand variable scopes, apply encapsulation, create immutable objects, and use local variable type inference (<code>var</code>).</li>
+      </ul>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <h3>Table of Contents</h3>
+    <div class="toc-grid">
+      <a href="#s1"><span class="n">01</span><span>The Environment &amp; Class Structure</span></a>
+      <a href="#s2"><span class="n">02</span><span>The main() Method &amp; Running Code</span></a>
+      <a href="#s3"><span class="n">03</span><span>Packages, Imports &amp; Class Order</span></a>
+      <a href="#s4"><span class="n">04</span><span>Creating Objects &amp; Initialization</span></a>
+      <a href="#s5"><span class="n">05</span><span>Data Types: Primitives &amp; References</span></a>
+      <a href="#s6"><span class="n">06</span><span>Declaring Variables &amp; var</span></a>
+      <a href="#s7"><span class="n">07</span><span>Scope &amp; Garbage Collection</span></a>
+      <a href="#recap"><span class="n">★</span><span>Short Recap</span></a>
+      <a href="#cheat"><span class="n">⚑</span><span>Exam Traps Cheat Sheet</span></a>
+    </div>
+  </nav>
+
+  <!-- SECTION 01 -->
+  <section id="s1">
+    <div class="secnum">SECTION 01</div>
+    <h2>The Environment &amp; Class Structure</h2>
+
+    <h3>Major components of Java</h3>
+    <p>The <strong>JDK</strong> (Java Development Kit) is the minimum software for Java development. Key commands:</p>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Command</th><th>Purpose</th></tr>
+      <tr><td><code>javac</code></td><td>Converts <code>.java</code> source files into <code>.class</code> bytecode.</td></tr>
+      <tr><td><code>java</code></td><td>Executes the program.</td></tr>
+      <tr><td><code>jar</code></td><td>Packages files together.</td></tr>
+      <tr><td><code>javadoc</code></td><td>Generates documentation.</td></tr>
+    </table>
+    </div>
+    <p><code>javac</code> produces <strong>bytecode</strong>; <code>java</code> launches the <strong>JVM</strong>, which knows how to run that bytecode on the actual machine. Since Java 11 there is no separate JRE — you use the full JDK to run programs.</p>
+    <div class="card remember"><span class="label">★ REMEMBER</span>
+      <p>Java class files run on the JVM and therefore run on <em>any</em> machine with Java, not just the one they were compiled on. Java 21 was released September 2023.</p>
+    </div>
+
+    <h3>Fields and methods</h3>
+    <p>A class has two primary elements: <strong>methods</strong> (functions/procedures) and <strong>fields</strong> (variables). Together they are the <strong>members</strong> of the class. The simplest class is just <code>public class Animal { }</code>.</p>
+<pre><code><span class="kw">public</span> <span class="kw">class</span> Animal {
+   <span class="kw">String</span> name;                       <span class="cm">// a field</span>
+   <span class="kw">public</span> <span class="kw">String</span> getName() {           <span class="cm">// method with String return type</span>
+      <span class="kw">return</span> name;
+   }
+   <span class="kw">public</span> <span class="kw">void</span> setName(<span class="kw">String</span> newName) { <span class="cm">// void = returns nothing</span>
+      name = newName;                  <span class="cm">// newName is a parameter</span>
+   }
+}</code></pre>
+    <div class="card key-rule"><span class="label">✓ KEY RULE — method signature</span>
+      <p>The <strong>method signature</strong> is the method name plus parameter <em>types</em> (not names, not return type). For <code>public int numberVisitors(int month)</code> the signature is <code>numberVisitors(int)</code>.</p>
+    </div>
+
+    <h3>Comments</h3>
+    <p>Three comment types: single-line <code>//</code>, multiline <code>/* ... */</code>, and Javadoc <code>/** ... */</code>. Comments can go <strong>anywhere</strong> in code.</p>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — nested multiline comments</span>
+      <p>Everything from the first <code>/*</code> to the first <code>*/</code> is one comment, even if it contains <code>//</code> or another <code>/*</code> inside. This line does <strong>not</strong> compile because of a leftover <code>*/</code>:</p>
+<pre><code><span class="cm">/*
+ * /* ferret */
+ */</code></pre>
+      <p>The compiler sees <code>/* ... */</code> ending at the inner <code>*/</code>, leaving a stray <code>*/</code> — invalid syntax.</p>
+    </div>
+
+    <h3>Classes and source files</h3>
+    <div class="rules-box">
+      <h4>Top-level type rules</h4>
+      <ul>
+        <li>A top-level type need <strong>not</strong> be <code>public</code>; <code>class Animal { }</code> is fine.</li>
+        <li>A file may contain multiple top-level types, but <strong>at most one</strong> can be <code>public</code>.</li>
+        <li>If a type is <code>public</code>, its name must <strong>match the filename</strong>. <code>public class Animal2</code> in <code>Animal.java</code> → <span class="err">DOES NOT COMPILE</span>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- SECTION 02 -->
+  <section id="s2">
+    <div class="secnum">SECTION 02</div>
+    <h2>The main() Method &amp; Running Code</h2>
+    <p>Execution begins with <code>main()</code> — the program's <strong>entry point</strong> that the JVM looks for.</p>
+<pre><code><span class="kw">public</span> <span class="kw">class</span> Zoo {
+   <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="kw">String</span>[] args) {
+      System.out.println(<span class="str">"Hello World"</span>);
+   }
+}</code></pre>
+    <p>Compile and run (note: omit <code>.class</code> when running):</p>
+<pre><code>javac Zoo.java   <span class="cm">// produces Zoo.class</span>
+java Zoo         <span class="cm">// runs it (no .class extension)</span></code></pre>
+
+    <h3>Words in the signature</h3>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Keyword</th><th>Meaning</th></tr>
+      <tr><td><code>public</code></td><td>Access modifier — full access from anywhere.</td></tr>
+      <tr><td><code>static</code></td><td>Binds the method to the class, so it can be called as <code>Zoo.main()</code> with no object.</td></tr>
+      <tr><td><code>void</code></td><td>The return type — returns no data.</td></tr>
+      <tr><td><code>String[] args</code></td><td>The parameter list — an array of <code>String</code> arguments.</td></tr>
+    </table>
+    </div>
+    <div class="card key-rule"><span class="label">✓ KEY RULE — three valid parameter forms</span>
+      <p>The compiler accepts any of these for <code>main</code>'s parameter (and any valid variable name):</p>
+<pre><code><span class="kw">String</span>[] args
+<span class="kw">String</span> options[]
+<span class="kw">String</span>... friends   <span class="cm">// varargs</span></code></pre>
+    </div>
+    <div class="card remember"><span class="label">★ REMEMBER — optional modifiers</span>
+      <p><code>public</code> and <code>static</code> are required, but a few optional modifiers are allowed. Both <code>final</code> keywords below are optional and still make a valid entry point:</p>
+<pre><code><span class="kw">public</span> <span class="kw">final</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="kw">final</span> <span class="kw">String</span>[] args) {}</code></pre>
+    </div>
+
+    <h3>Passing parameters</h3>
+    <p>Arguments come after the class name and are indexed from <strong>0</strong>. Spaces separate arguments; use quotes for spaces inside one.</p>
+<pre><code>java Zoo Bronx Zoo        <span class="cm">// args[0]=Bronx, args[1]=Zoo</span>
+java Zoo <span class="str">"San Diego"</span> Zoo   <span class="cm">// args[0]=San Diego</span></code></pre>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — missing argument</span>
+      <p>Reading an index that wasn't passed throws at runtime. <code>java Zoo Zoo</code> then reading <code>args[1]</code> → <code>ArrayIndexOutOfBoundsException</code> (Index 1 out of bounds for length 1).</p>
+    </div>
+    <div class="card remember"><span class="label">★ REMEMBER — single-file source-code launch</span>
+      <p>You can skip the explicit compile step: <code>java Zoo.java Bronx Zoo</code>. The twist: here you <strong>include</strong> the <code>.java</code> extension (unlike the compiled <code>java Zoo</code> form).</p>
+    </div>
+  </section>
+
+  <!-- SECTION 03 -->
+  <section id="s3">
+    <div class="secnum">SECTION 03</div>
+    <h2>Packages, Imports &amp; Class Order</h2>
+    <p>Java groups classes into <strong>packages</strong>. An <code>import</code> statement tells the compiler which package to look in for a class. Without it, you get <code>error: cannot find symbol</code>.</p>
+
+    <h3>Wildcards</h3>
+    <p><code>import java.util.*;</code> imports every class <em>directly</em> in <code>java.util</code>.</p>
+    <div class="card key-rule"><span class="label">✓ KEY RULE</span>
+      <p>A wildcard imports only classes directly under that package — <strong>not</strong> child packages, fields, or methods. So <code>import java.util.*;</code> does <em>not</em> bring in <code>java.util.concurrent.atomic.AtomicInteger</code>; you need <code>import java.util.concurrent.atomic.*;</code>.</p>
+    </div>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — invalid import forms</span>
+<pre><code><span class="kw">import</span> java.nio.*;            <span class="err">// NO GOOD — wildcard matches class names, not "file.Files"</span>
+<span class="kw">import</span> java.nio.*.*;          <span class="err">// NO GOOD — only one wildcard, and it must be last</span>
+<span class="kw">import</span> java.nio.file.Paths.*; <span class="err">// NO GOOD — cannot import methods, only class names</span></code></pre>
+    </div>
+
+    <h3>Redundant imports</h3>
+    <p><code>java.lang</code> is special — it is <strong>automatically imported</strong>. Also, a class in the same package as the current class needs no import.</p>
+<pre><code><span class="num">1</span>: <span class="kw">import</span> java.lang.System;  <span class="cm">// redundant (java.lang auto-imported)</span>
+<span class="num">2</span>: <span class="kw">import</span> java.lang.*;       <span class="cm">// redundant (java.lang auto-imported)</span>
+<span class="num">3</span>: <span class="kw">import</span> java.util.Random;
+<span class="num">4</span>: <span class="kw">import</span> java.util.*;        <span class="cm">// redundant here (Random already imported on line 3)</span></code></pre>
+    <p>Three of these four are redundant. If line 3 were absent, <code>java.util.*</code> would <em>not</em> be redundant — it would be the thing importing <code>Random</code>.</p>
+
+    <h3>Naming conflicts</h3>
+    <p><code>java.util.Date</code> and <code>java.sql.Date</code> both exist. Two wildcards that both contain <code>Date</code> make the usage ambiguous and it won't compile.</p>
+    <div class="rules-box">
+      <h4>Conflict resolution rules</h4>
+      <ul>
+        <li>An explicit class import <strong>takes precedence</strong> over wildcards: <code>import java.util.Date;</code> + <code>import java.sql.*;</code> compiles, using <code>java.util.Date</code>.</li>
+        <li>Two explicit imports of the same simple name → <span class="err">ambiguous, does not compile</span>.</li>
+        <li>To use both, pick one in an import and use the other's <strong>fully qualified name</strong> (e.g. <code>java.sql.Date sqlDate;</code>).</li>
+      </ul>
+    </div>
+
+    <h3>Compiling &amp; running with packages</h3>
+<pre><code>javac packagea/ClassA.java packageb/ClassB.java
+java packageb.ClassB             <span class="cm">// prints "Got it"</span>
+
+javac packagea/*.java            <span class="cm">// wildcard for files in one dir</span>
+<span class="cm">// javac *.java would NOT pick up files inside packages</span>
+
+javac -d classes packagea/ClassA.java <span class="cm">// -> classes/packagea/ClassA.class</span>
+java -cp classes packageb.ClassB
+java -classpath classes packageb.ClassB
+java --class-path classes packageb.ClassB <span class="cm">// note the TWO dashes</span></code></pre>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — case &amp; dashes</span>
+      <p>Java options are <strong>case sensitive</strong>: <code>-d</code> works, <code>-D</code> does not. <code>--class-path</code> needs two dashes while <code>-cp</code> and <code>-classpath</code> need one. The wrong number of dashes means the program won't run. The <code>-d</code> option preserves the package directory structure under the target directory.</p>
+    </div>
+
+    <h3>Ordering elements — the PIC rule</h3>
+    <div class="card key-rule"><span class="label">✓ KEY RULE — PIC (picture)</span>
+      <p><strong>P</strong>ackage, <strong>I</strong>mport, <strong>C</strong>lass — in that order. Package is the first non-comment line (optional); imports come after the package (optional); the type comes after imports. Fields and methods go anywhere inside the class. Comments go anywhere.</p>
+    </div>
+<pre><code><span class="kw">import</span> java.util.*;
+<span class="kw">package</span> structure;        <span class="err">// DOES NOT COMPILE (package must come before import)</span>
+<span class="kw">String</span> name;               <span class="err">// DOES NOT COMPILE (field outside a class)</span>
+<span class="kw">public</span> <span class="kw">class</span> Meerkat { }</code></pre>
+  </section>
+
+  <!-- SECTION 04 -->
+  <section id="s4">
+    <div class="secnum">SECTION 04</div>
+    <h2>Creating Objects &amp; Initialization</h2>
+
+    <h3>Calling constructors</h3>
+    <p>Create an instance with <code>new</code> + class name + parentheses: <code>Park p = new Park();</code>.</p>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — constructor vs method</span>
+      <p>A constructor's name matches the class and has <strong>no return type</strong>. A method that looks like a constructor but has a return type is just a regular method — it compiles but is <em>not</em> called by <code>new</code>:</p>
+<pre><code><span class="kw">public</span> <span class="kw">class</span> Chick {
+   <span class="kw">public</span> <span class="kw">void</span> Chick() { }   <span class="cm">// NOT A CONSTRUCTOR (has void return type)</span>
+}</code></pre>
+    </div>
+    <p>If you write no constructor, the compiler supplies a default "do nothing" constructor.</p>
+
+    <h3>Reading &amp; writing fields</h3>
+    <p>Instance variables can be read/written directly: <code>mother.numberEggs = 1;</code>. You can read already-initialized fields when initializing another field on the same object:</p>
+<pre><code><span class="num">2</span>: <span class="kw">String</span> first = <span class="str">"Theodore"</span>;
+<span class="num">3</span>: <span class="kw">String</span> last  = <span class="str">"Moose"</span>;
+<span class="num">4</span>: <span class="kw">String</span> full  = first + last;  <span class="cm">// reads first & last, writes full</span></code></pre>
+
+    <h3>Instance initializer blocks</h3>
+    <p>A code block <em>outside</em> a method is an <strong>instance initializer</strong>. Count code blocks by counting brace pairs; instance initializers cannot live inside a method.</p>
+<pre><code><span class="num">1</span>: <span class="kw">public</span> <span class="kw">class</span> Bird {
+<span class="num">2</span>:    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="kw">String</span>[] args) {
+<span class="num">3</span>:       { System.out.println(<span class="str">"Feathers"</span>); }  <span class="cm">// inner block, NOT an initializer</span>
+<span class="num">4</span>:    }
+<span class="num">5</span>:    { System.out.println(<span class="str">"Snowy"</span>); }        <span class="cm">// instance initializer (outside method)</span>
+<span class="num">6</span>: }</code></pre>
+    <p>Four code blocks here: class, method, inner block, instance initializer. Only line 5 is an instance initializer.</p>
+
+    <h3>Order of initialization</h3>
+    <div class="rules-box">
+      <h4>The two rules</h4>
+      <ol>
+        <li>Fields and instance initializer blocks run <strong>in the order they appear</strong> in the file.</li>
+        <li>The constructor runs <strong>after</strong> all fields and instance initializers.</li>
+      </ol>
+    </div>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — forward reference</span>
+      <p>You cannot read a field before it is defined:</p>
+<pre><code>{ System.out.println(name); } <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">private</span> <span class="kw">String</span> name = <span class="str">"Fluffy"</span>;</code></pre>
+    </div>
+    <div class="trace"><ul>
+      <li><code>private int number = 3;</code> → number = <span class="out">3</span></li>
+      <li><code>{ number = 4; }</code> → number = <span class="out">4</span></li>
+      <li>constructor <code>number = 5;</code> → number = <span class="out">5</span></li>
+      <li>So <code>egg.number</code> prints <span class="out">5</span></li>
+    </ul></div>
+  </section>
+
+  <!-- SECTION 05 -->
+  <section id="s5">
+    <div class="secnum">SECTION 05</div>
+    <h2>Data Types: Primitives &amp; References</h2>
+    <p>Java has two kinds of data: <strong>primitive types</strong> and <strong>reference types</strong>. There are eight primitives.</p>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Keyword</th><th>Type</th><th>Bits</th><th>Default</th></tr>
+      <tr><td><code>boolean</code></td><td>true / false</td><td>JVM-dependent</td><td><code>false</code></td></tr>
+      <tr><td><code>byte</code></td><td>integral</td><td>8 (-128..127)</td><td><code>0</code></td></tr>
+      <tr><td><code>short</code></td><td>integral (signed)</td><td>16 (-32,768..32,767)</td><td><code>0</code></td></tr>
+      <tr><td><code>int</code></td><td>integral</td><td>32</td><td><code>0</code></td></tr>
+      <tr><td><code>long</code></td><td>integral</td><td>64</td><td><code>0L</code></td></tr>
+      <tr><td><code>float</code></td><td>floating-point</td><td>32 (needs <code>f</code>/<code>F</code>)</td><td><code>0.0f</code></td></tr>
+      <tr><td><code>double</code></td><td>floating-point</td><td>64</td><td><code>0.0</code></td></tr>
+      <tr><td><code>char</code></td><td>Unicode (unsigned)</td><td>16 (0..65,535)</td><td><code>\u0000</code></td></tr>
+    </table>
+    </div>
+    <div class="card remember"><span class="label">★ REMEMBER</span>
+      <p>Each numeric type uses twice the bits of the next-smaller one; all numeric types are signed. <code>short</code> is signed and <code>char</code> is unsigned, but both are 16-bit, so they can be cast to each other. <code>String</code> is <strong>not</strong> a primitive — it's an object.</p>
+    </div>
+
+    <h3>Writing literals</h3>
+    <p>By default a numeric literal is an <code>int</code>. Add <code>L</code> for <code>long</code>, <code>f</code>/<code>F</code> for <code>float</code>.</p>
+<pre><code><span class="kw">long</span> max = <span class="num">3123456789</span>;   <span class="err">// DOES NOT COMPILE (too big for int)</span>
+<span class="kw">long</span> max = <span class="num">3123456789L</span>;  <span class="cm">// OK — now it's a long</span></code></pre>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Base</th><th>Digits</th><th>Prefix</th><th>Example</th></tr>
+      <tr><td>Octal</td><td>0–7</td><td><code>0</code></td><td><code>017</code></td></tr>
+      <tr><td>Hexadecimal</td><td>0–9, A–F (case-insensitive)</td><td><code>0x</code> / <code>0X</code></td><td><code>0xFF</code>, <code>0XFf</code></td></tr>
+      <tr><td>Binary</td><td>0–1</td><td><code>0b</code> / <code>0B</code></td><td><code>0b10</code></td></tr>
+    </table>
+    </div>
+
+    <h4>Underscores in literals</h4>
+    <div class="card key-rule"><span class="label">✓ KEY RULE</span>
+      <p>Underscores are allowed <strong>anywhere except</strong> at the start, the end, right before a decimal point, or right after a decimal point. Multiple adjacent underscores are allowed.</p>
+    </div>
+<pre><code><span class="kw">double</span> notAtStart   = _1000.00;   <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">double</span> notAtEnd     = 1000.00_;   <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">double</span> notByDecimal = 1000_.00;   <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">double</span> annoyingOK   = 1_00_0.0_0; <span class="cm">// ugly, but compiles</span></code></pre>
+
+    <h3>Reference types</h3>
+    <p>A reference "points" to an object on the heap by storing its memory address; you can't see the address. References can call methods (if not <code>null</code>); primitives cannot.</p>
+<pre><code><span class="num">4</span>: <span class="kw">String</span> reference = <span class="str">"hello"</span>;
+<span class="num">5</span>: <span class="kw">int</span> len = reference.length();
+<span class="num">6</span>: <span class="kw">int</span> bad = len.length();  <span class="err">// DOES NOT COMPILE (int has no methods)</span></code></pre>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — null</span>
+      <p>References can be assigned <code>null</code>; primitives cannot:</p>
+<pre><code><span class="kw">int</span> value = <span class="kw">null</span>;   <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">String</span> name = <span class="kw">null</span>; <span class="cm">// fine</span></code></pre>
+    </div>
+
+    <h3>Wrapper classes</h3>
+    <p>Each primitive has a wrapper class. The numeric ones extend <code>Number</code>; <code>Boolean</code> and <code>Character</code> do not.</p>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Primitive</th><th>Wrapper</th><th>Extends Number?</th><th>Example</th></tr>
+      <tr><td><code>boolean</code></td><td><code>Boolean</code></td><td class="no">No</td><td><code>Boolean.valueOf(true)</code></td></tr>
+      <tr><td><code>int</code></td><td><code>Integer</code></td><td class="yes">Yes</td><td><code>Integer.valueOf(1)</code></td></tr>
+      <tr><td><code>double</code></td><td><code>Double</code></td><td class="yes">Yes</td><td><code>Double.valueOf(1.0)</code></td></tr>
+      <tr><td><code>char</code></td><td><code>Character</code></td><td class="no">No</td><td><code>Character.valueOf('c')</code></td></tr>
+    </table>
+    </div>
+<pre><code><span class="kw">int</span> primitive   = Integer.parseInt(<span class="str">"123"</span>);  <span class="cm">// String -> int primitive</span>
+Integer wrapper = Integer.valueOf(<span class="str">"123"</span>);   <span class="cm">// String -> Integer wrapper</span>
+Integer.valueOf(<span class="str">"five"</span>);                   <span class="err">// NumberFormatException</span>
+Integer.valueOf(<span class="str">"a"</span>, <span class="num">16</span>);                 <span class="cm">// 10 (base 16)</span></code></pre>
+    <div class="card remember"><span class="label">★ REMEMBER — Boolean.valueOf &amp; Number helpers</span>
+      <p><code>Boolean.valueOf</code> returns <code>true</code> for any case-insensitive "true" (<code>"TrUe"</code>→true), and <code>false</code> otherwise — including <code>"kangaroo"</code> and <code>null</code>. Helper methods like <code>intValue()</code>/<code>byteValue()</code> can lose precision: from <code>Double.valueOf("200.99")</code>, <code>byteValue()</code> → <code>-56</code>, <code>intValue()</code> → <code>200</code>.</p>
+    </div>
+
+    <h3>Text blocks</h3>
+    <p>A text block starts and ends with <code>"""</code>; its contents needn't be escaped, and its type is still <code>String</code>.</p>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — line break required</span>
+<pre><code><span class="kw">String</span> block = <span class="str">"""doe"""</span>; <span class="err">// DOES NOT COMPILE (needs a line break after opening """)</span></code></pre>
+    </div>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Sequence</th><th>Regular String</th><th>Text block</th></tr>
+      <tr><td><code>\s</code></td><td>a space (preserves trailing)</td><td>a space (preserves trailing)</td></tr>
+      <tr><td><code>\</code> at end of line</td><td>n/a — invalid</td><td>omits the line break on that line</td></tr>
+      <tr><td>space at end of line</td><td>space</td><td>ignored</td></tr>
+    </table>
+    </div>
+    <p><strong>Incidental</strong> whitespace (left of the leftmost non-whitespace character) is stripped; <strong>essential</strong> whitespace is kept. <code>"""\n   doe \\\n   deer"""</code> outputs one line (<code>doe deer</code>) because <code>\</code> skips the line break.</p>
+  </section>
+
+  <!-- SECTION 06 -->
+  <section id="s6">
+    <div class="secnum">SECTION 06</div>
+    <h2>Declaring Variables &amp; var</h2>
+
+    <h3>Identifiers</h3>
+    <div class="rules-box">
+      <h4>Four rules for legal identifiers</h4>
+      <ol>
+        <li>Must begin with a letter, a currency symbol (<code>$</code>, <code>¥</code>, <code>€</code>…), or <code>_</code>.</li>
+        <li>May include numbers, but cannot <strong>start</strong> with one.</li>
+        <li>A single underscore <code>_</code> alone is <strong>not</strong> allowed.</li>
+        <li>Cannot be a reserved word. (<code>true</code>, <code>false</code>, <code>null</code> are literals, not usable as names either.)</li>
+      </ol>
+    </div>
+<pre><code><span class="cm">// legal</span>
+<span class="kw">long</span> okidentifier; <span class="kw">float</span> $OK2Identifier; <span class="kw">boolean</span> _alsoOK1d3ntifi3r;
+
+<span class="cm">// illegal</span>
+<span class="kw">int</span> 3DPointClass;    <span class="err">// starts with a number</span>
+<span class="kw">byte</span> hollywood@vine; <span class="err">// @ is not a letter, digit, $ or _</span>
+<span class="kw">double</span> public;       <span class="err">// reserved word</span>
+<span class="kw">short</span> _;             <span class="err">// single underscore not allowed</span></code></pre>
+
+    <h3>Declaring multiple variables</h3>
+    <p>Multiple variables in one statement must share <strong>one</strong> type declaration. Each comma-separated piece is its own little declaration.</p>
+<pre><code><span class="kw">String</span> s1, s2;                 <span class="cm">// two declared, none initialized</span>
+<span class="kw">String</span> s3 = <span class="str">"yes"</span>, s4 = <span class="str">"no"</span>;  <span class="cm">// two declared & initialized</span>
+<span class="kw">int</span> i1, i2, i3 = <span class="num">0</span>;           <span class="cm">// only i3 is initialized!</span>
+<span class="kw">int</span> num, <span class="kw">String</span> value;        <span class="err">// DOES NOT COMPILE (different types)</span>
+<span class="kw">double</span> d1, <span class="kw">double</span> d2;          <span class="err">// DOES NOT COMPILE (type repeated)</span></code></pre>
+
+    <h3>Initializing variables</h3>
+    <div class="vs-grid">
+      <div class="vs-col left"><h4>Local variables</h4>
+        <ul><li>No default value</li><li>Must be initialized before use (else compiler error)</li><li>Declared-but-unused is fine</li></ul>
+      </div>
+      <div class="vs-col right"><h4>Instance / class variables</h4>
+        <ul><li>Get a default automatically</li><li><code>null</code> for objects, <code>0</code> for numbers, <code>false</code> for boolean, <code>\u0000</code> for char</li></ul>
+      </div>
+    </div>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — uninitialized local read</span>
+<pre><code><span class="kw">int</span> x;
+<span class="kw">int</span> reply = x + <span class="num">10</span>;  <span class="err">// DOES NOT COMPILE (x never initialized)</span></code></pre>
+      <p>If a value is set in only <em>one</em> branch of an <code>if/else</code>, reading it afterward won't compile. Set in <em>both</em> branches → fine.</p>
+    </div>
+    <div class="card remember"><span class="label">★ REMEMBER — final locals</span>
+      <p><code>final</code> on a local variable makes it a constant — reassigning won't compile. For a <code>final</code> array reference you can still modify the <em>contents</em>, just not reassign the reference: <code>favoriteNumbers = null;</code> → does not compile.</p>
+    </div>
+
+    <h3>Local variable type inference: <code>var</code></h3>
+    <div class="rules-box">
+      <h4>var rules</h4>
+      <ul>
+        <li>Only for <strong>local variables</strong> — not instance/class variables, not method/constructor parameters.</li>
+        <li>The type is inferred from the <strong>same line</strong> as the declaration.</li>
+        <li>Type is fixed at <strong>compile time</strong>; the <em>value</em> can change at runtime but the type cannot.</li>
+        <li><code>var x = null;</code> alone → does not compile (but a reference-typed <code>var</code> can be reassigned <code>null</code> later).</li>
+        <li>No multiple-variable declarations: <code>var a, b = 3;</code> → does not compile.</li>
+        <li><code>var</code> is a <em>reserved type name</em>, not a reserved word — it can name a variable or method, but not a class/interface/enum.</li>
+      </ul>
+    </div>
+<pre><code><span class="kw">var</span> number = <span class="num">7</span>;
+number = <span class="num">4</span>;
+number = <span class="str">"five"</span>;  <span class="err">// DOES NOT COMPILE (inferred int)</span>
+
+<span class="kw">var</span> question;    <span class="err">// DOES NOT COMPILE (no value on the declaration line)</span>
+<span class="kw">var</span> n = <span class="kw">null</span>;    <span class="err">// DOES NOT COMPILE</span></code></pre>
+  </section>
+
+  <!-- SECTION 07 -->
+  <section id="s7">
+    <div class="secnum">SECTION 07</div>
+    <h2>Scope &amp; Garbage Collection</h2>
+
+    <h3>Variable scope</h3>
+    <div class="rules-box">
+      <h4>Scope by variable kind</h4>
+      <ul>
+        <li><strong>Local variables:</strong> from declaration to the end of the block.</li>
+        <li><strong>Method parameters:</strong> the whole method.</li>
+        <li><strong>Instance variables:</strong> from declaration until the object is eligible for garbage collection.</li>
+        <li><strong>Class (static) variables:</strong> from declaration until the program ends.</li>
+      </ul>
+    </div>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — out of scope</span>
+<pre><code><span class="num">4</span>: <span class="kw">if</span> (hungry) {
+<span class="num">5</span>:    <span class="kw">int</span> bitesOfCheese = <span class="num">1</span>;
+<span class="num">6</span>: } <span class="cm">// bitesOfCheese goes out of scope here</span>
+<span class="num">7</span>: System.out.println(bitesOfCheese); <span class="err">// DOES NOT COMPILE</span></code></pre>
+      <p>Inner blocks can read variables from outer blocks, but not vice versa. Match braces from the inside out to track scope.</p>
+    </div>
+
+    <h3>Garbage collection</h3>
+    <p>All objects live on the <strong>heap</strong> (the "free store"). The garbage collector frees memory by deleting objects that are no longer reachable.</p>
+    <div class="rules-box">
+      <h4>An object is eligible for GC when…</h4>
+      <ul>
+        <li>It no longer has any references pointing to it, <strong>or</strong></li>
+        <li>All references to it have gone out of scope.</li>
+      </ul>
+    </div>
+    <div class="card remember"><span class="label">★ REMEMBER — System.gc() is only a suggestion</span>
+      <p><code>System.gc()</code> merely <em>suggests</em> collection; the JVM is free to ignore it. Eligible for GC ≠ collected immediately, and an object may be eligible yet never collected (e.g. if the program ends first). Marking a variable <code>final</code> does <strong>not</strong> stop its object from being garbage collected.</p>
+    </div>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — tracing eligibility</span>
+<pre><code><span class="num">4</span>: one = <span class="kw">new</span> <span class="kw">String</span>(<span class="str">"a"</span>);
+<span class="num">5</span>: two = <span class="kw">new</span> <span class="kw">String</span>(<span class="str">"b"</span>);
+<span class="num">6</span>: one = two;          <span class="cm">// "a" now has no references -> eligible for GC</span>
+<span class="num">7</span>: <span class="kw">String</span> three = one;
+<span class="num">8</span>: one = <span class="kw">null</span>;          <span class="cm">// "b" still reachable via two & three</span>
+<span class="num">9</span>: }                    <span class="cm">// "b" eligible only when scope ends here</span></code></pre>
+      <p><code>"a"</code> becomes eligible on line 6; <code>"b"</code> stays reachable until the method ends on line 9.</p>
+    </div>
+  </section>
+
+  <!-- RECAP -->
+  <section id="recap" class="card recap">
+    <div class="secnum">★ SHORT RECAP</div>
+    <h2 style="border-color:#f0e3c8;">Short Recap</h2>
+    <h3>Environment &amp; structure</h3>
+    <ul>
+      <li><code>javac</code> compiles <code>.java</code> → <code>.class</code> bytecode; <code>java</code> runs it on the JVM. Run with no <code>.class</code> extension.</li>
+      <li>Members = fields + methods; method signature = name + parameter types. A public top-level type must match its filename.</li>
+    </ul>
+    <h3>main() &amp; packages</h3>
+    <ul>
+      <li><code>public static void main(String[] args)</code>; three parameter forms (<code>[]</code> either side, or <code>...</code>); args indexed from 0.</li>
+      <li>Wildcard imports classes directly in a package only (not child packages/fields/methods); <code>java.lang</code> is automatic; explicit imports beat wildcards. Order is <strong>PIC</strong>.</li>
+    </ul>
+    <h3>Objects &amp; initialization</h3>
+    <ul>
+      <li>Constructor = class name, no return type; a "constructor" with a return type is just a method. Fields &amp; instance initializers run in source order, then the constructor.</li>
+    </ul>
+    <h3>Data types</h3>
+    <ul>
+      <li>Eight primitives; literals default to <code>int</code> (add <code>L</code>/<code>f</code>); underscores not at edges or beside a decimal point; <code>String</code> is not a primitive.</li>
+      <li>References can be <code>null</code> and call methods; primitives can do neither. Numeric wrappers extend <code>Number</code>; <code>valueOf</code> throws <code>NumberFormatException</code> on bad input.</li>
+    </ul>
+    <h3>Variables, scope &amp; GC</h3>
+    <ul>
+      <li>Locals have no default and must be initialized before use; instance/class variables get defaults. <code>var</code> is local-only, inferred from the same line, type-fixed at compile time.</li>
+      <li>An object is GC-eligible when unreachable; <code>System.gc()</code> is only a hint; <code>final</code> doesn't prevent collection.</li>
+    </ul>
+  </section>
+
+  <!-- CHEAT SHEET -->
+  <section id="cheat">
+    <div class="secnum">⚑ CHEAT SHEET</div>
+    <h2>Exam Traps Cheat Sheet</h2>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Scenario</th><th>What it tests</th><th>Verdict</th></tr>
+      <tr><td><code>public class Animal2</code> inside <code>Animal.java</code></td><td>public type must match filename</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>public void Chick() { }</code> called via <code>new Chick()</code></td><td>return type → it's a method, not a constructor</td><td class="no">not invoked by new</td></tr>
+      <tr><td><code>import java.nio.file.Paths.*;</code></td><td>importing methods</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>import java.util.*;</code> + <code>import java.sql.*;</code> then <code>Date</code></td><td>ambiguous wildcard conflict</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>import</code> before <code>package</code></td><td>PIC ordering</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td>field declared outside any class</td><td>members must be in a class</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td>read a field before it's defined in an initializer</td><td>forward reference</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>long max = 3123456789;</code> (no <code>L</code>)</td><td>int literal out of range</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>1000_.00</code> / <code>_1000.00</code> / <code>1000.00_</code></td><td>underscore at edge / beside decimal</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>int value = null;</code></td><td>primitive assigned null</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>len.length()</code> where <code>len</code> is <code>int</code></td><td>method call on a primitive</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>Integer.valueOf("five")</code></td><td>invalid numeric String</td><td class="no">NumberFormatException</td></tr>
+      <tr><td><code>String block = """doe""";</code></td><td>text block needs a line break after <code>"""</code></td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>short _;</code></td><td>single underscore identifier</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>int num, String value;</code></td><td>multiple types in one statement</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>double d1, double d2;</code></td><td>type repeated in multi-declaration</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>int i1, i2, i3 = 0;</code></td><td>only the last variable is initialized</td><td class="yes">i1, i2 uninitialized</td></tr>
+      <tr><td>read a local set in only one <code>if</code> branch</td><td>definite assignment</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>var tricky = "Hello";</code> as an instance variable</td><td>var is local-only</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>var n = null;</code> / <code>var x;</code></td><td>var needs an inferable value on the line</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td>reading <code>args[1]</code> when one arg passed</td><td>array index out of bounds</td><td class="no">ArrayIndexOutOfBoundsException</td></tr>
+      <tr><td><code>System.gc();</code></td><td>GC guarantee</td><td class="no">only a suggestion</td></tr>
+    </table>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 · Chapter 1 — Building Blocks (MCQ Practice)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:ital,wght@0,400;0,600;0,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --ink:#2c2a28; --muted:#6f6a64; --line:#ece3da;
+    --sect:#c96442; --inlinebg:#f3ece4; --inlineink:#9a5030;
+    --yes:#3b7d57; --no:#c44d3e;
+    --purple:#7a5cb8; --purple-soft:#b29ad9;
+    --shadow:0 4px 18px rgba(60,50,40,.07); --shadow-h:0 10px 30px rgba(70,55,90,.16);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Source Sans 3',system-ui,sans-serif;font-size:17px;line-height:1.65;}
+  .wrap{max-width:860px;margin:0 auto;padding:32px 20px 80px;}
+  h1{font-family:'Merriweather',serif;line-height:1.3;}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+
+  .header{position:relative;overflow:hidden;background:linear-gradient(135deg,#ffffff,#fdf8f3);
+    border-radius:18px;padding:34px 34px 28px;box-shadow:var(--shadow);margin-bottom:28px;}
+  .header::after{content:"";position:absolute;top:-60px;right:-60px;width:220px;height:220px;
+    background:radial-gradient(circle,rgba(178,154,217,.30),transparent 70%);pointer-events:none;}
+  .pill{display:inline-block;background:linear-gradient(90deg,#7a5cb8,#9b7fd4);
+    color:#fff;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;
+    letter-spacing:.6px;text-transform:uppercase;padding:7px 14px;border-radius:999px;margin-bottom:14px;}
+  .header h1{font-size:31px;margin:4px 0 6px;font-weight:900;}
+  .header .sub{font-style:italic;color:var(--muted);font-size:18px;margin:0 0 18px;}
+  .topics{display:flex;flex-wrap:wrap;gap:8px;}
+  .topics span{background:var(--inlinebg);color:var(--inlineink);font-family:'JetBrains Mono',monospace;
+    font-size:12px;padding:5px 11px;border-radius:8px;}
+
+  .howto{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:5px solid #5aab7b;
+    border-radius:12px;padding:14px 18px;margin-bottom:26px;font-size:15.5px;color:#3a5e49;}
+
+  .q-card{position:relative;background:linear-gradient(135deg,#f4f0fa,#f9f6fd);
+    border-top:4px solid #9b7fd4;border-radius:14px;padding:20px 22px;margin:18px 0;
+    box-shadow:var(--shadow);transition:box-shadow .22s ease, transform .22s ease;}
+  .q-card:hover{box-shadow:var(--shadow-h);transform:translateY(-2px);}
+  .q-head{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap;}
+  .q-num{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--purple);font-size:15px;}
+  .q-tag{background:var(--purple-soft);color:#fff;font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;letter-spacing:.5px;text-transform:uppercase;padding:3px 9px;border-radius:7px;}
+  .q-prompt{font-weight:600;margin:6px 0 12px;}
+  .q-prompt .all{color:var(--purple);font-weight:700;}
+
+  pre{background:#fbf9fe;border-radius:12px;padding:14px 16px;overflow-x:auto;
+    box-shadow:inset 0 2px 8px rgba(80,60,120,.08);margin:12px 0;font-size:13.5px;line-height:1.55;}
+  pre code{background:none;padding:0;color:#3a352f;}
+  .kw{color:var(--kw);font-weight:500;} .str{color:var(--str);} .num{color:var(--num);}
+  .err{color:var(--err);font-weight:700;} .cm{color:var(--cm);font-style:italic;}
+
+  .opts{list-style:none;margin:8px 0 4px;padding:0;}
+  .opts li{margin:5px 0;padding-left:30px;position:relative;}
+  .opts li .ol{position:absolute;left:0;top:0;font-family:'JetBrains Mono',monospace;
+    font-weight:700;color:var(--purple);}
+  .opts code{background:#f3ece4;color:#9a5030;padding:1.5px 6px;border-radius:6px;font-size:14px;}
+
+  details{margin-top:12px;border-top:1px dashed #d8c9ec;padding-top:10px;}
+  summary{cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;
+    color:var(--purple);list-style:none;user-select:none;}
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸ ";}
+  details[open] summary::before{content:"▾ ";}
+  .ans-key{display:inline-block;background:#eef8f1;color:#3d8a5e;font-family:'JetBrains Mono',monospace;
+    font-weight:700;font-size:13px;padding:4px 11px;border-radius:8px;margin:10px 0 8px;}
+  .expl{font-size:15.5px;color:#403a44;margin:4px 0;}
+  .expl code{background:#f3ece4;color:#9a5030;padding:1.5px 6px;border-radius:6px;font-size:14px;}
+
+  .revision{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:5px solid #d4a24c;
+    border-radius:14px;padding:20px 24px;margin:30px 0 0;box-shadow:var(--shadow);}
+  .revision h3{font-family:'Merriweather',serif;color:#a9772a;margin:0 0 10px;font-size:21px;}
+  .revision ul{margin:6px 0;padding-left:22px;}
+  .revision li{margin:6px 0;}
+  .revision code{background:#f3ece4;color:#9a5030;padding:1.5px 6px;border-radius:6px;font-size:14px;}
+
+  @media(max-width:680px){
+    body{font-size:16px;}
+    .header h1{font-size:25px;}
+    .q-card{padding:18px 16px;} .header{padding:24px 20px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="header">
+    <span class="pill">OCP Java SE 21 · 1Z0-830</span>
+    <h1>Chapter 1 · Building Blocks — MCQ Practice</h1>
+    <p class="sub">28 exam-style questions on class structure, <code>main()</code>, packages &amp; imports, object initialization, data types, identifiers, <code>var</code>, scope, and garbage collection. Reveal each answer when you're ready.</p>
+    <div class="topics">
+      <span>CLASS STRUCTURE</span><span>MAIN() &amp; PACKAGES</span><span>INITIALIZATION</span>
+      <span>DATA TYPES &amp; LITERALS</span><span>VAR &amp; IDENTIFIERS</span><span>SCOPE &amp; GC</span>
+    </div>
+  </header>
+
+  <div class="howto">Try each one before expanding. Several say <strong>"Choose all that apply"</strong> — read those carefully; the rest have exactly one answer. Every answer is verified line-by-line against the study guide.</div>
+
+  <!-- Q1 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q1</span><span class="q-tag">main()</span></div>
+    <p class="q-prompt">Which are legal entry-point methods runnable from the command line? <span class="all">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>private static void main(String[] args)</code></li>
+      <li><span class="ol">B.</span> <code>public static final main(String[] args)</code></li>
+      <li><span class="ol">C.</span> <code>public void main(String[] args)</code></li>
+      <li><span class="ol">D.</span> <code>public static final void main(String[] args)</code></li>
+      <li><span class="ol">E.</span> <code>public static void main(String[] args)</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">D and E</span>
+      <p class="expl"><strong>E</strong> is the canonical signature you must memorize. <strong>D</strong> is the same with a redundant but legal <code>final</code>. <strong>A</strong> fails — <code>main</code> must be <code>public</code>. <strong>C</strong> fails — it must be <code>static</code>. <strong>B</strong> fails — it has no return type (<code>main</code> must return <code>void</code>).</p>
+    </details>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q2</span><span class="q-tag">Packages</span></div>
+    <p class="q-prompt">In which orders can these be assembled into a program that compiles? <span class="all">(Choose all that apply.)</span></p>
+<pre><code>X: <span class="kw">class</span> Rabbit {}
+Y: <span class="kw">import</span> java.util.*;
+Z: <span class="kw">package</span> animals;</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> X, Y, Z</li>
+      <li><span class="ol">B.</span> Y, Z, X</li>
+      <li><span class="ol">C.</span> Z, Y, X</li>
+      <li><span class="ol">D.</span> Y, X</li>
+      <li><span class="ol">E.</span> Z, X</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C, D, and E</span>
+      <p class="expl"><code>package</code> and <code>import</code> are both optional, but when present the order must be <strong>package → import → class</strong>. <strong>C</strong> (Z,Y,X) is the full correct order; <strong>D</strong> (Y,X) skips the optional package; <strong>E</strong> (Z,X) skips the optional import. A and B put things out of order; F (X,Z) puts the class first.</p>
+    </details>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q3</span><span class="q-tag">Class Structure</span></div>
+    <p class="q-prompt">Which are true? <span class="all">(Choose all that apply.)</span></p>
+<pre><code><span class="kw">public class</span> Bunny {
+   <span class="kw">public static void</span> main(String[] x) {
+      Bunny bun = <span class="kw">new</span> Bunny();
+} }</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>Bunny</code> is a class.</li>
+      <li><span class="ol">B.</span> <code>bun</code> is a class.</li>
+      <li><span class="ol">C.</span> <code>main</code> is a class.</li>
+      <li><span class="ol">D.</span> <code>bun</code> is a reference to an object.</li>
+      <li><span class="ol">E.</span> The <code>main()</code> method doesn't run because the parameter name is <code>x</code>.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A and D</span>
+      <p class="expl"><code>Bunny</code> is declared with <code>public class Bunny</code> (A). <code>bun</code> is a reference variable pointing to a <code>Bunny</code> object (D). <code>main</code> is a method, not a class. <strong>E</strong> is wrong: the parameter <em>type</em> (<code>String[]</code>) matters, not its name — <code>x</code> is perfectly fine.</p>
+    </details>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q4</span><span class="q-tag">Identifiers</span></div>
+    <p class="q-prompt">Which are valid Java identifiers? <span class="all">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>_</code></li>
+      <li><span class="ol">B.</span> <code>_helloWorld$</code></li>
+      <li><span class="ol">C.</span> <code>true</code></li>
+      <li><span class="ol">D.</span> <code>java.lang</code></li>
+      <li><span class="ol">E.</span> <code>Public</code></li>
+      <li><span class="ol">F.</span> <code>1980_s</code></li>
+      <li><span class="ol">G.</span> <code>_Q2_</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B, E, and G</span>
+      <p class="expl">Identifiers begin with a letter, currency symbol, or underscore, and may contain digits — but: a <em>single</em> underscore <code>_</code> is illegal (A); reserved words like <code>true</code> are illegal (C); a period is not allowed (D); they can't start with a digit (F). <code>Public</code> is fine because it's capitalized — only the lowercase <code>public</code> is reserved (E). B and G use only legal characters.</p>
+    </details>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q5</span><span class="q-tag">Garbage Collection</span></div>
+    <p class="q-prompt">Which are correct about this program? <span class="all">(Choose all that apply.)</span></p>
+<pre><code>2: <span class="kw">public class</span> Bear {
+3:    <span class="kw">private</span> Bear pandaBear;
+4:    <span class="kw">private void</span> roar(Bear b) {
+5:       System.out.println(<span class="str">"Roar!"</span>);
+6:       pandaBear = b;
+7:    }
+8:    <span class="kw">public static void</span> main(String[] args) {
+9:       Bear brownBear = <span class="kw">new</span> Bear();
+10:      Bear polarBear = <span class="kw">new</span> Bear();
+11:      brownBear.roar(polarBear);
+12:      polarBear = <span class="kw">null</span>;
+13:      brownBear = <span class="kw">null</span>;
+14:      System.gc(); } }</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> The object from line 9 is first eligible for GC after line 13.</li>
+      <li><span class="ol">B.</span> The object from line 9 is first eligible for GC after line 14.</li>
+      <li><span class="ol">C.</span> The object from line 10 is first eligible for GC after line 12.</li>
+      <li><span class="ol">D.</span> The object from line 10 is first eligible for GC after line 13.</li>
+      <li><span class="ol">E.</span> Garbage collection is guaranteed to run.</li>
+      <li><span class="ol">F.</span> Garbage collection might or might not run.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A, D, and F</span>
+      <p class="expl">GC is never guaranteed, so <strong>F</strong> is correct and E is wrong. The line-9 object (brownBear) is reachable until line 13 → <strong>A</strong>. The line-10 object (polarBear) is also reachable via <code>brownBear.pandaBear</code> (set on line 6), so nulling <code>polarBear</code> on line 12 isn't enough — it stays reachable until <code>brownBear</code> goes null on line 13 → <strong>D</strong>, not C.</p>
+    </details>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q6</span><span class="q-tag">Scope</span></div>
+    <p class="q-prompt">How many variables are in scope on line 14?</p>
+<pre><code>1: <span class="kw">public class</span> Camel {
+2:    { <span class="kw">int</span> hairs = 3_000_0; }
+3:    <span class="kw">long</span> water, air=2;
+4:    <span class="kw">boolean</span> twoHumps = <span class="kw">true</span>;
+5:    <span class="kw">public void</span> spit(<span class="kw">float</span> distance) {
+6:       <span class="kw">var</span> path = <span class="str">""</span>;
+7:       { <span class="kw">double</span> teeth = 32 + distance++; }
+8:       <span class="kw">while</span>(water&gt; 0) {
+9:          <span class="kw">int</span> age = twoHumps ? 1 : 2;
+10:         <span class="kw">short</span> i=-1;
+11:         <span class="kw">for</span>(i=0; i&lt;10; i++) {
+12:            <span class="kw">var</span> Private = 2;
+13:         }
+14:         <span class="cm">// SCOPE</span>
+15:      }
+16:   }
+17: }</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> 4</li>
+      <li><span class="ol">B.</span> 5</li>
+      <li><span class="ol">C.</span> 6</li>
+      <li><span class="ol">D.</span> 7</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">D · 7</span>
+      <p class="expl">Trace the braces. The block variables on lines 2 and 7, and <code>Private</code> on line 12 (scoped to the for loop), are all out of scope at line 14. In scope: the three instance variables <code>water</code>, <code>air</code>, <code>twoHumps</code> (lines 3–4), plus the parameter <code>distance</code> wait — count the available ones: <code>path</code> (6), <code>age</code> (9), <code>i</code> (10) are inside the still-open method/while, plus the 3 instance vars and <code>distance</code>… the book's count is <strong>7</strong>: water, air, twoHumps, distance, path, age, i.</p>
+    </details>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q7</span><span class="q-tag">Text Blocks</span></div>
+    <p class="q-prompt">Which are true about this code? <span class="all">(Choose all that apply.)</span></p>
+<pre><code><span class="kw">public class</span> KitchenSink {
+   <span class="kw">private int</span> numForks;
+   <span class="kw">public static void</span> main(String[] args) {
+      <span class="kw">int</span> numKnives;
+      System.out.print(<span class="str">"""
+         "# forks = " + numForks +
+          " # knives = " + numKnives +
+         # cups = 0"""</span>);
+   }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> The output includes <code># forks = 0</code>.</li>
+      <li><span class="ol">B.</span> The output includes <code># knives = 0</code>.</li>
+      <li><span class="ol">C.</span> The output includes <code># cups = 0</code>.</li>
+      <li><span class="ol">D.</span> The output includes a blank line.</li>
+      <li><span class="ol">E.</span> The output includes one or more lines that begin with whitespace.</li>
+      <li><span class="ol">F.</span> The code does not compile.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C and E</span>
+      <p class="expl">Everything inside the <code>"""</code> is just <em>text</em> — the variables are never evaluated (and conveniently, the uninitialized <code>numKnives</code> is never referenced, so it doesn't break compilation). So A and B are wrong. <strong>C</strong> matches the literal text. <strong>E</strong> is correct because <code>" # knives</code> is indented (essential whitespace). D is wrong — there's no trailing blank line.</p>
+    </details>
+  </div>
+
+  <!-- Q8 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q8</span><span class="q-tag">var</span></div>
+    <p class="q-prompt">Which <code>var</code> snippets compile without issue inside a method? <span class="all">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>var spring = null;</code></li>
+      <li><span class="ol">B.</span> <code>var fall = "leaves";</code></li>
+      <li><span class="ol">C.</span> <code>var evening = 2; evening = null;</code></li>
+      <li><span class="ol">D.</span> <code>var night = Integer.valueOf(3);</code></li>
+      <li><span class="ol">E.</span> <code>var day = 1/0;</code></li>
+      <li><span class="ol">F.</span> <code>var winter = 12, cold;</code></li>
+      <li><span class="ol">G.</span> <code>var morning = ""; morning = null;</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B, D, E, and G</span>
+      <p class="expl">A <code>var</code> can't be initialized to <code>null</code> with no type (A fails), but a non-primitive var can be reassigned <code>null</code> later — so <strong>G</strong> (String) compiles. <strong>B</strong> (String) and <strong>D</strong> (Integer) are clear. <strong>E</strong> compiles — <code>1/0</code> is a valid <em>int</em> expression; it throws only at runtime, but the question is about compiling. <strong>C</strong> fails — <code>evening</code> is an <code>int</code> (primitive), which can't take <code>null</code>. <strong>F</strong> fails — <code>var</code> can't be used in multiple-variable declarations.</p>
+    </details>
+  </div>
+
+  <!-- Q9 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q9</span><span class="q-tag">Default Values</span></div>
+    <p class="q-prompt">Which is correct?</p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> An instance variable of type <code>float</code> defaults to <code>0</code>.</li>
+      <li><span class="ol">B.</span> An instance variable of type <code>char</code> defaults to <code>null</code>.</li>
+      <li><span class="ol">C.</span> A local variable of type <code>double</code> defaults to <code>0.0</code>.</li>
+      <li><span class="ol">D.</span> A local variable of type <code>int</code> defaults to <code>null</code>.</li>
+      <li><span class="ol">E.</span> A class variable of type <code>String</code> defaults to <code>null</code>.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">E</span>
+      <p class="expl">Local variables (C, D) have <em>no</em> default at all — they must be assigned before use. Primitives never default to <code>null</code> (B, D wrong). A <code>float</code> default is written <code>0.0</code> with a decimal, not <code>0</code> (A wrong). Reference types like <code>String</code> in class/instance variables default to <code>null</code> → <strong>E</strong>.</p>
+    </details>
+  </div>
+
+  <!-- Q10 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q10</span><span class="q-tag">Numeric Literals</span></div>
+    <p class="q-prompt">Which expressions, inserted into <code>var magic = ___;</code>, let the code compile? <span class="all">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>3_1</code></li>
+      <li><span class="ol">B.</span> <code>1_329_.0</code></li>
+      <li><span class="ol">C.</span> <code>3_13.0_</code></li>
+      <li><span class="ol">D.</span> <code>5_291._2</code></li>
+      <li><span class="ol">E.</span> <code>2_234.0_0</code></li>
+      <li><span class="ol">F.</span> <code>9___6</code></li>
+      <li><span class="ol">G.</span> <code>_1_3_5_0</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A, E, and F</span>
+      <p class="expl">An underscore is allowed anywhere in a numeric literal <em>except</em> at the start, at the end, or adjacent to the decimal point — and multiple underscores in a row are fine. So <strong>A</strong>, <strong>E</strong>, and <strong>F</strong> (consecutive underscores) are valid. B and D put <code>_</code> next to the <code>.</code>; C ends with <code>_</code>; G starts with <code>_</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q11 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q11</span><span class="q-tag">Imports</span></div>
+    <p class="q-prompt">What is the maximum number of imports that can be removed and still compile?</p>
+<pre><code><span class="cm">// Tank.java</span>
+<span class="kw">package</span> aquarium;
+<span class="kw">import</span> java.lang.*;
+<span class="kw">import</span> java.lang.System;
+<span class="kw">import</span> aquarium.Water;
+<span class="kw">import</span> aquarium.*;
+<span class="kw">public class</span> Tank {
+   <span class="kw">public void</span> print(Water water) {
+      System.out.println(water); } }
+<span class="cm">// Water is public, package aquarium</span></code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> 2</li>
+      <li><span class="ol">B.</span> 3</li>
+      <li><span class="ol">C.</span> 4</li>
+      <li><span class="ol">D.</span> Does not compile</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · 4</span>
+      <p class="expl">All four imports are removable. The two <code>java.lang</code> imports are redundant because <code>java.lang</code> is imported automatically. The two <code>aquarium</code> imports are redundant because <code>Tank</code> and <code>Water</code> are in the <em>same</em> package. (If they were in different packages, only one of the two could go.)</p>
+    </details>
+  </div>
+
+  <!-- Q12 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q12</span><span class="q-tag">Class Structure</span></div>
+    <p class="q-prompt">Which are correct about this class? <span class="all">(Choose all that apply.)</span></p>
+<pre><code>1: <span class="kw">public class</span> ClownFish {
+2:    <span class="kw">int</span> gills = 0, <span class="kw">double</span> weight=2;
+3:    { <span class="kw">int</span> fins = gills; }
+4:    <span class="kw">void</span> print(<span class="kw">int</span> length = 3) {
+5:       System.out.println(gills);
+6:       System.out.println(weight);
+7:       System.out.println(fins);
+8:       System.out.println(length);
+9: } }</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> Line 2 generates a compiler error.</li>
+      <li><span class="ol">B.</span> Line 3 generates a compiler error.</li>
+      <li><span class="ol">C.</span> Line 4 generates a compiler error.</li>
+      <li><span class="ol">D.</span> Line 7 generates a compiler error.</li>
+      <li><span class="ol">E.</span> The code prints <code>0</code>.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A, C, and D</span>
+      <p class="expl"><strong>A</strong>: line 2 tries to declare two different types in one statement — illegal. <strong>C</strong>: Java has no default method-parameter values (<code>int length = 3</code>) — illegal. <strong>D</strong>: <code>fins</code> exists only inside the instance initializer on line 3, so referencing it on line 7 is out of scope. Line 3 itself is fine (an unused local in an initializer).</p>
+    </details>
+  </div>
+
+  <!-- Q13 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q13</span><span class="q-tag">Imports</span></div>
+    <p class="q-prompt">There are two <code>Water</code> classes — <code>aquarium.Water</code> and <code>aquarium.jellies.Water</code>. <code>WaterFiller</code> (in package <code>employee</code>) references <code>Water</code>. Which single import lets it compile? <span class="all">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>import aquarium.*;</code></li>
+      <li><span class="ol">B.</span> <code>import aquarium.Water;</code></li>
+      <li><span class="ol">C.</span> <code>import aquarium.jellies.Water;</code></li>
+      <li><span class="ol">D.</span> <code>import aquarium.*;</code> <strong>and</strong> <code>import aquarium.jellies.*;</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A, B, and C</span>
+      <p class="expl"><strong>A</strong> wildcard-imports <code>aquarium</code>, which includes <code>aquarium.Water</code>. <strong>B</strong> and <strong>C</strong> import a specific <code>Water</code> by class name — both unambiguous. <strong>D</strong> fails: two wildcard imports each containing a <code>Water</code> create an ambiguous reference, so Java can't tell which to use. (Importing the same class name twice explicitly would also fail.)</p>
+    </details>
+  </div>
+
+  <!-- Q14 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q14</span><span class="q-tag">Data Types</span></div>
+    <p class="q-prompt">Which lines generate a compiler error? <span class="all">(Choose all that apply.)</span></p>
+<pre><code>3: <span class="kw">short</span> numPets = 5L;
+4: <span class="kw">int</span> numGrains = 2.0;
+5: <span class="kw">String</span> name = <span class="str">"Scruffy"</span>;
+6: <span class="kw">int</span> d = numPets.length();
+7: <span class="kw">int</span> e = numGrains.length;
+8: <span class="kw">int</span> f = name.length();</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> Line 3</li>
+      <li><span class="ol">B.</span> Line 4</li>
+      <li><span class="ol">C.</span> Line 6</li>
+      <li><span class="ol">D.</span> Line 7</li>
+      <li><span class="ol">E.</span> Line 8</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A, B, C, and D</span>
+      <p class="expl"><strong>A</strong>: <code>5L</code> is a <code>long</code>, which doesn't fit in a <code>short</code>. <strong>B</strong>: <code>2.0</code> is a <code>double</code>, can't go in an <code>int</code>. <strong>C</strong> and <strong>D</strong>: <code>numPets</code> and <code>numGrains</code> are primitives — you can't call methods or fields on primitives. Line 8 is fine because <code>length()</code> is a real method on <code>String</code> (E not selected).</p>
+    </details>
+  </div>
+
+  <!-- Q15 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q15</span><span class="q-tag">Garbage Collection</span></div>
+    <p class="q-prompt">Which statements about garbage collection are correct? <span class="all">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> Calling <code>System.gc()</code> is guaranteed to free memory by destroying eligible objects.</li>
+      <li><span class="ol">B.</span> Garbage collection runs on a set schedule.</li>
+      <li><span class="ol">C.</span> Garbage collection lets the JVM reclaim memory for other objects.</li>
+      <li><span class="ol">D.</span> An object may be eligible for GC but never removed from the heap.</li>
+      <li><span class="ol">E.</span> An object is eligible for GC once no references to it are accessible.</li>
+      <li><span class="ol">F.</span> Marking a variable <code>final</code> means its object is never garbage collected.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C, D, and E</span>
+      <p class="expl">There are no guarantees about <em>when</em> GC runs, and the JVM may ignore <code>System.gc()</code> — so A and B are wrong. <strong>C</strong> states GC's purpose. <strong>D</strong> is true (e.g. the program ends before GC runs). <strong>E</strong> is the core eligibility rule. <strong>F</strong> is wrong — <code>final</code> means the variable can't be reassigned within its scope; the object is still collectible once it's unreachable.</p>
+    </details>
+  </div>
+
+  <!-- Q16 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q16</span><span class="q-tag">Text Blocks</span></div>
+    <p class="q-prompt">Which are true? <span class="all">(Choose all that apply.)</span></p>
+<pre><code><span class="kw">var</span> blocky = <span class="str">"""
+   squirrel \s
+   pigeon   \
+   termite"""</span>;
+System.out.print(blocky);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> It outputs two lines.</li>
+      <li><span class="ol">B.</span> It outputs three lines.</li>
+      <li><span class="ol">C.</span> There is one line with trailing whitespace.</li>
+      <li><span class="ol">D.</span> There are two lines with trailing whitespace.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A and C</span>
+      <p class="expl">The <code>\</code> at the end of the <code>pigeon</code> line means "skip this line break," joining <code>pigeon</code> and <code>termite</code> into one line — so there are <strong>two</strong> lines total (A). The <code>\s</code> on the first line forces one trailing space to be kept, giving <strong>one</strong> line with trailing whitespace (C). Incidental indentation is stripped in text blocks.</p>
+    </details>
+  </div>
+
+  <!-- Q17 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q17</span><span class="q-tag">Default Values</span></div>
+    <p class="q-prompt">What does this print? <span class="all">(Choose all that apply.)</span></p>
+<pre><code>1: <span class="kw">public class</span> WaterBottle {
+2:    <span class="kw">private String</span> brand;
+3:    <span class="kw">private boolean</span> empty;
+4:    <span class="kw">public static float</span> code;
+5:    <span class="kw">public static void</span> main(String[] args) {
+6:       WaterBottle wb = <span class="kw">new</span> WaterBottle();
+7:       System.out.println(<span class="str">"Empty = "</span> + wb.empty);
+8:       System.out.println(<span class="str">"Brand = "</span> + wb.brand);
+9:       System.out.println(<span class="str">"Code = "</span> + code);
+10:    } }</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>Empty = false</code></li>
+      <li><span class="ol">B.</span> <code>Brand = null</code></li>
+      <li><span class="ol">C.</span> <code>Brand = </code> (empty)</li>
+      <li><span class="ol">D.</span> <code>Code = 0.0</code></li>
+      <li><span class="ol">E.</span> <code>Code = 0f</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A, B, and D</span>
+      <p class="expl">It compiles and runs. A <code>boolean</code> field defaults to <code>false</code> → <strong>A</strong>. An object reference defaults to <code>null</code>, not an empty String → <strong>B</strong> (not C). A floating-point field defaults to <code>0.0</code>, and although <code>float</code> literals use an <code>f</code> suffix, values aren't <em>printed</em> with one → <strong>D</strong> (not E).</p>
+    </details>
+  </div>
+
+  <!-- Q18 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q18</span><span class="q-tag">var</span></div>
+    <p class="q-prompt">Which statements about <code>var</code> are true? <span class="all">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> A <code>var</code> can be used as a constructor parameter.</li>
+      <li><span class="ol">B.</span> The type of a <code>var</code> is known at compile time.</li>
+      <li><span class="ol">C.</span> A <code>var</code> cannot be used as an instance variable.</li>
+      <li><span class="ol">D.</span> A <code>var</code> can be used in a multiple-variable assignment.</li>
+      <li><span class="ol">E.</span> The type of a <code>var</code> cannot change at runtime.</li>
+      <li><span class="ol">F.</span> The word <code>var</code> is a reserved word in Java.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B, C, and E</span>
+      <p class="expl"><code>var</code> is only for local variables — not constructor/method parameters or instance/class variables, so A is wrong and <strong>C</strong> is right. Its type is fixed at compile time (<strong>B</strong>) and can't change at runtime (<strong>E</strong>), though its <em>value</em> can. D is wrong — no multiple-variable declarations. F is wrong — <code>var</code> is a reserved <em>type name</em>, not a reserved word (you can still name a variable <code>var</code>).</p>
+    </details>
+  </div>
+
+  <!-- Q19 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q19</span><span class="q-tag">Data Types</span></div>
+    <p class="q-prompt">Which are true? <span class="all">(Choose all that apply.)</span></p>
+<pre><code><span class="kw">var</span> num1 = Integer.parseInt(<span class="str">"11"</span>);
+<span class="kw">var</span> num2 = Integer.valueOf(<span class="str">"B"</span>, 16);
+System.out.println(Integer.max(num1, num2));</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> The output is <code>11</code>.</li>
+      <li><span class="ol">B.</span> The code does not compile.</li>
+      <li><span class="ol">C.</span> <code>num1</code> is a primitive.</li>
+      <li><span class="ol">D.</span> <code>num2</code> is a primitive.</li>
+      <li><span class="ol">E.</span> A <code>NumberFormatException</code> is thrown.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A and C</span>
+      <p class="expl"><code>parseInt</code> returns an <code>int</code> primitive (<strong>C</strong>); <code>valueOf</code> returns an <code>Integer</code> object (so D is wrong). <code>"B"</code> in base 16 is 11, and <code>Integer.max(11, 11)</code> is <code>11</code> → <strong>A</strong>. The code compiles and throws nothing.</p>
+    </details>
+  </div>
+
+  <!-- Q20 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q20</span><span class="q-tag">Initialization</span></div>
+    <p class="q-prompt">Which statement is correct?</p>
+<pre><code>1: <span class="kw">public class</span> PoliceBox {
+2:    <span class="kw">String</span> color;
+3:    <span class="kw">long</span> age;
+4:    <span class="kw">public void</span> PoliceBox() {
+5:       color = <span class="str">"blue"</span>;
+6:       age = 1200;
+7:    }
+8:    <span class="kw">public static void</span> main(String []time) {
+9:       <span class="kw">var</span> p = <span class="kw">new</span> PoliceBox();
+10:      <span class="kw">var</span> q = <span class="kw">new</span> PoliceBox();
+11:      p.color = <span class="str">"green"</span>;
+12:      p.age = 1400;
+13:      p = q;
+14:      System.out.println(<span class="str">"Q1="</span>+q.color);
+15:      System.out.println(<span class="str">"Q2="</span>+q.age);
+16:      System.out.println(<span class="str">"P1="</span>+p.color);
+17:      System.out.println(<span class="str">"P2="</span>+p.age);
+18: } }</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> It prints <code>Q1=blue</code>.</li>
+      <li><span class="ol">B.</span> It prints <code>Q2=1200</code>.</li>
+      <li><span class="ol">C.</span> It prints <code>P1=null</code>.</li>
+      <li><span class="ol">D.</span> It prints <code>P2=1400</code>.</li>
+      <li><span class="ol">E.</span> Line 4 does not compile.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · P1=null</span>
+      <p class="expl">The trap: line 4 has a <code>void</code> return type, so <code>PoliceBox()</code> is an ordinary <em>method</em>, not a constructor — it never runs. So <code>color</code>/<code>age</code> keep defaults <code>null</code>/<code>0</code>. Line 13 points <code>p</code> at <code>q</code> (untouched defaults). Output is <code>Q1=null</code>, <code>Q2=0</code>, <code>P1=null</code>, <code>P2=0</code> — only <strong>C</strong> is right.</p>
+    </details>
+  </div>
+
+  <!-- Q21 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q21</span><span class="q-tag">Initialization</span></div>
+    <p class="q-prompt">What is the output?</p>
+<pre><code>1: <span class="kw">public class</span> Salmon {
+2:    <span class="kw">int</span> count;
+3:    { System.out.print(count+<span class="str">"-"</span>); }
+4:    { count++; }
+5:    <span class="kw">public</span> Salmon() {
+6:       count = 4;
+7:       System.out.print(2+<span class="str">"-"</span>);
+8:    }
+9:    <span class="kw">public static void</span> main(String[] args) {
+10:      System.out.print(7+<span class="str">"-"</span>);
+11:      <span class="kw">var</span> s = <span class="kw">new</span> Salmon();
+12:      System.out.print(s.count+<span class="str">"-"</span>); } }</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>7-0-2-1-</code></li>
+      <li><span class="ol">B.</span> <code>7-0-2-4-</code></li>
+      <li><span class="ol">C.</span> <code>0-7-2-1-</code></li>
+      <li><span class="ol">D.</span> <code>7-0-1-</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B · 7-0-2-4-</span>
+      <p class="expl">Line 10 prints <code>7-</code>. Creating the object runs the two instance initializers in order: line 3 prints the current <code>count</code> (default <code>0</code>) → <code>0-</code>, then line 4 does <code>count++</code> → 1. Then the constructor sets <code>count = 4</code> and prints <code>2-</code>. Finally line 12 prints <code>s.count</code> = <code>4-</code>. Result: <code>7-0-2-4-</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q22 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q22</span><span class="q-tag">Numeric Literals</span></div>
+    <p class="q-prompt">Which lines can independently replace <code>INSERT CODE HERE</code> (followed by <code>System.out.print(amount);</code>) and compile? <span class="all">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>int Amount = 0b11;</code></li>
+      <li><span class="ol">B.</span> <code>int amount = 9L;</code></li>
+      <li><span class="ol">C.</span> <code>int amount = 0xE;</code></li>
+      <li><span class="ol">D.</span> <code>int amount = 1_2.0;</code></li>
+      <li><span class="ol">E.</span> <code>int amount = 0b101;</code></li>
+      <li><span class="ol">F.</span> <code>double amount = 9_2.1_2;</code></li>
+      <li><span class="ol">G.</span> <code>double amount = 1_2_.0_0;</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C, E, and F</span>
+      <p class="expl"><code>0x</code> is hex and <code>0b</code> is binary, both assignable to <code>int</code> — so <strong>C</strong> and <strong>E</strong> work. <strong>F</strong> is a valid <code>double</code> (underscores not touching the decimal). <strong>A</strong> fails because the variable is named <code>Amount</code> (capital A), so <code>print(amount)</code> won't resolve. <strong>B</strong> assigns a <code>long</code> (<code>9L</code>) to an <code>int</code>. <strong>D</strong> assigns a <code>double</code> (<code>1_2.0</code>) to an <code>int</code>. <strong>G</strong> has <code>_</code> next to the decimal point.</p>
+    </details>
+  </div>
+
+  <!-- Q23 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q23</span><span class="q-tag">Scope &amp; Types</span></div>
+    <p class="q-prompt">Which are true about this class? <span class="all">(Choose all that apply.)</span></p>
+<pre><code>1: <span class="kw">public class</span> River {
+2:    <span class="kw">int</span> Depth = 1;
+3:    <span class="kw">float</span> temp = 50.0;
+4:    <span class="kw">public void</span> flow() {
+5:       <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; 1; i++) {
+6:          <span class="kw">int</span> depth = 2;
+7:          depth++;
+8:          temp--;
+9:       }
+10:      System.out.println(depth);
+11:      System.out.println(temp); }
+12:    <span class="kw">public static void</span> main(String… s) {
+13:       <span class="kw">new</span> River().flow();
+14: } }</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> Line 3 generates a compiler error.</li>
+      <li><span class="ol">B.</span> Line 6 generates a compiler error.</li>
+      <li><span class="ol">C.</span> Line 10 generates a compiler error.</li>
+      <li><span class="ol">D.</span> The program prints <code>49.0</code> on line 11.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A and C</span>
+      <p class="expl"><strong>A</strong>: <code>temp</code> is a <code>float</code> but <code>50.0</code> is a <code>double</code> literal (no <code>f</code>/<code>F</code> suffix), which doesn't fit in a <code>float</code>. <strong>C</strong>: <code>depth</code> is declared inside the for loop (line 6), so reading it on line 10 is out of scope. Because the class doesn't compile, no output is produced (so D never occurs).</p>
+    </details>
+  </div>
+
+  <!-- Q24 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q24</span><span class="q-tag">Class Structure</span></div>
+    <p class="q-prompt">How many <code>public</code> top-level classes may a single <code>.java</code> file contain?</p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> Zero or one.</li>
+      <li><span class="ol">B.</span> Exactly one, always.</li>
+      <li><span class="ol">C.</span> Up to two.</li>
+      <li><span class="ol">D.</span> Any number.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A · zero or one</span>
+      <p class="expl">A file may have at most one <code>public</code> top-level class, and if present it must match the file name. A file can legally contain multiple non-public top-level classes — or even no public class at all — so the answer is "zero or one," not "exactly one."</p>
+    </details>
+  </div>
+
+  <!-- Q25 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q25</span><span class="q-tag">main() Args</span></div>
+    <p class="q-prompt">Running <code>java Zoo.java Bronx Zoo</code> on a class whose <code>main</code> body is <code>System.out.println(args[1]);</code> prints what?</p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>Bronx</code></li>
+      <li><span class="ol">B.</span> <code>Zoo</code></li>
+      <li><span class="ol">C.</span> <code>Zoo.java</code></li>
+      <li><span class="ol">D.</span> An <code>ArrayIndexOutOfBoundsException</code>.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B · Zoo</span>
+      <p class="expl">Program arguments are zero-indexed and exclude the program name. So <code>args[0]</code> is <code>"Bronx"</code> and <code>args[1]</code> is <code>"Zoo"</code> → prints <strong>Zoo</strong>. (If only one argument were passed, <code>args[1]</code> would throw <code>ArrayIndexOutOfBoundsException</code> — but here two were given.)</p>
+    </details>
+  </div>
+
+  <!-- Q26 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q26</span><span class="q-tag">Initialization Order</span></div>
+    <p class="q-prompt">In what order do these run when an instance is created?</p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> Constructor, then instance initializer blocks, then field initializers.</li>
+      <li><span class="ol">B.</span> Field initializers and instance initializer blocks in the order they appear, then the constructor.</li>
+      <li><span class="ol">C.</span> The constructor first, then everything else top to bottom.</li>
+      <li><span class="ol">D.</span> Instance initializers always run before all field initializers.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B</span>
+      <p class="expl">Fields and instance initializer blocks run <em>in the order they appear</em> in the source, top to bottom; the constructor body runs last. (Within that, a field can't be read by an initializer that appears above its declaration.) The constructor never runs first.</p>
+    </details>
+  </div>
+
+  <!-- Q27 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q27</span><span class="q-tag">var</span></div>
+    <p class="q-prompt">Which line does <strong>not</strong> compile?</p>
+<pre><code>3: <span class="kw">var</span> a = 2;
+4: <span class="kw">var</span> b = 3, c = 4;
+5: { <span class="kw">var</span> d = 5; }
+6: <span class="kw">var</span> e;</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> Only line 4.</li>
+      <li><span class="ol">B.</span> Only line 6.</li>
+      <li><span class="ol">C.</span> Lines 4 and 6.</li>
+      <li><span class="ol">D.</span> Lines 5 and 6.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · lines 4 and 6</span>
+      <p class="expl">Line 4 fails because <code>var</code> can't be used in a multiple-variable declaration. Line 6 fails because a <code>var</code> must be initialized on the same line (the compiler needs a value to infer the type). Lines 3 and 5 are fine.</p>
+    </details>
+  </div>
+
+  <!-- Q28 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q28</span><span class="q-tag">Data Types</span></div>
+    <p class="q-prompt">Which statement about primitives and references is correct?</p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>String</code> is one of the eight primitive types.</li>
+      <li><span class="ol">B.</span> A <code>char</code> can be assigned a small non-negative integer literal like <code>65</code>.</li>
+      <li><span class="ol">C.</span> A <code>boolean</code> can be assigned <code>0</code> or <code>1</code>.</li>
+      <li><span class="ol">D.</span> A <code>long</code> literal does not need an <code>L</code> suffix even when it exceeds <code>int</code> range.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B</span>
+      <p class="expl"><code>char</code> is an integral type, so <code>char c = 65;</code> is valid (it becomes <code>'A'</code>) → <strong>B</strong>. <code>String</code> is a reference type, not one of the eight primitives (A wrong). <code>boolean</code> holds only <code>true</code>/<code>false</code>, never numbers (C wrong). A literal beyond <code>int</code> range needs the <code>L</code> suffix or it won't compile (D wrong).</p>
+    </details>
+  </div>
+
+  <!-- REVISION -->
+  <div class="revision">
+    <h3>Quick Revision</h3>
+    <ul>
+      <li><strong>main():</strong> must be <code>public static void main(String[] args)</code> — public, static, void, and a <code>String[]</code>/varargs parameter (any name). <code>args[0]</code> is the first program argument.</li>
+      <li><strong>File order:</strong> <code>package</code> → <code>import</code> → class; both package and import are optional. At most one public top-level class per file (matching the file name).</li>
+      <li><strong>Imports:</strong> <code>java.lang.*</code> and same-package classes are automatic. Class-name imports beat wildcards; two wildcards offering the same class name are ambiguous.</li>
+      <li><strong>Identifiers:</strong> start with letter, <code>$</code>, or <code>_</code>; not a lone <code>_</code>; no reserved words; no leading digit. Case matters (<code>Public</code> ≠ <code>public</code>).</li>
+      <li><strong>Literals:</strong> <code>0x</code> hex, <code>0b</code> binary; underscores allowed except at start/end or next to the decimal point (consecutive ones are OK). <code>long</code> beyond <code>int</code> range needs <code>L</code>; <code>float</code> needs <code>f</code>.</li>
+      <li><strong>Defaults:</strong> instance/class fields default (objects → <code>null</code>, numeric → <code>0</code>/<code>0.0</code>, boolean → <code>false</code>); <em>local</em> variables have no default. You can't call methods on primitives.</li>
+      <li><strong>var:</strong> local variables only; single declaration; must be initialized on the same line; type fixed at compile time; can be reassigned (and set to <code>null</code> if non-primitive). Not a reserved word.</li>
+      <li><strong>Init order:</strong> fields &amp; instance initializer blocks run top-to-bottom, then the constructor. A <code>void</code>-returning "constructor" is really a method and won't run on <code>new</code>.</li>
+      <li><strong>Scope &amp; GC:</strong> a loop/block variable dies at its closing brace. An object is GC-eligible once unreachable; <code>System.gc()</code> is only a suggestion, and GC may never run.</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>
