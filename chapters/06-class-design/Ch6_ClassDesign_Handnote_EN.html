@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 · Chapter 6 — Class Design (Detailed Handnote)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff; --ink:#2b2b32; --muted:#6e6a72;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --accent:#c96442; --accent2:#d4845e; --line:#ece3da;
+    --green:#3b7d57; --green-b:#5aab7b; --red:#c44d3e; --gold:#a9772a; --purple:#7c5cbf;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Source Sans 3',system-ui,sans-serif; line-height:1.65;
+    -webkit-font-smoothing:antialiased; padding:32px 16px;
+  }
+  .wrap{max-width:1020px; margin:0 auto;}
+  h1,h2,h3,h4{font-family:'Merriweather',Georgia,serif; line-height:1.3; color:#22222a;}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+
+  /* ---- header ---- */
+  .header{
+    background:linear-gradient(135deg,#ffffff,#fbf7f4);
+    border-radius:18px; padding:34px 34px 30px; margin-bottom:26px;
+    box-shadow:0 10px 30px rgba(120,90,60,.08);
+  }
+  .badge{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-size:.72rem;
+    letter-spacing:.5px; text-transform:uppercase; color:#fff; font-weight:700;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    padding:6px 14px; border-radius:999px; box-shadow:0 4px 12px rgba(201,100,66,.28);
+  }
+  .header h1{font-size:2.1rem; margin:18px 0 4px;}
+  .header h1 .sub{color:var(--muted); font-weight:400; font-size:1.25rem;}
+  .header .tagline{font-style:italic; color:var(--muted); margin:0 0 20px; font-size:1.02rem;}
+  .objectives{
+    background:linear-gradient(135deg,#f0f9f3,#f7fcf8);
+    border-left:5px solid var(--green-b); border-radius:12px; padding:16px 20px;
+  }
+  .objectives h4{margin:0 0 8px; color:var(--green); font-size:.95rem; letter-spacing:.3px;}
+  .objectives ul{margin:0; padding-left:20px;}
+  .objectives li{margin:3px 0; font-size:.95rem;}
+
+  /* ---- toc ---- */
+  .toc{
+    background:var(--card); border-radius:16px; padding:22px 26px; margin-bottom:30px;
+    box-shadow:0 6px 20px rgba(120,90,60,.06);
+  }
+  .toc h3{margin:0 0 14px; font-size:1.05rem;}
+  .toc ol{columns:2; column-gap:34px; margin:0; padding-left:18px;}
+  .toc li{margin:6px 0; break-inside:avoid;}
+  .toc a{color:var(--accent); text-decoration:none; font-weight:600;}
+  .toc a:hover{text-decoration:underline;}
+
+  /* ---- section ---- */
+  section{margin-bottom:40px;}
+  .secnum{font-family:'JetBrains Mono',monospace; font-size:.8rem; font-weight:700;
+    letter-spacing:2px; color:var(--accent); display:block; margin-bottom:2px;}
+  section h2{font-size:1.55rem; margin:0 0 18px; padding-bottom:10px; border-bottom:2px solid var(--line);}
+  section h3{font-size:1.18rem; margin:26px 0 10px;}
+  p{margin:12px 0;}
+
+  /* ---- inline code ---- */
+  p code, li code, td code, .opt code{background:#f3ece4; color:#9a5030; padding:1.5px 6px; border-radius:5px; font-size:.86em;}
+
+  /* ---- code blocks ---- */
+  pre{
+    background:#fdfaf7; border-radius:12px; padding:16px 18px; overflow-x:auto;
+    box-shadow:inset 0 2px 8px rgba(120,90,60,.08); margin:14px 0; font-size:.86rem; line-height:1.55;
+  }
+  pre code{background:none; color:#3a3742; padding:0;}
+  .kw{color:var(--kw); font-weight:600;}
+  .str{color:var(--str);}
+  .num{color:var(--num);}
+  .err{color:var(--err); font-weight:600;}
+  .cm{color:var(--cm); font-style:italic;}
+
+  /* ---- cards ---- */
+  .card{border-radius:14px; padding:15px 19px; margin:16px 0; box-shadow:0 4px 14px rgba(120,90,60,.07);
+    transition:transform .18s ease, box-shadow .18s ease;}
+  .card:hover{transform:translateY(-2px); box-shadow:0 8px 22px rgba(120,90,60,.12);}
+  .card .label{font-family:'JetBrains Mono',monospace; font-size:.72rem; font-weight:700;
+    letter-spacing:.6px; text-transform:uppercase; display:block; margin-bottom:5px;}
+  .card p{margin:5px 0;}
+  .exam-trap{background:linear-gradient(135deg,#fef2f0,#fff8f7); border-left:5px solid #e06b5e;}
+  .exam-trap .label{color:#c0453a;}
+  .key-rule{background:linear-gradient(135deg,#f0f9f3,#f7fcf8); border-left:5px solid var(--green-b);}
+  .key-rule .label{color:var(--green);}
+  .remember{background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c;}
+  .remember .label{color:var(--gold);}
+
+  /* ---- rules box ---- */
+  .rules-box{background:linear-gradient(135deg,#f0f9f3,#f7fcf8); border-top:4px solid var(--green-b);
+    border-radius:12px; padding:16px 22px; margin:18px 0; box-shadow:0 4px 14px rgba(120,90,60,.06);}
+  .rules-box h4{margin:0 0 8px; color:var(--green);}
+  .rules-box ol,.rules-box ul{margin:6px 0; padding-left:22px;}
+  .rules-box li{margin:5px 0;}
+
+  /* ---- vs grid ---- */
+  .vs-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0;}
+  .vs-grid .col{background:var(--card); border-radius:12px; padding:14px 18px; box-shadow:0 4px 14px rgba(120,90,60,.07);}
+  .vs-grid .col h4{margin:0 0 8px; font-size:1rem;}
+  .vs-grid .col.left h4{color:var(--purple);}
+  .vs-grid .col.right h4{color:var(--green);}
+  .vs-grid .col ul{margin:0; padding-left:18px;} .vs-grid .col li{margin:4px 0; font-size:.92rem;}
+
+  /* ---- trace ---- */
+  .trace{background:#fffdf9; border:1px dashed #e3d6c4; border-radius:12px; padding:12px 18px; margin:14px 0;}
+  .trace h4{margin:0 0 6px; font-size:.9rem; color:var(--accent); font-family:'JetBrains Mono',monospace; letter-spacing:.5px;}
+  .trace ul{margin:0; padding-left:20px;} .trace li{margin:4px 0; font-size:.9rem;}
+  .out{display:inline-block; background:#eef8f1; color:#2f7350; font-family:'JetBrains Mono',monospace;
+    padding:1px 8px; border-radius:5px; font-size:.85em; font-weight:600;}
+
+  /* ---- tables ---- */
+  table{width:100%; border-collapse:separate; border-spacing:0; background:var(--card);
+    border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(120,90,60,.08); margin:16px 0; font-size:.9rem;}
+  th,td{padding:10px 14px; text-align:left; border-bottom:1px solid #f0ebe4; vertical-align:top;}
+  thead th{background:#f0e8de; font-family:'Source Sans 3',sans-serif; font-weight:700; color:#5a5048;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:#fcfaf7;}
+  .yes{color:var(--green); font-weight:700;}
+  .no{color:var(--red); font-weight:700;}
+
+  /* ---- recap ---- */
+  .recap{background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c;
+    border-radius:14px; padding:22px 26px; box-shadow:0 6px 18px rgba(120,90,60,.08);}
+  .recap h3{color:var(--gold); margin:16px 0 4px; font-size:1.02rem;}
+  .recap h3:first-child{margin-top:0;}
+  .recap ul{margin:4px 0 0; padding-left:20px;} .recap li{margin:3px 0; font-size:.93rem;}
+
+  @media(max-width:680px){
+    body{padding:18px 10px;}
+    .header{padding:24px 20px;} .header h1{font-size:1.6rem;} .header h1 .sub{font-size:1rem;}
+    .toc ol{columns:1;} .vs-grid{grid-template-columns:1fr;}
+    section h2{font-size:1.3rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ HEADER ============ -->
+  <header class="header">
+    <span class="badge">OCP Java SE 21 Developer — Exam 1Z0-830</span>
+    <h1>Chapter 6 · Class Design <span class="sub">(Detailed Handnote)</span></h1>
+    <p class="tagline">Inheritance, constructors, order of initialization, overriding &amp; hiding, abstract classes, and immutable objects — the chapter that ties Java&rsquo;s object model together.</p>
+    <div class="objectives">
+      <h4>EXAM OBJECTIVES COVERED</h4>
+      <ul>
+        <li>Create classes; define and use instance/static fields, methods, constructors, and instance/static initializers.</li>
+        <li>Understand variable scope, apply encapsulation, and create immutable objects.</li>
+        <li>Implement inheritance, including abstract types; override methods, including those of <code>Object</code>.</li>
+        <li>Differentiate object type vs. reference type (groundwork for polymorphism in Chapter 7).</li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- ============ TOC ============ -->
+  <nav class="toc">
+    <h3>Table of Contents</h3>
+    <ol>
+      <li><a href="#s1">Understanding Inheritance</a></li>
+      <li><a href="#s2">Creating Classes</a></li>
+      <li><a href="#s3">Declaring Constructors</a></li>
+      <li><a href="#s4">Initializing Objects</a></li>
+      <li><a href="#s5">Inheriting Members</a></li>
+      <li><a href="#s6">Creating Abstract Classes</a></li>
+      <li><a href="#s7">Creating Immutable Objects</a></li>
+      <li><a href="#recap">Short Recap</a></li>
+      <li><a href="#cheat">Exam Traps Cheat Sheet</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ SECTION 1 ============ -->
+  <section id="s1">
+    <span class="secnum">SECTION 01</span>
+    <h2>Understanding Inheritance</h2>
+    <p><strong>Inheritance</strong> lets a <em>subclass</em> (child) automatically include certain members — fields and methods — of a <em>superclass</em> (parent). You declare it with the <code>extends</code> keyword. The parent must not be <code>final</code>.</p>
+
+    <h3>What gets inherited</h3>
+    <table>
+      <thead><tr><th>Access level</th><th>Inherited by subclass?</th></tr></thead>
+      <tbody>
+        <tr><td><code>public</code></td><td class="yes">Yes — always</td></tr>
+        <tr><td><code>protected</code></td><td class="yes">Yes — always</td></tr>
+        <tr><td>package (default)</td><td>Only if <strong>same package</strong></td></tr>
+        <tr><td><code>private</code></td><td class="no">No — never inherited</td></tr>
+      </tbody>
+    </table>
+    <pre><code><span class="kw">public class</span> BigCat {
+    <span class="kw">protected double</span> size;
+}
+<span class="kw">public class</span> Jaguar <span class="kw">extends</span> BigCat {
+    <span class="kw">public</span> Jaguar() { size = <span class="num">10.2</span>; }       <span class="cm">// OK: size is protected, inherited</span>
+}
+<span class="kw">public class</span> Spider {
+    <span class="kw">public void</span> printDetails() {
+        System.out.println(size);            <span class="err">// DOES NOT COMPILE — Spider doesn't inherit size</span>
+    }
+}</code></pre>
+
+    <h3>Inheritance is transitive</h3>
+    <p>If <code>X extends Y</code> and <code>Y extends Z</code>, then <code>X</code> is a descendant of <code>Z</code>. A <em>direct</em> subclass is the one that literally writes <code>extends</code> — so <code>X</code> is a direct subclass only of <code>Y</code>, not of <code>Z</code>.</p>
+
+    <div class="card exam-trap">
+      <span class="label">⚠ Exam Trap</span>
+      <p>If you see a class marked <code>final</code> being extended, the code does <strong>not compile</strong> — instantly.</p>
+      <pre><code><span class="kw">public class</span> Mammal {}
+<span class="kw">public final class</span> Rhinoceros <span class="kw">extends</span> Mammal {}
+<span class="kw">public class</span> Clara <span class="kw">extends</span> Rhinoceros {}   <span class="err">// DOES NOT COMPILE — Rhinoceros is final</span></code></pre>
+    </div>
+
+    <div class="vs-grid">
+      <div class="col left"><h4>Single inheritance (Java)</h4>
+        <ul><li>A class has exactly <strong>one direct parent</strong>.</li><li>Multiple <em>levels</em> are allowed (X→Y→Z).</li><li>One parent may still have many children.</li></ul></div>
+      <div class="col right"><h4>Multiple inheritance (not in Java)</h4>
+        <ul><li>A class with <strong>multiple direct parents</strong> — disallowed.</li><li>Causes ambiguity over which parent to inherit from.</li><li>Only exception: a class may <code>implement</code> many <em>interfaces</em> (Ch.&nbsp;7).</li></ul></div>
+    </div>
+
+    <h3>Inheriting <code>Object</code></h3>
+    <p>Every class inherits from <code>java.lang.Object</code>. It is the only class with no parent. If your class doesn&rsquo;t <code>extend</code> anything, the compiler silently adds <code>extends java.lang.Object</code>. So these two are equivalent:</p>
+    <pre><code><span class="kw">public class</span> Zoo { }
+<span class="kw">public class</span> Zoo <span class="kw">extends</span> java.lang.Object { }   <span class="cm">// equivalent</span></code></pre>
+    <div class="card remember">
+      <span class="label">★ Remember</span>
+      <p>When you <code>extend</code> an existing class, Java does <strong>not</strong> add <code>Object</code> again — you already inherit it through the chain. Primitives (<code>int</code>, <code>boolean</code>) are <em>not</em> classes, so they don&rsquo;t inherit <code>Object</code>; their wrapper classes do (via autoboxing). Methods like <code>toString()</code> and <code>equals()</code> live in <code>Object</code>, so every class has them.</p>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 2 ============ -->
+  <section id="s2">
+    <span class="secnum">SECTION 02</span>
+    <h2>Creating Classes</h2>
+
+    <h3>Extending a class</h3>
+    <pre><code><span class="cm">// Animal.java</span>
+<span class="kw">public class</span> Animal {
+    <span class="kw">private int</span> age;                  <span class="cm">// private — not directly inherited</span>
+    <span class="kw">protected</span> String name;          <span class="cm">// protected — inherited &amp; directly accessible</span>
+    <span class="kw">public int</span> getAge() { <span class="kw">return</span> age; }
+    <span class="kw">public void</span> setAge(<span class="kw">int</span> newAge) { age = newAge; }
+}
+<span class="cm">// Lion.java</span>
+<span class="kw">public class</span> Lion <span class="kw">extends</span> Animal {
+    <span class="kw">protected void</span> setProperties(<span class="kw">int</span> age, String n) { setAge(age); name = n; }
+    <span class="kw">public void</span> roar() {
+        System.out.print(name + <span class="str">", age "</span> + getAge() + <span class="str">", says: Roar!"</span>);
+    }
+}</code></pre>
+    <p><code>lion.setProperties(3,"kion")</code> then <code>lion.roar()</code> prints <span class="out">kion, age 3, says: Roar!</span>. <code>age</code> is <code>private</code>, reachable only via <code>setAge()/getAge()</code>; <code>name</code> is <code>protected</code>, so it&rsquo;s directly accessible. Accessing <code>age</code> directly inside <code>Lion</code> would <span class="err">not compile</span>.</p>
+
+    <h3>Class access modifiers (top-level)</h3>
+    <div class="rules-box">
+      <h4>Top-level class rules</h4>
+      <ul>
+        <li>A <code>.java</code> file may have <strong>at most one</strong> <code>public</code> top-level class.</li>
+        <li>You may have as many package-access classes as you want, in any order — and you don&rsquo;t even need a public one.</li>
+        <li>A top-level class can only be <code>public</code> or package — <code>protected</code> and <code>private</code> are illegal here (allowed only on <em>nested</em> classes, Ch.&nbsp;7).</li>
+      </ul>
+    </div>
+    <pre><code><span class="kw">protected class</span> ClownFish {}    <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">private class</span> BlueTang {}       <span class="err">// DOES NOT COMPILE</span></code></pre>
+
+    <h3>The <code>this</code> reference</h3>
+    <p>When a parameter shares a name with an instance variable, Java uses the <strong>most granular (narrowest) scope</strong>. Watch this:</p>
+    <pre><code><span class="kw">public class</span> Flamingo {
+    <span class="kw">private</span> String color = <span class="kw">null</span>;
+    <span class="kw">public void</span> setColor(String color) {
+        color = color;                 <span class="cm">// assigns parameter to itself — instance var untouched!</span>
+    }
+}
+<span class="cm">// f.setColor("PINK"); System.out.print(f.color);  =&gt;</span> <span class="out">null</span></code></pre>
+    <p>Fix it with <code>this.color = color;</code> &rarr; prints <span class="out">PINK</span>. The <code>this</code> reference points to the current instance and works in any instance method, constructor, or instance initializer — but <strong>not</strong> in a static method or static initializer (no implicit instance there).</p>
+
+    <div class="trace">
+      <h4>TRACE — the Duck example &rarr; prints 0 2 white</h4>
+      <ul>
+        <li><code>length = this.length;</code> &mdash; backwards! Assigns instance <code>length</code> (0) to the parameter; instance stays <strong>0</strong>.</li>
+        <li><code>height = theHeight;</code> &mdash; different names, no <code>this</code> needed; sets height to <strong>2</strong>.</li>
+        <li><code>this.color = "white";</code> &mdash; fine; <code>this.</code> is legal even without a name clash.</li>
+      </ul>
+    </div>
+
+    <h3>The <code>super</code> reference</h3>
+    <p>When a variable/method exists in both parent and child, the instance holds <strong>two copies</strong>. <code>this</code> searches current → inherited; <code>super</code> searches inherited only (it excludes members of the current class).</p>
+    <pre><code><span class="kw">public class</span> Reptile { <span class="kw">protected int</span> speed = <span class="num">10</span>; }
+<span class="kw">public class</span> Crocodile <span class="kw">extends</span> Reptile {
+    <span class="kw">protected int</span> speed = <span class="num">20</span>;
+    <span class="kw">public int</span> getSpeed() { <span class="kw">return</span> speed; }        <span class="cm">// =&gt; 20 (this.speed)</span>
+    <span class="cm">// return super.speed;  would give =&gt; 10</span>
+}</code></pre>
+    <div class="card exam-trap">
+      <span class="label">⚠ Exam Trap — Insect / Beetle</span>
+      <p>This program <strong>does not compile</strong> because of one line:</p>
+      <pre><code><span class="kw">class</span> Insect { <span class="kw">protected int</span> numberOfLegs = <span class="num">4</span>; String label = <span class="str">"buggy"</span>; }
+<span class="kw">public class</span> Beetle <span class="kw">extends</span> Insect {
+    <span class="kw">protected int</span> numberOfLegs = <span class="num">6</span>;
+    <span class="kw">short</span> age = <span class="num">3</span>;
+    <span class="kw">public void</span> printData() {
+        System.out.println(<span class="kw">this</span>.label);    <span class="cm">// buggy  (inherited)</span>
+        System.out.println(<span class="kw">super</span>.label);   <span class="cm">// buggy  (inherited)</span>
+        System.out.println(<span class="kw">this</span>.age);      <span class="cm">// 3      (current class)</span>
+        System.out.println(<span class="kw">super</span>.age);     <span class="err">// DOES NOT COMPILE — age not inherited</span>
+        System.out.println(numberOfLegs);   <span class="cm">// 6      (narrowest scope = Beetle)</span>
+    }
+}</code></pre>
+      <p><code>this</code> = current + inherited; <code>super</code> = inherited only. <code>age</code> lives only in <code>Beetle</code>, so <code>super.age</code> is illegal.</p>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 3 ============ -->
+  <section id="s3">
+    <span class="secnum">SECTION 03</span>
+    <h2>Declaring Constructors</h2>
+    <p>A constructor <strong>matches the class name exactly</strong> and has <strong>no return type</strong> (not even <code>void</code>). It runs when <code>new</code> creates an instance.</p>
+    <pre><code><span class="kw">public class</span> Bunny {
+    <span class="kw">public</span> bunny() {}          <span class="err">// DOES NOT COMPILE — lowercase name = method, but no return type</span>
+    <span class="kw">public void</span> Bunny() {}     <span class="cm">// legal METHOD (has return type) — NOT a constructor</span>
+}</code></pre>
+    <div class="card exam-trap">
+      <span class="label">⚠ Exam Trap</span>
+      <p>Constructor parameters may be any class, array, primitive, or generic — but <strong>never <code>var</code></strong>: <code>public Bonobo(var food){}</code> <span class="err">does not compile</span>.</p>
+    </div>
+
+    <h3>The default constructor</h3>
+    <div class="rules-box">
+      <h4>Default no-arg constructor</h4>
+      <ul>
+        <li>If a class declares <strong>no constructors at all</strong>, the compiler inserts a <code>public</code> no-argument constructor.</li>
+        <li>It is generated at <strong>compile time</strong> — it never appears in the <code>.java</code> file, only in the <code>.class</code>.</li>
+        <li>If you declare <em>any</em> constructor (even a <code>private</code> one), no default is inserted.</li>
+      </ul>
+    </div>
+    <table>
+      <thead><tr><th>Class</th><th>Has a constructor coded?</th><th>Gets a default no-arg?</th></tr></thead>
+      <tbody>
+        <tr><td><code>Rabbit1 {}</code></td><td>No</td><td class="yes">Yes</td></tr>
+        <tr><td><code>Rabbit2</code> with <code>Rabbit2()</code></td><td>Yes</td><td class="no">No</td></tr>
+        <tr><td><code>Rabbit3</code> with <code>Rabbit3(boolean)</code></td><td>Yes</td><td class="no">No</td></tr>
+        <tr><td><code>Rabbit4</code> with <code>private Rabbit4()</code></td><td>Yes (private)</td><td class="no">No</td></tr>
+      </tbody>
+    </table>
+    <p><code>new Rabbit4()</code> from another class <span class="err">does not compile</span> — the constructor is private. A class with only private constructors can&rsquo;t be instantiated externally and gets no default (useful for static-only utility classes).</p>
+
+    <h3>Calling overloaded constructors with <code>this()</code></h3>
+    <p>Constructors can call one another, but only via <code>this(...)</code> — not by name and not with <code>new</code> (that would create a second, throwaway object).</p>
+    <pre><code><span class="kw">public</span> Hamster(<span class="kw">int</span> weight) {
+    Hamster(weight, <span class="str">"brown"</span>);        <span class="err">// DOES NOT COMPILE — can't call a constructor like a method</span>
+}
+<span class="kw">public</span> Hamster(<span class="kw">int</span> weight) {
+    <span class="kw">new</span> Hamster(weight, <span class="str">"brown"</span>);    <span class="cm">// compiles, but builds an EXTRA discarded object</span>
+}
+<span class="kw">public</span> Hamster(<span class="kw">int</span> weight) {
+    <span class="kw">this</span>(weight, <span class="str">"brown"</span>);          <span class="cm">// CORRECT — same instance</span>
+}</code></pre>
+
+    <div class="vs-grid">
+      <div class="col left"><h4><code>this</code> vs <code>this()</code></h4>
+        <ul><li><code>this</code> &rarr; a reference to the current instance.</li><li><code>this()</code> &rarr; a call to another constructor in the same class.</li></ul></div>
+      <div class="col right"><h4><code>super</code> vs <code>super()</code></h4>
+        <ul><li><code>super</code> &rarr; references a parent member.</li><li><code>super()</code> &rarr; calls a parent constructor.</li></ul></div>
+    </div>
+
+    <div class="rules-box">
+      <h4>Constructor rules to memorize</h4>
+      <ol>
+        <li>A class can have many overloaded constructors, each with a distinct signature.</li>
+        <li>The first line of every constructor is a call to <code>this()</code> or <code>super()</code>.</li>
+        <li>If <code>this()</code> / <code>super()</code> is present, it <strong>must be the first statement</strong> (so only one such call per constructor).</li>
+        <li>If neither is written, the compiler inserts a no-arg <code>super()</code> as the first line.</li>
+        <li>Java forbids cyclic constructor calls.</li>
+        <li><code>super()</code> always refers to the <strong>most direct</strong> parent.</li>
+      </ol>
+    </div>
+
+    <div class="card exam-trap">
+      <span class="label">⚠ Exam Trap — statement before this()</span>
+      <pre><code><span class="kw">public</span> Hamster(<span class="kw">int</span> weight) {
+    System.out.println(<span class="str">"chew"</span>);      <span class="cm">// a statement...</span>
+    <span class="kw">this</span>(weight, <span class="str">"brown"</span>);          <span class="err">// DOES NOT COMPILE — this() must be first</span>
+}</code></pre>
+      <p>Comments don&rsquo;t count as statements, so a comment before <code>this()</code> is fine. Cyclic calls also fail: <code>Gopher(int){ this(5); }</code> calling itself <span class="err">does not compile</span>.</p>
+    </div>
+
+    <h3>Calling parent constructors with <code>super()</code></h3>
+    <pre><code><span class="kw">public class</span> Zoo {
+    <span class="kw">public</span> Zoo() {
+        System.out.println(<span class="str">"Zoo created"</span>);
+        <span class="kw">super</span>();                       <span class="err">// DOES NOT COMPILE — super() must be first</span>
+    }
+}</code></pre>
+    <p>A child constructor may call <strong>any</strong> accessible parent constructor — it need not match its own signature. <code>super()</code> taking arguments still counts as &ldquo;the super call.&rdquo;</p>
+
+    <div class="card exam-trap">
+      <span class="label">⚠ Exam Trap — missing no-arg parent constructor</span>
+      <p>If the parent defines a constructor with args and <strong>no</strong> no-arg constructor, the auto-inserted <code>super()</code> has nothing to call:</p>
+      <pre><code><span class="kw">public class</span> Mammal { <span class="kw">public</span> Mammal(<span class="kw">int</span> age) {} }
+<span class="kw">public class</span> Seal <span class="kw">extends</span> Mammal {}              <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">public class</span> Elephant <span class="kw">extends</span> Mammal {
+    <span class="kw">public</span> Elephant() {}                          <span class="err">// DOES NOT COMPILE — implicit super() has no target</span>
+}</code></pre>
+      <p>Fix: add an explicit <code>super(6);</code> in the child constructor. (A subclass <em>may</em> have a no-arg constructor even when its parent doesn&rsquo;t — as long as it calls an existing parent constructor.)</p>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 4 ============ -->
+  <section id="s4">
+    <span class="secnum">SECTION 04</span>
+    <h2>Initializing Objects</h2>
+
+    <h3>Order of class initialization</h3>
+    <div class="rules-box">
+      <h4>Initialize Class X (happens at most ONCE)</h4>
+      <ol>
+        <li>Initialize the <strong>superclass</strong> of X first.</li>
+        <li>Process all <strong>static variable declarations</strong> in source order.</li>
+        <li>Process all <strong>static initializers</strong> in source order.</li>
+      </ol>
+    </div>
+    <p>A class loads before it is first used; the class holding <code>main()</code> loads before <code>main()</code> runs. If <code>main()</code> is inside <code>Hippo</code> (which <code>extends Animal</code>), the program prints <span class="out">ABC</span> exactly once — <code>A</code>+<code>B</code> from class init, then <code>C</code> from <code>main()</code>, even though three instances are created. If <code>Hippo</code> is instead used from another class, you&rsquo;d likely see <span class="out">CAB</span> (loaded only when needed).</p>
+
+    <h3>final fields</h3>
+    <div class="card key-rule">
+      <span class="label">✓ Key Rule</span>
+      <p>By the time a constructor <strong>completes</strong>, every <code>final</code> instance variable must be assigned a value <strong>exactly once</strong> — at its declaration, in an instance initializer, or in the constructor. Default values apply only to <em>non-final</em> fields.</p>
+    </div>
+    <pre><code><span class="kw">public class</span> MouseHouse {
+    <span class="kw">private final int</span> volume;
+    <span class="kw">private final</span> String type;
+    { <span class="kw">this</span>.volume = <span class="num">10</span>; }                <span class="cm">// instance initializer sets volume</span>
+    <span class="kw">public</span> MouseHouse(String type) { <span class="kw">this</span>.type = type; }   <span class="cm">// OK</span>
+    <span class="kw">public</span> MouseHouse() {                  <span class="err">// DOES NOT COMPILE</span>
+        <span class="kw">this</span>.volume = <span class="num">2</span>;                   <span class="err">// volume already set; AND type never set</span>
+    }
+}</code></pre>
+    <p>Each constructor is checked <strong>individually</strong>. The no-arg version fails twice: it never sets <code>type</code>, and it re-assigns the already-final <code>volume</code>. Delegating with <code>this(null)</code> fixes it — <code>null</code> is a valid one-time assignment for a final reference.</p>
+
+    <h3>Order of instance initialization</h3>
+    <div class="rules-box">
+      <h4>Initialize Instance of X</h4>
+      <ol>
+        <li>Initialize Class X (if not already done).</li>
+        <li>Initialize the <strong>superclass instance</strong> of X.</li>
+        <li>Process <strong>instance variable declarations</strong> in source order.</li>
+        <li>Process <strong>instance initializers</strong> in source order.</li>
+        <li>Run the <strong>constructor</strong> (including any <code>this()</code>-chained constructors).</li>
+      </ol>
+      <p style="margin:6px 0 0;">Short form: <strong>declarations → initializers → constructor</strong>, superclass before subclass.</p>
+    </div>
+
+    <div class="trace">
+      <h4>TRACE — ZooTickets &rarr; prints 0-10-BestZoo-z-</h4>
+      <ul>
+        <li>No superclass declared (so <code>Object</code>). <strong>Static first:</strong> <code>COUNT=0</code>, static init prints <code>0-</code>, second static init does <code>COUNT+=10</code> &amp; prints <code>10-</code>.</li>
+        <li><strong>Instance next:</strong> <code>name="BestZoo"</code>, instance init prints <code>BestZoo-</code>.</li>
+        <li><strong>Constructor:</strong> prints <code>z-</code>. &rArr; <span class="out">0-10-BestZoo-z-</span></li>
+      </ul>
+    </div>
+
+    <div class="trace">
+      <h4>TRACE — Primate / Ape / Chimpanzee &rarr; prints Primate-Ape1-Chimpanzee-</h4>
+      <ul>
+        <li><code>new Chimpanzee()</code> &rarr; <code>super(2)</code> calls <code>Ape(int)</code>.</li>
+        <li><code>Ape(int)</code> has an inserted <code>super()</code> &rarr; <code>Primate()</code> prints <code>Primate-</code>.</li>
+        <li>Back in <code>Ape(int)</code>: prints <code>Ape1-</code>. Then <code>Chimpanzee()</code>: prints <code>Chimpanzee-</code>.</li>
+        <li>Only ONE of the two <code>Ape</code> constructors runs. &rArr; <span class="out">Primate-Ape1-Chimpanzee-</span></li>
+      </ul>
+    </div>
+
+    <div class="card exam-trap">
+      <span class="label">⚠ Exam Trap — the hard one (Okapi)</span>
+      <p>Output is <span class="out">AFBECHG</span> then <span class="out">BECHG</span>. Walk it slowly:</p>
+      <ul style="margin:4px 0; padding-left:20px; font-size:.9rem;">
+        <li><strong>Class init:</strong> superclass <code>GiraffeFamily</code> static prints <code>A</code>; <code>Okapi</code> static prints <code>F</code>.</li>
+        <li><strong>new Okapi(1):</strong> super instance &rarr; <code>GiraffeFamily</code> instance init <code>B</code>; constructor <code>GiraffeFamily(String)</code> calls <code>this(1)</code> &rarr; <code>GiraffeFamily(int)</code> prints <code>E</code>, then back prints <code>C</code> &rArr; <code>BEC</code>.</li>
+        <li>Then <code>Okapi</code> instance init <code>H</code>, constructor <code>G</code> &rArr; <code>BECHG</code>. Combined first line: <code>AFBECHG</code>.</li>
+        <li><strong>Second new Okapi(2):</strong> class already loaded, so just <code>BECHG</code>. <code>D</code> never prints — the no-arg <code>GiraffeFamily()</code> is never called.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 5 ============ -->
+  <section id="s5">
+    <span class="secnum">SECTION 05</span>
+    <h2>Inheriting Members</h2>
+
+    <h3>Overriding a method</h3>
+    <p>Overriding = a subclass declares a new implementation for an inherited method with the <strong>same signature</strong> (name + parameters) and a compatible return type. Signature excludes return type, access modifiers, specifiers, and exceptions.</p>
+    <pre><code><span class="kw">public class</span> Kangaroo <span class="kw">extends</span> Marsupial {
+    <span class="kw">public double</span> getAverageWeight() {
+        <span class="kw">return super</span>.getAverageWeight() + <span class="num">20</span>;   <span class="cm">// Marsupial=50.0, Kangaroo=70.0</span>
+    }
+}
+<span class="cm">// Without super, calling getAverageWeight() inside itself =&gt;</span> <span class="err">StackOverflowError</span> <span class="cm">at runtime</span></code></pre>
+
+    <div class="rules-box">
+      <h4>The 4 rules for overriding</h4>
+      <ol>
+        <li><strong>Same signature</strong> as the parent method.</li>
+        <li><strong>At least as accessible</strong> as the parent method (not more restrictive).</li>
+        <li>May not declare a <strong>new or broader checked exception</strong>.</li>
+        <li>Return type must be the <strong>same or a subtype</strong> (covariant).</li>
+      </ol>
+    </div>
+
+    <table>
+      <thead><tr><th>Rule violated</th><th>Example</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td>#2 Access</td><td><code>public</code> parent → <code>private</code> child <code>getNumberOfHumps()</code></td><td class="no">No compile</td></tr>
+        <tr><td>#3 Exception (new)</td><td><code>hide()</code> adds <code>throws FileNotFoundException</code> (parent throws none)</td><td class="no">No compile</td></tr>
+        <tr><td>#3 Exception (broader)</td><td><code>exitShell()</code> throws <code>IOException</code> (parent throws <code>FileNotFoundException</code>)</td><td class="no">No compile</td></tr>
+        <tr><td>#3 Narrower exception</td><td><code>sleep()</code> throws <code>FileNotFoundException</code> (parent throws <code>IOException</code>)</td><td class="yes">OK</td></tr>
+        <tr><td>#4 Covariant OK</td><td><code>getName()</code>: <code>String</code> child overrides <code>CharSequence</code> parent</td><td class="yes">OK</td></tr>
+        <tr><td>#4 Covariant fail</td><td><code>getColor()</code>: <code>CharSequence</code> child overrides <code>String</code> parent</td><td class="no">No compile</td></tr>
+      </tbody>
+    </table>
+    <div class="card remember">
+      <span class="label">★ Remember</span>
+      <p>Covariance test: can you assign a <code>B</code> to an <code>A</code> reference without a cast? If yes, <code>B</code> is covariant with <code>A</code>. <code>String</code> is a subtype of <code>CharSequence</code>, so <code>String</code>→<code>CharSequence</code> works but not the reverse. If a return type is <code>void</code>, the override must also be <code>void</code>. Overrides may freely add new <strong>unchecked</strong> exceptions.</p>
+    </div>
+
+    <h3>Redeclaring private methods</h3>
+    <p>You can&rsquo;t override a <code>private</code> method (it isn&rsquo;t inherited). A child can <em>redeclare</em> one with any signature/return type — it&rsquo;s simply a new, independent method, no override rules apply.</p>
+    <pre><code><span class="kw">public class</span> Beetle { <span class="kw">private</span> String getSize() { <span class="kw">return</span> <span class="str">"Undefined"</span>; } }
+<span class="kw">public class</span> RhinocerosBeetle <span class="kw">extends</span> Beetle {
+    <span class="kw">private int</span> getSize() { <span class="kw">return</span> <span class="num">5</span>; }   <span class="cm">// compiles — not an override (parent's is private)</span>
+}</code></pre>
+
+    <h3>Hiding static methods</h3>
+    <div class="card key-rule">
+      <span class="label">✓ Key Rule</span>
+      <p>Static methods can&rsquo;t be overridden — they&rsquo;re <strong>hidden</strong>. All 4 override rules apply, plus a 5th: the child method must be <code>static</code> iff the parent method is <code>static</code>. Mismatch (one static, one not) &rArr; <span class="err">does not compile</span>.</p>
+    </div>
+    <pre><code><span class="kw">public class</span> Bear {
+    <span class="kw">public static void</span> sneeze() {}
+    <span class="kw">public void</span> hibernate() {}
+    <span class="kw">public static void</span> laugh() {}
+}
+<span class="kw">public class</span> SunBear <span class="kw">extends</span> Bear {
+    <span class="kw">public void</span> sneeze() {}            <span class="err">// DOES NOT COMPILE — parent static, child instance</span>
+    <span class="kw">public static void</span> hibernate() {}  <span class="err">// DOES NOT COMPILE — parent instance, child static</span>
+    <span class="kw">protected static void</span> laugh() {}   <span class="err">// DOES NOT COMPILE — more restrictive (rule #2)</span>
+}</code></pre>
+
+    <h3>Hiding variables</h3>
+    <p>Java never overrides variables — it only <strong>hides</strong> them. A same-named child variable creates two distinct copies; which one you see depends on the <strong>reference type</strong>.</p>
+    <pre><code><span class="kw">class</span> Carnivore { <span class="kw">protected boolean</span> hasFur = <span class="kw">false</span>; }
+<span class="kw">public class</span> Meerkat <span class="kw">extends</span> Carnivore {
+    <span class="kw">protected boolean</span> hasFur = <span class="kw">true</span>;
+    <span class="kw">public static void</span> main(String[] args) {
+        Meerkat m = <span class="kw">new</span> Meerkat();
+        Carnivore c = m;
+        System.out.println(m.hasFur);   <span class="cm">// true  (Meerkat reference)</span>
+        System.out.println(c.hasFur);   <span class="cm">// false (Carnivore reference)</span>
+    }
+}</code></pre>
+    <div class="card remember">
+      <span class="label">★ Remember</span>
+      <p>Overriding a method replaces it for <strong>all</strong> references (except <code>super</code>). Hiding a method/variable applies only when a <strong>child reference type</strong> is used.</p>
+    </div>
+
+    <h3>final methods</h3>
+    <p><code>final</code> methods cannot be overridden — nor can a <code>final static</code> method be hidden. Whether the child also writes <code>final</code> is irrelevant. (If the parent method were <code>private</code>, the child version would be a legal redeclaration.)</p>
+  </section>
+
+  <!-- ============ SECTION 6 ============ -->
+  <section id="s6">
+    <span class="secnum">SECTION 06</span>
+    <h2>Creating Abstract Classes</h2>
+    <p>An <strong>abstract class</strong> (marked <code>abstract</code>) cannot be instantiated directly and may contain <strong>abstract methods</strong> — methods declared with <code>abstract</code> and no body, which force subclasses to implement them.</p>
+    <pre><code><span class="kw">public abstract class</span> Canine {
+    <span class="kw">public abstract</span> String getSound();          <span class="cm">// no body, ends in ;</span>
+    <span class="kw">public void</span> bark() { System.out.println(getSound()); }
+}
+<span class="cm">// Canine w = new Fox(); w.bark();  =&gt;</span> <span class="out">Squeak!</span></code></pre>
+
+    <div class="rules-box">
+      <h4>Abstract rules</h4>
+      <ul>
+        <li>Only <strong>instance methods</strong> can be abstract — not variables, constructors, or static methods.</li>
+        <li>An abstract class may have <strong>zero or more</strong> abstract methods; a non-abstract class may have <strong>none</strong>.</li>
+        <li>The <strong>first concrete subclass</strong> must implement all inherited abstract methods.</li>
+        <li>Overriding an abstract method follows the normal override rules.</li>
+        <li>An abstract class is initialized via constructors only when a concrete subclass is instantiated.</li>
+      </ul>
+    </div>
+
+    <table>
+      <thead><tr><th>Declaration</th><th>Why it fails</th></tr></thead>
+      <tbody>
+        <tr><td><code>var a = new Alligator();</code> (Alligator abstract)</td><td>Can&rsquo;t instantiate an abstract class</td></tr>
+        <tr><td><code>FennecFox.getSound()</code> returns <code>int</code></td><td>Not covariant with <code>String</code></td></tr>
+        <tr><td><code>ArcticFox extends Canine {}</code></td><td>Doesn&rsquo;t implement <code>getSound()</code></td></tr>
+        <tr><td><code>Direwolf</code> (concrete) declares <code>abstract rest();</code></td><td>Abstract method in a non-abstract class</td></tr>
+        <tr><td><code>Jackal</code> declares <code>abstract String name;</code></td><td>Variables can&rsquo;t be abstract</td></tr>
+        <tr><td><code>public class Egret { abstract void peck(); }</code></td><td>Abstract method outside an abstract class</td></tr>
+      </tbody>
+    </table>
+
+    <div class="card key-rule">
+      <span class="label">✓ Key Rule</span>
+      <p>An abstract class need not contain any abstract methods (e.g. <code>abstract class Llama { void chew(){} }</code> compiles). But it still can&rsquo;t be instantiated.</p>
+    </div>
+
+    <h3>Spotting invalid abstract declarations</h3>
+    <pre><code><span class="kw">public abstract class</span> Turtle {
+    <span class="kw">public abstract long</span> eat()            <span class="err">// DOES NOT COMPILE — missing semicolon</span>
+    <span class="kw">public abstract void</span> swim() {};       <span class="err">// DOES NOT COMPILE — abstract + body</span>
+    <span class="kw">public abstract int</span> getAge() { <span class="kw">return</span> <span class="num">10</span>; }  <span class="err">// DOES NOT COMPILE — abstract + body</span>
+    <span class="kw">public abstract void</span> sleep;          <span class="err">// DOES NOT COMPILE — missing ()</span>
+    <span class="kw">public void</span> goInShell();              <span class="err">// DOES NOT COMPILE — not abstract, needs a body</span>
+}</code></pre>
+    <p>The <code>abstract</code> modifier may sit before or after the access modifier (<code>abstract public class Tiger</code> is fine), but <strong>not after</strong> the <code>class</code> keyword (<code>public class abstract Bear</code> fails) or after a method&rsquo;s return type.</p>
+
+    <h3>Illegal modifier combinations</h3>
+    <table>
+      <thead><tr><th>Combination</th><th>Allowed?</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td><code>abstract</code> + <code>final</code></td><td class="no">No</td><td>Conflict: one demands extension, the other forbids it</td></tr>
+        <tr><td><code>abstract</code> + <code>private</code></td><td class="no">No</td><td>A private method isn&rsquo;t inherited, so it can&rsquo;t be implemented</td></tr>
+        <tr><td><code>abstract</code> + <code>static</code></td><td class="no">No</td><td>Static methods can&rsquo;t be overridden, so never implemented</td></tr>
+        <tr><td><code>final</code> + <code>private</code></td><td class="yes">Yes</td><td>Legal but redundant</td></tr>
+      </tbody>
+    </table>
+    <div class="card exam-trap">
+      <span class="label">⚠ Exam Trap — first concrete subclass</span>
+      <p>Abstract methods may be passed down through several abstract classes. The <strong>first concrete</strong> subclass must implement everything still abstract. If an intermediate abstract class implements one method, the concrete class only owes the rest. Turn an intermediate class concrete and it suddenly owes <em>all</em> remaining abstract methods.</p>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 7 ============ -->
+  <section id="s7">
+    <span class="secnum">SECTION 07</span>
+    <h2>Creating Immutable Objects</h2>
+    <p>An <strong>immutable object</strong> cannot change state after creation — great for security and for sharing safely across threads.</p>
+    <div class="rules-box">
+      <h4>Common immutability strategy</h4>
+      <ol>
+        <li>Mark the class <code>final</code> <strong>or</strong> make all constructors <code>private</code>.</li>
+        <li>Mark all instance variables <code>private</code> and <code>final</code>.</li>
+        <li>Don&rsquo;t define any setter methods.</li>
+        <li>Don&rsquo;t allow referenced mutable objects to be modified.</li>
+        <li>Use a constructor to set all fields, making a <strong>copy</strong> if needed.</li>
+      </ol>
+    </div>
+
+    <div class="card exam-trap">
+      <span class="label">⚠ Exam Trap — leaking a mutable reference</span>
+      <p>Even with rules 1&ndash;3 followed, returning the internal list directly breaks immutability:</p>
+      <pre><code><span class="kw">public</span> List&lt;String&gt; getFavoriteFoods() { <span class="kw">return</span> favoriteFoods; }  <span class="cm">// caller can clear()/add()!</span></code></pre>
+      <p>Safer alternatives: <strong>delegate methods</strong> (<code>getFavoriteFoodsItem(int)</code>, <code>getFavoriteFoodsCount()</code>) or a <strong>copy-on-read</strong> getter: <code>return new ArrayList&lt;&gt;(this.favoriteFoods);</code>.</p>
+    </div>
+
+    <h3>Defensive copy (rule 5)</h3>
+    <p>If a caller supplies the data, storing their reference lets them mutate it later. Copy it in the constructor:</p>
+    <pre><code><span class="kw">public</span> Animal(List&lt;String&gt; favoriteFoods) {
+    <span class="kw">if</span> (favoriteFoods == <span class="kw">null</span> || favoriteFoods.size() == <span class="num">0</span>)
+        <span class="kw">throw new</span> RuntimeException(<span class="str">"favoriteFoods is required"</span>);
+    <span class="kw">this</span>.favoriteFoods = <span class="kw">new</span> ArrayList&lt;String&gt;(favoriteFoods);  <span class="cm">// defensive copy</span>
+}</code></pre>
+    <div class="card remember">
+      <span class="label">★ Remember</span>
+      <p>Without the defensive copy, a caller keeping their own reference can call <code>clear()</code>/<code>add()</code> afterward and the &ldquo;immutable&rdquo; object changes — the classic exam trap.</p>
+    </div>
+  </section>
+
+  <!-- ============ RECAP ============ -->
+  <section id="recap">
+    <span class="secnum">RECAP</span>
+    <h2>Short Recap</h2>
+    <div class="recap">
+      <h3>Inheritance</h3>
+      <ul><li><code>extends</code> = subclass; parent can&rsquo;t be <code>final</code>. public/protected always inherited, package only same-package, private never.</li><li>All classes inherit <code>java.lang.Object</code>; primitives don&rsquo;t.</li></ul>
+      <h3>Creating classes</h3>
+      <ul><li>One public top-level class per file; top-level can&rsquo;t be protected/private.</li><li><code>this</code> = current+inherited; <code>super</code> = inherited only; both unavailable in static context (only <code>this</code>).</li></ul>
+      <h3>Constructors</h3>
+      <ul><li>Name matches class, no return type, no <code>var</code> params. Default no-arg only when zero constructors declared.</li><li>First line is <code>this()</code> or <code>super()</code> (else compiler adds <code>super()</code>); must be first statement; no cycles.</li></ul>
+      <h3>Initialization order</h3>
+      <ul><li>Class: superclass → static vars → static initializers (once). Instance: superclass instance → instance vars → instance initializers → constructor.</li><li>Every <code>final</code> field assigned exactly once by constructor&rsquo;s end.</li></ul>
+      <h3>Overriding / hiding</h3>
+      <ul><li>Override: same signature, ≥ access, no new/broader checked exceptions, covariant return.</li><li>Static → hidden (must match static); variables → hidden (reference type decides); <code>final</code> can&rsquo;t be overridden/hidden.</li></ul>
+      <h3>Abstract classes</h3>
+      <ul><li>Can&rsquo;t instantiate; abstract methods have no body and end in <code>;</code>. First concrete subclass implements all. No <code>abstract</code>+<code>final</code>/<code>private</code>/<code>static</code>.</li></ul>
+      <h3>Immutable objects</h3>
+      <ul><li>final class or private constructors, private final fields, no setters, no mutable leaks, defensive copies in/out.</li></ul>
+    </div>
+  </section>
+
+  <!-- ============ CHEAT SHEET ============ -->
+  <section id="cheat">
+    <span class="secnum">CHEAT SHEET</span>
+    <h2>Exam Traps Cheat Sheet</h2>
+    <table>
+      <thead><tr><th>Scenario</th><th>What it tests</th><th>Verdict</th></tr></thead>
+      <tbody>
+        <tr><td>Class extends a <code>final</code> class</td><td>final modifier</td><td class="no">No compile</td></tr>
+        <tr><td>Subclass uses a <code>private</code> parent field directly</td><td>private not inherited</td><td class="no">No compile</td></tr>
+        <tr><td><code>super.x</code> where <code>x</code> is only in the current class</td><td>super = inherited only</td><td class="no">No compile</td></tr>
+        <tr><td><code>color = color;</code> (param == field name)</td><td>scope / missing <code>this</code></td><td>Field stays default</td></tr>
+        <tr><td>Constructor name mismatched case</td><td>treated as method, no return type</td><td class="no">No compile</td></tr>
+        <tr><td>Constructor with <code>var</code> parameter</td><td>var illegal in constructor params</td><td class="no">No compile</td></tr>
+        <tr><td>Statement before <code>this()</code>/<code>super()</code></td><td>must be first statement</td><td class="no">No compile</td></tr>
+        <tr><td>Parent has only an arg constructor; child omits <code>super(arg)</code></td><td>implicit <code>super()</code> has no target</td><td class="no">No compile</td></tr>
+        <tr><td>Cyclic <code>this()</code> constructor calls</td><td>no cycles allowed</td><td class="no">No compile</td></tr>
+        <tr><td><code>final</code> field set twice / never set</td><td>exactly-once rule</td><td class="no">No compile</td></tr>
+        <tr><td>Method inside itself without <code>super</code></td><td>infinite recursion</td><td><span class="no">StackOverflowError</span></td></tr>
+        <tr><td>Override narrows access (e.g. public→private)</td><td>override rule #2</td><td class="no">No compile</td></tr>
+        <tr><td>Override adds new/broader checked exception</td><td>override rule #3</td><td class="no">No compile</td></tr>
+        <tr><td>Override widens return type (String→CharSequence)</td><td>covariant return rule #4</td><td class="no">No compile</td></tr>
+        <tr><td>Static vs instance mismatch parent/child</td><td>hiding rule #5</td><td class="no">No compile</td></tr>
+        <tr><td>Hidden variable read via parent reference</td><td>reference type decides</td><td>Parent&rsquo;s value</td></tr>
+        <tr><td>Abstract method with a body / no <code>;</code> / no <code>()</code></td><td>abstract method syntax</td><td class="no">No compile</td></tr>
+        <tr><td>Concrete subclass skips an inherited abstract method</td><td>first concrete must implement all</td><td class="no">No compile</td></tr>
+        <tr><td><code>abstract</code> combined with <code>final</code>/<code>private</code>/<code>static</code></td><td>illegal combinations</td><td class="no">No compile</td></tr>
+        <tr><td>Immutable class returns its mutable field directly</td><td>mutable reference leak</td><td>Not immutable</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+</div>
+</body>
+</html>
