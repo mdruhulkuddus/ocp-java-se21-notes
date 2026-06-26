@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 · অধ্যায় ৩ — Making Decisions (বিশদ স্টাডি নোট)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --ink:#2c2a28; --muted:#6f6a64; --line:#ece3da;
+    --sect:#c96442; --inlinebg:#f3ece4; --inlineink:#9a5030;
+    --yes:#3b7d57; --no:#c44d3e; --purple:#7c5cbf;
+    --shadow:0 4px 18px rgba(60,50,40,.07); --shadow-h:0 10px 30px rgba(60,50,40,.13);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Noto Sans Bengali',system-ui,sans-serif;font-size:17px;line-height:1.8;}
+  .wrap{max-width:1000px;margin:0 auto;padding:32px 20px 80px;}
+  h1,h2,h3,h4{font-family:'Noto Sans Bengali',sans-serif;color:var(--ink);line-height:1.5;}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+  a{color:var(--sect);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+
+  .header{background:linear-gradient(135deg,#ffffff,#fbf7f4);border-radius:18px;
+    padding:34px 34px 30px;box-shadow:var(--shadow);margin-bottom:26px;}
+  .badge{display:inline-block;background:linear-gradient(90deg,#c96442,#d4845e);
+    color:#fff;font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:600;
+    letter-spacing:.4px;padding:7px 14px;border-radius:999px;margin-bottom:16px;}
+  .header h1{font-size:32px;margin:6px 0 4px;font-weight:900;}
+  .header h1 .muted{color:var(--muted);font-weight:400;font-size:22px;}
+  .subtitle{color:var(--muted);margin:6px 0 20px;font-size:18px;}
+  .obj{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:5px solid #5aab7b;
+    border-radius:12px;padding:16px 20px;}
+  .obj h4{margin:0 0 8px;color:#3b7d57;font-size:16px;}
+  .obj ul{margin:0;padding-left:20px;}
+  .obj li{margin:3px 0;}
+
+  .toc{background:var(--card);border-radius:14px;padding:22px 26px;box-shadow:var(--shadow);margin-bottom:30px;}
+  .toc h3{margin:0 0 12px;font-size:19px;}
+  .toc-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 28px;}
+  .toc-grid a{display:flex;gap:10px;padding:5px 0;border-bottom:1px dashed #eee5db;color:var(--ink);}
+  .toc-grid a:hover{color:var(--sect);text-decoration:none;}
+  .toc-grid .n{font-family:'JetBrains Mono',monospace;color:var(--sect);font-weight:600;font-size:14px;min-width:26px;}
+
+  section{background:var(--card);border-radius:16px;padding:28px 30px;box-shadow:var(--shadow);margin-bottom:26px;}
+  .secnum{font-family:'JetBrains Mono',monospace;color:var(--sect);font-weight:700;font-size:14px;letter-spacing:1px;}
+  section h2{font-size:25px;margin:4px 0 18px;padding-bottom:12px;border-bottom:2px solid var(--line);}
+  section h3{font-size:20px;margin:26px 0 8px;color:#39332e;}
+  section h4{font-size:17px;margin:18px 0 6px;color:#4a443e;}
+  p{margin:10px 0;}
+  ul,ol{margin:10px 0;padding-left:24px;}
+  li{margin:5px 0;}
+
+  p code,li code,td code,h4 code,.obj code,.card code,.rules-box code,.vs-col code,.trace code{
+    background:var(--inlinebg);color:var(--inlineink);padding:1.5px 6px;border-radius:6px;font-size:14.5px;}
+
+  pre{background:#fdfaf7;border-radius:12px;padding:16px 18px;overflow-x:auto;
+    box-shadow:inset 0 2px 8px rgba(70,55,40,.08);margin:14px 0;font-size:14px;line-height:1.6;}
+  pre code{background:none;padding:0;color:#3a352f;font-size:14px;}
+  .kw{color:var(--kw);font-weight:500;} .str{color:var(--str);} .num{color:var(--num);}
+  .err{color:var(--err);font-weight:700;} .cm{color:var(--cm);font-style:italic;}
+
+  .card{border-radius:14px;padding:15px 18px 15px 20px;margin:16px 0;box-shadow:var(--shadow);
+    transition:box-shadow .22s ease, transform .22s ease;}
+  .card:hover{box-shadow:var(--shadow-h);transform:translateY(-2px);}
+  .card .label{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;
+    letter-spacing:.6px;display:block;margin-bottom:5px;}
+  .card p,.card ul{margin:5px 0;}
+  .exam-trap{background:linear-gradient(135deg,#fef2f0,#fff8f7);border-left:5px solid #e06b5e;}
+  .exam-trap .label{color:#c0453a;}
+  .key-rule{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:5px solid #5aab7b;}
+  .key-rule .label{color:#3b7d57;}
+  .remember{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:5px solid #d4a24c;}
+  .remember .label{color:#a9772a;}
+
+  .rules-box{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-top:4px solid #5aab7b;
+    border-radius:12px;padding:16px 20px;margin:18px 0;box-shadow:var(--shadow);}
+  .rules-box h4{margin:0 0 8px;color:#3b7d57;}
+  .rules-box ol,.rules-box ul{margin:6px 0;}
+
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;}
+  .vs-col{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);}
+  .vs-col h4{margin:0 0 8px;font-size:16px;}
+  .vs-col.left h4{color:var(--purple);}
+  .vs-col.right h4{color:var(--yes);}
+  .vs-col ul{padding-left:18px;margin:6px 0;}
+
+  .tbl-wrap{overflow-x:auto;margin:16px 0;}
+  table{width:100%;border-collapse:separate;border-spacing:0;background:var(--card);
+    border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:15px;}
+  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid #f0eae2;vertical-align:top;}
+  th{background:#f0e8de;font-family:'Noto Sans Bengali',sans-serif;font-weight:700;color:#4a423a;}
+  tr:last-child td{border-bottom:none;}
+  td code{font-size:13.5px;}
+  .yes{color:var(--yes);font-weight:700;} .no{color:var(--no);font-weight:700;}
+
+  .trace{background:#fdfaf7;border-radius:12px;padding:14px 18px 14px 20px;
+    box-shadow:inset 0 2px 8px rgba(70,55,40,.06);margin:14px 0;border-left:4px solid #d4845e;}
+  .trace ul{list-style:none;padding-left:0;margin:0;}
+  .trace li{padding:3px 0;border-bottom:1px dashed #eee5db;font-size:15px;}
+  .trace li:last-child{border-bottom:none;}
+  .trace .out{font-family:'JetBrains Mono',monospace;color:var(--inlineink);background:var(--inlinebg);
+    padding:1px 6px;border-radius:5px;}
+
+  .recap{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:5px solid #d4a24c;}
+  .recap h3{color:#a9772a;margin-top:18px;}
+  .recap h3:first-of-type{margin-top:4px;}
+
+  @media(max-width:720px){
+    body{font-size:16px;}
+    .toc-grid,.vs-grid{grid-template-columns:1fr;}
+    .header h1{font-size:25px;} .header h1 .muted{font-size:17px;}
+    section{padding:20px 18px;} .header{padding:24px 20px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="header">
+    <span class="badge">OCP Java SE 21 Developer — Exam 1Z0-830</span>
+    <h1>অধ্যায় ৩ · Making Decisions <span class="muted">(বিশদ স্টাডি নোট)</span></h1>
+    <p class="subtitle"><code>if</code>/<code>else</code>, <code>instanceof</code> দিয়ে pattern matching ও flow scoping, <code>switch</code> statement ও expression (Java 21 pattern matching, <code>when</code> guard, <code>yield</code>, <code>case null</code>), <code>while</code>/<code>do-while</code>/<code>for</code>/<code>for-each</code> loop, এবং branching — পরীক্ষায় আসা প্রতিটি common MCQ trap, বই ধরে লাইন-বাই-লাইন যাচাই করা।</p>
+    <div class="obj">
+      <h4>যে exam objective-গুলো কভার হচ্ছে</h4>
+      <ul>
+        <li><code>if/else</code>, <code>switch</code> statement ও expression, loop, এবং <code>break</code>/<code>continue</code> দিয়ে program flow control তৈরি করা।</li>
+        <li><code>instanceof</code> operator ও <code>switch</code> construct-এ pattern matching ব্যবহার; flow scoping বোঝা।</li>
+      </ul>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <h3>সূচিপত্র</h3>
+    <div class="toc-grid">
+      <a href="#s1"><span class="n">01</span><span>if / else ও Pattern Matching</span></a>
+      <a href="#s2"><span class="n">02</span><span>switch Statement</span></a>
+      <a href="#s3"><span class="n">03</span><span>switch Expression</span></a>
+      <a href="#s4"><span class="n">04</span><span>Loop (while / do-while / for)</span></a>
+      <a href="#s5"><span class="n">05</span><span>Branching (break / continue)</span></a>
+      <a href="#recap"><span class="n">★</span><span>সংক্ষিপ্ত রিভিউ</span></a>
+      <a href="#cheat"><span class="n">⚑</span><span>Exam Traps চিট-শিট</span></a>
+    </div>
+  </nav>
+
+  <!-- SECTION 01 -->
+  <section id="s1">
+    <div class="secnum">SECTION 01</div>
+    <h2>Decision-Making: if / else ও Pattern Matching</h2>
+    <p>একটা <code>if</code> statement একটা block তখনই চালায় যখন একটা <strong>boolean</strong> expression <code>true</code> হয়। <code>else</code> (ও chained <code>else if</code>) বিকল্পগুলো সামলায়। Java উপর থেকে নিচে branch মূল্যায়ন করে আর প্রথম <code>true</code>-তেই থামে।</p>
+
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — indentation মিথ্যা বলে; brace trace করুন</span>
+<pre><code><span class="kw">if</span> (hourOfDay &lt; <span class="num">11</span>)
+  System.out.println(<span class="str">"Good Morning"</span>);
+  morningGreetingCount++;  <span class="cm">// runs ALWAYS — not part of the if</span></code></pre>
+      <p>brace ছাড়া একটা <code>if</code> শুধু পরের একটামাত্র statement নিয়ন্ত্রণ করে। Java-তে tab শুধু whitespace। সবসময় open/close brace trace করুন, indentation উপেক্ষা করে।</p>
+    </div>
+
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — if-এ boolean লাগে</span>
+<pre><code><span class="kw">int</span> hourOfDay = <span class="num">1</span>;
+<span class="kw">if</span> (hourOfDay) { ... }  <span class="err">// DOES NOT COMPILE (0 and 1 are not boolean)</span></code></pre>
+    </div>
+
+    <h3><code>instanceof</code> দিয়ে pattern matching</h3>
+    <p>Pattern matching type-এর পরে একটা <em>pattern variable</em> যোগ করে — type check আর cast এক ধাপে মিলিয়ে দেয়, আর cast শুধু তখনই চলে যখন <code>instanceof</code> <code>true</code>, ফলে <code>ClassCastException</code> এড়ানো যায়।</p>
+<pre><code><span class="cm">// old, verbose</span>
+<span class="kw">if</span> (number <span class="kw">instanceof</span> Integer) {
+  Integer data = (Integer) number;
+  System.out.print(data.compareTo(<span class="num">5</span>));
+}
+<span class="cm">// pattern matching</span>
+<span class="kw">if</span> (number <span class="kw">instanceof</span> Integer data)
+  System.out.print(data.compareTo(<span class="num">5</span>));</code></pre>
+    <p>একটা optional guard (<code>&amp;&amp;</code> দিয়ে boolean expression) আরও filter করতে পারে, যে line-এ pattern variable declare হয় সেই line-এই ব্যবহার করে:</p>
+<pre><code><span class="kw">if</span> (number <span class="kw">instanceof</span> Integer data &amp;&amp; data.compareTo(<span class="num">5</span>) &gt; <span class="num">0</span>)
+  System.out.print(data);</code></pre>
+    <div class="card key-rule"><span class="label">✓ KEY RULE — null ও reassignment</span>
+      <p><code>instanceof</code> (ও pattern matching) <code>null</code>-এর জন্য সবসময় <code>false</code>। Pattern variable পুনরায় assign করা bad practice; <code>final</code> দিলে compile হবে না (<code>if (n instanceof final Integer data) { data = 10; }</code> → compile হয় না)। Pattern type-টা হতে হবে একই, subtype, বা supertype — অসম্ভব type যেমন <code>Number n instanceof String s</code> compile হয় না।</p>
+    </div>
+
+    <h3>Flow scoping</h3>
+    <p>একটা pattern variable শুধু সেখানেই scope-এ থাকে যেখানে compiler তার type <em>প্রমাণ</em> করতে পারে — এটা সাধারণ hierarchical scoping-এর মতো নয়।</p>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — OR scope ভাঙে</span>
+<pre><code><span class="kw">if</span> (number <span class="kw">instanceof</span> Integer data || data.compareTo(<span class="num">5</span>) &gt; <span class="num">0</span>)  <span class="err">// DOES NOT COMPILE</span></code></pre>
+      <p><code>||</code>-এর ক্ষেত্রে, input যদি <code>Integer</code> না হয়, তাহলে <code>data</code> undefined — তাই ব্যবহার করা যায় না। (<code>&amp;&amp;</code> দিয়ে ঠিক আছে।)</p>
+    </div>
+    <p>কিন্তু একটা pattern variable <code>if</code>-এর বাইরেও <em>বেরোতে</em> পারে যখন flow type নিশ্চিত করে। এটা compile হয়, কারণ শেষ line-এ পৌঁছানো প্রমাণ করে <code>number</code> একটা <code>Integer</code>:</p>
+<pre><code><span class="kw">void</span> printOnlyIntegers(Number number) {
+  <span class="kw">if</span> (!(number <span class="kw">instanceof</span> Integer data))
+    <span class="kw">return</span>;
+  System.out.print(data.intValue());  <span class="cm">// in scope here</span>
+}</code></pre>
+  </section>
+
+  <!-- SECTION 02 -->
+  <section id="s2">
+    <div class="secnum">SECTION 02</div>
+    <h2>switch Statement</h2>
+    <p>একটা <code>switch</code> একটা value মূল্যায়ন করে এক বা একাধিক branch-এ flow পাঠায়। একটা <strong>statement</strong> কোনো value ফেরায় না (expression-এর বিপরীতে)। দুটোই <code>switch (var)</code> দিয়ে শুরু হয় আর zero বা তার বেশি <code>case</code> clause support করে; প্রতিটা clause-এ comma দিয়ে আলাদা করা value, একটা separator (<code>:</code> বা <code>-&gt;</code>), তারপর একটা expression বা block থাকে।</p>
+
+    <h3>Supported switch type</h3>
+    <div class="card remember"><span class="label">★ REMEMBER — অনুমোদিত switch variable type</span>
+      <p><code>int</code>/<code>Integer</code>, <code>byte</code>/<code>Byte</code>, <code>short</code>/<code>Short</code>, <code>char</code>/<code>Character</code>, <code>String</code>, <code>enum</code> value, যেকোনো object type (pattern matching সহ), এবং <code>var</code> যদি এগুলোর একটায় resolve হয়। <strong>সমর্থিত নয়:</strong> <code>boolean</code>, <code>long</code>, <code>float</code>, <code>double</code>।</p>
+    </div>
+
+    <h3>গ্রহণযোগ্য case value</h3>
+    <p><code>case</code> value হতে হবে <strong>compile-time constant</strong>: literal, <code>enum</code> constant, বা literal দিয়ে initialize করা <code>final</code> variable। Method আর non-final variable চলে না।</p>
+<pre><code><span class="kw">final int</span> bananas = <span class="num">1</span>;
+<span class="kw">int</span> apples = <span class="num">2</span>;
+<span class="kw">final int</span> cookies = getCookies();
+<span class="kw">switch</span> (numberOfAnimals) {
+  <span class="kw">case</span> bananas:        <span class="cm">// OK (final + literal)</span>
+  <span class="kw">case</span> apples:         <span class="err">// DOES NOT COMPILE (not final)</span>
+  <span class="kw">case</span> getCookies():   <span class="err">// DOES NOT COMPILE (method)</span>
+  <span class="kw">case</span> cookies:        <span class="err">// DOES NOT COMPILE (final from a method, not a literal)</span>
+  <span class="kw">case</span> <span class="num">3</span> * <span class="num">5</span>:         <span class="cm">// OK (constant expression)</span>
+}</code></pre>
+    <p><code>case</code> type-টা switch variable-এর type-এর সাথে মিলতে হবে। একটা <code>int</code> switch-এ <code>String</code> case compile হয় না। যদি একটা switch-এ <code>-&gt;</code> আর <code>:</code> মিশানো হয়, তাহলে compile হয় না — একটা style বেছে নিন।</p>
+
+    <h3>Fall-through ও break</h3>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — colon-style fall through করে</span>
+      <p><code>break</code> ছাড়া execution পরের branch-গুলোতে <em>ক্রমে</em> চলতে থাকে, <code>default</code> যেখানেই থাকুক সহ। নিচের <code>printSeasonForMonth(2)</code> সবকিছু print করে:</p>
+<pre><code><span class="kw">switch</span> (month) {
+  <span class="kw">case</span> <span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>: System.out.print(<span class="str">"Winter-"</span>);
+  <span class="kw">case</span> <span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>: System.out.print(<span class="str">"Spring-"</span>);
+  <span class="kw">default</span>:     System.out.print(<span class="str">"Unknown-"</span>);
+  <span class="kw">case</span> <span class="num">7</span>, <span class="num">8</span>, <span class="num">9</span>: System.out.print(<span class="str">"Summer-"</span>);
+  <span class="kw">case</span> <span class="num">10</span>,<span class="num">11</span>,<span class="num">12</span>: System.out.print(<span class="str">"Fall-"</span>);
+}
+<span class="cm">// Winter-Spring-Unknown-Summer-Fall-</span></code></pre>
+      <p>Order গুরুত্বপূর্ণ! প্রতিটা branch-এর পরে <code>break</code> দিয়ে fall-through থামান। কোনো <code>case</code> clause না থাকা switch (<code>switch (month) {}</code>) বৈধ।</p>
+    </div>
+    <div class="card remember"><span class="label">★ REMEMBER — arrow-style switch <em>statement</em></span>
+      <p>যে arrow <code>switch</code>-এর body গুলো <code>void</code> ফেরায় (যেমন সব <code>System.out.print(...)</code>) সেটা এখনও একটা <strong>switch statement</strong>, expression নয় — কোনো value ফেরায় না। Arrow clause fall through করে না।</p>
+    </div>
+  </section>
+
+  <!-- SECTION 03 -->
+  <section id="s3">
+    <div class="secnum">SECTION 03</div>
+    <h2>switch Expression</h2>
+    <p>একটা <code>switch</code> <strong>expression</strong> value ফেরায়, তাই সাধারণত <code>=</code>-এর ডানে বা <code>return</code>-এর পরে বসে, আর শেষে একটা semicolon লাগে। প্রতিটা arrow <code>case</code> expression-এরও নিজের semicolon লাগে; একটা <code>case</code> block (brace) লাগে না।</p>
+<pre><code><span class="kw">var</span> result = <span class="kw">switch</span> (bear) {
+  <span class="kw">case</span> <span class="num">30</span> -&gt; <span class="str">"Grizzly"</span>;   <span class="cm">// semicolon after each case expression</span>
+  <span class="kw">default</span> -&gt; <span class="str">"Panda"</span>;
+};                          <span class="cm">// semicolon after the whole expression</span></code></pre>
+
+    <h3>Consistent return type</h3>
+    <p>প্রতিটা branch target type-এর সাথে compatible একটা value ফেরাতে হবে।</p>
+<pre><code><span class="kw">int</span> size = <span class="kw">switch</span> (measurement) {
+  <span class="kw">case</span> <span class="num">5</span>  -&gt; Integer.valueOf(<span class="num">1</span>); <span class="cm">// OK (unboxed to int)</span>
+  <span class="kw">case</span> <span class="num">10</span> -&gt; (<span class="kw">short</span>)<span class="num">2</span>;         <span class="cm">// OK (short fits int)</span>
+  <span class="kw">default</span> -&gt; <span class="num">3</span>;
+  <span class="kw">case</span> <span class="num">20</span> -&gt; <span class="str">"4"</span>;             <span class="err">// DOES NOT COMPILE</span>
+  <span class="kw">case</span> <span class="num">40</span> -&gt; <span class="num">5L</span>;             <span class="err">// DOES NOT COMPILE</span>
+  <span class="kw">case</span> <span class="num">50</span> -&gt; <span class="kw">null</span>;           <span class="err">// DOES NOT COMPILE</span>
+};</code></pre>
+
+    <h3>Exhaustiveness</h3>
+    <div class="rules-box">
+      <h4>switch expression অবশ্যই exhaustive হতে হবে — তিন উপায়</h4>
+      <ol>
+        <li>একটা <code>default</code> clause যোগ করুন (সবচেয়ে প্রচলিত)।</li>
+        <li><code>enum</code>-এর জন্য, প্রতিটা value-র জন্য একটা <code>case</code> দিন।</li>
+        <li>Pattern matching দিয়ে সব সম্ভাব্য type cover করুন।</li>
+      </ol>
+    </div>
+    <p>একটা value (যেমন <code>FALL</code>) বাদ পড়া <code>enum</code> switch ততক্ষণ compile হয় না যতক্ষণ সেই case বা একটা <code>default</code> না দেওয়া হয়। প্রতিটা <code>int</code> (এমনকি প্রতিটা <code>byte</code>)-এর জন্য case লেখা গ্রহণযোগ্য নয় — <code>default</code> লাগবেই।</p>
+
+    <h3><code>yield</code> statement</h3>
+    <p>একটা <code>case</code> <em>block</em> তার value <code>yield</code> দিয়ে ফেরায় (একটা <code>return</code> পুরো method থেকে বেরিয়ে যাবে)। block-এ <code>yield</code> লাগে, যদি না সেটা exception throw করে।</p>
+<pre><code><span class="kw">var</span> name = <span class="kw">switch</span> (fish) {
+  <span class="kw">case</span> <span class="num">1</span> -&gt; <span class="str">"Goldfish"</span>;
+  <span class="kw">case</span> <span class="num">2</span> -&gt; { <span class="kw">yield</span> <span class="str">"Trout"</span>; }
+  <span class="kw">case</span> <span class="num">3</span> -&gt; {
+    <span class="kw">if</span> (length &gt; <span class="num">10</span>) <span class="kw">yield</span> <span class="str">"Blobfish"</span>;
+    <span class="kw">else</span> <span class="kw">yield</span> <span class="str">"Green"</span>;
+  }
+  <span class="kw">default</span> -&gt; <span class="str">"Swordfish"</span>;
+};</code></pre>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — case block-এ semicolon</span>
+      <p>একটা <code>case</code> expression-এ semicolon লাগে; একটা <code>case</code> block-এর closing brace-এর পরে <strong>লাগে না</strong>। <code>case 2 -&gt; { yield "Trout"; };</code>-এ একটা extra semicolon আছে আর compile হয় না।</p>
+    </div>
+
+    <h3>Pattern matching switch (Java 21)</h3>
+    <p>প্রতিটা <code>case</code>-এ একটা type + pattern variable ব্যবহার করুন। একটা <code>when</code> guard একটা condition যোগ করে (<code>when</code> keyword লাগেই)। এতে <code>switch</code> range সামলাতে পারে।</p>
+<pre><code><span class="kw">return</span> <span class="kw">switch</span> (height) {
+  <span class="kw">case</span> Integer i <span class="kw">when</span> i &gt; <span class="num">10</span> -&gt; <span class="str">"Joseph"</span>;
+  <span class="kw">case</span> Integer i              -&gt; <span class="str">"Daniel"</span>;
+  <span class="kw">case</span> Double num <span class="kw">when</span> num &lt;= <span class="num">15.5</span> -&gt; <span class="str">"Peter"</span>;
+  <span class="kw">case</span> Double num             -&gt; <span class="str">"Kelly"</span>;
+  <span class="kw">case</span> Number num             -&gt; <span class="str">"Ralph"</span>;
+};</code></pre>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — dominance ও ordering</span>
+      <p>Pattern matching-এ, statement আর expression <em>দুটোর</em> জন্যই order গুরুত্বপূর্ণ। সরু case-এর আগে একটা চওড়া case সরুটাকে unreachable করে → compile error। <code>case Integer i</code> <code>case Integer i when i &gt; 10</code>-এর আগে দিলে compile হয় না। switch variable-এর সাথে সম্পর্কহীন type (<code>Number</code> switch, <code>case String s</code>) compile হয় না।</p>
+    </div>
+    <div class="card key-rule"><span class="label">✓ KEY RULE — case null ও runtime null</span>
+      <p><code>case null</code> ছাড়া, একটা <code>null</code> switch variable runtime-এ <code>NullPointerException</code> throw করে (একটা <code>default</code> থাকলেও)। Java 21 <code>case null</code> অনুমোদন করে। <code>case null</code> ব্যবহার করলে switch-টা pattern-matching switch হয়ে যায় (তাই exhaustive হতে হবে), আর <code>case null</code> <code>default</code>-এর পরে আসতে পারে না।</p>
+    </div>
+  </section>
+
+  <!-- SECTION 04 -->
+  <section id="s4">
+    <div class="secnum">SECTION 04</div>
+    <h2>Loop: while, do-while, for, for-each</h2>
+
+    <h3>while ও do-while</h3>
+    <p>একটা <code>while</code> প্রতিটা iteration-এর <em>আগে</em> condition check করে, তাই body শূন্য বার চলতে পারে। একটা <code>do/while</code> body-টা <strong>অন্তত একবার</strong> চালায়, তারপর check করে।</p>
+    <div class="vs-grid">
+      <div class="vs-col left"><h4>while (cond) { ... }</h4>
+        <ul><li>Condition আগে।</li><li>শূন্য বা তার বেশি iteration।</li><li><code>full=5</code> হলে <code>while (full &lt; 5)</code> কিছুই print করে না।</li></ul>
+      </div>
+      <div class="vs-col right"><h4>do { ... } while (cond);</h4>
+        <ul><li>Body আগে, condition পরে।</li><li>এক বা তার বেশি iteration।</li><li><code>do { lizard++; } while (false);</code> → <code>lizard</code> হয় 1।</li></ul>
+      </div>
+    </div>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — infinite loop</span>
+      <p>Condition-এর কোনো variable না বদলালে loop শেষ হয় না: <code>pen</code> fixed থাকলে <code>while (pen &lt; 10) pigs++;</code> চিরকাল চলে। নিশ্চিত করুন loop variable termination-এর দিকে এগোয়।</p>
+    </div>
+
+    <h3>basic for loop</h3>
+    <p>তিনটা semicolon দিয়ে আলাদা করা অংশ: init; condition; update। Init আর update-এ comma দিয়ে একাধিক statement থাকতে পারে; declare করা variable-গুলো একই type হতে হবে।</p>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — for-loop-এর খুঁটিনাটি</span>
+<pre><code><span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">10</span>; i++) ...;
+System.out.println(i);  <span class="err">// DOES NOT COMPILE (i scoped to the loop)</span>
+
+<span class="kw">for</span> ( ; ; ) ...           <span class="cm">// valid infinite loop (all sections optional)</span>
+
+<span class="kw">int</span> x = <span class="num">0</span>;
+<span class="kw">for</span> (<span class="kw">int</span> x = <span class="num">4</span>; x &lt; <span class="num">5</span>; x++) ...  <span class="err">// DOES NOT COMPILE (x redeclared)</span>
+
+<span class="kw">for</span> (<span class="kw">long</span> y = <span class="num">0</span>, <span class="kw">int</span> z = <span class="num">4</span>; ...) ... <span class="err">// DOES NOT COMPILE (mixed types)</span></code></pre>
+    </div>
+    <div class="card remember"><span class="label">★ REMEMBER — reverse loop পড়া</span>
+      <p>Decrement loop প্রচুর test হয়। <code>for (var c = 4; c &gt;= 0; c--)</code> print করে <code>4 3 2 1 0</code>। Start value আর condition <code>&gt;</code> না <code>&gt;=</code> খেয়াল করুন।</p>
+    </div>
+
+    <h3>for-each loop</h3>
+    <p>ডান পাশ হতে হবে একটা built-in array বা <code>java.lang.Iterable</code> implement করা কিছু (যেমন <code>List</code>, <code>Set</code> — কিন্তু <code>Map</code> <strong>নয়</strong>, আর <code>String</code> নয়)। বাঁ পাশ একটা variable declare করে যার type প্রতিটা element-এর সাথে মেলে।</p>
+<pre><code><span class="kw">for</span> (<span class="kw">var</span> name : names) System.out.println(name);
+
+String birds = <span class="str">"Jay"</span>;
+<span class="kw">for</span> (String bird : birds) ...   <span class="err">// DOES NOT COMPILE (String isn't iterable here)</span>
+String[] sloths = <span class="kw">new</span> String[<span class="num">3</span>];
+<span class="kw">for</span> (<span class="kw">int</span> sloth : sloths) ...    <span class="err">// DOES NOT COMPILE (int vs String)</span></code></pre>
+  </section>
+
+  <!-- SECTION 05 -->
+  <section id="s5">
+    <div class="secnum">SECTION 05</div>
+    <h2>Branching: break, continue, return, label</h2>
+    <p>একটা <strong>label</strong> হলো একটা colon দিয়ে শেষ হওয়া identifier যা একটা loop-এর আগে বসে, <code>break</code>/<code>continue</code>-কে একটা outer loop target করতে দেয়। প্রথা অনুযায়ী label <code>SNAKE_CASE</code>।</p>
+    <div class="vs-grid">
+      <div class="vs-col left"><h4>break</h4>
+        <ul><li>পুরো loop থেকে বেরিয়ে যায়।</li><li><code>break LABEL;</code> labelled outer loop থেকে বেরোয়।</li></ul>
+      </div>
+      <div class="vs-col right"><h4>continue</h4>
+        <ul><li>বর্তমান iteration শেষ করে, condition আবার check করে।</li><li><code>continue LABEL;</code> labelled loop continue করে।</li></ul>
+      </div>
+    </div>
+    <p>Label ছাড়া <code>break</code>/<code>continue</code> নিকটতম inner loop-এ লাগে। <code>return</code> পুরো method থেকে বেরোয় আর পরিষ্কার nested-loop search-এর জন্য label-এর বিকল্প হতে পারে।</p>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — unreachable code</span>
+<pre><code><span class="kw">if</span> (checkDate &gt; <span class="num">100</span>) {
+  <span class="kw">break</span>;
+  checkDate++;  <span class="err">// DOES NOT COMPILE (unreachable)</span>
+}</code></pre>
+      <p><code>break</code>, <code>continue</code>, বা <code>return</code>-এর ঠিক পরে একই block-এ থাকা যেকোনো statement unreachable আর compile হয় না — branch-টা যৌক্তিকভাবে অসম্ভব দেখালেও।</p>
+    </div>
+    <div class="card remember"><span class="label">★ REMEMBER — labelled break ফল বদলায়</span>
+      <p>একটা nested search-এ, <code>break LABEL;</code> প্রথম match-এই সব loop থেকে বেরোয়; একটা সাধারণ <code>break;</code> শুধু inner loop থেকে বেরোয় (শেষ inner match খুঁজে); কোনো <code>break</code> না থাকলে সর্বশেষ match খুঁজে। প্রতিটা ক্ষেত্রে output আলাদা।</p>
+    </div>
+  </section>
+
+  <!-- RECAP -->
+  <section id="recap" class="card recap">
+    <div class="secnum">★ SHORT RECAP</div>
+    <h2 style="border-color:#f0e3c8;">সংক্ষিপ্ত রিভিউ</h2>
+    <h3>Decision ও pattern matching</h3>
+    <ul>
+      <li><code>if</code>-এ boolean লাগে (0/1 নয়); brace ছাড়া এটা একটা statement নিয়ন্ত্রণ করে — indentation নয়, brace trace করুন।</li>
+      <li>Pattern matching check + cast মিলিয়ে দেয়; <code>null</code> সবসময় <code>false</code>। Flow scoping variable-টাকে শুধু সেখানেই scope-এ রাখে যেখানে type প্রমাণিত (<code>&amp;&amp;</code> ঠিক, <code>||</code> নয়; early <code>return</code> scope বাড়াতে পারে)।</li>
+    </ul>
+    <h3>switch</h3>
+    <ul>
+      <li>অনুমোদিত type: <code>int/Integer</code>, <code>byte/Byte</code>, <code>short/Short</code>, <code>char/Character</code>, <code>String</code>, <code>enum</code>, object (pattern), <code>var</code>; কখনো <code>boolean/long/float/double</code> নয়। case হতে হবে switch type-এর সাথে মেলা compile-time constant।</li>
+      <li>Colon-style fall through করে (<code>break</code> দিন); arrow-style করে না। Expression exhaustive হতে হবে আর consistent type ফেরাতে হবে; <code>yield</code> block থেকে ফেরায়; <code>case null</code> pattern matching বোঝায় আর <code>default</code>-এর পরে আসতে পারে না।</li>
+    </ul>
+    <h3>Loop ও branching</h3>
+    <ul>
+      <li><code>while</code> = zero-or-more; <code>do/while</code> = one-or-more। <code>for</code>-এর অংশ optional কিন্তু দুটো semicolon নয়; loop variable loop-এ scope করা। <code>for-each</code>-এ array বা <code>Iterable</code> লাগে (<code>Map</code>/<code>String</code> নয়)।</li>
+      <li>Label <code>break</code>/<code>continue</code>-কে outer loop target করতে দেয়; <code>return</code> method থেকে বেরোয়; <code>break</code>/<code>continue</code>/<code>return</code>-এর ঠিক পরের code unreachable।</li>
+    </ul>
+  </section>
+
+  <!-- CHEAT SHEET -->
+  <section id="cheat">
+    <div class="secnum">⚑ CHEAT SHEET</div>
+    <h2>Exam Traps চিট-শিট</h2>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>পরিস্থিতি</th><th>কী টেস্ট হয়</th><th>রায়</th></tr>
+      <tr><td><code>if (hourOfDay)</code> with <code>int</code></td><td>if-এ boolean লাগে</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>n instanceof Integer d || d...</code></td><td>OR দিয়ে flow scoping</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>if (!(n instanceof Integer d)) return; ...d...</code></td><td>return দিয়ে flow scoping</td><td class="yes">compiles</td></tr>
+      <tr><td><code>null instanceof X</code></td><td>null-এ instanceof</td><td class="yes">false</td></tr>
+      <tr><td><code>switch</code> on <code>long</code>/<code>boolean</code>/<code>double</code></td><td>অসমর্থিত switch type</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>case getCookies():</code></td><td>case compile-time constant হতে হবে</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td>colon switch, <code>break</code> ছাড়া</td><td>fall-through</td><td class="yes">পরের সব branch চলে</td></tr>
+      <tr><td>এক switch-এ <code>:</code> ও <code>-&gt;</code> মেশানো</td><td>একটাই separator style</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td>switch expression-এ একটা value বাদ</td><td>exhaustiveness</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>case 2 -&gt; { yield "x"; };</code></td><td>block-এর পরে extra semicolon</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>case Integer i</code> আগে <code>case Integer i when …</code></td><td>dominance / ordering</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>null</code> switch var, <code>case null</code> ছাড়া</td><td>runtime null</td><td class="no">NullPointerException</td></tr>
+      <tr><td><code>case null</code> <code>default</code>-এর পরে</td><td>case null placement</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>do { x++; } while (false);</code></td><td>do-while একবার চলে</td><td class="yes">x = 1</td></tr>
+      <tr><td>loop-এর পরে for-loop var পড়া</td><td>loop variable scope</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>for (long y=0, int z=4; …)</code></td><td>init একই type হতে হবে</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>String</code> বা <code>Map</code>-এ for-each</td><td>array/Iterable লাগে</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>break</code>/<code>continue</code>/<code>return</code>-এর পরে statement</td><td>unreachable code</td><td class="no">DOES NOT COMPILE</td></tr>
+    </table>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

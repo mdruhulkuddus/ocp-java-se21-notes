@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 · অধ্যায় ২ — Operators (বিশদ স্টাডি নোট)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --ink:#2c2a28; --muted:#6f6a64; --line:#ece3da;
+    --sect:#c96442; --inlinebg:#f3ece4; --inlineink:#9a5030;
+    --yes:#3b7d57; --no:#c44d3e; --purple:#7c5cbf;
+    --shadow:0 4px 18px rgba(60,50,40,.07); --shadow-h:0 10px 30px rgba(60,50,40,.13);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Noto Sans Bengali',system-ui,sans-serif;font-size:17px;line-height:1.8;}
+  .wrap{max-width:1000px;margin:0 auto;padding:32px 20px 80px;}
+  h1,h2,h3,h4{font-family:'Noto Sans Bengali',sans-serif;color:var(--ink);line-height:1.5;}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+  a{color:var(--sect);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+
+  .header{background:linear-gradient(135deg,#ffffff,#fbf7f4);border-radius:18px;
+    padding:34px 34px 30px;box-shadow:var(--shadow);margin-bottom:26px;}
+  .badge{display:inline-block;background:linear-gradient(90deg,#c96442,#d4845e);
+    color:#fff;font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:600;
+    letter-spacing:.4px;padding:7px 14px;border-radius:999px;margin-bottom:16px;}
+  .header h1{font-size:32px;margin:6px 0 4px;font-weight:900;}
+  .header h1 .muted{color:var(--muted);font-weight:400;font-size:22px;}
+  .subtitle{color:var(--muted);margin:6px 0 20px;font-size:18px;}
+  .obj{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:5px solid #5aab7b;
+    border-radius:12px;padding:16px 20px;}
+  .obj h4{margin:0 0 8px;color:#3b7d57;font-size:16px;}
+  .obj ul{margin:0;padding-left:20px;}
+  .obj li{margin:3px 0;}
+
+  .toc{background:var(--card);border-radius:14px;padding:22px 26px;box-shadow:var(--shadow);margin-bottom:30px;}
+  .toc h3{margin:0 0 12px;font-size:19px;}
+  .toc-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 28px;}
+  .toc-grid a{display:flex;gap:10px;padding:5px 0;border-bottom:1px dashed #eee5db;color:var(--ink);}
+  .toc-grid a:hover{color:var(--sect);text-decoration:none;}
+  .toc-grid .n{font-family:'JetBrains Mono',monospace;color:var(--sect);font-weight:600;font-size:14px;min-width:26px;}
+
+  section{background:var(--card);border-radius:16px;padding:28px 30px;box-shadow:var(--shadow);margin-bottom:26px;}
+  .secnum{font-family:'JetBrains Mono',monospace;color:var(--sect);font-weight:700;font-size:14px;letter-spacing:1px;}
+  section h2{font-size:25px;margin:4px 0 18px;padding-bottom:12px;border-bottom:2px solid var(--line);}
+  section h3{font-size:20px;margin:26px 0 8px;color:#39332e;}
+  section h4{font-size:17px;margin:18px 0 6px;color:#4a443e;}
+  p{margin:10px 0;}
+  ul,ol{margin:10px 0;padding-left:24px;}
+  li{margin:5px 0;}
+
+  p code,li code,td code,h4 code,.obj code,.card code,.rules-box code,.vs-col code,.trace code{
+    background:var(--inlinebg);color:var(--inlineink);padding:1.5px 6px;border-radius:6px;font-size:14.5px;}
+
+  pre{background:#fdfaf7;border-radius:12px;padding:16px 18px;overflow-x:auto;
+    box-shadow:inset 0 2px 8px rgba(70,55,40,.08);margin:14px 0;font-size:14px;line-height:1.6;}
+  pre code{background:none;padding:0;color:#3a352f;font-size:14px;}
+  .kw{color:var(--kw);font-weight:500;} .str{color:var(--str);} .num{color:var(--num);}
+  .err{color:var(--err);font-weight:700;} .cm{color:var(--cm);font-style:italic;}
+
+  .card{border-radius:14px;padding:15px 18px 15px 20px;margin:16px 0;box-shadow:var(--shadow);
+    transition:box-shadow .22s ease, transform .22s ease;}
+  .card:hover{box-shadow:var(--shadow-h);transform:translateY(-2px);}
+  .card .label{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;
+    letter-spacing:.6px;display:block;margin-bottom:5px;}
+  .card p,.card ul{margin:5px 0;}
+  .exam-trap{background:linear-gradient(135deg,#fef2f0,#fff8f7);border-left:5px solid #e06b5e;}
+  .exam-trap .label{color:#c0453a;}
+  .key-rule{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:5px solid #5aab7b;}
+  .key-rule .label{color:#3b7d57;}
+  .remember{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:5px solid #d4a24c;}
+  .remember .label{color:#a9772a;}
+
+  .rules-box{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-top:4px solid #5aab7b;
+    border-radius:12px;padding:16px 20px;margin:18px 0;box-shadow:var(--shadow);}
+  .rules-box h4{margin:0 0 8px;color:#3b7d57;}
+  .rules-box ol,.rules-box ul{margin:6px 0;}
+
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;}
+  .vs-col{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);}
+  .vs-col h4{margin:0 0 8px;font-size:16px;}
+  .vs-col.left h4{color:var(--purple);}
+  .vs-col.right h4{color:var(--yes);}
+  .vs-col ul{padding-left:18px;margin:6px 0;}
+
+  .tbl-wrap{overflow-x:auto;margin:16px 0;}
+  table{width:100%;border-collapse:separate;border-spacing:0;background:var(--card);
+    border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:15px;}
+  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid #f0eae2;vertical-align:top;}
+  th{background:#f0e8de;font-family:'Noto Sans Bengali',sans-serif;font-weight:700;color:#4a423a;}
+  tr:last-child td{border-bottom:none;}
+  td code{font-size:13.5px;}
+  .yes{color:var(--yes);font-weight:700;} .no{color:var(--no);font-weight:700;}
+
+  .trace{background:#fdfaf7;border-radius:12px;padding:14px 18px 14px 20px;
+    box-shadow:inset 0 2px 8px rgba(70,55,40,.06);margin:14px 0;border-left:4px solid #d4845e;}
+  .trace ul{list-style:none;padding-left:0;margin:0;}
+  .trace li{padding:3px 0;border-bottom:1px dashed #eee5db;font-size:15px;}
+  .trace li:last-child{border-bottom:none;}
+  .trace .out{font-family:'JetBrains Mono',monospace;color:var(--inlineink);background:var(--inlinebg);
+    padding:1px 6px;border-radius:5px;}
+
+  .recap{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:5px solid #d4a24c;}
+  .recap h3{color:#a9772a;margin-top:18px;}
+  .recap h3:first-of-type{margin-top:4px;}
+
+  @media(max-width:720px){
+    body{font-size:16px;}
+    .toc-grid,.vs-grid{grid-template-columns:1fr;}
+    .header h1{font-size:25px;} .header h1 .muted{font-size:17px;}
+    section{padding:20px 18px;} .header{padding:24px 20px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="header">
+    <span class="badge">OCP Java SE 21 Developer — Exam 1Z0-830</span>
+    <h1>অধ্যায় ২ · Operators <span class="muted">(বিশদ স্টাডি নোট)</span></h1>
+    <p class="subtitle">Operator precedence, unary ও binary arithmetic, numeric promotion ও casting, equality / relational / logical operator, <code>instanceof</code>, short-circuit, এবং ternary operator — পরীক্ষায় আসা প্রতিটি common MCQ trap, বই ধরে লাইন-বাই-লাইন যাচাই করা।</p>
+    <div class="obj">
+      <h4>যে exam objective-গুলো কভার হচ্ছে</h4>
+      <ul>
+        <li>primitive ও wrapper class ব্যবহার; Math API, precedence, type conversion ও casting দিয়ে arithmetic ও boolean expression মূল্যায়ন।</li>
+        <li>কোন operator কোন data type-এ চলে তা চেনা, আর operator/operand mismatch কোথায় compiler error দেয় তা ধরা।</li>
+        <li>কখন numeric promotion স্বয়ংক্রিয়ভাবে হয় আর কখন explicit cast লাগে তা বোঝা।</li>
+      </ul>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <h3>সূচিপত্র</h3>
+    <div class="toc-grid">
+      <a href="#s1"><span class="n">01</span><span>Operator ও Precedence</span></a>
+      <a href="#s2"><span class="n">02</span><span>Unary Operator</span></a>
+      <a href="#s3"><span class="n">03</span><span>Binary Arithmetic ও Promotion</span></a>
+      <a href="#s4"><span class="n">04</span><span>Value Assign ও Casting</span></a>
+      <a href="#s5"><span class="n">05</span><span>Value তুলনা করা</span></a>
+      <a href="#s6"><span class="n">06</span><span>Ternary Operator</span></a>
+      <a href="#recap"><span class="n">★</span><span>সংক্ষিপ্ত রিভিউ</span></a>
+      <a href="#cheat"><span class="n">⚑</span><span>Exam Traps চিট-শিট</span></a>
+    </div>
+  </nav>
+
+  <!-- SECTION 01 -->
+  <section id="s1">
+    <div class="secnum">SECTION 01</div>
+    <h2>Java Operator ও Precedence বোঝা</h2>
+    <p>একটা <em>operator</em> হলো এমন symbol যা <em>operand</em> (value, variable বা literal)-এর উপর প্রয়োগ হয়ে একটা result দেয়। Java-তে তিন ধরনের operator: <strong>unary</strong> (এক operand), <strong>binary</strong> (দুই), এবং <strong>ternary</strong> (তিন)।</p>
+    <div class="card remember"><span class="label">★ REMEMBER</span>
+      <p>Operator সবসময় বাঁ থেকে ডানে মূল্যায়ন হয় <strong>না</strong>। কোনটা আগে চলবে তা precedence ঠিক করে; কিছু operator (unary, cast, assignment, ternary) ডান থেকে বাঁয়ে মূল্যায়ন হয়।</p>
+    </div>
+<pre><code><span class="kw">int</span> cookies = <span class="num">4</span>;
+<span class="kw">double</span> reward = <span class="num">3</span> + <span class="num">2</span> * --cookies;  <span class="cm">// decrement first -> 3, then 2*3=6, then +3 = 9 -> 9.0</span>
+<span class="cm">// reward = 9.0, cookies = 3</span></code></pre>
+
+    <h3>Operator precedence (ক্রমটা মুখস্থ রাখুন)</h3>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Operator group</th><th>Symbol</th><th>মূল্যায়ন</th></tr>
+      <tr><td>Post-unary</td><td><code>expr++</code>, <code>expr--</code></td><td>বাঁ→ডান</td></tr>
+      <tr><td>Pre-unary</td><td><code>++expr</code>, <code>--expr</code></td><td>বাঁ→ডান</td></tr>
+      <tr><td>অন্যান্য unary</td><td><code>-</code>, <code>!</code>, <code>~</code>, <code>+</code>, <code>(type)</code></td><td>ডান→বাঁ</td></tr>
+      <tr><td>Multiplicative</td><td><code>*</code>, <code>/</code>, <code>%</code></td><td>বাঁ→ডান</td></tr>
+      <tr><td>Additive</td><td><code>+</code>, <code>-</code></td><td>বাঁ→ডান</td></tr>
+      <tr><td>Shift</td><td><code>&lt;&lt;</code>, <code>&gt;&gt;</code>, <code>&gt;&gt;&gt;</code></td><td>বাঁ→ডান</td></tr>
+      <tr><td>Relational</td><td><code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code>, <code>instanceof</code></td><td>বাঁ→ডান</td></tr>
+      <tr><td>Equality</td><td><code>==</code>, <code>!=</code></td><td>বাঁ→ডান</td></tr>
+      <tr><td>Logical AND / XOR / OR</td><td><code>&amp;</code> , <code>^</code> , <code>|</code></td><td>বাঁ→ডান</td></tr>
+      <tr><td>Conditional AND / OR</td><td><code>&amp;&amp;</code> , <code>||</code></td><td>বাঁ→ডান</td></tr>
+      <tr><td>Ternary</td><td><code>? :</code></td><td>ডান→বাঁ</td></tr>
+      <tr><td>Assignment</td><td><code>=</code>, <code>+=</code>, <code>-=</code>, <code>*=</code>, <code>/=</code>, <code>%=</code>, …</td><td>ডান→বাঁ</td></tr>
+      <tr><td>Arrow</td><td><code>-&gt;</code></td><td>ডান→বাঁ</td></tr>
+    </table>
+    </div>
+    <div class="card remember"><span class="label">★ REMEMBER — তিনটা "ডান-থেকে-বাঁ" দ্বীপ</span>
+      <p>binary/assignment group-গুলোর মধ্যে শুধু <strong>unary, cast, ternary ও assignment</strong> ডান→বাঁ মূল্যায়ন হয়। বাকি সব মাঝখানের অংশ বাঁ→ডান। Shift operator সরাসরি পরীক্ষায় আসে না, তবে এর অস্তিত্ব জেনে রাখুন।</p>
+    </div>
+    <p>Parentheses precedence override করে। এগুলো অবশ্যই <strong>balanced ও সঠিকভাবে nested</strong> হতে হবে, এবং Java parentheses-এর জায়গায় bracket <code>[]</code> মেনে নেয় <em>না</em>:</p>
+<pre><code><span class="kw">long</span> pigeon = <span class="num">1</span> + ((<span class="num">3</span> * <span class="num">5</span>) / <span class="num">3</span>;     <span class="err">// DOES NOT COMPILE (unbalanced)</span>
+<span class="kw">int</span>  blueJay = (<span class="num">9</span> + <span class="num">2</span>) + <span class="num">3</span>) / (<span class="num">2</span> * <span class="num">4</span>; <span class="err">// DOES NOT COMPILE (mis-nested)</span>
+<span class="kw">short</span> robin = <span class="num">3</span> + [(<span class="num">4</span> * <span class="num">2</span>) + <span class="num">4</span>];      <span class="err">// DOES NOT COMPILE (brackets not allowed)</span></code></pre>
+  </section>
+
+  <!-- SECTION 02 -->
+  <section id="s2">
+    <div class="secnum">SECTION 02</div>
+    <h2>Unary Operator প্রয়োগ</h2>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Operator</th><th>উদাহরণ</th><th>বর্ণনা</th></tr>
+      <tr><td>Logical complement</td><td><code>!a</code></td><td>একটা <code>boolean</code> মান উল্টে দেয়।</td></tr>
+      <tr><td>Bitwise complement</td><td><code>~b</code></td><td>একটা সংখ্যার সব bit উল্টে দেয়।</td></tr>
+      <tr><td>Plus / Negation</td><td><code>+c</code> / <code>-d</code></td><td>positive নির্দেশ / numeric expression negate করে।</td></tr>
+      <tr><td>Increment / Decrement</td><td><code>++e</code>, <code>f++</code></td><td>১ যোগ / বিয়োগ করে।</td></tr>
+      <tr><td>Cast</td><td><code>(String)i</code></td><td>নির্দিষ্ট type-এ cast করে।</td></tr>
+    </table>
+    </div>
+
+    <h3>Complement ও negation — type গুরুত্বপূর্ণ</h3>
+    <p><code>!</code> শুধু <code>boolean</code>-এ চলে; <code>-</code> ও <code>~</code> শুধু সংখ্যায়। এগুলো মিশিয়ে ফেলা একটা ক্লাসিক compile-fail trap:</p>
+<pre><code><span class="kw">int</span> pelican = !<span class="num">5</span>;        <span class="err">// DOES NOT COMPILE (! needs boolean)</span>
+<span class="kw">boolean</span> penguin = -<span class="kw">true</span>;  <span class="err">// DOES NOT COMPILE (- needs number)</span>
+<span class="kw">boolean</span> parrot = ~<span class="kw">true</span>;   <span class="err">// DOES NOT COMPILE (~ needs number)</span>
+<span class="kw">boolean</span> peacock = !<span class="num">0</span>;     <span class="err">// DOES NOT COMPILE (! needs boolean; 0 is not false)</span></code></pre>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — 1 ≠ true, 0 ≠ false</span>
+      <p>কিছু ভাষার বিপরীতে, Java-তে numeric মান আর <code>boolean</code> মান সম্পর্কহীন। <code>1</code> মানে <code>true</code> নয়, <code>0</code> মানে <code>false</code> নয়।</p>
+    </div>
+    <p>Bitwise complement-এর শর্টকাট: <code>~n</code> = <code>-n - 1</code>।</p>
+<pre><code><span class="kw">int</span> number = <span class="num">70</span>;
+System.out.println(~number);   <span class="cm">// -71</span>
+System.out.println(~(~number));<span class="cm">// 70</span></code></pre>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — <code>-(-x)</code> বনাম <code>--x</code></span>
+      <p>দুইবার negate করতে parentheses লাগে: <code>-(-x)</code>। <code>--x</code> লিখলে সেটা <em>decrement</em> operator হিসেবে পড়া হয় আর ভিন্ন ফল দেয়।</p>
+    </div>
+
+    <h3>Increment ও decrement — pre বনাম post</h3>
+    <div class="rules-box">
+      <h4>যে একটা নিয়মে পয়েন্ট আসে</h4>
+      <ul>
+        <li><strong>Pre</strong> (<code>++w</code>, <code>--x</code>): আগে পরিবর্তন, তারপর <em>নতুন</em> মান return।</li>
+        <li><strong>Post</strong> (<code>y++</code>, <code>z--</code>): আগে <em>আসল</em> মান return, তারপর পরিবর্তন।</li>
+      </ul>
+    </div>
+<pre><code><span class="kw">int</span> a = <span class="num">0</span>;
+System.out.println(a);    <span class="cm">// 0</span>
+System.out.println(++a);  <span class="cm">// 1  (pre: new value)</span>
+System.out.println(a);    <span class="cm">// 1</span>
+System.out.println(a--);  <span class="cm">// 1  (post: original value)</span>
+System.out.println(a);    <span class="cm">// 0</span></code></pre>
+  </section>
+
+  <!-- SECTION 03 -->
+  <section id="s3">
+    <div class="secnum">SECTION 03</div>
+    <h2>Binary Arithmetic ও Numeric Promotion</h2>
+    <p>Arithmetic operator <code>+ - * / %</code> সব numeric primitive-এ চলে (<code>boolean</code>-এ নয়)। শুধু <code>+</code> (ও <code>+=</code>) <code>String</code>-এও চলে, যা concatenation দেয়। Multiplicative (<code>* / %</code>) additive (<code>+ -</code>)-এর চেয়ে উপরে।</p>
+<pre><code><span class="kw">int</span> price = <span class="num">2</span> * <span class="num">5</span> + <span class="num">3</span> * <span class="num">4</span> - <span class="num">8</span>;  <span class="cm">// 10 + 12 - 8 = 14</span>
+<span class="kw">int</span> p2 = <span class="num">2</span> * ((<span class="num">5</span> + <span class="num">3</span>) * <span class="num">4</span> - <span class="num">8</span>); <span class="cm">// 2 * (32 - 8) = 48</span></code></pre>
+
+    <h3>Division ও modulus</h3>
+    <p>Integer division <strong>floor</strong> নেয় (দশমিক বাদ, round নয়)। Modulus <code>%</code> হলো ভাগশেষ।</p>
+<pre><code>System.out.println(<span class="num">9</span> / <span class="num">3</span>);  <span class="cm">// 3</span>
+System.out.println(<span class="num">9</span> % <span class="num">3</span>);  <span class="cm">// 0</span>
+System.out.println(<span class="num">11</span> / <span class="num">3</span>); <span class="cm">// 3</span>
+System.out.println(<span class="num">11</span> % <span class="num">3</span>); <span class="cm">// 2</span></code></pre>
+    <div class="card remember"><span class="label">★ REMEMBER — modulus ও negative</span>
+      <p>negative <em>divisor</em>-এর sign উপেক্ষিত হয়। ফলের sign <em>dividend</em>-কে অনুসরণ করে: <code>-7 % 5</code> = <code>-2</code>, কিন্তু <code>7 % -5</code> = <code>2</code>।</p>
+    </div>
+
+    <h3>Numeric promotion-এর নিয়ম</h3>
+    <div class="rules-box">
+      <h4>এই চারটা মুখস্থ রাখুন</h4>
+      <ol>
+        <li>Type ভিন্ন হলে → ছোটটা বড়টায় promote হয়।</li>
+        <li>Integral-এর সাথে floating-point মিশলে → integral-টা floating-point type-এ promote হয়।</li>
+        <li><code>byte</code>, <code>short</code>, <code>char</code> binary arithmetic operator-এ <em>variable</em>-এর সাথে ব্যবহৃত হলেই <code>int</code>-এ promote হয় — কোনো operand <code>int</code> না হলেও।</li>
+        <li>Promotion শেষে result-এর type হয় (promoted) operand-এর মতোই।</li>
+      </ol>
+    </div>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — rule 3 কামড় দেয়</span>
+<pre><code><span class="kw">short</span> x = <span class="num">10</span>, y = <span class="num">3</span>;
+<span class="kw">var</span> z = x * y;   <span class="cm">// z is int, NOT short (both promoted to int)</span>
+
+<span class="kw">double</span> a = <span class="num">39.21</span>;
+<span class="kw">float</span> b = <span class="num">2.1</span>;     <span class="err">// DOES NOT COMPILE (2.1 is a double; needs 2.1f)</span></code></pre>
+      <p>খেয়াল: unary <code>++</code>/<code>--</code> rule 3 থেকে বাদ — একটা <code>short</code>-এ <code>++</code> প্রয়োগে ফল <code>short</code>-ই থাকে।</p>
+    </div>
+    <p>ধাপে-ধাপে — <code>w * x / y</code> যেখানে <code>short w</code>, <code>float x</code>, <code>double y</code>: <code>w</code> → <code>int</code> (rule 3), তারপর <code>x</code>-এর সাথে গুণ করতে → <code>float</code>, তারপর <code>y</code> দিয়ে ভাগ করতে product → <code>double</code>। ফল একটা <strong>double</strong>।</p>
+  </section>
+
+  <!-- SECTION 04 -->
+  <section id="s4">
+    <div class="secnum">SECTION 04</div>
+    <h2>Value Assign ও Casting</h2>
+    <p>Assignment একটা binary operator যা <strong>ডান→বাঁ</strong> মূল্যায়ন হয়। Java ছোট→বড় auto-promote করে, কিন্তু বড়→ছোট যেতে explicit cast লাগে, নয়তো compile হয় না।</p>
+
+    <h3>Casting-এর মূল কথা</h3>
+<pre><code><span class="kw">int</span> fur = (<span class="kw">int</span>)<span class="num">5</span>;
+<span class="kw">short</span> tail = (<span class="kw">short</span>)(<span class="num">4</span> + <span class="num">10</span>);
+<span class="kw">long</span> feathers = <span class="num">10</span>(<span class="kw">long</span>);  <span class="err">// DOES NOT COMPILE (type on wrong side)</span></code></pre>
+    <p>এগুলো সব fail — cast ছাড়া বড় বা floating মান ছোট type-এ:</p>
+<pre><code><span class="kw">int</span> fish = <span class="num">1.0</span>;     <span class="err">// DOES NOT COMPILE (double -> int)</span>
+<span class="kw">short</span> bird = <span class="num">1921222</span>;<span class="err">// DOES NOT COMPILE (out of short range)</span>
+<span class="kw">int</span> mammal = <span class="num">9f</span>;    <span class="err">// DOES NOT COMPILE (float -> int)</span>
+<span class="kw">long</span> reptile = <span class="num">192_301_398_193_810_323</span>; <span class="err">// DOES NOT COMPILE (int literal too big; needs L)</span></code></pre>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — cast unary, শক্তভাবে bind করে</span>
+<pre><code><span class="kw">short</span> mouse = <span class="num">10</span>, hamster = <span class="num">3</span>;
+<span class="kw">short</span> c1 = (<span class="kw">short</span>)mouse * hamster;       <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">short</span> c2 = <span class="num">1</span> + (<span class="kw">short</span>)(mouse * hamster); <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">short</span> ok = (<span class="kw">short</span>)(mouse * hamster);       <span class="cm">// compiles</span></code></pre>
+      <p>Cast শুধু তার ঠিক পরের একটা operand-এ লাগে। <code>c1</code>-এ শুধু <code>mouse</code> cast হয়, তারপর দুটোই <code>int</code>-এ promote হয়। <code>c2</code>-তে cast ঠিক আছে কিন্তু <code>1 +</code> ফলকে আবার <code>int</code>-এ promote করে।</p>
+    </div>
+
+    <h3>Value বনাম variable</h3>
+    <p>Compiler আঁটা literal arithmetic মেনে নেয়, কিন্তু একই arithmetic <em>variable</em>-এ করলে আপত্তি করে (rule 3 <code>int</code>-এ promote করে):</p>
+<pre><code><span class="kw">byte</span> gloves = <span class="num">7</span> * <span class="num">10</span>;   <span class="cm">// compiles (70 fits in byte)</span>
+<span class="kw">short</span> boots = <span class="num">2</span> + <span class="num">1</span>;    <span class="cm">// compiles</span>
+<span class="kw">short</span> bad = <span class="num">2</span> + hat;     <span class="err">// DOES NOT COMPILE (hat is a variable)</span>
+<span class="kw">byte</span> over = <span class="num">7</span> * <span class="num">100</span>;   <span class="err">// DOES NOT COMPILE (700 overflows byte)</span></code></pre>
+
+    <h3>Compound assignment auto-cast করে</h3>
+    <p>Compound operator (<code>+= -= *= /=</code> …) ফলকে চুপচাপ বাঁ variable-এর type-এ cast করে দেয়, তাই explicit cast-এর বদলে ব্যবহার করা যায়:</p>
+<pre><code><span class="kw">long</span> goat = <span class="num">10</span>;
+<span class="kw">int</span> sheep = <span class="num">5</span>;
+sheep = sheep * goat; <span class="err">// DOES NOT COMPILE (long -> int)</span>
+sheep *= goat;        <span class="cm">// compiles (compound casts back to int)</span></code></pre>
+    <div class="card key-rule"><span class="label">✓ KEY RULE — assignment একটা মান ফেরায়</span>
+      <p>Assignment নিজেই একটা expression যা assign-করা মানের সমান। তাই <code>long c = (wolf = 3);</code> <code>wolf</code>-কে 3 করে <em>এবং</em> <code>c</code>-কে 3 দেয়। সাবধান <code>if (healthy = true)</code> — এটা <strong>assign</strong> করে, তুলনা করে না, তাই এখানে সবসময় true।</p>
+    </div>
+  </section>
+
+  <!-- SECTION 05 -->
+  <section id="s5">
+    <div class="secnum">SECTION 05</div>
+    <h2>Value তুলনা করা</h2>
+
+    <h3>Equality operator (<code>==</code>, <code>!=</code>)</h3>
+    <p>primitive-এ <code>==</code> মান তুলনা করে। object-এ <em>reference</em> তুলনা করে — true শুধু তখনই যখন দুটো একই object নির্দেশ করে (বা দুটোই <code>null</code>)। সম্পর্কহীন type মেশানো যায় না।</p>
+<pre><code><span class="kw">boolean</span> monkey = <span class="kw">true</span> == <span class="num">3</span>;      <span class="err">// DOES NOT COMPILE (boolean vs number)</span>
+<span class="kw">boolean</span> ape = <span class="kw">false</span> != <span class="str">"Grape"</span>;  <span class="err">// DOES NOT COMPILE (boolean vs String)</span>
+System.out.print(<span class="kw">null</span> == <span class="kw">null</span>);     <span class="cm">// true</span></code></pre>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — condition-এর ভিতরে = বনাম ==</span>
+<pre><code><span class="kw">boolean</span> bear = <span class="kw">false</span>;
+<span class="kw">boolean</span> polar = (bear = <span class="kw">true</span>); <span class="cm">// assigns true, so polar is true</span>
+System.out.println(polar);        <span class="cm">// true</span></code></pre>
+    </div>
+
+    <h3>Relational operator ও <code>instanceof</code></h3>
+    <p><code>&lt; &lt;= &gt; &gt;=</code> সংখ্যায় চলে (ছোট operand promote হয়)। <code>instanceof</code> runtime-এ পরীক্ষা করে একটা reference কোনো type-এর instance কি না।</p>
+    <div class="card key-rule"><span class="label">✓ KEY RULE — instanceof ও null</span>
+      <p><code>instanceof</code> একটা <code>null</code> literal বা <code>null</code> reference-এ সবসময় <code>false</code> ফেরায়। কিন্তু <code>x instanceof null</code> <strong>compile হয় না</strong>। অসম্ভব type-এর বিপরীতে test (যেমন একটা <code>Number</code> variable <code>instanceof String</code>)-ও compile হয় না।</p>
+    </div>
+<pre><code>System.out.print(<span class="kw">null</span> <span class="kw">instanceof</span> Object); <span class="cm">// false</span>
+String s = <span class="kw">null</span>;
+System.out.print(s <span class="kw">instanceof</span> String);  <span class="cm">// false</span></code></pre>
+
+    <h3>Logical ও bitwise operator (<code>&amp;</code>, <code>|</code>, <code>^</code>)</h3>
+    <p><code>boolean</code> মানে এগুলো logical operator; সংখ্যায় bitwise। দুই পাশই সবসময় মূল্যায়ন হয়।</p>
+    <div class="rules-box">
+      <h4>Truth-table শর্টকাট</h4>
+      <ul>
+        <li><code>&amp;</code> AND — true শুধু যদি <strong>দুটোই</strong> true।</li>
+        <li><code>|</code> inclusive OR — false শুধু যদি <strong>দুটোই</strong> false।</li>
+        <li><code>^</code> exclusive OR — true শুধু যদি operand দুটো <strong>আলাদা</strong> হয়।</li>
+      </ul>
+    </div>
+<pre><code><span class="kw">boolean</span> a = <span class="kw">true</span>, b = <span class="kw">true</span>;
+System.out.println(a | b); <span class="cm">// true</span>
+System.out.println(a &amp; b); <span class="cm">// true</span>
+System.out.println(a ^ b); <span class="cm">// false (same -> false)</span></code></pre>
+
+    <h3>Conditional (short-circuit) operator (<code>&amp;&amp;</code>, <code>||</code>)</h3>
+    <p>একই truth table, কিন্তু বাঁ পাশ ফল ঠিক করে দিলে ডান পাশ বাদ পড়ে।</p>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — unperformed side effect</span>
+<pre><code><span class="kw">int</span> rabbit = <span class="num">6</span>;
+<span class="kw">boolean</span> bunny = (rabbit &gt;= <span class="num">6</span>) || (++rabbit &lt;= <span class="num">7</span>);
+System.out.println(rabbit); <span class="cm">// 6  (left is true, so ++rabbit never runs)</span></code></pre>
+    </div>
+    <p>Short-circuit <code>NullPointerException</code>-ও ঠেকায়: <code>if (duck != null &amp;&amp; duck.getAge() &lt; 5)</code> <code>duck</code> <code>null</code> হলে কখনো <code>getAge()</code> ডাকে না। একক <code>&amp;</code> দিয়ে ডাকত।</p>
+  </section>
+
+  <!-- SECTION 06 -->
+  <section id="s6">
+    <div class="secnum">SECTION 06</div>
+    <h2>Ternary Operator</h2>
+    <p>একমাত্র তিন-operand operator: <code>booleanExpression ? expr1 : expr2</code>। এটা একটা সংক্ষিপ্ত <code>if/else</code> যা একটা মান ফেরায়।</p>
+<pre><code><span class="kw">int</span> owl = <span class="num">5</span>;
+<span class="kw">int</span> food = owl &lt; <span class="num">2</span> ? <span class="num">3</span> : <span class="num">4</span>; <span class="cm">// 4</span></code></pre>
+    <p>Ternary nest করা যায়; parentheses readability অনেক বাড়ায়:</p>
+<pre><code><span class="kw">int</span> f1 = owl &lt; <span class="num">4</span> ? owl &gt; <span class="num">2</span> ? <span class="num">3</span> : <span class="num">4</span> : <span class="num">5</span>;
+<span class="kw">int</span> f2 = (owl &lt; <span class="num">4</span> ? ((owl &gt; <span class="num">2</span>) ? <span class="num">3</span> : <span class="num">4</span>) : <span class="num">5</span>); <span class="cm">// equivalent</span></code></pre>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — branch type ও assignment</span>
+<pre><code><span class="kw">int</span> stripes = <span class="num">7</span>;
+System.out.print((stripes &gt; <span class="num">5</span>) ? <span class="num">21</span> : <span class="str">"Zebra"</span>); <span class="cm">// compiles (print takes Object)</span>
+<span class="kw">int</span> animal = (stripes &lt; <span class="num">9</span>) ? <span class="num">3</span> : <span class="str">"Horse"</span>;       <span class="err">// DOES NOT COMPILE (String -> int)</span></code></pre>
+      <p><code>print()</code>-এর জন্য দুই branch একই type হওয়ার দরকার নেই (এটা <code>Object</code>-এ convert করে), কিন্তু ফল assign করলে type compatibility বাধ্যতামূলক হয়।</p>
+    </div>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — শুধু একটা branch চলে</span>
+<pre><code><span class="kw">int</span> sheep = <span class="num">1</span>, zzz = <span class="num">1</span>;
+<span class="kw">int</span> sleep = zzz &lt; <span class="num">10</span> ? sheep++ : zzz++;
+System.out.print(sheep + <span class="str">","</span> + zzz); <span class="cm">// 2,1  (only sheep++ evaluated)</span></code></pre>
+      <p>Condition true বলে শুধু <code>sheep++</code> চলে; <code>zzz++</code> একটা unperformed side effect। Condition উল্টালে শুধু <code>zzz</code> বদলায়।</p>
+    </div>
+  </section>
+
+  <!-- RECAP -->
+  <section id="recap" class="card recap">
+    <div class="secnum">★ SHORT RECAP</div>
+    <h2 style="border-color:#f0e3c8;">সংক্ষিপ্ত রিভিউ</h2>
+    <h3>Precedence ও unary</h3>
+    <ul>
+      <li>precedence table মুখস্থ রাখুন; unary, cast, ternary ও assignment ডান→বাঁ মূল্যায়ন হয়। Parentheses balanced হতে হবে; bracket <code>[]</code> চলে না।</li>
+      <li><code>!</code> শুধু <code>boolean</code>-এ; <code>-</code>/<code>~</code> শুধু সংখ্যায়; <code>1≠true</code>, <code>0≠false</code>। Pre নতুন মান, post আসল মান ফেরায়।</li>
+    </ul>
+    <h3>Arithmetic ও promotion</h3>
+    <ul>
+      <li><code>* / %</code> > <code>+ -</code>; integer division floor নেয়; modulus-এর sign dividend অনুসরণ করে।</li>
+      <li><code>byte/short/char</code> variable-এ binary arithmetic-এ <code>int</code>-এ promote হয়; floating-point-এর সাথে মিশলে float/double type-এ promote হয়।</li>
+    </ul>
+    <h3>Assignment ও casting</h3>
+    <ul>
+      <li>বড়→ছোট cast লাগে; cast unary, শুধু এক operand-এ bind করে। আঁটা literal arithmetic compile হয়; variable-এ একই জিনিস না-ও হতে পারে।</li>
+      <li>Compound operator বাঁ type-এ auto-cast করে। Assignment নিজের মানের সমান একটা expression (<code>=</code> বনাম <code>==</code> trap)।</li>
+    </ul>
+    <h3>তুলনা ও ternary</h3>
+    <ul>
+      <li><code>==</code> object-এ reference, primitive-এ value তুলনা করে; সম্পর্কহীন type মেশানো যায় না। <code>instanceof</code> <code>null</code>-এ <code>false</code>; <code>instanceof null</code> compile হয় না।</li>
+      <li><code>&amp; | ^</code> সবসময় দুই পাশ মূল্যায়ন করে; <code>&amp;&amp; ||</code> short-circuit করে। Ternary শুধু একটা branch চালায়; ফল assign করলে type compatibility বাধ্যতামূলক।</li>
+    </ul>
+  </section>
+
+  <!-- CHEAT SHEET -->
+  <section id="cheat">
+    <div class="secnum">⚑ CHEAT SHEET</div>
+    <h2>Exam Traps চিট-শিট</h2>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>পরিস্থিতি</th><th>কী টেস্ট হয়</th><th>রায়</th></tr>
+      <tr><td><code>int x = !5;</code> / <code>boolean y = -true;</code></td><td>operator/operand type mismatch</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>boolean b = !0;</code></td><td>0 মানে false নয়</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>short z = x * y;</code> (x,y short)</td><td>int-এ promotion (rule 3)</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>var z = x * y;</code> (x,y short)</td><td>result type</td><td class="yes"><code>int</code></td></tr>
+      <tr><td><code>float b = 2.1;</code></td><td>double literal-এ <code>f</code> লাগে</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>short s = (short)mouse * hamster;</code></td><td>cast unary, তারপর re-promote</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>short bad = 2 + hat;</code> (hat var)</td><td>value বনাম variable</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>byte over = 7 * 100;</code></td><td>700 byte overflow করে</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>sheep *= goat;</code> (int *= long)</td><td>compound auto-cast করে</td><td class="yes">compiles</td></tr>
+      <tr><td><code>long c = (wolf = 3);</code></td><td>assignment একটা মান ফেরায়</td><td class="yes">c = 3</td></tr>
+      <tr><td><code>if (healthy = true)</code></td><td><code>=</code> বনাম <code>==</code></td><td class="yes">সবসময় true (assign)</td></tr>
+      <tr><td><code>true == 3</code></td><td>equality type মেশানো</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>null == null</code></td><td>null reference equality</td><td class="yes">true</td></tr>
+      <tr><td><code>null instanceof Object</code></td><td>null-এ instanceof</td><td class="yes">false</td></tr>
+      <tr><td><code>x instanceof null</code></td><td>instanceof-এর ডানে null</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>(rabbit&gt;=6) || (++rabbit&lt;=7)</code></td><td>short-circuit side effect</td><td class="yes">++rabbit বাদ পড়ে</td></tr>
+      <tr><td><code>int a = cond ? 3 : "Horse";</code></td><td>assign-এ ternary branch type</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>print(cond ? 21 : "Zebra")</code></td><td>print Object-এ convert করে</td><td class="yes">compiles</td></tr>
+      <tr><td><code>(int)fruit + vegetables</code> long হিসেবে return</td><td>cast precedence + promotion</td><td class="no">DOES NOT COMPILE</td></tr>
+    </table>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

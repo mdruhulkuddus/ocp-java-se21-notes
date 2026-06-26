@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 · Chapter 3 — Making Decisions (Detailed Handnote)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --ink:#2c2a28; --muted:#6f6a64; --line:#ece3da;
+    --sect:#c96442; --inlinebg:#f3ece4; --inlineink:#9a5030;
+    --yes:#3b7d57; --no:#c44d3e; --purple:#7c5cbf;
+    --shadow:0 4px 18px rgba(60,50,40,.07); --shadow-h:0 10px 30px rgba(60,50,40,.13);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Source Sans 3',system-ui,sans-serif;font-size:17px;line-height:1.65;}
+  .wrap{max-width:1000px;margin:0 auto;padding:32px 20px 80px;}
+  h1,h2,h3,h4{font-family:'Merriweather',serif;color:var(--ink);line-height:1.3;}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+  a{color:var(--sect);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+
+  .header{background:linear-gradient(135deg,#ffffff,#fbf7f4);border-radius:18px;
+    padding:34px 34px 30px;box-shadow:var(--shadow);margin-bottom:26px;}
+  .badge{display:inline-block;background:linear-gradient(90deg,#c96442,#d4845e);
+    color:#fff;font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:600;
+    letter-spacing:.4px;padding:7px 14px;border-radius:999px;margin-bottom:16px;}
+  .header h1{font-size:33px;margin:6px 0 4px;font-weight:900;}
+  .header h1 .muted{color:var(--muted);font-weight:400;font-size:23px;}
+  .subtitle{font-style:italic;color:var(--muted);margin:6px 0 20px;font-size:18px;}
+  .obj{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:5px solid #5aab7b;
+    border-radius:12px;padding:16px 20px;}
+  .obj h4{margin:0 0 8px;color:#3b7d57;font-size:16px;}
+  .obj ul{margin:0;padding-left:20px;}
+  .obj li{margin:3px 0;}
+
+  .toc{background:var(--card);border-radius:14px;padding:22px 26px;box-shadow:var(--shadow);margin-bottom:30px;}
+  .toc h3{margin:0 0 12px;font-size:19px;}
+  .toc-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 28px;}
+  .toc-grid a{display:flex;gap:10px;padding:5px 0;border-bottom:1px dashed #eee5db;color:var(--ink);}
+  .toc-grid a:hover{color:var(--sect);text-decoration:none;}
+  .toc-grid .n{font-family:'JetBrains Mono',monospace;color:var(--sect);font-weight:600;font-size:14px;min-width:26px;}
+
+  section{background:var(--card);border-radius:16px;padding:28px 30px;box-shadow:var(--shadow);margin-bottom:26px;}
+  .secnum{font-family:'JetBrains Mono',monospace;color:var(--sect);font-weight:700;font-size:14px;letter-spacing:1px;}
+  section h2{font-size:25px;margin:4px 0 18px;padding-bottom:12px;border-bottom:2px solid var(--line);}
+  section h3{font-size:19.5px;margin:26px 0 8px;color:#39332e;}
+  section h4{font-size:16.5px;margin:18px 0 6px;color:#4a443e;}
+  p{margin:10px 0;}
+  ul,ol{margin:10px 0;padding-left:24px;}
+  li{margin:5px 0;}
+
+  p code,li code,td code,h4 code,.obj code,.card code,.rules-box code,.vs-col code,.trace code{
+    background:var(--inlinebg);color:var(--inlineink);padding:1.5px 6px;border-radius:6px;font-size:14.5px;}
+
+  pre{background:#fdfaf7;border-radius:12px;padding:16px 18px;overflow-x:auto;
+    box-shadow:inset 0 2px 8px rgba(70,55,40,.08);margin:14px 0;font-size:14px;line-height:1.6;}
+  pre code{background:none;padding:0;color:#3a352f;font-size:14px;}
+  .kw{color:var(--kw);font-weight:500;} .str{color:var(--str);} .num{color:var(--num);}
+  .err{color:var(--err);font-weight:700;} .cm{color:var(--cm);font-style:italic;}
+
+  .card{border-radius:14px;padding:15px 18px 15px 20px;margin:16px 0;box-shadow:var(--shadow);
+    transition:box-shadow .22s ease, transform .22s ease;}
+  .card:hover{box-shadow:var(--shadow-h);transform:translateY(-2px);}
+  .card .label{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;
+    letter-spacing:.6px;display:block;margin-bottom:5px;}
+  .card p,.card ul{margin:5px 0;}
+  .exam-trap{background:linear-gradient(135deg,#fef2f0,#fff8f7);border-left:5px solid #e06b5e;}
+  .exam-trap .label{color:#c0453a;}
+  .key-rule{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:5px solid #5aab7b;}
+  .key-rule .label{color:#3b7d57;}
+  .remember{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:5px solid #d4a24c;}
+  .remember .label{color:#a9772a;}
+
+  .rules-box{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-top:4px solid #5aab7b;
+    border-radius:12px;padding:16px 20px;margin:18px 0;box-shadow:var(--shadow);}
+  .rules-box h4{margin:0 0 8px;color:#3b7d57;}
+  .rules-box ol,.rules-box ul{margin:6px 0;}
+
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;}
+  .vs-col{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);}
+  .vs-col h4{margin:0 0 8px;font-size:16px;}
+  .vs-col.left h4{color:var(--purple);}
+  .vs-col.right h4{color:var(--yes);}
+  .vs-col ul{padding-left:18px;margin:6px 0;}
+
+  .tbl-wrap{overflow-x:auto;margin:16px 0;}
+  table{width:100%;border-collapse:separate;border-spacing:0;background:var(--card);
+    border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:15px;}
+  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid #f0eae2;vertical-align:top;}
+  th{background:#f0e8de;font-family:'Source Sans 3',sans-serif;font-weight:700;color:#4a423a;}
+  tr:last-child td{border-bottom:none;}
+  td code{font-size:13.5px;}
+  .yes{color:var(--yes);font-weight:700;} .no{color:var(--no);font-weight:700;}
+
+  .trace{background:#fdfaf7;border-radius:12px;padding:14px 18px 14px 20px;
+    box-shadow:inset 0 2px 8px rgba(70,55,40,.06);margin:14px 0;border-left:4px solid #d4845e;}
+  .trace ul{list-style:none;padding-left:0;margin:0;}
+  .trace li{padding:3px 0;border-bottom:1px dashed #eee5db;font-size:15px;}
+  .trace li:last-child{border-bottom:none;}
+  .trace .out{font-family:'JetBrains Mono',monospace;color:var(--inlineink);background:var(--inlinebg);
+    padding:1px 6px;border-radius:5px;}
+
+  .recap{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:5px solid #d4a24c;}
+  .recap h3{color:#a9772a;margin-top:18px;}
+  .recap h3:first-of-type{margin-top:4px;}
+
+  @media(max-width:720px){
+    body{font-size:16px;}
+    .toc-grid,.vs-grid{grid-template-columns:1fr;}
+    .header h1{font-size:26px;} .header h1 .muted{font-size:18px;}
+    section{padding:20px 18px;} .header{padding:24px 20px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="header">
+    <span class="badge">OCP Java SE 21 Developer — Exam 1Z0-830</span>
+    <h1>Chapter 3 · Making Decisions <span class="muted">(Detailed Handnote)</span></h1>
+    <p class="subtitle"><code>if</code>/<code>else</code>, pattern matching with <code>instanceof</code> and flow scoping, <code>switch</code> statements &amp; expressions (Java 21 pattern matching, <code>when</code> guards, <code>yield</code>, <code>case null</code>), <code>while</code>/<code>do-while</code>/<code>for</code>/<code>for-each</code> loops, and branching — every common MCQ trap, verified line-by-line.</p>
+    <div class="obj">
+      <h4>Exam objectives covered</h4>
+      <ul>
+        <li>Create program flow control constructs including <code>if/else</code>, <code>switch</code> statements and expressions, loops, and <code>break</code>/<code>continue</code> statements.</li>
+        <li>Use pattern matching with the <code>instanceof</code> operator and the <code>switch</code> construct; understand flow scoping.</li>
+      </ul>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <h3>Contents</h3>
+    <div class="toc-grid">
+      <a href="#s1"><span class="n">01</span><span>if / else &amp; Pattern Matching</span></a>
+      <a href="#s2"><span class="n">02</span><span>switch Statements</span></a>
+      <a href="#s3"><span class="n">03</span><span>switch Expressions</span></a>
+      <a href="#s4"><span class="n">04</span><span>Loops (while / do-while / for)</span></a>
+      <a href="#s5"><span class="n">05</span><span>Branching (break / continue)</span></a>
+      <a href="#recap"><span class="n">★</span><span>Short Recap</span></a>
+      <a href="#cheat"><span class="n">⚑</span><span>Exam Traps Cheat Sheet</span></a>
+    </div>
+  </nav>
+
+  <!-- SECTION 01 -->
+  <section id="s1">
+    <div class="secnum">SECTION 01</div>
+    <h2>Decision-Making: if / else &amp; Pattern Matching</h2>
+    <p>An <code>if</code> statement runs a block only when a <strong>boolean</strong> expression is <code>true</code>. An <code>else</code> (and chained <code>else if</code>) handles the alternatives. Java evaluates branches top to bottom and stops at the first <code>true</code>.</p>
+
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — indentation lies; trace the braces</span>
+<pre><code><span class="kw">if</span> (hourOfDay &lt; <span class="num">11</span>)
+  System.out.println(<span class="str">"Good Morning"</span>);
+  morningGreetingCount++;  <span class="cm">// runs ALWAYS — not part of the if</span></code></pre>
+      <p>Without braces, an <code>if</code> governs only the next single statement. Tabs are just whitespace in Java. Always trace the open/close braces, ignoring indentation.</p>
+    </div>
+
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — if needs a boolean</span>
+<pre><code><span class="kw">int</span> hourOfDay = <span class="num">1</span>;
+<span class="kw">if</span> (hourOfDay) { ... }  <span class="err">// DOES NOT COMPILE (0 and 1 are not boolean)</span></code></pre>
+    </div>
+
+    <h3>Pattern matching with <code>instanceof</code></h3>
+    <p>Pattern matching adds a <em>pattern variable</em> after the type, combining the type check and the cast in one step — and the cast runs only when <code>instanceof</code> is <code>true</code>, avoiding <code>ClassCastException</code>.</p>
+<pre><code><span class="cm">// old, verbose</span>
+<span class="kw">if</span> (number <span class="kw">instanceof</span> Integer) {
+  Integer data = (Integer) number;
+  System.out.print(data.compareTo(<span class="num">5</span>));
+}
+<span class="cm">// pattern matching</span>
+<span class="kw">if</span> (number <span class="kw">instanceof</span> Integer data)
+  System.out.print(data.compareTo(<span class="num">5</span>));</code></pre>
+    <p>An optional guard (a boolean expression with <code>&amp;&amp;</code>) can filter further, using the pattern variable on the same line it's declared:</p>
+<pre><code><span class="kw">if</span> (number <span class="kw">instanceof</span> Integer data &amp;&amp; data.compareTo(<span class="num">5</span>) &gt; <span class="num">0</span>)
+  System.out.print(data);</code></pre>
+    <div class="card key-rule"><span class="label">✓ KEY RULE — null &amp; reassignment</span>
+      <p><code>instanceof</code> (and pattern matching) is always <code>false</code> for <code>null</code>. Reassigning a pattern variable is bad practice; with <code>final</code> it won't compile (<code>if (n instanceof final Integer data) { data = 10; }</code> → does not compile). The pattern type must be the same, a subtype, or a supertype — an impossible type like <code>Number n instanceof String s</code> does not compile.</p>
+    </div>
+
+    <h3>Flow scoping</h3>
+    <p>A pattern variable is in scope only where the compiler can <em>prove</em> its type — this is unlike ordinary hierarchical scoping.</p>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — OR breaks scope</span>
+<pre><code><span class="kw">if</span> (number <span class="kw">instanceof</span> Integer data || data.compareTo(<span class="num">5</span>) &gt; <span class="num">0</span>)  <span class="err">// DOES NOT COMPILE</span></code></pre>
+      <p>With <code>||</code>, if the input isn't an <code>Integer</code>, <code>data</code> is undefined — so it can't be used. (With <code>&amp;&amp;</code> it's fine.)</p>
+    </div>
+    <p>But a pattern variable <em>can</em> escape the <code>if</code> when flow guarantees the type. This compiles, because reaching the last line proves <code>number</code> is an <code>Integer</code>:</p>
+<pre><code><span class="kw">void</span> printOnlyIntegers(Number number) {
+  <span class="kw">if</span> (!(number <span class="kw">instanceof</span> Integer data))
+    <span class="kw">return</span>;
+  System.out.print(data.intValue());  <span class="cm">// in scope here</span>
+}</code></pre>
+  </section>
+
+  <!-- SECTION 02 -->
+  <section id="s2">
+    <div class="secnum">SECTION 02</div>
+    <h2>switch Statements</h2>
+    <p>A <code>switch</code> evaluates one value and redirects flow to one or more branches. A <strong>statement</strong> doesn't return a value (unlike an expression). Both start with <code>switch (var)</code> and support zero or more <code>case</code> clauses; each clause lists comma-separated values, a separator (<code>:</code> or <code>-&gt;</code>), then an expression or block.</p>
+
+    <h3>Supported switch types</h3>
+    <div class="card remember"><span class="label">★ REMEMBER — allowed switch variable types</span>
+      <p><code>int</code>/<code>Integer</code>, <code>byte</code>/<code>Byte</code>, <code>short</code>/<code>Short</code>, <code>char</code>/<code>Character</code>, <code>String</code>, <code>enum</code> values, any object type (with pattern matching), and <code>var</code> if it resolves to one of these. <strong>Not</strong> supported: <code>boolean</code>, <code>long</code>, <code>float</code>, <code>double</code>.</p>
+    </div>
+
+    <h3>Acceptable case values</h3>
+    <p><code>case</code> values must be <strong>compile-time constants</strong>: literals, <code>enum</code> constants, or <code>final</code> variables initialized with a literal. Methods and non-final variables don't qualify.</p>
+<pre><code><span class="kw">final int</span> bananas = <span class="num">1</span>;
+<span class="kw">int</span> apples = <span class="num">2</span>;
+<span class="kw">final int</span> cookies = getCookies();
+<span class="kw">switch</span> (numberOfAnimals) {
+  <span class="kw">case</span> bananas:        <span class="cm">// OK (final + literal)</span>
+  <span class="kw">case</span> apples:         <span class="err">// DOES NOT COMPILE (not final)</span>
+  <span class="kw">case</span> getCookies():   <span class="err">// DOES NOT COMPILE (method)</span>
+  <span class="kw">case</span> cookies:        <span class="err">// DOES NOT COMPILE (final from a method, not a literal)</span>
+  <span class="kw">case</span> <span class="num">3</span> * <span class="num">5</span>:         <span class="cm">// OK (constant expression)</span>
+}</code></pre>
+    <p>The <code>case</code> type must match the switch variable's type. A <code>String</code> case on an <code>int</code> switch does not compile. If <code>-&gt;</code> and <code>:</code> are mixed across clauses, it does not compile — pick one style.</p>
+
+    <h3>Fall-through &amp; break</h3>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — colon-style falls through</span>
+      <p>Without <code>break</code>, execution continues into the following branches <em>in order</em>, including <code>default</code> wherever it sits. <code>printSeasonForMonth(2)</code> below prints everything:</p>
+<pre><code><span class="kw">switch</span> (month) {
+  <span class="kw">case</span> <span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>: System.out.print(<span class="str">"Winter-"</span>);
+  <span class="kw">case</span> <span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>: System.out.print(<span class="str">"Spring-"</span>);
+  <span class="kw">default</span>:     System.out.print(<span class="str">"Unknown-"</span>);
+  <span class="kw">case</span> <span class="num">7</span>, <span class="num">8</span>, <span class="num">9</span>: System.out.print(<span class="str">"Summer-"</span>);
+  <span class="kw">case</span> <span class="num">10</span>,<span class="num">11</span>,<span class="num">12</span>: System.out.print(<span class="str">"Fall-"</span>);
+}
+<span class="cm">// Winter-Spring-Unknown-Summer-Fall-</span></code></pre>
+      <p>Order matters! Add <code>break</code> after each branch to stop fall-through. A <code>switch</code> with no <code>case</code> clauses (<code>switch (month) {}</code>) is valid.</p>
+    </div>
+    <div class="card remember"><span class="label">★ REMEMBER — arrow-style switch <em>statement</em></span>
+      <p>An arrow <code>switch</code> whose bodies return <code>void</code> (e.g. all <code>System.out.print(...)</code>) is still a <strong>switch statement</strong>, not an expression — it doesn't return a value. Arrow clauses don't fall through.</p>
+    </div>
+  </section>
+
+  <!-- SECTION 03 -->
+  <section id="s3">
+    <div class="secnum">SECTION 03</div>
+    <h2>switch Expressions</h2>
+    <p>A <code>switch</code> <strong>expression</strong> returns a value, so it usually sits on the right of <code>=</code> or after <code>return</code>, and needs a trailing semicolon. Each arrow <code>case</code> expression also needs its own semicolon; a <code>case</code> block (braces) does not.</p>
+<pre><code><span class="kw">var</span> result = <span class="kw">switch</span> (bear) {
+  <span class="kw">case</span> <span class="num">30</span> -&gt; <span class="str">"Grizzly"</span>;   <span class="cm">// semicolon after each case expression</span>
+  <span class="kw">default</span> -&gt; <span class="str">"Panda"</span>;
+};                          <span class="cm">// semicolon after the whole expression</span></code></pre>
+
+    <h3>Consistent return type</h3>
+    <p>Every branch must return a value compatible with the target type.</p>
+<pre><code><span class="kw">int</span> size = <span class="kw">switch</span> (measurement) {
+  <span class="kw">case</span> <span class="num">5</span>  -&gt; Integer.valueOf(<span class="num">1</span>); <span class="cm">// OK (unboxed to int)</span>
+  <span class="kw">case</span> <span class="num">10</span> -&gt; (<span class="kw">short</span>)<span class="num">2</span>;         <span class="cm">// OK (short fits int)</span>
+  <span class="kw">default</span> -&gt; <span class="num">3</span>;
+  <span class="kw">case</span> <span class="num">20</span> -&gt; <span class="str">"4"</span>;             <span class="err">// DOES NOT COMPILE</span>
+  <span class="kw">case</span> <span class="num">40</span> -&gt; <span class="num">5L</span>;             <span class="err">// DOES NOT COMPILE</span>
+  <span class="kw">case</span> <span class="num">50</span> -&gt; <span class="kw">null</span>;           <span class="err">// DOES NOT COMPILE</span>
+};</code></pre>
+
+    <h3>Exhaustiveness</h3>
+    <div class="rules-box">
+      <h4>A switch expression must be exhaustive — three ways</h4>
+      <ol>
+        <li>Add a <code>default</code> clause (most common).</li>
+        <li>For an <code>enum</code>, add a <code>case</code> for every value.</li>
+        <li>Cover all possible types via pattern matching.</li>
+      </ol>
+    </div>
+    <p>An <code>enum</code> switch missing one value (e.g. <code>FALL</code>) does not compile until you add that case or a <code>default</code>. Writing a case for every <code>int</code> (or even every <code>byte</code>) is not accepted — you need <code>default</code>.</p>
+
+    <h3>The <code>yield</code> statement</h3>
+    <p>A <code>case</code> <em>block</em> returns its value with <code>yield</code> (a <code>return</code> would exit the whole method). <code>yield</code> is required in a block unless it throws.</p>
+<pre><code><span class="kw">var</span> name = <span class="kw">switch</span> (fish) {
+  <span class="kw">case</span> <span class="num">1</span> -&gt; <span class="str">"Goldfish"</span>;
+  <span class="kw">case</span> <span class="num">2</span> -&gt; { <span class="kw">yield</span> <span class="str">"Trout"</span>; }
+  <span class="kw">case</span> <span class="num">3</span> -&gt; {
+    <span class="kw">if</span> (length &gt; <span class="num">10</span>) <span class="kw">yield</span> <span class="str">"Blobfish"</span>;
+    <span class="kw">else</span> <span class="kw">yield</span> <span class="str">"Green"</span>;
+  }
+  <span class="kw">default</span> -&gt; <span class="str">"Swordfish"</span>;
+};</code></pre>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — semicolons with case blocks</span>
+      <p>A <code>case</code> expression needs a semicolon; a <code>case</code> block must <strong>not</strong> have one after the closing brace. <code>case 2 -&gt; { yield "Trout"; };</code> has an extra semicolon and does not compile.</p>
+    </div>
+
+    <h3>Pattern matching switch (Java 21)</h3>
+    <p>Use a type + pattern variable in each <code>case</code>. A <code>when</code> guard adds a condition (the keyword <code>when</code> is required). This lets <code>switch</code> handle ranges.</p>
+<pre><code><span class="kw">return</span> <span class="kw">switch</span> (height) {
+  <span class="kw">case</span> Integer i <span class="kw">when</span> i &gt; <span class="num">10</span> -&gt; <span class="str">"Joseph"</span>;
+  <span class="kw">case</span> Integer i              -&gt; <span class="str">"Daniel"</span>;
+  <span class="kw">case</span> Double num <span class="kw">when</span> num &lt;= <span class="num">15.5</span> -&gt; <span class="str">"Peter"</span>;
+  <span class="kw">case</span> Double num             -&gt; <span class="str">"Kelly"</span>;
+  <span class="kw">case</span> Number num             -&gt; <span class="str">"Ralph"</span>;
+};</code></pre>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — dominance &amp; ordering</span>
+      <p>With pattern matching, order matters for <em>both</em> statements and expressions. A broader case before a narrower one makes the narrower unreachable → compile error. <code>case Integer i</code> before <code>case Integer i when i &gt; 10</code> does not compile. A type unrelated to the switch variable (<code>Number</code> switch, <code>case String s</code>) does not compile.</p>
+    </div>
+    <div class="card key-rule"><span class="label">✓ KEY RULE — case null &amp; runtime null</span>
+      <p>Without <code>case null</code>, a <code>null</code> switch variable throws <code>NullPointerException</code> at runtime (even with a <code>default</code>). Java 21 allows <code>case null</code>. Using <code>case null</code> makes the switch a pattern-matching switch (so it must be exhaustive), and <code>case null</code> cannot come after <code>default</code>.</p>
+    </div>
+  </section>
+
+  <!-- SECTION 04 -->
+  <section id="s4">
+    <div class="secnum">SECTION 04</div>
+    <h2>Loops: while, do-while, for, for-each</h2>
+
+    <h3>while &amp; do-while</h3>
+    <p>A <code>while</code> checks its condition <em>before</em> each iteration, so the body may run zero times. A <code>do/while</code> runs the body <strong>at least once</strong>, then checks.</p>
+    <div class="vs-grid">
+      <div class="vs-col left"><h4>while (cond) { ... }</h4>
+        <ul><li>Condition first.</li><li>Zero or more iterations.</li><li><code>while (full &lt; 5)</code> with <code>full=5</code> prints nothing.</li></ul>
+      </div>
+      <div class="vs-col right"><h4>do { ... } while (cond);</h4>
+        <ul><li>Body first, condition after.</li><li>One or more iterations.</li><li><code>do { lizard++; } while (false);</code> → <code>lizard</code> is 1.</li></ul>
+      </div>
+    </div>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — infinite loops</span>
+      <p>If no variable in the condition changes, the loop never ends: <code>while (pen &lt; 10) pigs++;</code> with <code>pen</code> fixed loops forever. Make sure the loop variable moves toward termination.</p>
+    </div>
+
+    <h3>The basic for loop</h3>
+    <p>Three semicolon-separated sections: init; condition; update. Init and update may have multiple comma-separated statements; declared variables must share one type.</p>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — for-loop quirks</span>
+<pre><code><span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">10</span>; i++) ...;
+System.out.println(i);  <span class="err">// DOES NOT COMPILE (i scoped to the loop)</span>
+
+<span class="kw">for</span> ( ; ; ) ...           <span class="cm">// valid infinite loop (all sections optional)</span>
+
+<span class="kw">int</span> x = <span class="num">0</span>;
+<span class="kw">for</span> (<span class="kw">int</span> x = <span class="num">4</span>; x &lt; <span class="num">5</span>; x++) ...  <span class="err">// DOES NOT COMPILE (x redeclared)</span>
+
+<span class="kw">for</span> (<span class="kw">long</span> y = <span class="num">0</span>, <span class="kw">int</span> z = <span class="num">4</span>; ...) ... <span class="err">// DOES NOT COMPILE (mixed types)</span></code></pre>
+    </div>
+    <div class="card remember"><span class="label">★ REMEMBER — reading reverse loops</span>
+      <p>Decrementing loops are heavily tested. <code>for (var c = 4; c &gt;= 0; c--)</code> prints <code>4 3 2 1 0</code>. Watch the start value and whether the condition uses <code>&gt;</code> or <code>&gt;=</code>.</p>
+    </div>
+
+    <h3>The for-each loop</h3>
+    <p>The right side must be a built-in array or something that implements <code>java.lang.Iterable</code> (e.g. <code>List</code>, <code>Set</code> — but <strong>not</strong> <code>Map</code>, and not a <code>String</code>). The left side declares a variable whose type matches each element.</p>
+<pre><code><span class="kw">for</span> (<span class="kw">var</span> name : names) System.out.println(name);
+
+String birds = <span class="str">"Jay"</span>;
+<span class="kw">for</span> (String bird : birds) ...   <span class="err">// DOES NOT COMPILE (String isn't iterable here)</span>
+String[] sloths = <span class="kw">new</span> String[<span class="num">3</span>];
+<span class="kw">for</span> (<span class="kw">int</span> sloth : sloths) ...    <span class="err">// DOES NOT COMPILE (int vs String)</span></code></pre>
+  </section>
+
+  <!-- SECTION 05 -->
+  <section id="s5">
+    <div class="secnum">SECTION 05</div>
+    <h2>Branching: break, continue, return, labels</h2>
+    <p>A <strong>label</strong> is an identifier followed by a colon placed before a loop, letting <code>break</code>/<code>continue</code> target an outer loop. By convention labels are <code>SNAKE_CASE</code>.</p>
+    <div class="vs-grid">
+      <div class="vs-col left"><h4>break</h4>
+        <ul><li>Exits the loop entirely.</li><li><code>break LABEL;</code> exits the labelled outer loop.</li></ul>
+      </div>
+      <div class="vs-col right"><h4>continue</h4>
+        <ul><li>Ends the current iteration, re-checks the condition.</li><li><code>continue LABEL;</code> continues the labelled loop.</li></ul>
+      </div>
+    </div>
+    <p>Unlabelled <code>break</code>/<code>continue</code> apply to the nearest inner loop. <code>return</code> exits the whole method and can replace labels for cleaner nested-loop searches.</p>
+    <div class="card exam-trap"><span class="label">⚠ EXAM TRAP — unreachable code</span>
+<pre><code><span class="kw">if</span> (checkDate &gt; <span class="num">100</span>) {
+  <span class="kw">break</span>;
+  checkDate++;  <span class="err">// DOES NOT COMPILE (unreachable)</span>
+}</code></pre>
+      <p>Any statement immediately after <code>break</code>, <code>continue</code>, or <code>return</code> in the same block is unreachable and fails to compile — even if the branch looks logically impossible.</p>
+    </div>
+    <div class="card remember"><span class="label">★ REMEMBER — labelled break changes the result</span>
+      <p>In a nested search, <code>break LABEL;</code> exits all loops at the first match; a plain <code>break;</code> only exits the inner loop (finding the last inner match); no <code>break</code> finds the very last match overall. The output differs in each case.</p>
+    </div>
+  </section>
+
+  <!-- RECAP -->
+  <section id="recap" class="card recap">
+    <div class="secnum">★ SHORT RECAP</div>
+    <h2 style="border-color:#f0e3c8;">Short Recap</h2>
+    <h3>Decisions &amp; pattern matching</h3>
+    <ul>
+      <li><code>if</code> needs a boolean (not 0/1); without braces it governs one statement — trace braces, not indentation.</li>
+      <li>Pattern matching merges check + cast; <code>null</code> is always <code>false</code>. Flow scoping keeps the variable in scope only where its type is proven (<code>&amp;&amp;</code> ok, <code>||</code> not; early <code>return</code> can extend scope).</li>
+    </ul>
+    <h3>switch</h3>
+    <ul>
+      <li>Allowed types: <code>int/Integer</code>, <code>byte/Byte</code>, <code>short/Short</code>, <code>char/Character</code>, <code>String</code>, <code>enum</code>, object (pattern), <code>var</code>; never <code>boolean/long/float/double</code>. Cases must be compile-time constants matching the switch type.</li>
+      <li>Colon-style falls through (use <code>break</code>); arrow-style doesn't. Expressions must be exhaustive and return a consistent type; <code>yield</code> returns from a block; <code>case null</code> implies pattern matching and can't follow <code>default</code>.</li>
+    </ul>
+    <h3>Loops &amp; branching</h3>
+    <ul>
+      <li><code>while</code> = zero-or-more; <code>do/while</code> = one-or-more. <code>for</code> sections are optional but the two semicolons aren't; loop variables are scoped to the loop. <code>for-each</code> needs an array or <code>Iterable</code> (not <code>Map</code>/<code>String</code>).</li>
+      <li>Labels let <code>break</code>/<code>continue</code> target outer loops; <code>return</code> exits the method; code right after <code>break</code>/<code>continue</code>/<code>return</code> is unreachable.</li>
+    </ul>
+  </section>
+
+  <!-- CHEAT SHEET -->
+  <section id="cheat">
+    <div class="secnum">⚑ CHEAT SHEET</div>
+    <h2>Exam Traps Cheat Sheet</h2>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>Scenario</th><th>What it tests</th><th>Verdict</th></tr>
+      <tr><td><code>if (hourOfDay)</code> with <code>int</code></td><td>if needs boolean</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>n instanceof Integer d || d...</code></td><td>flow scoping with OR</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>if (!(n instanceof Integer d)) return; ...d...</code></td><td>flow scoping with return</td><td class="yes">compiles</td></tr>
+      <tr><td><code>null instanceof X</code></td><td>instanceof on null</td><td class="yes">false</td></tr>
+      <tr><td><code>switch</code> on <code>long</code>/<code>boolean</code>/<code>double</code></td><td>unsupported switch types</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>case getCookies():</code></td><td>case must be compile-time constant</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td>colon switch, no <code>break</code></td><td>fall-through</td><td class="yes">runs all following branches</td></tr>
+      <tr><td>mixing <code>:</code> and <code>-&gt;</code> in one switch</td><td>one separator style only</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td>switch expression missing a value</td><td>exhaustiveness</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>case 2 -&gt; { yield "x"; };</code></td><td>extra semicolon after block</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>case Integer i</code> before <code>case Integer i when …</code></td><td>dominance / ordering</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>null</code> switch var, no <code>case null</code></td><td>runtime null</td><td class="no">NullPointerException</td></tr>
+      <tr><td><code>case null</code> after <code>default</code></td><td>case null placement</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>do { x++; } while (false);</code></td><td>do-while runs once</td><td class="yes">x = 1</td></tr>
+      <tr><td>for-loop var read after loop</td><td>loop variable scope</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td><code>for (long y=0, int z=4; …)</code></td><td>init must share one type</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td>for-each over a <code>String</code> or <code>Map</code></td><td>needs array/Iterable</td><td class="no">DOES NOT COMPILE</td></tr>
+      <tr><td>statement after <code>break</code>/<code>continue</code>/<code>return</code></td><td>unreachable code</td><td class="no">DOES NOT COMPILE</td></tr>
+    </table>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>
