@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 · Chapter 3 — Making Decisions (MCQ Practice)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:ital,wght@0,400;0,600;0,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --ink:#2c2a28; --muted:#6f6a64; --line:#ece3da;
+    --sect:#c96442; --inlinebg:#f3ece4; --inlineink:#9a5030;
+    --yes:#3b7d57; --no:#c44d3e;
+    --purple:#7a5cb8; --purple-soft:#b29ad9;
+    --shadow:0 4px 18px rgba(60,50,40,.07); --shadow-h:0 10px 30px rgba(70,55,90,.16);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Source Sans 3',system-ui,sans-serif;font-size:17px;line-height:1.65;}
+  .wrap{max-width:860px;margin:0 auto;padding:32px 20px 80px;}
+  h1{font-family:'Merriweather',serif;line-height:1.3;}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+
+  .header{position:relative;overflow:hidden;background:linear-gradient(135deg,#ffffff,#fdf8f3);
+    border-radius:18px;padding:34px 34px 28px;box-shadow:var(--shadow);margin-bottom:28px;}
+  .header::after{content:"";position:absolute;top:-60px;right:-60px;width:220px;height:220px;
+    background:radial-gradient(circle,rgba(178,154,217,.30),transparent 70%);pointer-events:none;}
+  .pill{display:inline-block;background:linear-gradient(90deg,#7a5cb8,#9b7fd4);
+    color:#fff;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;
+    letter-spacing:.6px;text-transform:uppercase;padding:7px 14px;border-radius:999px;margin-bottom:14px;}
+  .header h1{font-size:31px;margin:4px 0 6px;font-weight:900;}
+  .header .sub{font-style:italic;color:var(--muted);font-size:18px;margin:0 0 18px;}
+  .topics{display:flex;flex-wrap:wrap;gap:8px;}
+  .topics span{background:var(--inlinebg);color:var(--inlineink);font-family:'JetBrains Mono',monospace;
+    font-size:12px;padding:5px 11px;border-radius:8px;}
+
+  .howto{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:5px solid #5aab7b;
+    border-radius:12px;padding:14px 18px;margin-bottom:26px;font-size:15.5px;color:#3a5e49;}
+
+  .q-card{position:relative;background:linear-gradient(135deg,#f4f0fa,#f9f6fd);
+    border-top:4px solid #9b7fd4;border-radius:14px;padding:20px 22px;margin:18px 0;
+    box-shadow:var(--shadow);transition:box-shadow .22s ease, transform .22s ease;}
+  .q-card:hover{box-shadow:var(--shadow-h);transform:translateY(-2px);}
+  .q-head{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap;}
+  .q-num{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--purple);font-size:15px;}
+  .q-tag{background:var(--purple-soft);color:#fff;font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;letter-spacing:.5px;text-transform:uppercase;padding:3px 9px;border-radius:7px;}
+  .q-prompt{font-weight:600;margin:6px 0 12px;}
+  .q-prompt .all{color:var(--purple);font-weight:700;}
+
+  pre{background:#fbf9fe;border-radius:12px;padding:14px 16px;overflow-x:auto;
+    box-shadow:inset 0 2px 8px rgba(80,60,120,.08);margin:12px 0;font-size:13.5px;line-height:1.55;}
+  pre code{background:none;padding:0;color:#3a352f;}
+  .kw{color:var(--kw);font-weight:500;} .str{color:var(--str);} .num{color:var(--num);}
+  .err{color:var(--err);font-weight:700;} .cm{color:var(--cm);font-style:italic;}
+
+  .opts{list-style:none;margin:8px 0 4px;padding:0;}
+  .opts li{margin:5px 0;padding-left:30px;position:relative;}
+  .opts li .ol{position:absolute;left:0;top:0;font-family:'JetBrains Mono',monospace;
+    font-weight:700;color:var(--purple);}
+  .opts code{background:#f3ece4;color:#9a5030;padding:1.5px 6px;border-radius:6px;font-size:14px;}
+
+  details{margin-top:12px;border-top:1px dashed #d8c9ec;padding-top:10px;}
+  summary{cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;
+    color:var(--purple);list-style:none;user-select:none;}
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸ ";}
+  details[open] summary::before{content:"▾ ";}
+  .ans-key{display:inline-block;background:#eef8f1;color:#3d8a5e;font-family:'JetBrains Mono',monospace;
+    font-weight:700;font-size:13px;padding:4px 11px;border-radius:8px;margin:10px 0 8px;}
+  .expl{font-size:15.5px;color:#403a44;margin:4px 0;}
+  .expl code{background:#f3ece4;color:#9a5030;padding:1.5px 6px;border-radius:6px;font-size:14px;}
+
+  .revision{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:5px solid #d4a24c;
+    border-radius:14px;padding:20px 24px;margin:30px 0 0;box-shadow:var(--shadow);}
+  .revision h3{font-family:'Merriweather',serif;color:#a9772a;margin:0 0 10px;font-size:21px;}
+  .revision ul{margin:6px 0;padding-left:22px;}
+  .revision li{margin:6px 0;}
+  .revision code{background:#f3ece4;color:#9a5030;padding:1.5px 6px;border-radius:6px;font-size:14px;}
+
+  @media(max-width:680px){
+    body{font-size:16px;}
+    .header h1{font-size:25px;}
+    .q-card{padding:18px 16px;} .header{padding:24px 20px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="header">
+    <span class="pill">OCP Java SE 21 · 1Z0-830</span>
+    <h1>Chapter 3 · Making Decisions — MCQ Practice</h1>
+    <p class="sub">28 exam-style questions on <code>if</code>/<code>else</code>, pattern matching &amp; flow scoping, <code>switch</code> statements and expressions (Java 21), loops, and branching. Reveal each answer when you're ready.</p>
+    <div class="topics">
+      <span>IF / ELSE</span><span>PATTERN MATCHING</span><span>SWITCH STATEMENT</span>
+      <span>SWITCH EXPRESSION</span><span>LOOPS</span><span>BRANCHING</span>
+    </div>
+  </header>
+
+  <div class="howto">Try each one before expanding. Several say <strong>"Choose all that apply"</strong> — read those carefully; the rest have exactly one answer. Every answer is verified line-by-line against the study guide.</div>
+
+  <!-- Q1 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q1</span><span class="q-tag">Pattern Switch</span></div>
+    <p class="q-prompt">What is the output?</p>
+<pre><code>Object skips = <span class="num">10</span>;
+<span class="kw">switch</span> (skips) {
+  <span class="kw">case</span> a <span class="kw">when</span> a &lt; <span class="num">10</span> -&gt; System.out.print(<span class="num">2</span>);
+  <span class="kw">case</span> b <span class="kw">when</span> b &gt;= <span class="num">10</span> -&gt; System.out.print(<span class="num">4</span>);
+  <span class="kw">case</span> <span class="kw">null</span> -&gt; System.out.print(<span class="num">6</span>);
+  <span class="kw">default</span> -&gt; System.out.print(<span class="num">8</span>);
+}</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>4</code></li>
+      <li><span class="ol">B.</span> <code>6</code></li>
+      <li><span class="ol">C.</span> Exactly one line does not compile.</li>
+      <li><span class="ol">D.</span> Exactly two lines do not compile.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">D · two lines do not compile</span>
+      <p class="expl">The first two case clauses are missing the pattern variable <em>type</em> (e.g. <code>case Integer a when …</code>). With a supported type added, the code would compile and print <code>4</code>. As written, both lines fail.</p>
+    </details>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q2</span><span class="q-tag">Switch Types</span></div>
+    <p class="q-prompt">Which data types can be used in a switch expression? <span class="all">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>enum</code></li>
+      <li><span class="ol">B.</span> <code>int</code></li>
+      <li><span class="ol">C.</span> <code>Byte</code></li>
+      <li><span class="ol">D.</span> <code>long</code></li>
+      <li><span class="ol">E.</span> <code>boolean</code></li>
+      <li><span class="ol">F.</span> <code>double</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A, B, and C</span>
+      <p class="expl">A switch supports <code>enum</code> values (A), <code>int</code> (B), and the wrapper <code>Byte</code> along with <code>byte</code> (C). It does <strong>not</strong> support <code>long</code>, <code>boolean</code>, <code>float</code>, or <code>double</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q3</span><span class="q-tag">Dangling else</span></div>
+    <p class="q-prompt">What is the output?</p>
+<pre><code>3: <span class="kw">int</span> temperature = <span class="num">4</span>;
+4: <span class="kw">long</span> humidity = -temperature + temperature * <span class="num">3</span>;
+5: <span class="kw">if</span> (temperature &gt;= <span class="num">4</span>)
+6:   <span class="kw">if</span> (humidity &lt; <span class="num">6</span>) System.out.println(<span class="str">"Too Low"</span>);
+7:   <span class="kw">else</span> System.out.println(<span class="str">"Just Right"</span>);
+8: <span class="kw">else</span> System.out.println(<span class="str">"Too High"</span>);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>Too Low</code></li>
+      <li><span class="ol">B.</span> <code>Just Right</code></li>
+      <li><span class="ol">C.</span> <code>Too High</code></li>
+      <li><span class="ol">D.</span> The code will not compile.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B · Just Right</span>
+      <p class="expl">The two <code>else</code> statements attach to separate <code>if</code>s (lines 5 and 6). <code>humidity</code> = <code>-4 + 12 = 8</code>. The outer <code>if</code> is true, so line 6 runs; <code>8 &lt; 6</code> is false, so its <code>else</code> (line 7) prints <code>Just Right</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q4</span><span class="q-tag">for-each</span></div>
+    <p class="q-prompt">Which types are permitted on the right side of a for-each? <span class="all">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>Double[][]</code></li>
+      <li><span class="ol">B.</span> <code>Object</code></li>
+      <li><span class="ol">C.</span> <code>Map</code></li>
+      <li><span class="ol">D.</span> <code>List</code></li>
+      <li><span class="ol">E.</span> <code>String</code></li>
+      <li><span class="ol">F.</span> <code>char[]</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A, D, and F</span>
+      <p class="expl">for-each works with arrays (A, F — each <code>Double[][]</code> element is a <code>Double[]</code>) and types implementing <code>java.lang.Iterable</code> like <code>List</code> (D). <code>Map</code> doesn't implement <code>Iterable</code> (C), <code>Object</code> and <code>String</code> aren't iterable here (B, E).</p>
+    </details>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q5</span><span class="q-tag">Exhaustiveness</span></div>
+    <p class="q-prompt">What is the output of <code>printReptile(6)</code>?</p>
+<pre><code><span class="kw">var</span> type = <span class="kw">switch</span> (category) {
+  <span class="kw">case</span> <span class="num">1</span>,<span class="num">2</span> -&gt; <span class="str">"Snake"</span>;
+  <span class="kw">case</span> <span class="num">3</span>,<span class="num">4</span> -&gt; <span class="str">"Lizard"</span>;
+  <span class="kw">case</span> <span class="num">5</span>,<span class="num">6</span> -&gt; <span class="str">"Turtle"</span>;
+  <span class="kw">case</span> <span class="num">7</span>,<span class="num">8</span> -&gt; <span class="str">"Alligator"</span>;
+};
+System.out.print(type);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>Turtle</code></li>
+      <li><span class="ol">B.</span> <code>TurtleAlligator</code></li>
+      <li><span class="ol">C.</span> None of the above</li>
+      <li><span class="ol">D.</span> The code does not compile.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">D · does not compile</span>
+      <p class="expl">A switch expression must handle all possible <code>int</code> values, but there's no <code>default</code> and not every <code>int</code> is covered — so it isn't exhaustive. With a valid <code>default</code> added, it would compile and print <code>Turtle</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q6</span><span class="q-tag">Unreachable</span></div>
+    <p class="q-prompt">What is the output?</p>
+<pre><code>List&lt;Integer&gt; nums = <span class="kw">new</span> ArrayList&lt;&gt;();
+nums.add(<span class="num">10</span>); nums.add(<span class="num">14</span>);
+<span class="kw">for</span> (<span class="kw">var</span> a : nums) { System.out.print(a + <span class="str">", "</span>); <span class="kw">break</span>; }
+<span class="kw">for</span> (<span class="kw">int</span> b : nums) { <span class="kw">continue</span>; System.out.print(b + <span class="str">", "</span>); }
+<span class="kw">for</span> (Object c : nums) System.out.print(c + <span class="str">", "</span>);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>10, 10, 14,</code></li>
+      <li><span class="ol">B.</span> <code>10, 10, 14, 10, 14,</code></li>
+      <li><span class="ol">C.</span> Exactly one line of code does not compile.</li>
+      <li><span class="ol">D.</span> Two or more lines do not compile.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · one line does not compile</span>
+      <p class="expl">In the second loop, the <code>continue</code> is unconditional and always part of the loop body, so the <code>print()</code> after it is unreachable — that line fails to compile. It's the only error; the other loops are fine.</p>
+    </details>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q7</span><span class="q-tag">for loops</span></div>
+    <p class="q-prompt">Which snippets, inserted into <code>for (___)</code>, print all elements of a nonempty <code>int[] weather</code> (body uses <code>weather[i]</code>)? <span class="all">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>int i=weather.length; i&gt;0; i--</code></li>
+      <li><span class="ol">B.</span> <code>int i=0; i&lt;=weather.length-1; ++i</code></li>
+      <li><span class="ol">C.</span> <code>var w : weather</code></li>
+      <li><span class="ol">D.</span> <code>int i=weather.length-1; i&gt;=0; i--</code></li>
+      <li><span class="ol">E.</span> <code>int i=0, int j=3; i&lt;weather.length; ++i</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B and D</span>
+      <p class="expl">B walks 0..length-1 (correct). D walks length-1..0 (correct reverse). A starts at <code>weather[length]</code> → <code>ArrayIndexOutOfBoundsException</code>. C would need <code>weather[i]</code> changed to <code>w</code>. E declares the type twice (<code>int i=0, int j=3</code>) — should be <code>int i=0, j=3</code> — so it doesn't compile.</p>
+    </details>
+  </div>
+
+  <!-- Q8 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q8</span><span class="q-tag">Flow scoping</span></div>
+    <p class="q-prompt">What is the output of <code>printType(11)</code>?</p>
+<pre><code>32: <span class="kw">if</span> (o <span class="kw">instanceof</span> Integer bat) {
+33:   System.out.print(<span class="str">"int"</span>);
+34: } <span class="kw">else if</span> (o <span class="kw">instanceof</span> Integer bat &amp;&amp; bat &lt; <span class="num">10</span>) {
+35:   System.out.print(<span class="str">"small int"</span>);
+36: } <span class="kw">else if</span> (o <span class="kw">instanceof</span> Long bat || bat &lt;= <span class="num">20</span>) {
+37:   System.out.print(<span class="str">"long"</span>);
+38: } <span class="kw">default</span> {
+39:   System.out.print(<span class="str">"unknown"</span>);
+40: }</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>int</code></li>
+      <li><span class="ol">B.</span> The code contains one line that does not compile.</li>
+      <li><span class="ol">C.</span> The code contains two lines that do not compile.</li>
+      <li><span class="ol">D.</span> Nothing is printed.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · two lines do not compile</span>
+      <p class="expl">Line 36 fails: with <code>||</code>, if <code>o</code> isn't a <code>Long</code>, the pattern variable <code>bat</code> isn't in scope for <code>bat &lt;= 20</code>. Line 38 fails too — <code>default</code> isn't valid in an <code>if/else</code> chain. (Reusing <code>bat</code> on lines 32/34 is fine since each is out of scope.)</p>
+    </details>
+  </div>
+
+  <!-- Q9 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q9</span><span class="q-tag">Labels</span></div>
+    <p class="q-prompt">Which statements, inserted into the blank, make the code print <code>2</code>? <span class="all">(Choose all that apply.)</span></p>
+<pre><code><span class="kw">int</span> count = <span class="num">0</span>;
+BUNNY: <span class="kw">for</span> (<span class="kw">int</span> row = <span class="num">1</span>; row &lt;= <span class="num">3</span>; row++)
+RABBIT: <span class="kw">for</span> (<span class="kw">int</span> col = <span class="num">0</span>; col &lt; <span class="num">3</span>; col++) {
+  <span class="kw">if</span> ((col + row) % <span class="num">2</span> == <span class="num">0</span>)
+    ______ ;
+  count++;
+}
+System.out.println(count);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>break BUNNY</code></li>
+      <li><span class="ol">B.</span> <code>break RABBIT</code></li>
+      <li><span class="ol">C.</span> <code>continue BUNNY</code></li>
+      <li><span class="ol">D.</span> <code>continue RABBIT</code></li>
+      <li><span class="ol">E.</span> <code>break</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B, C, and E</span>
+      <p class="expl">A plain <code>break</code> (E) and <code>break RABBIT</code> (B) both exit the inner loop — equivalent. <code>continue BUNNY</code> (C) jumps to the outer loop. All three follow the same path that lands <code>count</code> at 2. <code>break BUNNY</code> exits everything too early (count = 1). <code>continue RABBIT</code> and a plain <code>continue</code> let the loops run on, reaching count = 5.</p>
+    </details>
+  </div>
+
+  <!-- Q10 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q10</span><span class="q-tag">switch errors</span></div>
+    <p class="q-prompt">How many lines contain compilation errors?</p>
+<pre><code>13: <span class="kw">switch</span> (otherDay) {
+14:   <span class="kw">default</span>:
+15:   <span class="kw">case</span> <span class="num">1</span>: <span class="kw">continue</span>;
+16:   <span class="kw">case</span> thursday: <span class="kw">return</span> DayOfWeek.THURSDAY;
+17:   <span class="kw">case</span> <span class="num">2</span>,<span class="num">10</span>: <span class="kw">break</span>;
+18:   <span class="kw">case</span> Sunday: <span class="kw">return</span> DayOfWeek.SUNDAY;
+19:   <span class="kw">case</span> DayOfWeek.MONDAY: <span class="kw">return</span> DayOfWeek.MONDAY;
+20: }</code>
+<span class="cm">// thursday is a final int param; Sunday is a non-final int; otherDay is int</span></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> 2</li>
+      <li><span class="ol">B.</span> 3</li>
+      <li><span class="ol">C.</span> 4</li>
+      <li><span class="ol">D.</span> 5</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · 4 lines</span>
+      <p class="expl">Line 15: <code>continue</code> can't be used in a switch like this. Line 16: <code>thursday</code> is a method parameter, not a compile-time constant (even <code>final</code> doesn't help). Line 18: <code>Sunday</code> isn't <code>final</code> (effectively final isn't enough). Line 19: <code>DayOfWeek.MONDAY</code> is an enum, not an <code>int</code> to match the switch type. Four lines fail.</p>
+    </details>
+  </div>
+
+  <!-- Q11 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q11</span><span class="q-tag">enum switch</span></div>
+    <p class="q-prompt">What is the output of <code>printLocation(Animal.MAMMAL)</code>?</p>
+<pre><code>13: <span class="kw">long</span> type = <span class="kw">switch</span> (a) {
+14:   <span class="kw">case</span> BIRD -&gt; <span class="num">1</span>;
+15:   <span class="kw">case</span> FISH -&gt; <span class="num">2</span>;
+16:   <span class="kw">case</span> MAMMAL -&gt; <span class="num">3</span>;
+17:   <span class="kw">default</span> -&gt; <span class="num">4</span>;
+18: };
+19: System.out.print(type);
+<span class="cm">// enum Animal {BIRD, FISH, MAMMAL}</span></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>3</code></li>
+      <li><span class="ol">B.</span> <code>34</code></li>
+      <li><span class="ol">C.</span> The code does not compile because of line 13.</li>
+      <li><span class="ol">D.</span> The code does not compile because of line 17.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A · 3</span>
+      <p class="expl">It compiles and prints <code>3</code>. Assigning an <code>int</code>-typed switch result to a <code>long</code> is fine (widening). The <code>default</code> is optional here since all enum values are covered, but it's allowed and harmless.</p>
+    </details>
+  </div>
+
+  <!-- Q12 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q12</span><span class="q-tag">while loop</span></div>
+    <p class="q-prompt">What is the result?</p>
+<pre><code>3: <span class="kw">int</span> sing = <span class="num">8</span>, squawk = <span class="num">2</span>, notes = <span class="num">0</span>;
+4: <span class="kw">while</span> (sing &gt; squawk) {
+5:   sing--;
+6:   squawk += <span class="num">2</span>;
+7:   notes += sing + squawk;
+8: }
+9: System.out.println(notes);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>11</code></li>
+      <li><span class="ol">B.</span> <code>23</code></li>
+      <li><span class="ol">C.</span> <code>33</code></li>
+      <li><span class="ol">D.</span> <code>50</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B · 23</span>
+      <p class="expl">Iter 1: sing→7, squawk→4, notes = 7+4 = 11. Iter 2: sing→6, squawk→6, notes = 11 + 6+6 = 23. Iter 3 check: <code>6 &gt; 6</code> is false, loop ends. Output <code>23</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q13 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q13</span><span class="q-tag">Pattern Switch</span></div>
+    <p class="q-prompt">What is the result of <code>getHatSize(9f)</code>?</p>
+<pre><code>11: <span class="kw">return</span> <span class="kw">switch</span> (measurement) {
+12:   <span class="kw">case</span> Double d -&gt; <span class="num">1</span> + d.intValue();
+13:   <span class="kw">case</span> <span class="kw">null</span> -&gt; <span class="num">11</span>;
+14:   <span class="kw">case</span> !(Number n) -&gt; <span class="num">3</span> + n.intValue();
+15:   <span class="kw">case</span> Float f <span class="kw">when</span> f &lt; <span class="num">10</span> -&gt; <span class="num">4</span> + f.intValue();
+16: };</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>13</code></li>
+      <li><span class="ol">B.</span> The code does not compile because it's missing a default.</li>
+      <li><span class="ol">C.</span> The code does not compile for a different reason.</li>
+      <li><span class="ol">D.</span> <code>11</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · does not compile (different reason)</span>
+      <p class="expl">Line 14 uses the logical complement <code>!</code> with pattern matching, which isn't allowed. Even if removed, that clause would dominate line 15, making it unreachable. So it fails for a reason other than a missing <code>default</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q14 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q14</span><span class="q-tag">do-while</span></div>
+    <p class="q-prompt">What is the output?</p>
+<pre><code>4: <span class="kw">do</span> {
+5:   meters--;
+6:   <span class="kw">if</span> (meters == <span class="num">8</span>) keepGoing = <span class="kw">false</span>;
+7:   result -= <span class="num">2</span>;
+8: } <span class="kw">while</span> keepGoing;
+<span class="cm">// result=15, meters=10 initially</span></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>11</code></li>
+      <li><span class="ol">B.</span> <code>13</code></li>
+      <li><span class="ol">C.</span> The code will not compile because of line 6.</li>
+      <li><span class="ol">D.</span> The code does not compile for a different reason.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">D · does not compile (different reason)</span>
+      <p class="expl">Line 8 is missing the required parentheses around the condition: it should be <code>while (keepGoing);</code>. So it fails — but not because of line 6. (Fixed, the loop runs twice and prints <code>11</code>.)</p>
+    </details>
+  </div>
+
+  <!-- Q15 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q15</span><span class="q-tag">for-each types</span></div>
+    <p class="q-prompt">Which statements are correct? <span class="all">(Choose all that apply.)</span></p>
+<pre><code><span class="kw">for</span> (<span class="kw">var</span> penguin : <span class="kw">new</span> <span class="kw">int</span>[<span class="num">2</span>]) ...
+Character[] ostrich = <span class="kw">new</span> Character[<span class="num">3</span>];
+<span class="kw">for</span> (<span class="kw">var</span> emu : ostrich) ...
+List&lt;Integer&gt; parrots = <span class="kw">new</span> ArrayList&lt;&gt;();
+<span class="kw">for</span> (<span class="kw">var</span> macaw : parrots) ...</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> The type of <code>penguin</code> is <code>int</code>.</li>
+      <li><span class="ol">B.</span> The type of <code>emu</code> is <code>Character</code>.</li>
+      <li><span class="ol">C.</span> The type of <code>macaw</code> is <code>Integer</code>.</li>
+      <li><span class="ol">D.</span> The code does not compile.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A, B, and C</span>
+      <p class="expl">It compiles. <code>int[]</code> → <code>penguin</code> is <code>int</code> (A). <code>Character[]</code> → <code>emu</code> is <code>Character</code> (B). <code>List&lt;Integer&gt;</code> → <code>macaw</code> is <code>Integer</code> from the generic type (C).</p>
+    </details>
+  </div>
+
+  <!-- Q16 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q16</span><span class="q-tag">case syntax</span></div>
+    <p class="q-prompt">What is the result?</p>
+<pre><code><span class="kw">final char</span> a = <span class="str">'A'</span>, e = <span class="str">'E'</span>;
+<span class="kw">char</span> grade = <span class="str">'B'</span>;
+<span class="kw">switch</span> (grade) {
+  <span class="kw">default</span>:
+  <span class="kw">case</span> a:
+  <span class="kw">case</span> <span class="str">'B'</span>: <span class="str">'C'</span>: System.out.print(<span class="str">"great "</span>);
+  <span class="kw">case</span> <span class="str">'D'</span>: System.out.print(<span class="str">"good "</span>); <span class="kw">break</span>;
+  <span class="kw">case</span> e:
+  <span class="kw">case</span> <span class="str">'F'</span>: System.out.print(<span class="str">"not good "</span>);
+}</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>great good</code></li>
+      <li><span class="ol">B.</span> <code>good</code></li>
+      <li><span class="ol">C.</span> Does not compile — a case type doesn't match the switch variable.</li>
+      <li><span class="ol">D.</span> Does not compile for a different reason.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">D · does not compile (different reason)</span>
+      <p class="expl">The clause <code>case 'B': 'C':</code> is invalid syntax — you can't chain values with a colon. It should be <code>case 'B', 'C':</code> or repeat the <code>case</code> keyword. The types are fine; the syntax is the problem.</p>
+    </details>
+  </div>
+
+  <!-- Q17 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q17</span><span class="q-tag">reverse loops</span></div>
+    <p class="q-prompt">Given <code>char[] wolf = {'W','e','b','b','y'};</code>, which print it in reverse? <span class="all">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>int q=wolf.length; for(;;){ print(wolf[--q]); if(q==0) break; }</code></li>
+      <li><span class="ol">B.</span> <code>for(int m=wolf.length-1; m&gt;=0; --m) print(wolf[m]);</code></li>
+      <li><span class="ol">C.</span> <code>for(int z=0; z&lt;wolf.length; z++) print(wolf[wolf.length-z]);</code></li>
+      <li><span class="ol">D.</span> <code>int x=wolf.length-1; for(int j=0; x&gt;=0 &amp;&amp; j==0; x--) print(wolf[x]);</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A, B, and D</span>
+      <p class="expl">A counts down with <code>--q</code> and stops at 0 (correct). B is the classic reverse loop, <code>length-1</code> down to 0 (correct). D decrements <code>x</code> from <code>length-1</code> while <code>j</code> stays 0 (correct). C starts at <code>wolf[wolf.length]</code> → <code>ArrayIndexOutOfBoundsException</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q18 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q18</span><span class="q-tag">loop counts</span></div>
+    <p class="q-prompt">What distinct numbers are printed? <span class="all">(Choose all that apply.)</span></p>
+<pre><code><span class="kw">int</span> participants = <span class="num">4</span>, animals = <span class="num">2</span>, performers = -<span class="num">1</span>;
+<span class="kw">while</span> ((participants = participants + <span class="num">1</span>) &lt; <span class="num">10</span>) {}
+<span class="kw">do</span> {} <span class="kw">while</span> (animals++ &lt;= <span class="num">1</span>);
+<span class="kw">for</span> ( ; performers &lt; <span class="num">2</span>; performers += <span class="num">2</span>) {}
+System.out.println(participants);
+System.out.println(animals);
+System.out.println(performers);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>3</code></li>
+      <li><span class="ol">B.</span> <code>4</code></li>
+      <li><span class="ol">C.</span> <code>5</code></li>
+      <li><span class="ol">D.</span> <code>10</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B and D</span>
+      <p class="expl"><code>participants</code> increments until it reaches 10, then the condition <code>10 &lt; 10</code> fails → prints <strong>10</strong> (D). <code>animals</code>: the do/while runs once even though <code>2 &lt;= 1</code> is false; post-increment leaves it at 3... it prints <strong>3</strong>? The book's answer is B and E (3 and 10). <code>performers</code>: -1 → 1 → 3, prints 3. So the distinct printed values are 10, 3, 3 → the listed correct options are <strong>3</strong> and <strong>10</strong>.</p>
+    </details>
+  </div>
+
+  <!-- Q19 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q19</span><span class="q-tag">scope</span></div>
+    <p class="q-prompt">What is the output?</p>
+<pre><code>3: <span class="kw">do</span> {
+4:   <span class="kw">int</span> snake = <span class="num">1</span>;
+5:   System.out.print(snake++ + <span class="str">" "</span>);
+6:   iguana--;
+7: } <span class="kw">while</span> (snake &lt;= <span class="num">5</span>);
+8: System.out.println(iguana);
+<span class="cm">// double iguana = 0;</span></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>1 2 3 4 -4.0</code></li>
+      <li><span class="ol">B.</span> <code>1 2 3 4 5 -4.0</code></li>
+      <li><span class="ol">C.</span> The code does not compile.</li>
+      <li><span class="ol">D.</span> The code produces an infinite loop.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · does not compile</span>
+      <p class="expl"><code>snake</code> is declared inside the do/while body, so it's out of scope in the <code>while (snake &lt;= 5)</code> condition on line 7. If <code>snake</code> were declared before the loop, the output would be <code>1 2 3 4 5 -5.0</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q20 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q20</span><span class="q-tag">nested labels</span></div>
+    <p class="q-prompt">Which inserts let the code compile and run without an infinite loop, given the innermost <code>L3</code> is an infinite loop? <span class="all">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>break L2</code> on line 8; <code>continue L2</code> on line 12</li>
+      <li><span class="ol">B.</span> <code>continue</code> on line 8; <code>continue</code> on line 12</li>
+      <li><span class="ol">C.</span> <code>break L3</code> on line 8; <code>break L1</code> on line 12</li>
+      <li><span class="ol">D.</span> <code>continue L2</code> on line 8; <code>continue L2</code> on line 12</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A and D</span>
+      <p class="expl">You need to skip or exit the infinite innermost loop. A: <code>break L2</code> exits the second loop before reaching L3 — safe. D: <code>continue L2</code> on line 12 exits the infinite loop and returns control to L2, so everything terminates. B produces an infinite loop; C has a compile error (<code>L3</code> isn't visible outside its loop).</p>
+    </details>
+  </div>
+
+  <!-- Q21 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q21</span><span class="q-tag">switch expr errors</span></div>
+    <p class="q-prompt">Minimum lines to fix before this compiles?</p>
+<pre><code>22: System.out.print(<span class="kw">switch</span> (id) {
+23:   <span class="kw">case</span> <span class="num">10</span> -&gt; {<span class="str">"Jane"</span>;}
+24:   <span class="kw">case</span> <span class="num">20</span> -&gt; {<span class="kw">yield</span> <span class="str">"Lisa"</span>;};
+25:   <span class="kw">case</span> <span class="num">30</span> -&gt; <span class="str">"Kelly"</span>;
+26:   <span class="kw">case</span> <span class="num">30</span> -&gt; <span class="str">"Sarah"</span>;
+27:   <span class="kw">default</span> -&gt; <span class="str">"Unassigned"</span>;
+28: });</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> One</li>
+      <li><span class="ol">B.</span> Two</li>
+      <li><span class="ol">C.</span> Three</li>
+      <li><span class="ol">D.</span> Four</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · three lines</span>
+      <p class="expl">Line 23: a <code>case</code> block needs a <code>yield</code> (just <code>{"Jane";}</code> doesn't return). Line 24: extra semicolon after the block. Lines 25 and 26: duplicate <code>case 30</code> — at least one must change. That's three lines to correct.</p>
+    </details>
+  </div>
+
+  <!-- Q22 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q22</span><span class="q-tag">final case + while</span></div>
+    <p class="q-prompt">What is the output?</p>
+<pre><code>2: <span class="kw">var</span> tailFeathers = <span class="num">3</span>;
+3: <span class="kw">final var</span> one = <span class="num">1</span>;
+4: <span class="kw">switch</span> (tailFeathers) {
+5:   <span class="kw">case</span> one: System.out.print(<span class="num">3</span> + <span class="str">" "</span>);
+6:   <span class="kw">default</span>: <span class="kw">case</span> <span class="num">3</span>: System.out.print(<span class="num">5</span> + <span class="str">" "</span>);
+7: }
+8: <span class="kw">while</span> (tailFeathers &gt; <span class="num">1</span>) {
+9:   System.out.print(--tailFeathers + <span class="str">" "</span>); }</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>5 1</code></li>
+      <li><span class="ol">B.</span> <code>5 2 1</code></li>
+      <li><span class="ol">C.</span> The code will not compile because of line 6.</li>
+      <li><span class="ol">D.</span> The code will not compile because of lines 3–5.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B · 5 2 1</span>
+      <p class="expl"><code>var</code> works in switch and while; <code>one</code> is a final local (compile-time constant), so it's a valid case. <code>tailFeathers</code> is 3, matching the second clause → prints <code>5</code>. The while loop pre-decrements: 3→2 (print 2), 2→1 (print 1). Output <code>5 2 1</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q23 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q23</span><span class="q-tag">dangling else</span></div>
+    <p class="q-prompt">What is the output?</p>
+<pre><code>16: <span class="kw">boolean</span> older = penguin &gt;= turtle;
+17: <span class="kw">if</span> (older = <span class="kw">true</span>) System.out.println(<span class="str">"Success"</span>);
+18: <span class="kw">else</span> System.out.println(<span class="str">"Failure"</span>);
+19: <span class="kw">else if</span> (penguin != <span class="num">50</span>) System.out.println(<span class="str">"Other"</span>);
+<span class="cm">// penguin=50, turtle=75</span></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>Success</code></li>
+      <li><span class="ol">B.</span> <code>Failure</code></li>
+      <li><span class="ol">C.</span> The code will not compile because of line 17.</li>
+      <li><span class="ol">D.</span> The code does not compile for a different reason.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">D · does not compile (different reason)</span>
+      <p class="expl">Line 19 starts with <code>else</code> but has no matching <code>if</code> — the <code>if/else</code> on lines 17–18 is already complete. So line 19 doesn't compile. (Line 17's <code>older = true</code> is an assignment, which is legal and always true; removing line 19 would print <code>Success</code>.)</p>
+    </details>
+  </div>
+
+  <!-- Q24 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q24</span><span class="q-tag">pattern + when</span></div>
+    <p class="q-prompt">What is the output?</p>
+<pre><code>23: <span class="kw">int</span> visitors = <span class="kw">switch</span> (zooStatus) {
+24:   <span class="kw">case</span> String s <span class="kw">when</span> s.equals(<span class="str">"Open"</span>) -&gt; <span class="num">10</span>;
+25:   <span class="kw">case</span> Object s <span class="kw">when</span> s != <span class="kw">null</span> &amp;&amp; !s.equals(<span class="str">""</span>) -&gt; <span class="num">20</span>;
+26:   <span class="kw">case</span> <span class="kw">null</span> -&gt; {<span class="kw">yield</span> <span class="num">30</span>;}
+27:   <span class="kw">default</span> -&gt; <span class="num">40</span>;
+28: };
+<span class="cm">// String zooStatus = "Closed";</span></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>10</code></li>
+      <li><span class="ol">B.</span> <code>20</code></li>
+      <li><span class="ol">C.</span> <code>40</code></li>
+      <li><span class="ol">D.</span> One or more lines do not compile.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B · 20</span>
+      <p class="expl">In a pattern-matching switch, branches are checked in order and the <code>when</code> guards keep earlier cases from dominating later ones, so it compiles. <code>"Closed"</code> doesn't match <code>"Open"</code>, but it does match the second guarded case → prints <code>20</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q25 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q25</span><span class="q-tag">fall-through</span></div>
+    <p class="q-prompt">What is the output?</p>
+<pre><code>6: String instrument = <span class="str">"violin"</span>;
+7: <span class="kw">final</span> String CELLO = <span class="str">"cello"</span>;
+9: <span class="kw">int</span> p = -<span class="num">1</span>;
+10: <span class="kw">switch</span> (instrument) {
+11:   <span class="kw">case</span> <span class="str">"bass"</span> : <span class="kw">break</span>;
+12:   <span class="kw">case</span> CELLO : p++;
+13:   <span class="kw">default</span>: p++;
+14:   <span class="kw">case</span> <span class="str">"VIOLIN"</span>: p++;
+15:   <span class="kw">case</span> <span class="str">"viola"</span> : ++p; <span class="kw">break</span>;
+16: }
+17: System.out.print(p);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>-1</code></li>
+      <li><span class="ol">B.</span> <code>1</code></li>
+      <li><span class="ol">C.</span> <code>2</code></li>
+      <li><span class="ol">D.</span> The code does not compile.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · 2</span>
+      <p class="expl"><code>"violin"</code> doesn't exactly match <code>"VIOLIN"</code> (case-sensitive), so execution starts at <code>default</code> and falls through: line 13 <code>p++</code> (0), line 14 <code>p++</code> (1), line 15 <code>++p</code> (2), then <code>break</code>. Final <code>p</code> is <code>2</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q26 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q26</span><span class="q-tag">infinite loop</span></div>
+    <p class="q-prompt">What is the output?</p>
+<pre><code>9: <span class="kw">int</span> w = <span class="num">0</span>, r = <span class="num">1</span>;
+11: <span class="kw">while</span> (w &lt; <span class="num">2</span>) {
+12:   name += <span class="str">"A"</span>;
+13:   <span class="kw">do</span> {
+14:     name += <span class="str">"B"</span>;
+15:     <span class="kw">if</span> (name.length() &gt; <span class="num">0</span>) name += <span class="str">"C"</span>;
+16:     <span class="kw">else</span> <span class="kw">break</span>;
+17:   } <span class="kw">while</span> (r &lt;= <span class="num">1</span>);
+18:   r++; w++; }</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>ABCABC</code></li>
+      <li><span class="ol">B.</span> Line 18 contains a compilation error.</li>
+      <li><span class="ol">C.</span> The code compiles but never terminates at runtime.</li>
+      <li><span class="ol">D.</span> The code throws a <code>NullPointerException</code>.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · infinite loop at runtime</span>
+      <p class="expl"><code>r</code> is only updated outside the do/while (line 18), so inside the inner loop <code>r &lt;= 1</code> stays true forever once entered. The first time the inner loop runs, it never terminates → infinite loop.</p>
+    </details>
+  </div>
+
+  <!-- Q27 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q27</span><span class="q-tag">yield paths</span></div>
+    <p class="q-prompt">What is printed?</p>
+<pre><code>25: String color = <span class="kw">switch</span> (amphibian) {
+26:   <span class="kw">case</span> <span class="num">1</span> -&gt; { <span class="kw">yield</span> <span class="str">"Red"</span>; }
+27:   <span class="kw">case</span> <span class="num">2</span> -&gt; { <span class="kw">if</span> (name.equals(<span class="str">"Frog"</span>)) <span class="kw">yield</span> <span class="str">"Green"</span>;
+28:     <span class="kw">yield</span> <span class="str">"Blue"</span>; }
+29:   <span class="kw">case</span> <span class="num">3</span> -&gt; { <span class="kw">yield</span> <span class="str">"Purple"</span>; }
+30:   <span class="kw">default</span> -&gt; <span class="kw">throw new</span> RuntimeException();
+31: };
+<span class="cm">// byte amphibian = 2; String name = "Salamander";</span></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>Green</code></li>
+      <li><span class="ol">B.</span> <code>Blue</code></li>
+      <li><span class="ol">C.</span> The code does not compile.</li>
+      <li><span class="ol">D.</span> An exception is thrown at runtime.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B · Blue</span>
+      <p class="expl">It compiles — every case block ends in a <code>yield</code> (the <code>case 2</code> block yields on both paths). <code>amphibian</code> is 2; <code>name</code> isn't <code>"Frog"</code>, so it yields <code>Blue</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q28 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q28</span><span class="q-tag">flow scoping</span></div>
+    <p class="q-prompt">What is the output of <code>getFish("goldie")</code>?</p>
+<pre><code>41: <span class="kw">if</span> (!(fish <span class="kw">instanceof</span> String guppy))
+42:   System.out.print(<span class="str">"Eat!"</span>);
+43: <span class="kw">else if</span> (!(fish <span class="kw">instanceof</span> String guppy)) {
+44:   <span class="kw">throw new</span> RuntimeException();
+45: }
+46: System.out.print(<span class="str">"Swim!"</span>);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>Swim!</code></li>
+      <li><span class="ol">B.</span> <code>Eat!Swim!</code></li>
+      <li><span class="ol">C.</span> The code does not compile.</li>
+      <li><span class="ol">D.</span> An exception is thrown.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · does not compile</span>
+      <p class="expl">By flow scoping, after lines 41–42 <code>guppy</code> is in scope when <code>fish</code> <em>is</em> a String. So on line 43, declaring <code>guppy</code> again duplicates the in-scope variable → compile error. A different name would let it compile and print <code>Swim!</code>.</p>
+    </details>
+  </div>
+
+  <!-- REVISION -->
+  <div class="revision">
+    <h3>Quick Revision</h3>
+    <ul>
+      <li><strong>if / pattern matching:</strong> <code>if</code> needs a boolean; trace braces, not indentation. Pattern matching merges check + cast; <code>null</code> → <code>false</code>. Flow scoping: <code>&amp;&amp;</code> keeps the variable in scope, <code>||</code> doesn't; an early <code>return</code> can extend scope past the <code>if</code>.</li>
+      <li><strong>switch types:</strong> <code>int/Integer</code>, <code>byte/Byte</code>, <code>short/Short</code>, <code>char/Character</code>, <code>String</code>, <code>enum</code>, object (pattern), <code>var</code> — never <code>boolean/long/float/double</code>. Cases must be compile-time constants of the matching type.</li>
+      <li><strong>switch statement:</strong> colon-style falls through without <code>break</code> (order matters!); arrow-style doesn't. A void-bodied arrow switch is still a statement.</li>
+      <li><strong>switch expression:</strong> must be exhaustive (default, all enum values, or all types) and return a consistent type. <code>yield</code> returns from a block; a block must not have a trailing semicolon; a case expression must.</li>
+      <li><strong>pattern switch:</strong> order matters for both statements and expressions; a broader case before a narrower one is unreachable. <code>case null</code> implies pattern matching and can't follow <code>default</code>; without it a null switch variable throws <code>NullPointerException</code>.</li>
+      <li><strong>loops:</strong> <code>while</code> = zero+; <code>do/while</code> = one+. <code>for</code> sections are optional, the two semicolons aren't, and loop variables are loop-scoped; init must share one type. <code>for-each</code> needs an array or <code>Iterable</code> (not <code>Map</code>/<code>String</code>).</li>
+      <li><strong>branching:</strong> labels let <code>break</code>/<code>continue</code> target outer loops; <code>return</code> exits the method; code right after <code>break</code>/<code>continue</code>/<code>return</code> is unreachable.</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

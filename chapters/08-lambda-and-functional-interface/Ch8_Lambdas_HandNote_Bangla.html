@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 · অধ্যায় ৮ — Lambdas and Functional Interfaces (বিশদ স্টাডি নোট)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff; --ink:#2b2b32; --muted:#6e6a72;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --accent:#c96442; --accent2:#d4845e; --line:#ece3da;
+    --green:#3b7d57; --green-b:#5aab7b; --red:#c44d3e; --gold:#a9772a; --purple:#7c5cbf;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Noto Sans Bengali',system-ui,sans-serif; line-height:1.8;
+    -webkit-font-smoothing:antialiased; padding:32px 16px;
+  }
+  .wrap{max-width:1020px; margin:0 auto;}
+  h1,h2,h3,h4{font-family:'Noto Sans Bengali',sans-serif; line-height:1.5; color:#22222a; font-weight:700;}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+
+  .header{
+    background:linear-gradient(135deg,#ffffff,#fbf7f4);
+    border-radius:18px; padding:34px 34px 30px; margin-bottom:26px;
+    box-shadow:0 10px 30px rgba(120,90,60,.08);
+  }
+  .badge{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-size:.72rem;
+    letter-spacing:.5px; text-transform:uppercase; color:#fff; font-weight:700;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    padding:6px 14px; border-radius:999px; box-shadow:0 4px 12px rgba(201,100,66,.28);
+  }
+  .header h1{font-size:1.95rem; margin:18px 0 6px;}
+  .header h1 .sub{color:var(--muted); font-weight:400; font-size:1.15rem;}
+  .header .tagline{color:var(--muted); margin:0 0 20px; font-size:1rem;}
+  .objectives{
+    background:linear-gradient(135deg,#f0f9f3,#f7fcf8);
+    border-left:5px solid var(--green-b); border-radius:12px; padding:16px 20px;
+  }
+  .objectives h4{margin:0 0 8px; color:var(--green); font-size:.95rem; letter-spacing:.3px;}
+  .objectives ul{margin:0; padding-left:20px;}
+  .objectives li{margin:5px 0; font-size:.95rem;}
+
+  .toc{
+    background:var(--card); border-radius:16px; padding:22px 26px; margin-bottom:30px;
+    box-shadow:0 6px 20px rgba(120,90,60,.06);
+  }
+  .toc h3{margin:0 0 14px; font-size:1.05rem;}
+  .toc ol{columns:2; column-gap:34px; margin:0; padding-left:18px;}
+  .toc li{margin:8px 0; break-inside:avoid;}
+  .toc a{color:var(--accent); text-decoration:none; font-weight:600;}
+  .toc a:hover{text-decoration:underline;}
+
+  section{margin-bottom:40px;}
+  .secnum{font-family:'JetBrains Mono',monospace; font-size:.8rem; font-weight:700;
+    letter-spacing:2px; color:var(--accent); display:block; margin-bottom:2px;}
+  section h2{font-size:1.45rem; margin:0 0 18px; padding-bottom:10px; border-bottom:2px solid var(--line);}
+  section h3{font-size:1.12rem; margin:26px 0 10px;}
+  p{margin:12px 0;}
+
+  p code, li code, td code, .opt code{background:#f3ece4; color:#9a5030; padding:1.5px 6px; border-radius:5px; font-size:.84em; font-family:'JetBrains Mono',monospace;}
+
+  pre{
+    background:#fdfaf7; border-radius:12px; padding:16px 18px; overflow-x:auto;
+    box-shadow:inset 0 2px 8px rgba(120,90,60,.08); margin:14px 0; font-size:.86rem; line-height:1.55;
+  }
+  pre code{background:none; color:#3a3742; padding:0; font-family:'JetBrains Mono',monospace;}
+  .kw{color:var(--kw); font-weight:600;}
+  .str{color:var(--str);}
+  .num{color:var(--num);}
+  .err{color:var(--err); font-weight:600;}
+  .cm{color:var(--cm); font-style:italic;}
+
+  .card{border-radius:14px; padding:15px 19px; margin:16px 0; box-shadow:0 4px 14px rgba(120,90,60,.07);
+    transition:transform .18s ease, box-shadow .18s ease;}
+  .card:hover{transform:translateY(-2px); box-shadow:0 8px 22px rgba(120,90,60,.12);}
+  .card .label{font-family:'JetBrains Mono',monospace; font-size:.72rem; font-weight:700;
+    letter-spacing:.6px; text-transform:uppercase; display:block; margin-bottom:5px;}
+  .card p{margin:5px 0;}
+  .exam-trap{background:linear-gradient(135deg,#fef2f0,#fff8f7); border-left:5px solid #e06b5e;}
+  .exam-trap .label{color:#c0453a;}
+  .key-rule{background:linear-gradient(135deg,#f0f9f3,#f7fcf8); border-left:5px solid var(--green-b);}
+  .key-rule .label{color:var(--green);}
+  .remember{background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c;}
+  .remember .label{color:var(--gold);}
+
+  .rules-box{background:linear-gradient(135deg,#f0f9f3,#f7fcf8); border-top:4px solid var(--green-b);
+    border-radius:12px; padding:16px 22px; margin:18px 0; box-shadow:0 4px 14px rgba(120,90,60,.06);}
+  .rules-box h4{margin:0 0 8px; color:var(--green);}
+  .rules-box ol,.rules-box ul{margin:6px 0; padding-left:22px;}
+  .rules-box li{margin:6px 0;}
+
+  .vs-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0;}
+  .vs-grid .col{background:var(--card); border-radius:12px; padding:14px 18px; box-shadow:0 4px 14px rgba(120,90,60,.07);}
+  .vs-grid .col h4{margin:0 0 8px; font-size:1rem;}
+  .vs-grid .col.left h4{color:var(--purple);}
+  .vs-grid .col.right h4{color:var(--green);}
+  .vs-grid .col ul{margin:0; padding-left:18px;} .vs-grid .col li{margin:6px 0; font-size:.9rem;}
+
+  .trace{background:#fffdf9; border:1px dashed #e3d6c4; border-radius:12px; padding:12px 18px; margin:14px 0;}
+  .trace h4{margin:0 0 6px; font-size:.9rem; color:var(--accent); font-family:'JetBrains Mono',monospace; letter-spacing:.5px;}
+  .trace ul{margin:0; padding-left:20px;} .trace li{margin:5px 0; font-size:.9rem;}
+  .out{display:inline-block; background:#eef8f1; color:#2f7350; font-family:'JetBrains Mono',monospace;
+    padding:1px 8px; border-radius:5px; font-size:.85em; font-weight:600;}
+
+  table{width:100%; border-collapse:separate; border-spacing:0; background:var(--card);
+    border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(120,90,60,.08); margin:16px 0; font-size:.9rem;}
+  th,td{padding:10px 14px; text-align:left; border-bottom:1px solid #f0ebe4; vertical-align:top;}
+  thead th{background:#f0e8de; font-weight:700; color:#5a5048;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:#fcfaf7;}
+  .yes{color:var(--green); font-weight:700;}
+  .no{color:var(--red); font-weight:700;}
+
+  .recap{background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c;
+    border-radius:14px; padding:22px 26px; box-shadow:0 6px 18px rgba(120,90,60,.08);}
+  .recap h3{color:var(--gold); margin:16px 0 4px; font-size:1.02rem;}
+  .recap h3:first-child{margin-top:0;}
+  .recap ul{margin:4px 0 0; padding-left:20px;} .recap li{margin:6px 0; font-size:.92rem;}
+
+  @media(max-width:680px){
+    body{padding:18px 10px;}
+    .header{padding:24px 20px;} .header h1{font-size:1.5rem;} .header h1 .sub{font-size:1rem;}
+    .toc ol{columns:1;} .vs-grid{grid-template-columns:1fr;}
+    section h2{font-size:1.25rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="header">
+    <span class="badge">OCP Java SE 21 Developer — Exam 1Z0-830</span>
+    <h1>অধ্যায় ৮ <span class="sub">— Lambdas and Functional Interfaces</span></h1>
+    <p class="tagline">পঠনযোগ্য deferred execution: lambda syntax, single-abstract-method নিয়ম, method reference, এবং built-in functional interface।</p>
+    <div class="objectives">
+      <h4>এই অধ্যায়ে যা শিখবেন</h4>
+      <ul>
+        <li><strong>Lambda expression</strong> লেখা এবং deferred execution বোঝা।</li>
+        <li><strong>Functional interface</strong> চেনা (single-abstract-method নিয়ম) এবং <code>@FunctionalInterface</code> annotation।</li>
+        <li>চার ধরনের <strong>method reference</strong>: static, bound instance, unbound instance, ও constructor।</li>
+        <li><code>java.util.function</code>-এর <strong>built-in functional interface</strong> ও তাদের convenience method।</li>
+        <li><strong>Primitive</strong> functional interface এবং lambda-তে <strong>variable</strong>-এর নিয়ম।</li>
+      </ul>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <h3>এই পেজে যা আছে</h3>
+    <ol>
+      <li><a href="#s1">Lambda লেখা</a></li>
+      <li><a href="#s2">Functional Interface</a></li>
+      <li><a href="#s3">Method Reference</a></li>
+      <li><a href="#s4">Built-in Functional Interface</a></li>
+      <li><a href="#s5">Primitive Functional Interface</a></li>
+      <li><a href="#s6">Lambda-তে Variable</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ SECTION 1 ============ -->
+  <section id="s1">
+    <span class="secnum">SECTION 01</span>
+    <h2>Lambda লেখা</h2>
+
+    <p>একটি <strong>lambda expression</strong> হলো এমন একটি code block যা চারপাশে পাস করা যায় — parameter ও body সহ একটি নামহীন method, যা একটি anonymous class-এর ভেতরে থাকে। Lambda <strong>deferred execution</strong> সম্ভব করে: code এখন লেখা হয় কিন্তু পরে চলে।</p>
+<pre><code><span class="cm">// Instead of a whole CheckIfHopper class, just pass the logic:</span>
+print(animals, a -> a.canHop());
+print(animals, a -> a.canSwim());
+print(animals, a -> !a.canSwim());</code></pre>
+
+    <h3>Syntax (এবং এর optional অংশ)</h3>
+    <p>নিচের দুটি লাইন হুবহু একই কাজ করে। arrow operator <code>-&gt;</code> parameter list থেকে body আলাদা করে।</p>
+<pre><code>a -> a.canHop()                          <span class="cm">// shortest form</span>
+(Animal a) -> { <span class="kw">return</span> a.canHop(); }     <span class="cm">// most verbose form</span></code></pre>
+    <div class="rules-box">
+      <h4>যা বাদ দেওয়া যায়</h4>
+      <ul>
+        <li><strong>Parentheses</strong> — কেবল তখন, যখন একটিমাত্র parameter থাকে <em>এবং</em> এর type উল্লেখ করা হয় না।</li>
+        <li><strong>Braces, <code>return</code>, ও semicolon</strong> — কেবল single-expression body-এর জন্য (brace ছাড়া)।</li>
+        <li>প্রতিটি declared parameter ব্যবহার করতে হবে না। আর <code>s -&gt; {}</code> একটি বৈধ lambda।</li>
+      </ul>
+    </div>
+
+    <div class="vs-grid">
+      <div class="col left">
+        <h4>বৈধ (boolean রিটার্ন)</h4>
+        <ul>
+          <li><code>() -&gt; true</code></li>
+          <li><code>x -&gt; x.startsWith("test")</code></li>
+          <li><code>(String x) -&gt; x.startsWith("test")</code></li>
+          <li><code>(x, y) -&gt; { return x.startsWith("test"); }</code></li>
+        </ul>
+      </div>
+      <div class="col right">
+        <h4>অবৈধ</h4>
+        <ul>
+          <li><code>x, y -&gt; ...</code> — parentheses নেই</li>
+          <li><code>x -&gt; { x.startsWith("c"); }</code> — <code>return</code> নেই</li>
+          <li><code>x -&gt; { return x.startsWith("g") }</code> — semicolon নেই</li>
+          <li><code>String x -&gt; ...</code> — type দিলে parentheses লাগে</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — lambda + var</span>
+      <p><code>var invalid = (Animal a) -&gt; a.canHop();</code> compile হয় <strong>না</strong>। একটি lambda context থেকে তার type পায়, আর <code>var</code>-এরও context লাগে — একসাথে কোন functional interface ব্যবহার হবে তা বোঝার মতো যথেষ্ট তথ্য নেই।</p>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 2 ============ -->
+  <section id="s2">
+    <span class="secnum">SECTION 02</span>
+    <h2>Functional Interface</h2>
+
+    <p>একটি <strong>functional interface</strong> হলো ঠিক একটিমাত্র abstract method-যুক্ত interface — <strong>single abstract method (SAM)</strong> নিয়ম। Lambda ও method reference কেবল functional interface-এ assign করা যায়।</p>
+<pre><code><span class="cm">@FunctionalInterface</span>
+<span class="kw">public interface</span> Sprint {
+   <span class="kw">public void</span> sprint(<span class="kw">int</span> speed);
+}</code></pre>
+    <div class="card key-rule">
+      <span class="label">Key Rule — @FunctionalInterface</span>
+      <p>এই annotation compiler-কে SAM নিয়ম প্রয়োগ করতে বলে (লঙ্ঘন হলে error), কিন্তু এটি optional — একটিমাত্র abstract method-যুক্ত interface annotation থাকুক বা না থাকুক functional। <code>interface Dance { void move(); void rest(); }</code>-এ <code>@FunctionalInterface</code> দিলে compile হয় না (দুটি abstract method)।</p>
+    </div>
+
+    <h3>কোনগুলো functional interface?</h3>
+    <table>
+      <thead><tr><th>Interface (<code>Sprint</code>-এ <code>sprint()</code> আছে)</th><th>Functional?</th><th>কেন</th></tr></thead>
+      <tbody>
+        <tr><td><code>interface Dash extends Sprint {}</code></td><td class="yes">হ্যাঁ</td><td>একমাত্র abstract <code>sprint()</code> inherit করে</td></tr>
+        <tr><td><code>interface Skip extends Sprint { void skip(); }</code></td><td class="no">না</td><td>দুটি abstract: <code>sprint()</code> + <code>skip()</code></td></tr>
+        <tr><td><code>interface Sleep { private void snore(){} default int getZzz(){return 1;} }</code></td><td class="no">না</td><td>কোনো abstract method নেই</td></tr>
+        <tr><td><code>interface Climb { void reach(); default…; static…; private static…; }</code></td><td class="yes">হ্যাঁ</td><td>একমাত্র abstract: <code>reach()</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Object-method ব্যতিক্রম</h3>
+    <p>যে abstract method-এর signature <code>Object</code>-এর কোনো <code>public</code> method-এর সাথে মেলে — <code>toString()</code>, <code>equals(Object)</code>, <code>hashCode()</code> — তা SAM গণনায় <strong>ধরা হয় না</strong>, কারণ প্রতিটি implementing class এমনিতেই <code>Object</code> থেকে তা inherit করে।</p>
+<pre><code><span class="kw">public interface</span> Soar { <span class="kw">abstract</span> String toString(); }   <span class="cm">// NOT functional — toString doesn't count</span>
+
+<span class="kw">public interface</span> Dive {                <span class="cm">// IS functional — dive() is the only SAM</span>
+   String toString();
+   <span class="kw">public boolean</span> equals(Object o);
+   <span class="kw">public abstract int</span> hashCode();
+   <span class="kw">public void</span> dive();
+}</code></pre>
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — দেখতে এক, signature আলাদা</span>
+      <p><code>interface Hibernate { String toString(); boolean equals(Hibernate o); int hashCode(); void rest(); }</code> functional <strong>নয়</strong>। <code>equals(Hibernate)</code> ≠ <code>equals(Object)</code>, তাই এটি গণনায় ধরা হয় — ফলে দুটি abstract method থেকে যায় (<code>equals(Hibernate)</code> ও <code>rest()</code>)। এছাড়া interface <code>Object</code>-এর সাথে অসঙ্গত method ঘোষণা করতে পারে না (যেমন <code>int toString()</code> compile হয় না)।</p>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 3 ============ -->
+  <section id="s3">
+    <span class="secnum">SECTION 03</span>
+    <h2>Method Reference</h2>
+
+    <p>একটি <strong>method reference</strong> (<code>::</code> operator) deferred execution-এর জন্য lambda-র সংক্ষিপ্ত রূপ। একটি method reference ও তার সমতুল্য lambda runtime-এ একই আচরণ করে। চার ধরন আছে।</p>
+
+    <table>
+      <thead><tr><th>ধরন</th><th><code>::</code>-এর আগে</th><th>উদাহরণ</th><th>সমতুল্য lambda</th></tr></thead>
+      <tbody>
+        <tr><td>static method</td><td>Class name</td><td><code>Math::round</code></td><td><code>x -&gt; Math.round(x)</code></td></tr>
+        <tr><td>instance method, <em>bound</em> object</td><td>variable name</td><td><code>str::startsWith</code></td><td><code>s -&gt; str.startsWith(s)</code></td></tr>
+        <tr><td>instance method, <em>unbound</em> parameter</td><td>Class name</td><td><code>String::isEmpty</code></td><td><code>s -&gt; s.isEmpty()</code></td></tr>
+        <tr><td>constructor</td><td>Class name</td><td><code>String::new</code></td><td><code>() -&gt; new String()</code></td></tr>
+      </tbody>
+    </table>
+
+    <div class="card key-rule">
+      <span class="label">Key Rule — bound বনাম unbound</span>
+      <p><em>Unbound</em> reference যেমন <code>String::startsWith</code> &harr; <code>(s, p) -&gt; s.startsWith(p)</code>-এ, <strong>প্রথম parameter-টি হলো instance</strong> যার উপর method কল হয়; বাকিগুলো argument। দেখতে static মনে হলেও static নয়।</p>
+    </div>
+
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — সব lambda reference হয় না</span>
+      <p>সব method reference lambda-তে রূপান্তরিত হয়, কিন্তু উল্টোটা নয়। <code>() -&gt; str.startsWith("Zoo")</code> method reference হতে পারে না — <code>"Zoo"</code> argument-টি পাস করার কোনো উপায় নেই। এখানে <code>str::startsWith</code> ও <code>str::startsWith("Zoo")</code> দুটোই compile হয় না।</p>
+    </div>
+
+    <p>যেহেতু overloaded method থাকে (যেমন <code>Math.round</code> <code>double</code> বা <code>float</code> নেয়), Java functional-interface context দিয়ে সঠিকটি বেছে নেয়। যদি কোনোটি না পায় বা একাধিক পায়, তাহলে compiler error দেয় (ambiguous-type error)।</p>
+  </section>
+
+  <!-- ============ SECTION 4 ============ -->
+  <section id="s4">
+    <span class="secnum">SECTION 04</span>
+    <h2>Built-in Functional Interface</h2>
+
+    <p>মূল interface গুলো <code>java.util.function</code>-এ থাকে। <code>&lt;T&gt;</code> হলো input, <code>&lt;U&gt;</code> দ্বিতীয় input, <code>&lt;R&gt;</code> return। <strong>এই টেবিল মুখস্থ করুন</strong> — এটি সরাসরি যাচাই হয় এবং অধ্যায় ৯ ও ১০-এর ভিত্তি।</p>
+    <table>
+      <thead><tr><th>Interface</th><th>Method</th><th>Return</th><th># param</th></tr></thead>
+      <tbody>
+        <tr><td><code>Supplier&lt;T&gt;</code></td><td><code>get()</code></td><td><code>T</code></td><td>0</td></tr>
+        <tr><td><code>Consumer&lt;T&gt;</code></td><td><code>accept(T)</code></td><td><code>void</code></td><td>1 (T)</td></tr>
+        <tr><td><code>BiConsumer&lt;T,U&gt;</code></td><td><code>accept(T,U)</code></td><td><code>void</code></td><td>2 (T, U)</td></tr>
+        <tr><td><code>Predicate&lt;T&gt;</code></td><td><code>test(T)</code></td><td><code>boolean</code></td><td>1 (T)</td></tr>
+        <tr><td><code>BiPredicate&lt;T,U&gt;</code></td><td><code>test(T,U)</code></td><td><code>boolean</code></td><td>2 (T, U)</td></tr>
+        <tr><td><code>Function&lt;T,R&gt;</code></td><td><code>apply(T)</code></td><td><code>R</code></td><td>1 (T)</td></tr>
+        <tr><td><code>BiFunction&lt;T,U,R&gt;</code></td><td><code>apply(T,U)</code></td><td><code>R</code></td><td>2 (T, U)</td></tr>
+        <tr><td><code>UnaryOperator&lt;T&gt;</code></td><td><code>apply(T)</code></td><td><code>T</code></td><td>1 (T)</td></tr>
+        <tr><td><code>BinaryOperator&lt;T&gt;</code></td><td><code>apply(T,T)</code></td><td><code>T</code></td><td>2 (T, T)</td></tr>
+      </tbody>
+    </table>
+<pre><code>Supplier&lt;LocalDate&gt; s   = LocalDate::now;       <span class="cm">// get()</span>
+Consumer&lt;String&gt; c      = System.out::println;   <span class="cm">// accept("Annie")</span>
+Predicate&lt;String&gt; p     = String::isEmpty;       <span class="cm">// test("")  -> true</span>
+Function&lt;String,Integer&gt; f = String::length;    <span class="cm">// apply("cluck") -> 5</span>
+BiFunction&lt;String,String,String&gt; b = String::concat;
+UnaryOperator&lt;String&gt; u = String::toUpperCase;   <span class="cm">// apply("chirp") -> CHIRP</span></code></pre>
+
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — Predicate বনাম Function</span>
+      <p>"একটি <code>Boolean</code> রিটার্ন করে ও একটি <code>String</code> নেয়" — এটি <code>Function&lt;String,Boolean&gt;</code>, <code>Predicate</code> <strong>নয়</strong> — কারণ <code>Predicate</code> <code>boolean</code> <em>primitive</em> রিটার্ন করে। <code>UnaryOperator</code>/<code>BinaryOperator</code> সব type parameter একই type-এ বাধ্য করে, তাই <code>BinaryOperator&lt;Integer&gt;</code> সমতুল্য <code>BiFunction&lt;Integer,Integer,Integer&gt;</code>-এর চেয়ে ভালো।</p>
+    </div>
+<pre><code>Function&lt;List&lt;String&gt;&gt; ex1 = x -> x.get(<span class="num">0</span>);   <span class="err">// DOES NOT COMPILE — Function needs 2 type args</span>
+UnaryOperator&lt;Long&gt; ex2 = (Long l) -> <span class="num">3.14</span>;     <span class="err">// DOES NOT COMPILE — must return Long, not double</span></code></pre>
+
+    <h3>Convenience (default) method</h3>
+    <div class="rules-box">
+      <h4>Functional interface একত্র করা</h4>
+      <ul>
+        <li><code>Predicate</code>: <code>and()</code>, <code>or()</code>, <code>negate()</code> — যেমন <code>egg.and(brown.negate())</code>।</li>
+        <li><code>Consumer</code>: <code>andThen()</code> — একই input-এ পরপর দুটি consumer চালায়।</li>
+        <li><code>Function</code>: <code>andThen()</code> (এটি, তারপর arg) ও <code>compose()</code> (arg আগে, তারপর এটি)।</li>
+      </ul>
+    </div>
+    <div class="trace">
+      <h4>andThen বনাম compose</h4>
+      <ul>
+        <li><code>c1.andThen(c2)</code> তারপর <code>accept("Annie")</code> &rarr; <span class="out">1: Annie,2: Annie</span> (একই input দুটিতে)।</li>
+        <li><code>after.compose(before)</code> তারপর <code>apply(3)</code> &rarr; before: 3&rarr;4, after দ্বিগুণ করে 4&rarr;<span class="out">8</span>।</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 5 ============ -->
+  <section id="s5">
+    <span class="secnum">SECTION 05</span>
+    <h2>Primitive Functional Interface</h2>
+
+    <p>Boxing এড়াতে <code>double</code>, <code>int</code>, ও <code>long</code>-এর জন্য primitive variant আছে — সাথে <code>boolean</code>-এর জন্য একটি। দুটি জিনিস বদলায়: generics প্রায়ই উধাও হয় (type নামের মধ্যেই থাকে), এবং primitive রিটার্ন করলে single abstract method-এর নাম বদলায়।</p>
+
+    <div class="card remember">
+      <span class="label">Remember — BooleanSupplier</span>
+      <p>একমাত্র <code>boolean</code> functional interface হলো <code>BooleanSupplier</code>, যার method <code>getAsBoolean()</code>। <code>BooleanSupplier b = () -&gt; true;</code> তারপর <code>b.getAsBoolean()</code>।</p>
+    </div>
+
+    <table>
+      <thead><tr><th>পরিবার</th><th>Method-নামের ধরন</th><th>উদাহরণ</th></tr></thead>
+      <tbody>
+        <tr><td><code>DoubleSupplier</code> / <code>IntSupplier</code> / <code>LongSupplier</code></td><td><code>getAsDouble</code> / <code>getAsInt</code> / <code>getAsLong</code></td><td>primitive রিটার্ন করে</td></tr>
+        <tr><td><code>DoubleConsumer</code> / <code>IntConsumer</code> / <code>LongConsumer</code></td><td><code>accept</code></td><td>১ primitive param, void</td></tr>
+        <tr><td><code>DoublePredicate</code> / <code>IntPredicate</code> / <code>LongPredicate</code></td><td><code>test</code></td><td>১ primitive param, boolean</td></tr>
+        <tr><td><code>DoubleFunction&lt;R&gt;</code> / <code>IntFunction&lt;R&gt;</code> / <code>LongFunction&lt;R&gt;</code></td><td><code>apply</code></td><td>কেবল <em>return</em> generic থাকে</td></tr>
+        <tr><td><code>DoubleUnaryOperator</code> / <code>IntUnaryOperator</code> / <code>LongUnaryOperator</code></td><td><code>applyAsDouble</code> / <code>applyAsInt</code> / <code>applyAsLong</code></td><td>১ primitive in/out</td></tr>
+        <tr><td><code>DoubleBinaryOperator</code> / <code>IntBinaryOperator</code> / <code>LongBinaryOperator</code></td><td><code>applyAs…</code></td><td>২ primitive param</td></tr>
+        <tr><td><code>ToIntFunction&lt;T&gt;</code> / <code>ToDoubleFunction&lt;T&gt;</code> / <code>ToLongFunction&lt;T&gt;</code></td><td><code>applyAs…</code></td><td>object in &rarr; primitive out</td></tr>
+        <tr><td><code>IntToDoubleFunction</code>, <code>DoubleToIntFunction</code>, …</td><td><code>applyAs…</code></td><td>primitive &rarr; primitive</td></tr>
+        <tr><td><code>ObjIntConsumer&lt;T&gt;</code> / <code>ObjDoubleConsumer&lt;T&gt;</code> / <code>ObjLongConsumer&lt;T&gt;</code></td><td><code>accept</code></td><td>২ param (T, primitive)</td></tr>
+      </tbody>
+    </table>
+<pre><code><span class="kw">var</span> d = <span class="num">1.0</span>;
+______________ f1 = x -> <span class="num">1</span>;   <span class="cm">// takes double, returns int, method applyAsInt</span>
+f1.applyAsInt(d);                  <span class="cm">// DoubleToIntFunction or ToIntFunction both fit</span></code></pre>
+  </section>
+
+  <!-- ============ SECTION 6 ============ -->
+  <section id="s6">
+    <span class="secnum">SECTION 06</span>
+    <h2>Lambda-তে Variable</h2>
+
+    <p>Lambda-র চারপাশে variable তিন জায়গায় আসে: <strong>parameter list</strong>, <strong>body-তে declared local variable</strong>, এবং <strong>body থেকে referenced variable</strong>। প্রতিটিই পরীক্ষার প্রিয় ফাঁদ।</p>
+
+    <h3>Parameter list — সর্বত্র একই format</h3>
+    <p>নিচের তিনটি বিনিময়যোগ্য, এবং <code>x</code>-এর inferred type <code>String</code>:</p>
+<pre><code>Predicate&lt;String&gt; p = x -> <span class="kw">true</span>;
+Predicate&lt;String&gt; p = (<span class="kw">var</span> x) -> <span class="kw">true</span>;
+Predicate&lt;String&gt; p = (String x) -> <span class="kw">true</span>;</code></pre>
+    <div class="card key-rule">
+      <span class="label">Key Rule — সামঞ্জস্যপূর্ণ format</span>
+      <p>প্রতিটি parameter একই <strong>format</strong> ব্যবহার করতে হবে: সব untyped, সব typed, বা সব <code>var</code>। Parameter-এ <code>final</code> বা annotation যোগ করা যায়: <code>(final var x, @Deprecated var y) -&gt; x.compareTo(y)</code>।</p>
+    </div>
+<pre><code>(<span class="kw">var</span> x, y) -> <span class="str">"Hello"</span>                  <span class="err">// DOES NOT COMPILE — mix of var and none</span>
+(<span class="kw">var</span> x, Integer y) -> <span class="kw">true</span>             <span class="err">// DOES NOT COMPILE — mix of var and type</span>
+(String x, <span class="kw">var</span> y, Integer z) -> <span class="kw">true</span>   <span class="err">// DOES NOT COMPILE — three formats mixed</span>
+(Integer x, y) -> <span class="str">"goodbye"</span>            <span class="err">// DOES NOT COMPILE — mix of type and none</span></code></pre>
+
+    <h3>Body-তে local variable</h3>
+<pre><code>(a, b) -> { <span class="kw">int</span> c = <span class="num">0</span>; <span class="kw">return</span> <span class="num">5</span>; }   <span class="cm">// OK</span>
+(a, b) -> { <span class="kw">int</span> a = <span class="num">0</span>; <span class="kw">return</span> <span class="num">5</span>; }   <span class="err">// DOES NOT COMPILE — redeclares parameter a</span></code></pre>
+
+    <h3>চারপাশের variable reference করা</h3>
+    <div class="rules-box">
+      <h4>Lambda body যা access করতে পারে</h4>
+      <ul>
+        <li>Instance variable &mdash; <span class="yes">সবসময় অনুমোদিত</span>।</li>
+        <li>Static variable &mdash; <span class="yes">সবসময় অনুমোদিত</span>।</li>
+        <li>Local variable ও method parameter &mdash; কেবল <strong>final বা effectively final</strong> হলে।</li>
+        <li>Lambda parameter &mdash; <span class="yes">সবসময় অনুমোদিত</span>।</li>
+      </ul>
+    </div>
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — error কোথায় পড়ে</span>
+      <p>captured local/parameter reassign হলে compiler error <strong>lambda-র ব্যবহারের জায়গায়</strong> দেখায়, reassignment-এর লাইনে নয় — এমনকি reassignment lambda-র <em>পরে</em> হলেও। মান assign করা শুধু lambda-র দৃষ্টিকোণ থেকেই সমস্যা।</p>
+    </div>
+  </section>
+
+  <!-- ============ RECAP ============ -->
+  <section class="recap">
+    <h3>সংক্ষিপ্ত রিভিউ</h3>
+    <ul>
+      <li>Lambda parentheses কেবল একটি untyped parameter-এর জন্য optional; braces/<code>return</code>/semicolon কেবল single-expression body-এর জন্য optional। <code>var x = lambda;</code> কখনো compile হয় না।</li>
+      <li>Functional interface-এ ঠিক একটি abstract method (SAM)। <code>@FunctionalInterface</code> প্রয়োগ করে কিন্তু বাধ্যতামূলক নয়। <code>Object</code>-signature method (<code>toString</code>, <code>equals(Object)</code>, <code>hashCode</code>) গণনায় ধরা হয় না।</li>
+      <li>চার ধরনের method reference: static (<code>Math::round</code>), bound instance (<code>str::startsWith</code>), unbound instance (<code>String::isEmpty</code>, প্রথম param-ই instance), constructor (<code>String::new</code>)।</li>
+      <li>মূল interface: <code>Supplier</code> (0&rarr;T), <code>Consumer</code>/<code>BiConsumer</code> (&rarr;void), <code>Predicate</code>/<code>BiPredicate</code> (&rarr;boolean), <code>Function</code>/<code>BiFunction</code> (&rarr;R), <code>UnaryOperator</code>/<code>BinaryOperator</code> (একই type)।</li>
+      <li>Convenience: <code>Predicate.and/or/negate</code>, <code>Consumer.andThen</code>, <code>Function.andThen/compose</code> (compose-এ argument আগে চলে)।</li>
+      <li>Primitive-এ generics বাদ পড়ে ও method-নাম বদলায় (<code>getAsInt</code>, <code>applyAsDouble</code>); <code>BooleanSupplier</code> একমাত্র boolean।</li>
+      <li>Lambda parameter একই format; body parameter redeclare করতে পারে না; captured local/param effectively final হতে হবে, error lambda-তে দেখায়।</li>
+    </ul>
+  </section>
+
+  <!-- ============ CHEAT SHEET ============ -->
+  <section>
+    <span class="secnum">CHEAT SHEET</span>
+    <h2>Exam Traps চিট-শিট</h2>
+    <table>
+      <thead><tr><th>পরিস্থিতি</th><th>কী টেস্ট হয়</th><th>রায়</th></tr></thead>
+      <tbody>
+        <tr><td><code>var x = (Animal a) -&gt; a.canHop();</code></td><td>var + lambda-র context নেই</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>String x -&gt; x.endsWith("e")</code></td><td>typed param-এ parentheses লাগে</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>x -&gt; { x.startsWith("c"); }</code></td><td>brace-এ <code>return</code> লাগে</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>দুই-abstract-method interface-এ <code>@FunctionalInterface</code></td><td>SAM নিয়ম প্রয়োগ</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>শুধু <code>default</code>/<code>private</code> method-যুক্ত interface</td><td>কোনো abstract method নেই</td><td class="no">Functional নয়</td></tr>
+        <tr><td>একমাত্র method হিসেবে <code>abstract String toString();</code></td><td>Object method গণনা হয় না</td><td class="no">Functional নয়</td></tr>
+        <tr><td><code>equals(Object)</code>-এর বদলে <code>equals(Hibernate)</code></td><td>signature না মেলায় গণনা হয়</td><td class="no">Functional নয়</td></tr>
+        <tr><td><code>str::startsWith("Zoo")</code></td><td>reference-এ বাড়তি arg দেওয়া যায় না</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>"Boolean রিটার্ন, String নেয়"</td><td>Predicate primitive boolean দেয়</td><td class="yes"><code>Function&lt;String,Boolean&gt;</code></td></tr>
+        <tr><td><code>Function&lt;List&lt;String&gt;&gt;</code></td><td>Function-এ input + return generic লাগে</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>UnaryOperator&lt;Long&gt; = l -&gt; 3.14</code></td><td>return type মিলতে হবে</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>after.compose(before).apply(3)</code></td><td>compose argument আগে চালায়</td><td class="yes">8</td></tr>
+        <tr><td><code>(var x, Integer y) -&gt; …</code></td><td>parameter format মিলতে হবে</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>(a, b) -&gt; { int a = 0; … }</code></td><td>parameter redeclare করা যায় না</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>lambda reassigned local/param ব্যবহার করে</td><td>effectively final হতে হবে</td><td class="no">DOES NOT COMPILE (lambda-তে)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+</div>
+</body>
+</html>

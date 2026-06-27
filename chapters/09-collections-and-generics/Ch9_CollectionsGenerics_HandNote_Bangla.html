@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 · অধ্যায় ৯ — Collections and Generics (বিশদ স্টাডি নোট)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff; --ink:#2b2b32; --muted:#6e6a72;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --accent:#c96442; --accent2:#d4845e; --line:#ece3da;
+    --green:#3b7d57; --green-b:#5aab7b; --red:#c44d3e; --gold:#a9772a; --purple:#7c5cbf;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Noto Sans Bengali',system-ui,sans-serif; line-height:1.8;
+    -webkit-font-smoothing:antialiased; padding:32px 16px;
+  }
+  .wrap{max-width:1020px; margin:0 auto;}
+  h1,h2,h3,h4{font-family:'Noto Sans Bengali',sans-serif; line-height:1.5; color:#22222a; font-weight:700;}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+
+  .header{
+    background:linear-gradient(135deg,#ffffff,#fbf7f4);
+    border-radius:18px; padding:34px 34px 30px; margin-bottom:26px;
+    box-shadow:0 10px 30px rgba(120,90,60,.08);
+  }
+  .badge{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-size:.72rem;
+    letter-spacing:.5px; text-transform:uppercase; color:#fff; font-weight:700;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    padding:6px 14px; border-radius:999px; box-shadow:0 4px 12px rgba(201,100,66,.28);
+  }
+  .header h1{font-size:1.95rem; margin:18px 0 6px;}
+  .header h1 .sub{color:var(--muted); font-weight:400; font-size:1.1rem;}
+  .header .tagline{color:var(--muted); margin:0 0 20px; font-size:1rem;}
+  .objectives{
+    background:linear-gradient(135deg,#f0f9f3,#f7fcf8);
+    border-left:5px solid var(--green-b); border-radius:12px; padding:16px 20px;
+  }
+  .objectives h4{margin:0 0 8px; color:var(--green); font-size:.95rem; letter-spacing:.3px;}
+  .objectives ul{margin:0; padding-left:20px;}
+  .objectives li{margin:5px 0; font-size:.95rem;}
+
+  .toc{
+    background:var(--card); border-radius:16px; padding:22px 26px; margin-bottom:30px;
+    box-shadow:0 6px 20px rgba(120,90,60,.06);
+  }
+  .toc h3{margin:0 0 14px; font-size:1.05rem;}
+  .toc ol{columns:2; column-gap:34px; margin:0; padding-left:18px;}
+  .toc li{margin:8px 0; break-inside:avoid;}
+  .toc a{color:var(--accent); text-decoration:none; font-weight:600;}
+  .toc a:hover{text-decoration:underline;}
+
+  section{margin-bottom:40px;}
+  .secnum{font-family:'JetBrains Mono',monospace; font-size:.8rem; font-weight:700;
+    letter-spacing:2px; color:var(--accent); display:block; margin-bottom:2px;}
+  section h2{font-size:1.45rem; margin:0 0 18px; padding-bottom:10px; border-bottom:2px solid var(--line);}
+  section h3{font-size:1.12rem; margin:26px 0 10px;}
+  p{margin:12px 0;}
+
+  p code, li code, td code, .opt code{background:#f3ece4; color:#9a5030; padding:1.5px 6px; border-radius:5px; font-size:.84em; font-family:'JetBrains Mono',monospace;}
+
+  pre{
+    background:#fdfaf7; border-radius:12px; padding:16px 18px; overflow-x:auto;
+    box-shadow:inset 0 2px 8px rgba(120,90,60,.08); margin:14px 0; font-size:.85rem; line-height:1.55;
+  }
+  pre code{background:none; color:#3a3742; padding:0; font-family:'JetBrains Mono',monospace;}
+  .kw{color:var(--kw); font-weight:600;}
+  .str{color:var(--str);}
+  .num{color:var(--num);}
+  .err{color:var(--err); font-weight:600;}
+  .cm{color:var(--cm); font-style:italic;}
+
+  .card{border-radius:14px; padding:15px 19px; margin:16px 0; box-shadow:0 4px 14px rgba(120,90,60,.07);
+    transition:transform .18s ease, box-shadow .18s ease;}
+  .card:hover{transform:translateY(-2px); box-shadow:0 8px 22px rgba(120,90,60,.12);}
+  .card .label{font-family:'JetBrains Mono',monospace; font-size:.72rem; font-weight:700;
+    letter-spacing:.6px; text-transform:uppercase; display:block; margin-bottom:5px;}
+  .card p{margin:5px 0;}
+  .exam-trap{background:linear-gradient(135deg,#fef2f0,#fff8f7); border-left:5px solid #e06b5e;}
+  .exam-trap .label{color:#c0453a;}
+  .key-rule{background:linear-gradient(135deg,#f0f9f3,#f7fcf8); border-left:5px solid var(--green-b);}
+  .key-rule .label{color:var(--green);}
+  .remember{background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c;}
+  .remember .label{color:var(--gold);}
+
+  .rules-box{background:linear-gradient(135deg,#f0f9f3,#f7fcf8); border-top:4px solid var(--green-b);
+    border-radius:12px; padding:16px 22px; margin:18px 0; box-shadow:0 4px 14px rgba(120,90,60,.06);}
+  .rules-box h4{margin:0 0 8px; color:var(--green);}
+  .rules-box ol,.rules-box ul{margin:6px 0; padding-left:22px;}
+  .rules-box li{margin:6px 0;}
+
+  .vs-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0;}
+  .vs-grid .col{background:var(--card); border-radius:12px; padding:14px 18px; box-shadow:0 4px 14px rgba(120,90,60,.07);}
+  .vs-grid .col h4{margin:0 0 8px; font-size:1rem;}
+  .vs-grid .col.left h4{color:var(--purple);}
+  .vs-grid .col.right h4{color:var(--green);}
+  .vs-grid .col ul{margin:0; padding-left:18px;} .vs-grid .col li{margin:6px 0; font-size:.9rem;}
+
+  .trace{background:#fffdf9; border:1px dashed #e3d6c4; border-radius:12px; padding:12px 18px; margin:14px 0;}
+  .trace h4{margin:0 0 6px; font-size:.9rem; color:var(--accent); font-family:'JetBrains Mono',monospace; letter-spacing:.5px;}
+  .trace ul{margin:0; padding-left:20px;} .trace li{margin:5px 0; font-size:.9rem;}
+  .out{display:inline-block; background:#eef8f1; color:#2f7350; font-family:'JetBrains Mono',monospace;
+    padding:1px 8px; border-radius:5px; font-size:.85em; font-weight:600;}
+
+  table{width:100%; border-collapse:separate; border-spacing:0; background:var(--card);
+    border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(120,90,60,.08); margin:16px 0; font-size:.88rem;}
+  th,td{padding:9px 13px; text-align:left; border-bottom:1px solid #f0ebe4; vertical-align:top;}
+  thead th{background:#f0e8de; font-weight:700; color:#5a5048;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:#fcfaf7;}
+  .yes{color:var(--green); font-weight:700;}
+  .no{color:var(--red); font-weight:700;}
+
+  .recap{background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c;
+    border-radius:14px; padding:22px 26px; box-shadow:0 6px 18px rgba(120,90,60,.08);}
+  .recap h3{color:var(--gold); margin:16px 0 4px; font-size:1.02rem;}
+  .recap h3:first-child{margin-top:0;}
+  .recap ul{margin:4px 0 0; padding-left:20px;} .recap li{margin:6px 0; font-size:.92rem;}
+
+  @media(max-width:680px){
+    body{padding:18px 10px;}
+    .header{padding:24px 20px;} .header h1{font-size:1.5rem;} .header h1 .sub{font-size:.95rem;}
+    .toc ol{columns:1;} .vs-grid{grid-template-columns:1fr;}
+    section h2{font-size:1.25rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="header">
+    <span class="badge">OCP Java SE 21 Developer — Exam 1Z0-830</span>
+    <h1>অধ্যায় ৯ <span class="sub">— Collections and Generics</span></h1>
+    <p class="tagline">Java Collections Framework পূর্ণাঙ্গভাবে: List, Set, Queue/Deque, Map, Comparable ও Comparator দিয়ে sorting, Java 21-এর sequenced collections, এবং bounded wildcard সহ generics।</p>
+    <div class="objectives">
+      <h4>এই অধ্যায়ে যা শিখবেন</h4>
+      <ul>
+        <li>সাধারণ <strong>Collection</strong> API ও factory method দিয়ে collection তৈরি।</li>
+        <li><strong>List, Set, Queue/Deque, ও Map</strong> implementation-এর মধ্যে বাছাই ও তাদের method।</li>
+        <li><strong>Comparable</strong> ও <strong>Comparator</strong> দিয়ে sort/search এবং Java 21-এর <strong>sequenced collections</strong>।</li>
+        <li><strong>Generic</strong> class, record, interface, method লেখা এবং <strong>type erasure</strong> বোঝা।</li>
+        <li><strong>Bounded wildcard</strong> (<code>?</code>, <code>? extends</code>, <code>? super</code>) প্রয়োগ।</li>
+      </ul>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <h3>এই পেজে যা আছে</h3>
+    <ol>
+      <li><a href="#s1">Collection API ও Generics বেসিক</a></li>
+      <li><a href="#s2">List Interface</a></li>
+      <li><a href="#s3">Set, Queue ও Deque</a></li>
+      <li><a href="#s4">Map Interface</a></li>
+      <li><a href="#s5">Sorting, Searching ও Sequenced Collections</a></li>
+      <li><a href="#s6">Generics ও Wildcards</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ SECTION 1 ============ -->
+  <section id="s1">
+    <span class="secnum">SECTION 01</span>
+    <h2>Collection API ও Generics বেসিক</h2>
+
+    <p>Java Collections Framework (<code>java.util</code>-এ) এর চারটি প্রধান interface আছে। <strong>Map, <code>Collection</code> implement করে না</strong> — এটি framework-এর অংশ কিন্তু নিজস্ব key/value method রাখে।</p>
+    <table>
+      <thead><tr><th>Interface</th><th>অর্থ</th></tr></thead>
+      <tbody>
+        <tr><td><code>List</code></td><td>ordered, duplicate অনুমোদিত, <code>int</code> index দিয়ে access</td></tr>
+        <tr><td><code>Set</code></td><td>কোনো duplicate entry নেই</td></tr>
+        <tr><td><code>Queue</code> / <code>Deque</code></td><td>processing-এর জন্য ক্রমে রাখে; <code>Deque</code> উভয় প্রান্তে অনুমতি দেয়</td></tr>
+        <tr><td><code>Map</code></td><td>key থেকে value; duplicate key নেই</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Generics শর্টহ্যান্ড: diamond ও var</h3>
+    <p>Generics হলো parameterized type। <strong>Diamond operator <code>&lt;&gt;</code></strong> বাঁ দিক থেকে infer করে এবং কেবল assignment-এর ডান পাশে অনুমোদিত; <code>var</code> ডান দিক থেকে infer করে। দুই পাশে type দেবেন না।</p>
+<pre><code>List&lt;Integer&gt; list = new ArrayList&lt;&gt;();        <span class="cm">// diamond infers from left</span>
+var list = new ArrayList&lt;Integer&gt;();            <span class="cm">// var infers from right</span>
+
+List&lt;&gt; bad = new ArrayList&lt;Integer&gt;();          <span class="err">// DOES NOT COMPILE (diamond on left)</span>
+var map = new HashMap&lt;&gt;();                       <span class="cm">// compiles -> HashMap&lt;Object,Object&gt;</span></code></pre>
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — var + diamond একসাথে</span>
+      <p><code>var map = new HashMap&lt;&gt;();</code> compile হয়, কিন্তু infer করার মতো কিছু না থাকায় type হয় <code>HashMap&lt;Object, Object&gt;</code>।</p>
+    </div>
+
+    <h3>সাধারণ Collection method</h3>
+    <table>
+      <thead><tr><th>Method</th><th>আচরণ</th></tr></thead>
+      <tbody>
+        <tr><td><code>boolean add(E e)</code></td><td>List সবসময় <code>true</code>; Set duplicate-এ <code>false</code></td></tr>
+        <tr><td><code>boolean remove(Object o)</code></td><td>একটি match মুছে, সফল কিনা ফেরত দেয়</td></tr>
+        <tr><td><code>boolean isEmpty()</code>, <code>int size()</code></td><td>element সংখ্যা</td></tr>
+        <tr><td><code>void clear()</code></td><td>সব element বাদ দেয়</td></tr>
+        <tr><td><code>boolean contains(Object o)</code></td><td>element-এ <code>equals()</code> ব্যবহার করে</td></tr>
+        <tr><td><code>boolean removeIf(Predicate&lt;? super E&gt;)</code></td><td>সব matching element মুছে</td></tr>
+        <tr><td><code>void forEach(Consumer&lt;? super T&gt;)</code></td><td>loop ছাড়াই iterate</td></tr>
+      </tbody>
+    </table>
+<pre><code>Collection&lt;String&gt; set = new HashSet&lt;&gt;();
+set.add(<span class="str">"Sparrow"</span>);   <span class="cm">// true</span>
+set.add(<span class="str">"Sparrow"</span>);   <span class="cm">// false (Set-এ duplicate)</span>
+set.removeIf(String::isEmpty);   <span class="cm">// s -> s.isEmpty()</span></code></pre>
+
+    <h3>collection জুড়ে equals()</h3>
+    <div class="trace">
+      <h4>order সংবেদনশীলতা</h4>
+      <ul>
+        <li><code>List.of(1,2).equals(List.of(2,1))</code> &rarr; <span class="out">false</span> (List order মানে)</li>
+        <li><code>Set.of(1,2).equals(Set.of(2,1))</code> &rarr; <span class="out">true</span> (Set order মানে না)</li>
+        <li><code>List.of(1,2).equals(Set.of(1,2))</code> &rarr; <span class="out">false</span> (ভিন্ন type)</li>
+      </ul>
+    </div>
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — null unbox করা</span>
+      <p><code>List&lt;Integer&gt;</code>-এ <code>null</code> add করা বৈধ, কিন্তু primitive-এ unbox করলে throw করে: <code>int h = heights.get(0);</code> &rarr; <strong>NullPointerException</strong>।</p>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 2 ============ -->
+  <section id="s2">
+    <span class="secnum">SECTION 02</span>
+    <h2>List Interface</h2>
+
+    <p>একটি <strong>List</strong> ordered ও duplicate অনুমোদিত, index-ভিত্তিক access সহ। দুটি implementation জানতে হবে:</p>
+    <div class="vs-grid">
+      <div class="col left">
+        <h4>ArrayList</h4>
+        <ul>
+          <li>Resizable array; index দিয়ে constant-time lookup।</li>
+          <li>লেখার চেয়ে পড়া বেশি (বা সমান) হলে ভালো।</li>
+          <li>সন্দেহ হলে "default" পছন্দ।</li>
+        </ul>
+      </div>
+      <div class="col right">
+        <h4>LinkedList</h4>
+        <ul>
+          <li><code>List</code> ও <code>Deque</code> দুটোই implement করে।</li>
+          <li>প্রান্তে add/remove/access constant-time।</li>
+          <li>যেকোনো index-এ access linear time।</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Factory method</h3>
+    <table>
+      <thead><tr><th>Method</th><th>ফলাফল</th><th>Replace?</th><th>Add/Delete?</th></tr></thead>
+      <tbody>
+        <tr><td><code>Arrays.asList(varargs)</code></td><td>array-backed fixed-size list</td><td class="yes">হ্যাঁ</td><td class="no">না</td></tr>
+        <tr><td><code>List.of(varargs)</code></td><td>immutable list</td><td class="no">না</td><td class="no">না</td></tr>
+        <tr><td><code>List.copyOf(collection)</code></td><td>immutable copy</td><td class="no">না</td><td class="no">না</td></tr>
+      </tbody>
+    </table>
+    <div class="card key-rule">
+      <span class="label">Key Rule — backed array বনাম immutable</span>
+      <p><code>Arrays.asList()</code> array দ্বারা backed: array বদলালে list বদলায় এবং <code>set()</code> array-কে আবার বদলায়। <code>List.of()</code> ও <code>List.copyOf()</code> immutable — যেকোনো <code>set()</code>, <code>add()</code>, বা <code>remove()</code> <code>UnsupportedOperationException</code> throw করে। (আর <code>Arrays.asList().add()</code>-ও throw করে, কারণ size fixed।)</p>
+    </div>
+
+    <h3>List method ও overloaded remove() ফাঁদ</h3>
+    <p>inherited <code>Collection</code> method ছাড়াও: <code>add(int, E)</code>, <code>get(int)</code>, <code>indexOf</code>, <code>lastIndexOf</code> (না পেলে <code>-1</code>), <code>remove(int)</code>, <code>set(int, E)</code>, <code>replaceAll(UnaryOperator)</code>, ও <code>sort(Comparator)</code>। range-এর বাইরে index-এ <code>set()</code> <code>IndexOutOfBoundsException</code> throw করে।</p>
+<pre><code>var list = new LinkedList&lt;Integer&gt;();
+list.add(<span class="num">3</span>); list.add(<span class="num">2</span>); list.add(<span class="num">1</span>);   <span class="cm">// [3, 2, 1]</span>
+list.remove(<span class="num">2</span>);                  <span class="cm">// INDEX 2 মুছে -> [3, 2]</span>
+list.remove(Integer.valueOf(<span class="num">2</span>));  <span class="cm">// VALUE 2 মুছে -> [3]</span></code></pre>
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — remove(int) বনাম remove(Object)</span>
+      <p><code>Integer</code> list-এ <code>remove(int)</code> <em>index</em> দিয়ে মুছে এবং না পেলে <code>IndexOutOfBoundsException</code> throw করে; <code>remove(Object)</code> <em>value</em> দিয়ে মুছে এবং না পেলে <code>false</code> দেয়। <code>remove(Integer.valueOf(2))</code> value version-কে বাধ্য করে।</p>
+    </div>
+<pre><code>var nums = Arrays.asList(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>);
+nums.replaceAll(x -> x*<span class="num">2</span>);   <span class="cm">// [2, 4, 6]</span>
+
+String[] arr = list.toArray(<span class="kw">new</span> String[<span class="num">0</span>]);  <span class="cm">// typed array; size 0 দিলে Java নিজে size দেয়</span></code></pre>
+    <p>argument ছাড়া <code>toArray()</code> <code>Object[]</code> ফেরত দেয়। ফেরত array একটি copy — list clear করলে array-তে প্রভাব পড়ে না।</p>
+  </section>
+
+  <!-- ============ SECTION 3 ============ -->
+  <section id="s3">
+    <span class="secnum">SECTION 03</span>
+    <h2>Set, Queue ও Deque</h2>
+
+    <h3>Set implementation</h3>
+    <table>
+      <thead><tr><th>Class</th><th>Storage / order</th></tr></thead>
+      <tbody>
+        <tr><td><code>HashSet</code></td><td>hash table; <code>hashCode()</code> ব্যবহার; arbitrary order</td></tr>
+        <tr><td><code>LinkedHashSet</code></td><td>hash table + insertion (encounter) order</td></tr>
+        <tr><td><code>TreeSet</code></td><td>sorted tree; সবসময় sorted; add/remove ধীর</td></tr>
+      </tbody>
+    </table>
+    <div class="trace">
+      <h4>66, 10, 8 add করা হলে</h4>
+      <ul>
+        <li><code>HashSet</code> &rarr; <span class="out">66,8,10</span> (arbitrary)</li>
+        <li><code>LinkedHashSet</code> &rarr; <span class="out">66,10,8</span> (insertion)</li>
+        <li><code>TreeSet</code> &rarr; <span class="out">8,10,66</span> (sorted)</li>
+      </ul>
+    </div>
+    <p>Immutable set আসে <code>Set.of(...)</code> ও <code>Set.copyOf(...)</code> থেকে। সমতা <code>equals()</code> দিয়ে; <code>hashCode()</code> bucket বেছে নেয়।</p>
+
+    <h3>Queue ও Deque</h3>
+    <p>একটি <code>Queue</code> হলো FIFO। <code>LinkedList</code> ও <code>ArrayDeque</code> দুটোই <code>Deque</code> implement করে (যা <code>Queue</code> extend করে)। <code>List</code> method না লাগলে <code>ArrayDeque</code> ব্যবহার করুন।</p>
+    <div class="rules-box">
+      <h4>প্রতিটি operation-এর দুই রূপ</h4>
+      <p>প্রতিটি ক্ষমতার একটি version ব্যর্থতায় <strong>throw</strong> করে, আরেকটি sentinel (<code>null</code>/<code>false</code>) ফেরত দেয়:</p>
+      <ul>
+        <li>পেছনে add: <code>add(e)</code> (throws) · <code>offer(e)</code> (boolean দেয়)</li>
+        <li>সামনে read: <code>element()</code> (throws) · <code>peek()</code> (<code>null</code> দেয়)</li>
+        <li>সামনে থেকে remove: <code>remove()</code> (throws) · <code>poll()</code> (<code>null</code> দেয়)</li>
+      </ul>
+    </div>
+    <table>
+      <thead><tr><th>Deque উদ্দেশ্য</th><th>সামনের method</th><th>পেছনের method</th></tr></thead>
+      <tbody>
+        <tr><td>Add</td><td><code>addFirst</code> / <code>offerFirst</code></td><td><code>addLast</code> / <code>offerLast</code></td></tr>
+        <tr><td>Read (peek)</td><td><code>getFirst</code> / <code>peekFirst</code></td><td><code>getLast</code> / <code>peekLast</code></td></tr>
+        <tr><td>Remove</td><td><code>removeFirst</code> / <code>pollFirst</code></td><td><code>removeLast</code> / <code>pollLast</code></td></tr>
+      </tbody>
+    </table>
+    <div class="card remember">
+      <span class="label">Remember — Deque-কে stack হিসেবে (LIFO)</span>
+      <p>Stack হিসেবে method গুলো হলো <code>push(e)</code> (front/top-এ add), <code>pop()</code> (front/top থেকে remove), ও <code>peek()</code>। FIFO queue হলো মানুষের লাইন; LIFO stack হলো প্লেটের স্তূপ।</p>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 4 ============ -->
+  <section id="s4">
+    <span class="secnum">SECTION 04</span>
+    <h2>Map Interface</h2>
+
+    <p>একটি <strong>Map</strong> key/value pair রাখে এবং <code>Collection</code> extend করে <strong>না</strong>। Generics হলো <code>K</code> (key) ও <code>V</code> (value)।</p>
+    <table>
+      <thead><tr><th>Class</th><th>Order</th></tr></thead>
+      <tbody>
+        <tr><td><code>HashMap</code></td><td>key-এর <code>hashCode()</code>; arbitrary order</td></tr>
+        <tr><td><code>LinkedHashMap</code></td><td>insertion (encounter) order</td></tr>
+        <tr><td><code>TreeMap</code></td><td>key অনুযায়ী sorted; <code>null</code> key নেই</td></tr>
+      </tbody>
+    </table>
+<pre><code>Map.of(<span class="str">"key1"</span>, <span class="str">"value1"</span>, <span class="str">"key2"</span>, <span class="str">"value2"</span>);     <span class="cm">// up to 10 pairs</span>
+Map.ofEntries(Map.entry(<span class="str">"k1"</span>, <span class="str">"v1"</span>), Map.entry(<span class="str">"k2"</span>, <span class="str">"v2"</span>));  <span class="cm">// নিরাপদ</span>
+Map.copyOf(map);</code></pre>
+
+    <h3>যে Map method জানতে হবে</h3>
+    <table>
+      <thead><tr><th>Method</th><th>আচরণ</th></tr></thead>
+      <tbody>
+        <tr><td><code>V get(Object key)</code></td><td>value বা absent হলে <code>null</code></td></tr>
+        <tr><td><code>V getOrDefault(key, default)</code></td><td>value বা absent হলে default</td></tr>
+        <tr><td><code>V put(K, V)</code></td><td>add/replace; আগের value বা <code>null</code> দেয়</td></tr>
+        <tr><td><code>V putIfAbsent(K, V)</code></td><td>কেবল key absent বা <code>null</code> mapped হলে সেট</td></tr>
+        <tr><td><code>V replace(K, V)</code> / <code>replaceAll(BiFunction)</code></td><td>value বদলায়; missing key এড়ায়</td></tr>
+        <tr><td><code>V merge(K, V, BiFunction)</code></td><td>value একত্র করে (নিচের নিয়ম দেখুন)</td></tr>
+        <tr><td><code>containsKey</code> / <code>containsValue</code></td><td>key ও value আলাদাভাবে যাচাই</td></tr>
+        <tr><td><code>keySet</code> / <code>values</code> / <code>entrySet</code></td><td>key / value / <code>Map.Entry</code> pair-এর view</td></tr>
+        <tr><td><code>forEach(BiConsumer&lt;K,V&gt;)</code></td><td>key/value pair-এ iterate</td></tr>
+      </tbody>
+    </table>
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — contains() Map-এ নেই</span>
+      <p><code>map.contains("lion")</code> compile হয় <strong>না</strong> — <code>contains()</code> একটি <code>Collection</code> method। Map-এ আছে <code>containsKey()</code> ও <code>containsValue()</code>।</p>
+    </div>
+
+    <h3>merge() আচরণ</h3>
+    <div class="rules-box">
+      <h4>merge(key, value, fn) যা করে</h4>
+      <ul>
+        <li>Key absent, বা <code>null</code> mapped &rarr; <code>value</code> সেট (function <strong>কল হয় না</strong>)।</li>
+        <li>Key-এর non-null value আছে &rarr; <code>fn(old, value)</code> সেট।</li>
+        <li>Function <code>null</code> দিলে &rarr; key <strong>মুছে যায়</strong>।</li>
+      </ul>
+    </div>
+    <div class="trace">
+      <h4>সবচেয়ে লম্বা নামের mapper</h4>
+      <ul>
+        <li><code>favorites.put("Jenny","Bus Tour"); merge("Jenny","Skyride", longest)</code> &rarr; <span class="out">Bus Tour</span> রাখে (লম্বা)।</li>
+        <li><code>favorites.put("Tom","Tram"); merge("Tom","Skyride", longest)</code> &rarr; <span class="out">Skyride</span> (লম্বা)।</li>
+      </ul>
+    </div>
+    <p>Map-এ <code>forEach</code> দুটি parameter নেয়: <code>map.forEach((k, v) -&gt; ...)</code>। <code>entrySet()</code> <code>Map.Entry&lt;K,V&gt;</code> object দেয় যাতে <code>getKey()</code>/<code>getValue()</code> থাকে।</p>
+  </section>
+
+  <!-- ============ SECTION 5 ============ -->
+  <section id="s5">
+    <span class="secnum">SECTION 05</span>
+    <h2>Sorting, Searching ও Sequenced Collections</h2>
+
+    <h3>Comparable বনাম Comparator</h3>
+    <table>
+      <thead><tr><th>পার্থক্য</th><th>Comparable</th><th>Comparator</th></tr></thead>
+      <tbody>
+        <tr><td>Package</td><td><code>java.lang</code></td><td><code>java.util</code></td></tr>
+        <tr><td>তুলনাকৃত class implement করে?</td><td class="yes">হ্যাঁ</td><td class="no">না</td></tr>
+        <tr><td>Method নাম</td><td><code>compareTo(T)</code></td><td><code>compare(T, T)</code></td></tr>
+        <tr><td>parameter সংখ্যা</td><td>১</td><td>২</td></tr>
+        <tr><td>সাধারণত lambda?</td><td class="no">না</td><td class="yes">হ্যাঁ</td></tr>
+      </tbody>
+    </table>
+    <div class="card key-rule">
+      <span class="label">Key Rule — compareTo() রিটার্ন মান</span>
+      <p>সমান হলে <strong>0</strong>, <code>this</code> ছোট হলে <strong>negative</strong>, বড় হলে <strong>positive</strong>। <code>id - d.id</code> ascending; <code>d.id - id</code> descending।</p>
+    </div>
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — ভুল method নাম</span>
+      <p><code>Comparator</code>-কে <code>compare()</code> implement করতে হয়, <code>compareTo()</code> নয়। <code>new Comparator&lt;Duck&gt;(){ public int compareTo(...){} }</code> compile হয় <strong>না</strong>। দুটোই functional interface (এক abstract method), কিন্তু <code>Comparable</code>-এর জন্য lambda অর্থহীন।</p>
+    </div>
+
+    <h3>Comparator তৈরি</h3>
+<pre><code>Comparator&lt;Duck&gt; byWeight = Comparator.comparing(Duck::weight);
+Comparator&lt;Squirrel&gt; c = Comparator.comparing(Squirrel::species)
+                                   .thenComparingInt(Squirrel::weight);
+var desc = Comparator.comparing(Squirrel::species).reversed();</code></pre>
+    <p>Static builder: <code>comparing</code>, <code>comparingInt/Double/Long</code>, <code>naturalOrder()</code>, <code>reverseOrder()</code>। Chainable default method: <code>reversed()</code>, <code>thenComparing</code>, <code>thenComparingInt/Double/Long</code>।</p>
+
+    <h3>Sorting ও binarySearch</h3>
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — sort-এ Comparable লাগে</span>
+      <p>non-<code>Comparable</code> type-এ <code>Collections.sort(rabbits)</code> compile হয় <strong>না</strong>। কিন্তু <code>TreeSet</code>-এ non-<code>Comparable</code> element add করা compile হয় ও <em>runtime</em>-এ (প্রথম add-এ) <code>ClassCastException</code> throw করে। উভয় ক্ষেত্রে <code>Comparator</code> পাস করে ঠিক করুন।</p>
+    </div>
+<pre><code>List&lt;Integer&gt; list = Arrays.asList(<span class="num">6</span>,<span class="num">9</span>,<span class="num">1</span>,<span class="num">8</span>);
+Collections.sort(list);                       <span class="cm">// [1, 6, 8, 9]</span>
+Collections.binarySearch(list, <span class="num">6</span>);            <span class="cm">// 1  (index-এ পাওয়া গেল)</span>
+Collections.binarySearch(list, <span class="num">3</span>);            <span class="cm">// -2  (-(insertion point)-1)</span></code></pre>
+    <p><code>binarySearch</code>-এর জন্য sorted list লাগে; পাওয়া গেলে index দেয়, নইলে <code>-(insertion point) - 1</code>। list-এর order-এর সাথে না মেলা comparator দিয়ে search করলে ফল <strong>undefined</strong>।</p>
+
+    <h3>Sequenced collections (Java 21)</h3>
+    <p><code>SequencedCollection</code>, <code>SequencedSet</code>, ও <code>SequencedMap</code>-এর well-defined <em>encounter order</em> আছে (sorted হতেই হবে এমন নয়)। Method-এ আছে <code>addFirst</code>/<code>addLast</code>, <code>getFirst</code>/<code>getLast</code>, <code>removeFirst</code>/<code>removeLast</code>, ও <code>reversed()</code>; map-এ আছে <code>firstEntry</code>/<code>lastEntry</code>, <code>pollFirstEntry</code>/<code>pollLastEntry</code>, <code>putFirst</code>/<code>putLast</code>।</p>
+    <div class="card remember">
+      <span class="label">Remember — Hash type sequenced নয়</span>
+      <p><code>HashSet</code> ও <code>HashMap</code> উল্লেখযোগ্য ব্যতিক্রম যাদের encounter order নেই, তাই <code>HashMap</code> <code>SequencedMap</code> হতে পারে না (compile হয় না)। <code>TreeSet</code>-এ <code>addLast()</code> <code>UnsupportedOperationException</code> throw করে — sorted structure-এ position চাপানো যায় না। Sorted set-এ <code>null</code> value নিষেধ; sorted map-এ <code>null</code> key নিষেধ।</p>
+    </div>
+    <p>একটি <strong>unmodifiable view</strong> (<code>Collections.unmodifiableList/Set/Map/Collection</code>) view দিয়ে বদলানো যায় না, কিন্তু underlying collection-এর পরিবর্তন view-তে দেখা যায়।</p>
+  </section>
+
+  <!-- ============ SECTION 6 ============ -->
+  <section id="s6">
+    <span class="secnum">SECTION 06</span>
+    <h2>Generics ও Wildcards</h2>
+
+    <p>angle bracket-এ formal type parameter ঘোষণা করুন। Convention: <code>E</code> element, <code>K</code> key, <code>V</code> value, <code>N</code> number, <code>T</code> type, <code>S/U/V</code> আরও বেশি।</p>
+<pre><code><span class="kw">public class</span> Crate&lt;T&gt; {
+   <span class="kw">private</span> T contents;
+   <span class="kw">public</span> T lookInCrate() { <span class="kw">return</span> contents; }
+   <span class="kw">public void</span> packCrate(T contents) { <span class="kw">this</span>.contents = contents; }
+}
+<span class="kw">public record</span> CrateRecord&lt;T&gt;(T contents) {}   <span class="cm">// generic record</span></code></pre>
+
+    <h3>Type erasure</h3>
+    <p>compile time-এ compiler প্রতিটি <code>T</code>-কে <code>Object</code> (বা তার bound) দিয়ে প্রতিস্থাপন করে ও cast যোগ করে। একটিই class file থাকে। এর প্রভাব overloading ও overriding-এ পড়ে।</p>
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — erasure overloading ভাঙে</span>
+      <p><code>chew(List&lt;Object&gt;)</code> ও <code>chew(List&lt;Double&gt;)</code> দুটো একসাথে রাখা যায় না — erasure-এর পরে দুটোই <code>chew(List)</code> &rarr; compile হয় না। parent/child-এও একই। কিন্তু <code>chew(List&lt;Object&gt;)</code> ও <code>chew(ArrayList&lt;Double&gt;)</code> একসাথে থাকতে পারে (ভিন্ন raw type)।</p>
+    </div>
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — covariant return, exact generic</span>
+      <p>overriding method-এর return type subtype হতে পারে, কিন্তু <strong>generic parameter হুবহু মিলতে হবে</strong>। <code>List&lt;CharSequence&gt; play()</code>-কে override করে <code>ArrayList&lt;CharSequence&gt; play()</code> compile হয়; <code>List&lt;String&gt; play()</code> হয় <strong>না</strong> (<code>String</code> ≠ <code>CharSequence</code>), যদিও <code>CharSequence sleep()</code>-কে override করে <code>String sleep()</code> ঠিক আছে।</p>
+    </div>
+
+    <h3>Generic method</h3>
+<pre><code><span class="kw">public static</span> &lt;T&gt; <span class="kw">void</span> prepare(T t) { }
+<span class="kw">public static</span> &lt;T&gt; Crate&lt;T&gt; ship(T t) { <span class="kw">return new</span> Crate&lt;T&gt;(); }
+<span class="kw">public static</span> T noGood(T t) { <span class="kw">return</span> t; }   <span class="err">// DOES NOT COMPILE (&lt;T&gt; নেই)</span></code></pre>
+    <p>formal type parameter <code>&lt;T&gt;</code> return type-এর ঠিক আগে বসে (class থেকে inherited না হলে)। method-এর <code>T</code> class-এর <code>T</code> থেকে স্বাধীন।</p>
+
+    <h3>Wildcards</h3>
+    <table>
+      <thead><tr><th>Bound</th><th>Syntax</th><th>উদাহরণ</th></tr></thead>
+      <tbody>
+        <tr><td>Unbounded</td><td><code>?</code></td><td><code>List&lt;?&gt; a = new ArrayList&lt;String&gt;();</code></td></tr>
+        <tr><td>Upper bound</td><td><code>? extends type</code></td><td><code>List&lt;? extends Number&gt; a = new ArrayList&lt;Integer&gt;();</code></td></tr>
+        <tr><td>Lower bound</td><td><code>? super type</code></td><td><code>List&lt;? super Exception&gt; a = new ArrayList&lt;Object&gt;();</code></td></tr>
+      </tbody>
+    </table>
+    <div class="card key-rule">
+      <span class="label">Key Rule — upper/unbounded read-only</span>
+      <p><code>List&lt;String&gt;</code>-কে <code>List&lt;Object&gt;</code>-এ assign করা যায় না (type safety)। "যেকোনো কিছুর list"-এর জন্য <code>List&lt;?&gt;</code> ব্যবহার করুন। unbounded বা upper-bounded wildcard-এ list logically <strong>immutable</strong>: <code>List&lt;? extends Bird&gt;</code>-এ <code>birds.add(new Sparrow())</code> compile হয় না। Upper bound class ও interface উভয়ের জন্য <code>extends</code> ব্যবহার করে।</p>
+    </div>
+    <div class="card key-rule">
+      <span class="label">Key Rule — lower bound add করতে দেয়</span>
+      <p><code>List&lt;? super String&gt;</code> একটি <code>List&lt;String&gt;</code> বা যেকোনো supertype list গ্রহণ করে, তাই <code>String</code> add করা নিরাপদ। <code>List&lt;? super IOException&gt;</code>-এ <code>IOException</code> বা তার subclass <code>FileNotFoundException</code> add করা যায়, কিন্তু সাধারণ <code>Exception</code> নয় (এটি আসলে <code>List&lt;IOException&gt;</code> হতে পারে)।</p>
+    </div>
+<pre><code>List&lt;? extends B&gt; l4 = <span class="kw">new</span> ArrayList&lt;A&gt;();    <span class="err">// DOES NOT COMPILE (A, B/sub নয়)</span>
+List&lt;?&gt; l6 = <span class="kw">new</span> ArrayList&lt;? extends A&gt;();    <span class="err">// DOES NOT COMPILE (wildcard instantiate করা যায় না)</span>
+&lt;B extends A&gt; B third(List&lt;B&gt; list){ <span class="kw">return new</span> B(); }  <span class="err">// DOES NOT COMPILE (type param new করা যায় না)</span>
+&lt;X&gt; <span class="kw">void</span> fifth(List&lt;X super B&gt; list){ }           <span class="err">// DOES NOT COMPILE (wildcard-এ ? লাগে)</span></code></pre>
+    <div class="card remember">
+      <span class="label">Remember — generics দিয়ে যা করা যায় না</span>
+      <p>erasure-এর কারণে যা করা যায় না: <code>new T()</code>, <code>new T[]</code>, parameterized type-এ <code>instanceof</code>, primitive-কে type argument, type parameter-এর <code>static</code> field, বা <code>T</code> catch করা।</p>
+    </div>
+  </section>
+
+  <!-- ============ RECAP ============ -->
+  <section class="recap">
+    <h3>সংক্ষিপ্ত রিভিউ</h3>
+    <ul>
+      <li>চার interface: List (ordered, dup), Set (no dup), Queue/Deque (processing order), Map (key/value, <code>Collection</code> নয়)।</li>
+      <li>Diamond <code>&lt;&gt;</code> বাঁ থেকে infer; <code>var</code> ডান থেকে; <code>var x = new HashMap&lt;&gt;()</code> দেয় <code>&lt;Object,Object&gt;</code>।</li>
+      <li><code>Arrays.asList</code> = fixed-size, backed array (set ok, add/remove throw); <code>List.of</code>/<code>copyOf</code> = পূর্ণ immutable।</li>
+      <li><code>remove(int)</code> index দিয়ে (না পেলে throw); <code>remove(Object)</code> value দিয়ে (false দেয়)। <code>Integer.valueOf(n)</code> value version বাধ্য করে।</li>
+      <li>HashSet/HashMap unordered, Linked* insertion order, Tree* sorted (null key/value নিষেধ)।</li>
+      <li>Queue/Deque: throw বনাম sentinel জোড়া (<code>add</code>/<code>offer</code>, <code>element</code>/<code>peek</code>, <code>remove</code>/<code>poll</code>); stack-এ <code>push</code>/<code>pop</code>/<code>peek</code>।</li>
+      <li><code>merge</code>: দুটি real value থাকলেই function চলে; null দিলে remove। <code>putIfAbsent</code> null mapping update করে। <code>map.contains()</code> compile হয় না।</li>
+      <li>Comparable: <code>compareTo</code>, ১ param, <code>java.lang</code>, class-এ। Comparator: <code>compare</code>, ২ param, <code>java.util</code>, সাধারণত lambda।</li>
+      <li>non-Comparable-এ <code>Collections.sort</code> compile হয় না; <code>TreeSet</code> add runtime-এ <code>ClassCastException</code> throw করে।</li>
+      <li>Type erasure <code>T</code>-কে <code>Object</code> করে; generic type দিয়ে overloading আটকায়; covariant override-এ generic হুবহু মিলতে হয়।</li>
+      <li>Wildcard: <code>?</code> / <code>? extends</code> (read-only) / <code>? super</code> (add করা যায়)। Generic method return type-এর আগে <code>&lt;T&gt;</code> ঘোষণা করে।</li>
+    </ul>
+  </section>
+
+  <!-- ============ CHEAT SHEET ============ -->
+  <section>
+    <span class="secnum">CHEAT SHEET</span>
+    <h2>Exam Traps চিট-শিট</h2>
+    <table>
+      <thead><tr><th>পরিস্থিতি</th><th>কী টেস্ট হয়</th><th>রায়</th></tr></thead>
+      <tbody>
+        <tr><td><code>List&lt;&gt; x = new ArrayList&lt;Integer&gt;();</code></td><td>বাঁয়ে diamond</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>var m = new HashMap&lt;&gt;();</code></td><td>infer করার কিছু নেই</td><td class="yes"><code>HashMap&lt;Object,Object&gt;</code></td></tr>
+        <tr><td><code>List.of(...).add(x)</code></td><td>immutable list</td><td class="no">UnsupportedOperationException</td></tr>
+        <tr><td><code>Arrays.asList(...).add(x)</code></td><td>fixed-size backed array</td><td class="no">UnsupportedOperationException</td></tr>
+        <tr><td><code>list.remove(2)</code> Integer list-এ</td><td>index দিয়ে remove, value নয়</td><td class="yes">index 2 মুছে</td></tr>
+        <tr><td><code>int h = list.get(0)</code> element null</td><td>null unbox</td><td class="no">NullPointerException</td></tr>
+        <tr><td><code>map.contains("x")</code></td><td>contains, Collection-এ</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>new Comparator&lt;&gt;(){ int compareTo(...) }</code></td><td>ভুল method নাম</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>Collections.sort(nonComparableList)</code></td><td>Comparable লাগে</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>treeSet.add(nonComparable)</code></td><td>runtime sort ব্যর্থতা</td><td class="no">ClassCastException</td></tr>
+        <tr><td><code>HashMap</code>-কে <code>SequencedMap</code></td><td>encounter order নেই</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>treeSet.addLast(x)</code></td><td>sorted-এ position দেওয়া যায় না</td><td class="no">UnsupportedOperationException</td></tr>
+        <tr><td><code>chew(List&lt;Object&gt;)</code> + <code>chew(List&lt;Double&gt;)</code></td><td>erasure সংঘর্ষ</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>List&lt;String&gt; play()</code> override <code>List&lt;CharSequence&gt;</code></td><td>generic হুবহু মিলতে হবে</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>static T noGood(T t)</code></td><td><code>&lt;T&gt;</code> নেই</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>List&lt;? extends Bird&gt;</code>-এ <code>birds.add(new Sparrow())</code></td><td>upper bound read-only</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>List&lt;? super Exception&gt;.add(new Exception())</code></td><td>List&lt;IOException&gt; হতে পারে</td><td class="no">DOES NOT COMPILE</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+</div>
+</body>
+</html>

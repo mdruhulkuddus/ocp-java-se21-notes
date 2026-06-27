@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 · অধ্যায় ৭ — Beyond Classes (বিশদ স্টাডি নোট)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff; --ink:#2b2b32; --muted:#6e6a72;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --accent:#c96442; --accent2:#d4845e; --line:#ece3da;
+    --green:#3b7d57; --green-b:#5aab7b; --red:#c44d3e; --gold:#a9772a; --purple:#7c5cbf;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Noto Sans Bengali',system-ui,sans-serif; line-height:1.8;
+    -webkit-font-smoothing:antialiased; padding:32px 16px;
+  }
+  .wrap{max-width:1020px; margin:0 auto;}
+  h1,h2,h3,h4{font-family:'Noto Sans Bengali',sans-serif; line-height:1.5; color:#22222a; font-weight:700;}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+
+  .header{
+    background:linear-gradient(135deg,#ffffff,#fbf7f4);
+    border-radius:18px; padding:34px 34px 30px; margin-bottom:26px;
+    box-shadow:0 10px 30px rgba(120,90,60,.08);
+  }
+  .badge{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-size:.72rem;
+    letter-spacing:.5px; text-transform:uppercase; color:#fff; font-weight:700;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    padding:6px 14px; border-radius:999px; box-shadow:0 4px 12px rgba(201,100,66,.28);
+  }
+  .header h1{font-size:1.95rem; margin:18px 0 6px;}
+  .header h1 .sub{color:var(--muted); font-weight:400; font-size:1.15rem;}
+  .header .tagline{color:var(--muted); margin:0 0 20px; font-size:1rem;}
+  .objectives{
+    background:linear-gradient(135deg,#f0f9f3,#f7fcf8);
+    border-left:5px solid var(--green-b); border-radius:12px; padding:16px 20px;
+  }
+  .objectives h4{margin:0 0 8px; color:var(--green); font-size:.95rem; letter-spacing:.3px;}
+  .objectives ul{margin:0; padding-left:20px;}
+  .objectives li{margin:5px 0; font-size:.95rem;}
+
+  .toc{
+    background:var(--card); border-radius:16px; padding:22px 26px; margin-bottom:30px;
+    box-shadow:0 6px 20px rgba(120,90,60,.06);
+  }
+  .toc h3{margin:0 0 14px; font-size:1.05rem;}
+  .toc ol{columns:2; column-gap:34px; margin:0; padding-left:18px;}
+  .toc li{margin:8px 0; break-inside:avoid;}
+  .toc a{color:var(--accent); text-decoration:none; font-weight:600;}
+  .toc a:hover{text-decoration:underline;}
+
+  section{margin-bottom:40px;}
+  .secnum{font-family:'JetBrains Mono',monospace; font-size:.8rem; font-weight:700;
+    letter-spacing:2px; color:var(--accent); display:block; margin-bottom:2px;}
+  section h2{font-size:1.45rem; margin:0 0 18px; padding-bottom:10px; border-bottom:2px solid var(--line);}
+  section h3{font-size:1.12rem; margin:26px 0 10px;}
+  p{margin:12px 0;}
+
+  p code, li code, td code, .opt code{background:#f3ece4; color:#9a5030; padding:1.5px 6px; border-radius:5px; font-size:.84em; font-family:'JetBrains Mono',monospace;}
+
+  pre{
+    background:#fdfaf7; border-radius:12px; padding:16px 18px; overflow-x:auto;
+    box-shadow:inset 0 2px 8px rgba(120,90,60,.08); margin:14px 0; font-size:.86rem; line-height:1.55;
+  }
+  pre code{background:none; color:#3a3742; padding:0; font-family:'JetBrains Mono',monospace;}
+  .kw{color:var(--kw); font-weight:600;}
+  .str{color:var(--str);}
+  .num{color:var(--num);}
+  .err{color:var(--err); font-weight:600;}
+  .cm{color:var(--cm); font-style:italic;}
+
+  .card{border-radius:14px; padding:15px 19px; margin:16px 0; box-shadow:0 4px 14px rgba(120,90,60,.07);
+    transition:transform .18s ease, box-shadow .18s ease;}
+  .card:hover{transform:translateY(-2px); box-shadow:0 8px 22px rgba(120,90,60,.12);}
+  .card .label{font-family:'JetBrains Mono',monospace; font-size:.72rem; font-weight:700;
+    letter-spacing:.6px; text-transform:uppercase; display:block; margin-bottom:5px;}
+  .card p{margin:5px 0;}
+  .exam-trap{background:linear-gradient(135deg,#fef2f0,#fff8f7); border-left:5px solid #e06b5e;}
+  .exam-trap .label{color:#c0453a;}
+  .key-rule{background:linear-gradient(135deg,#f0f9f3,#f7fcf8); border-left:5px solid var(--green-b);}
+  .key-rule .label{color:var(--green);}
+  .remember{background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c;}
+  .remember .label{color:var(--gold);}
+
+  .rules-box{background:linear-gradient(135deg,#f0f9f3,#f7fcf8); border-top:4px solid var(--green-b);
+    border-radius:12px; padding:16px 22px; margin:18px 0; box-shadow:0 4px 14px rgba(120,90,60,.06);}
+  .rules-box h4{margin:0 0 8px; color:var(--green);}
+  .rules-box ol,.rules-box ul{margin:6px 0; padding-left:22px;}
+  .rules-box li{margin:6px 0;}
+
+  .vs-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0;}
+  .vs-grid .col{background:var(--card); border-radius:12px; padding:14px 18px; box-shadow:0 4px 14px rgba(120,90,60,.07);}
+  .vs-grid .col h4{margin:0 0 8px; font-size:1rem;}
+  .vs-grid .col.left h4{color:var(--purple);}
+  .vs-grid .col.right h4{color:var(--green);}
+  .vs-grid .col ul{margin:0; padding-left:18px;} .vs-grid .col li{margin:6px 0; font-size:.9rem;}
+
+  .trace{background:#fffdf9; border:1px dashed #e3d6c4; border-radius:12px; padding:12px 18px; margin:14px 0;}
+  .trace h4{margin:0 0 6px; font-size:.9rem; color:var(--accent); font-family:'JetBrains Mono',monospace; letter-spacing:.5px;}
+  .trace ul{margin:0; padding-left:20px;} .trace li{margin:5px 0; font-size:.9rem;}
+  .out{display:inline-block; background:#eef8f1; color:#2f7350; font-family:'JetBrains Mono',monospace;
+    padding:1px 8px; border-radius:5px; font-size:.85em; font-weight:600;}
+
+  table{width:100%; border-collapse:separate; border-spacing:0; background:var(--card);
+    border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(120,90,60,.08); margin:16px 0; font-size:.9rem;}
+  th,td{padding:10px 14px; text-align:left; border-bottom:1px solid #f0ebe4; vertical-align:top;}
+  thead th{background:#f0e8de; font-weight:700; color:#5a5048;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:#fcfaf7;}
+  .yes{color:var(--green); font-weight:700;}
+  .no{color:var(--red); font-weight:700;}
+
+  .recap{background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c;
+    border-radius:14px; padding:22px 26px; box-shadow:0 6px 18px rgba(120,90,60,.08);}
+  .recap h3{color:var(--gold); margin:16px 0 4px; font-size:1.02rem;}
+  .recap h3:first-child{margin-top:0;}
+  .recap ul{margin:4px 0 0; padding-left:20px;} .recap li{margin:6px 0; font-size:.92rem;}
+
+  @media(max-width:680px){
+    body{padding:18px 10px;}
+    .header{padding:24px 20px;} .header h1{font-size:1.5rem;} .header h1 .sub{font-size:1rem;}
+    .toc ol{columns:1;} .vs-grid{grid-template-columns:1fr;}
+    section h2{font-size:1.25rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="header">
+    <span class="badge">OCP Java SE 21 Developer — Exam 1Z0-830</span>
+    <h1>অধ্যায় ৭ <span class="sub">— Beyond Classes</span></h1>
+    <p class="tagline">Interface, enum, sealed class, record, nested class এবং polymorphism — সাধারণ class-এর বাইরে Java-র টাইপ সিস্টেম।</p>
+    <div class="objectives">
+      <h4>এই অধ্যায়ে যা শিখবেন</h4>
+      <ul>
+        <li><strong>Interface</strong> তৈরি ও ব্যবহার; functional interface চেনা; private, static এবং default interface method ব্যবহার।</li>
+        <li>field, method এবং constructor সহ <strong>enum</strong> টাইপ তৈরি।</li>
+        <li><strong>abstract ও sealed</strong> টাইপ এবং <strong>record</strong> দিয়ে inheritance প্রয়োগ।</li>
+        <li><strong>Encapsulation</strong> প্রয়োগ ও immutable object তৈরি; <strong>nested class</strong> object তৈরি।</li>
+        <li><strong>Polymorphism</strong> প্রয়োগ; object type বনাম reference type; casting এবং pattern matching সহ <code>instanceof</code> ব্যবহার।</li>
+      </ul>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <h3>এই পেজে যা আছে</h3>
+    <ol>
+      <li><a href="#s1">Interface বাস্তবায়ন</a></li>
+      <li><a href="#s2">Enum নিয়ে কাজ</a></li>
+      <li><a href="#s3">Sealed Class</a></li>
+      <li><a href="#s4">Encapsulation ও Record</a></li>
+      <li><a href="#s5">Nested Class তৈরি</a></li>
+      <li><a href="#s6">Polymorphism বোঝা</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ SECTION 1 ============ -->
+  <section id="s1">
+    <span class="secnum">SECTION 01</span>
+    <h2>Interface বাস্তবায়ন</h2>
+
+    <p>একটি <strong>interface</strong> হলো এমন একটি abstract data type, যা কিছু abstract method ঘোষণা করে — implementing class-কে সেগুলো অবশ্যই দিতে হয়। একটি class কেবল একটিমাত্র class <code>extends</code> করতে পারে, কিন্তু comma দিয়ে আলাদা করে যত খুশি interface <code>implements</code> করতে পারে। এভাবেই Java টাইপের multiple inheritance পায়।</p>
+
+    <h3>Interface ঘোষণা ও ব্যবহার</h3>
+    <p><code>interface</code> keyword দিয়ে interface ঘোষণা হয়। Interface-এর variable গুলো <strong>constant</strong> — implicitly <code>public static final</code> — এবং ঘোষণার সময়ই constant value দিয়ে initialize করতে হয়। Abstract method গুলো implicitly <code>public</code>।</p>
+<pre><code><span class="kw">public abstract interface</span> WalksOnTwoLegs {}   <span class="cm">// compiles; abstract is optional</span>
+
+<span class="kw">final interface</span> WalksOnEightLegs {}            <span class="err">// DOES NOT COMPILE — interface can't be final</span>
+
+<span class="kw">public class</span> Biped {
+   <span class="kw">public static void</span> main(String[] args) {
+      <span class="kw">var</span> e = <span class="kw">new</span> WalksOnTwoLegs();           <span class="err">// DOES NOT COMPILE — can't instantiate interface</span>
+   }
+}</code></pre>
+
+    <div class="card exam-trap">
+      <span class="label">Exam Trap</span>
+      <p>Abstract class-কে যেমন <code>final</code> করা যায় না, interface-কেও তেমনি যায় না — <code>final</code> করলে এর মানে দাঁড়ায় কোনো class কখনোই এটি implement করতে পারবে না। আর <code>new SomeInterface()</code> কখনোই লেখা যাবে না।</p>
+    </div>
+
+    <p>Interface implement করা concrete class-কে প্রতিটি inherited abstract method override করতে হবে এবং স্পষ্টভাবে <code>public</code> লিখতে হবে (interface-এর implicit <code>public</code> এখানে এমনি এমনি পাওয়া যায় না — override-এ আবার লিখতে হয়)। Return type covariant হতে পারে।</p>
+<pre><code><span class="kw">public interface</span> Climb {
+   Number getSpeed(<span class="kw">int</span> age);
+}
+<span class="kw">public class</span> FieldMouse <span class="kw">implements</span> Climb {
+   <span class="cm">@Override</span>
+   <span class="kw">public</span> Float getSpeed(<span class="kw">int</span> age) { <span class="kw">return</span> <span class="num">2.0f</span>; }  <span class="cm">// Float is covariant with Number; must be public</span>
+}</code></pre>
+
+    <h3>Interface extend ও keyword মেশানো</h3>
+    <p>একটি interface একসাথে <strong>একাধিক</strong> interface <code>extends</code> করতে পারে (class পারে না)। পরীক্ষায় প্রায়ই class ও interface-এর মধ্যে <code>extends</code>/<code>implements</code> অদলবদল করে ফাঁদ পাতা হয়।</p>
+    <div class="vs-grid">
+      <div class="col left">
+        <h4>অনুমোদিত</h4>
+        <ul>
+          <li>class <code>implements</code> interface(s)</li>
+          <li>class <code>extends</code> একটি class</li>
+          <li>interface <code>extends</code> interface(s)</li>
+        </ul>
+      </div>
+      <div class="col right">
+        <h4>DOES NOT COMPILE</h4>
+        <ul>
+          <li>class <code>extends</code> interface</li>
+          <li>interface <code>implements</code> interface</li>
+          <li>interface <code>extends</code> একটি class</li>
+        </ul>
+      </div>
+    </div>
+<pre><code><span class="kw">public interface</span> CanRun {}
+<span class="kw">public class</span> Cheetah <span class="kw">extends</span> CanRun {}      <span class="err">// DOES NOT COMPILE — class can't extend interface</span>
+
+<span class="kw">public class</span> Hyena {}
+<span class="kw">public interface</span> HasFur <span class="kw">extends</span> Hyena {}     <span class="err">// DOES NOT COMPILE — interface can't extend class</span></code></pre>
+
+    <h3>Duplicate abstract method inherit করা</h3>
+    <p>দুটি inherited abstract method ঠিক আছে যদি একটিমাত্র override দুটোকেই satisfy করতে পারে (compatible signature, covariant return)। Parameter-এর <em>নাম</em> মিলতে হবে না — শুধু type মিলতে হবে।</p>
+<pre><code><span class="kw">public interface</span> Herbivore { <span class="kw">int</span> eatPlants(<span class="kw">int</span> plantsLeft); }
+<span class="kw">public interface</span> Omnivore  { <span class="kw">int</span> eatPlants(<span class="kw">int</span> foodRemaining); }
+<span class="kw">public class</span> Bear <span class="kw">implements</span> Herbivore, Omnivore {
+   <span class="kw">public int</span> eatPlants(<span class="kw">int</span> plants) { <span class="kw">return</span> plants - <span class="num">1</span>; }  <span class="cm">// satisfies both</span>
+}
+
+<span class="cm">// Incompatible — one returns void, the other int:</span>
+<span class="kw">public interface</span> Herbivore { <span class="kw">void</span> eatPlants(<span class="kw">int</span> p); }
+<span class="kw">public interface</span> Omnivore  { <span class="kw">int</span>  eatPlants(<span class="kw">int</span> p); }
+<span class="kw">public class</span> Tiger <span class="kw">implements</span> Herbivore, Omnivore {}  <span class="err">// DOES NOT COMPILE — impossible to override both</span></code></pre>
+
+    <h3>Implicit modifier ও conflict</h3>
+    <div class="rules-box">
+      <h4>Compiler যে implicit modifier বসায়</h4>
+      <ul>
+        <li>Interface implicitly <code>abstract</code>।</li>
+        <li>Interface variable implicitly <code>public static final</code> (constant)।</li>
+        <li>Body ছাড়া interface method implicitly <code>abstract</code>।</li>
+        <li><code>private</code> ছাড়া interface method implicitly <code>public</code>।</li>
+      </ul>
+    </div>
+    <p>যেহেতু member গুলো implicitly <code>public</code>, তাই এর সাথে সাংঘর্ষিকভাবে <code>protected</code> বা <code>private</code> লিখলে compile হয় না। Interface <code>protected</code> বা package member <strong>সমর্থন করে না</strong>।</p>
+<pre><code><span class="kw">public interface</span> Dance {
+   <span class="kw">private int</span> count = <span class="num">4</span>;       <span class="err">// DOES NOT COMPILE — conflicts with implicit public</span>
+   <span class="kw">protected void</span> step();        <span class="err">// DOES NOT COMPILE — conflicts with implicit public</span>
+}</code></pre>
+
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — visibility কমানো</span>
+      <p>Interface method <code>public</code>। Implementing class যদি override-এ দুর্বল (package) access দেয়, তাহলে compile হয় না: <code>class Georgette implements Poodle { void play() {} }</code> ব্যর্থ হয়, কারণ <code>Poodle</code>-এ <code>play()</code> public। তবে <em>abstract class</em>-এর package-access method-কে package access দিয়ে override করা ঠিক আছে।</p>
+    </div>
+
+    <h3>ছয় ধরনের interface member</h3>
+    <table>
+      <thead><tr><th>Member</th><th>Required modifier</th><th>Membership</th><th>Body আছে?</th></tr></thead>
+      <tbody>
+        <tr><td>Constant variable</td><td><code>—</code> (implicit <code>public static final</code>)</td><td>Class</td><td class="yes">Value</td></tr>
+        <tr><td>abstract method</td><td><code>—</code> (implicit <code>public abstract</code>)</td><td>Instance</td><td class="no">না</td></tr>
+        <tr><td>default method</td><td><code>default</code></td><td>Instance</td><td class="yes">হ্যাঁ</td></tr>
+        <tr><td>static method</td><td><code>static</code></td><td>Class</td><td class="yes">হ্যাঁ</td></tr>
+        <tr><td>private method</td><td><code>private</code></td><td>Instance</td><td class="yes">হ্যাঁ</td></tr>
+        <tr><td>private static method</td><td><code>private static</code></td><td>Class</td><td class="yes">হ্যাঁ</td></tr>
+      </tbody>
+    </table>
+
+    <h3>default method</h3>
+    <div class="rules-box">
+      <h4>default method-এর নিয়ম</h4>
+      <ol>
+        <li>কেবল interface-এর ভেতরে ঘোষণা করা যায়।</li>
+        <li><code>default</code> keyword ও body থাকতে হবে।</li>
+        <li>Implicitly <code>public</code>।</li>
+        <li><code>abstract</code>, <code>final</code> বা <code>static</code> করা যায় না।</li>
+        <li>Implementing class override করতে পারে।</li>
+        <li>একই signature-এর দুটি default inherit করলে class-কে <strong>অবশ্যই</strong> override করতে হবে।</li>
+      </ol>
+    </div>
+<pre><code><span class="kw">public interface</span> Walk { <span class="kw">default int</span> getSpeed() { <span class="kw">return</span> <span class="num">5</span>; } }
+<span class="kw">public interface</span> Run  { <span class="kw">default int</span> getSpeed() { <span class="kw">return</span> <span class="num">10</span>; } }
+<span class="kw">public class</span> Cat <span class="kw">implements</span> Walk, Run {}   <span class="err">// DOES NOT COMPILE — duplicate default, ambiguous</span>
+
+<span class="cm">// Fix by overriding, and reach a "hidden" version with InterfaceName.super:</span>
+<span class="kw">public class</span> Cat <span class="kw">implements</span> Walk, Run {
+   <span class="kw">public int</span> getSpeed() { <span class="kw">return</span> <span class="num">1</span>; }
+   <span class="kw">public int</span> getWalkSpeed() { <span class="kw">return</span> Walk.<span class="kw">super</span>.getSpeed(); }  <span class="cm">// not Walk.this</span>
+}</code></pre>
+    <div class="card key-rule">
+      <span class="label">Key Rule</span>
+      <p>default method একটি <em>instance</em>-এর সাথে যুক্ত। Interface-এর উপর সরাসরি কল করা যায় না: <code>Dance.getRhythm()</code> compile হয় না। কোনো inherited (hidden) default-এ পৌঁছাতে বিশেষ syntax <code>InterfaceName.super.method()</code> ব্যবহার করুন।</p>
+    </div>
+
+    <h3>static ও private interface method</h3>
+    <div class="rules-box">
+      <h4>static interface method-এর নিয়ম</h4>
+      <ol>
+        <li><code>static</code> ও body থাকতে হবে।</li>
+        <li>Access modifier না থাকলে implicitly <code>public</code>।</li>
+        <li><code>abstract</code> বা <code>final</code> করা যায় না।</li>
+        <li><strong>Inherit হয় না</strong> — interface-এর নাম দিয়ে কল করতে হবে।</li>
+      </ol>
+    </div>
+<pre><code><span class="kw">public interface</span> Hop { <span class="kw">static int</span> getJumpHeight() { <span class="kw">return</span> <span class="num">8</span>; } }
+
+<span class="kw">public class</span> Bunny <span class="kw">implements</span> Hop {
+   <span class="kw">public void</span> printDetails() {
+      System.out.println(getJumpHeight());        <span class="err">// DOES NOT COMPILE — needs Hop. prefix</span>
+      System.out.println(Hop.getJumpHeight());    <span class="cm">// OK</span>
+   }
+}</code></pre>
+    <p><strong>private</strong> ও <strong>private static</strong> method কেবল interface-এর ভেতরে code-duplication কমাতে ব্যবহৃত হয়। একটি <code>private static</code> method interface-এর যেকোনো method থেকে কল করা যায়; non-static <code>private</code> method কেবল <code>default</code> ও অন্য non-static <code>private</code> method থেকে কল করা যায়। কোনোটিই implementing class থেকে কল করা যায় না। মনে রাখুন: <code>static</code> method object reference ছাড়া <code>default</code>/<code>private</code> instance method কল করতে পারে না।</p>
+  </section>
+
+  <!-- ============ SECTION 2 ============ -->
+  <section id="s2">
+    <span class="secnum">SECTION 02</span>
+    <h2>Enum নিয়ে কাজ</h2>
+
+    <p>একটি <strong>enum</strong> হলো constant-এর একটি নির্দিষ্ট সেট, যা compile-time টাইপ-নিরাপত্তা দেয়। Value গুলো সাধারণত <code>SNAKE_CASE</code>-এ লেখা হয়। <code>==</code> বা <code>equals()</code> দিয়ে তুলনা করা যায়, কারণ প্রতিটি value JVM-এ একবারই তৈরি হয়।</p>
+<pre><code><span class="kw">public enum</span> Season { WINTER, SPRING, SUMMER, FALL }
+
+<span class="kw">var</span> s = Season.SUMMER;
+System.out.println(Season.SUMMER);        <span class="cm">// SUMMER (name via toString)</span>
+System.out.println(s == Season.SUMMER);   <span class="cm">// true</span></code></pre>
+
+    <h3>সাধারণ method</h3>
+    <table>
+      <thead><tr><th>Method</th><th>রিটার্ন করে</th><th>নোট</th></tr></thead>
+      <tbody>
+        <tr><td><code>values()</code></td><td>সব value-র array</td><td>for-each loop-এ ব্যবহারযোগ্য</td></tr>
+        <tr><td><code>name()</code></td><td><code>String</code></td><td>ঘোষিত নাম</td></tr>
+        <tr><td><code>ordinal()</code></td><td><code>int</code></td><td>0-based ঘোষণার ক্রম</td></tr>
+        <tr><td><code>valueOf(String)</code></td><td>মিলে যাওয়া value</td><td><strong>হুবহু</strong> মিলতে হবে, নইলে <code>IllegalArgumentException</code></td></tr>
+      </tbody>
+    </table>
+<pre><code>Season.valueOf(<span class="str">"SUMMER"</span>);   <span class="cm">// SUMMER</span>
+Season.valueOf(<span class="str">"summer"</span>);   <span class="err">// IllegalArgumentException at runtime</span></code></pre>
+
+    <div class="card exam-trap">
+      <span class="label">Exam Trap</span>
+      <p>enum-কে <code>int</code>-এর সাথে তুলনা করা বা ordinal ব্যবহার করা যায় না যেখানে value চাওয়া হয়:</p>
+      <p><code>if (Season.SUMMER == 2) {}</code> &rarr; <span class="no">DOES NOT COMPILE</span>। switch-এ enum-এর জন্য <code>case 0 -&gt;</code> &rarr; <span class="no">DOES NOT COMPILE</span>।</p>
+    </div>
+
+    <p>enum extend করা বা <code>final</code> করা যায় না, কিন্তু এটি <strong>interface implement করতে পারে</strong>।</p>
+<pre><code><span class="kw">public enum</span> ExtendedSeason <span class="kw">extends</span> Season {}  <span class="err">// DOES NOT COMPILE — can't extend an enum</span></code></pre>
+
+    <h3>switch-এ enum</h3>
+    <p>সব value handle করা হলে (exhaustive) enum switch-এ <code>default</code> branch লাগে না। Java 21-এ <code>case</code> label-এ enum-এর নাম optional।</p>
+<pre><code>String getWeather(Season value) {
+   <span class="kw">return</span> <span class="kw">switch</span> (value) {
+      <span class="kw">case</span> SUMMER        -> <span class="str">"Too hot"</span>;
+      <span class="kw">case</span> Season.WINTER -> <span class="str">"Too cold"</span>;   <span class="cm">// name optional but allowed</span>
+      <span class="kw">case</span> SPRING, FALL  -> <span class="str">"Just right"</span>;
+   };  <span class="cm">// no default needed — all values covered</span>
+}</code></pre>
+
+    <h3>Complex enum: field, constructor, method</h3>
+    <div class="card key-rule">
+      <span class="label">Key Rule</span>
+      <p>value list-এর বাইরে কিছু থাকলেই <strong>value-র তালিকা আগে আসবে এবং semicolon দিয়ে শেষ হবে</strong>। Enum constructor <strong>implicitly <code>private</code></strong>; <code>public</code>/<code>protected</code> দিলে compile হয় না। প্রতিটি constructor enum প্রথমবার ব্যবহারের সময় একবারই চলে।</p>
+    </div>
+<pre><code><span class="kw">enum</span> SeasonWithVisitors <span class="kw">implements</span> Visitors {
+   WINTER(<span class="str">"Low"</span>), SPRING(<span class="str">"Medium"</span>), SUMMER(<span class="str">"High"</span>), FALL(<span class="str">"Medium"</span>);  <span class="cm">// ; required</span>
+   <span class="kw">private final</span> String visitors;
+   <span class="kw">public static final</span> String DESCRIPTION = <span class="str">"Weather enum"</span>;
+   <span class="kw">private</span> SeasonWithVisitors(String visitors) {     <span class="cm">// implicitly private</span>
+      System.out.print(<span class="str">"constructing,"</span>);
+      <span class="kw">this</span>.visitors = visitors;
+   }
+   <span class="cm">@Override</span> <span class="kw">public void</span> printVisitors() { System.out.println(visitors); }
+}</code></pre>
+    <div class="trace">
+      <h4>CONSTRUCTOR প্রতি VALUE-তে একবার চলে</h4>
+      <ul>
+        <li><code>SeasonWithVisitors.SUMMER</code> দু'বার কল করলে প্রিন্ট হয় <span class="out">begin,constructing,constructing,constructing,constructing,middle,end</span></li>
+        <li>প্রথম ব্যবহারে চারটি value-ই construct হয়; দ্বিতীয় reference কিছুই construct করে না।</li>
+      </ul>
+    </div>
+
+    <h3>প্রতিটি value-র নিজস্ব method body</h3>
+    <p>enum-এ <code>abstract</code> method ঘোষণা করলে প্রতিটি value-কে তা implement করতে হবে। অথবা একটি default body দিয়ে কেবল বিশেষ ক্ষেত্রগুলো override করুন।</p>
+<pre><code><span class="kw">public enum</span> SeasonWithTimes {
+   WINTER { <span class="kw">public</span> String getHours() { <span class="kw">return</span> <span class="str">"10am-3pm"</span>; } },
+   SUMMER { <span class="kw">public</span> String getHours() { <span class="kw">return</span> <span class="str">"9am-7pm"</span>; } },
+   SPRING, FALL;
+   <span class="kw">public</span> String getHours() { <span class="kw">return</span> <span class="str">"9am-5pm"</span>; }   <span class="cm">// default for the rest</span>
+}</code></pre>
+  </section>
+
+  <!-- ============ SECTION 3 ============ -->
+  <section id="s3">
+    <span class="secnum">SECTION 03</span>
+    <h2>Sealed Class</h2>
+
+    <p>একটি <strong>sealed</strong> class নিয়ন্ত্রণ করে কোন কোন class এটি extend করতে পারবে। তিনটি keyword গুরুত্বপূর্ণ: <code>sealed</code> (নির্দিষ্ট type-এ extension সীমিত করে), <code>permits</code> (সেই type-গুলোর তালিকা দেয়) এবং <code>non-sealed</code> (sealed parent-কে অজানা subclass-এর জন্য আবার খুলে দেয়)।</p>
+
+    <div class="rules-box">
+      <h4>Sealed class-এর নিয়ম</h4>
+      <ul>
+        <li><code>sealed</code> ও (optionally) <code>permits</code> দিয়ে ঘোষণা।</li>
+        <li>sealed class ও তার direct subclass একই <strong>package</strong>-এ (বা named module-এ) থাকতে হবে।</li>
+        <li>প্রতিটি direct subclass অবশ্যই <code>final</code>, <code>sealed</code>, বা <code>non-sealed</code>-এর ঠিক একটি হবে।</li>
+        <li>subclass একই file-এ বা sealed class-এর ভেতরে nested হলে <code>permits</code> optional।</li>
+        <li>Interface-ও sealed হতে পারে; extending interface কেবল <code>sealed</code> বা <code>non-sealed</code> হতে পারে (কখনো <code>final</code> নয়)।</li>
+      </ul>
+    </div>
+
+<pre><code><span class="kw">public class sealed</span> Frog <span class="kw">permits</span> GlassFrog {}   <span class="err">// DOES NOT COMPILE — modifier order (sealed before class)</span>
+
+<span class="kw">public abstract sealed class</span> Mammal <span class="kw">permits</span> Wolf {}
+<span class="kw">public final class</span> Wolf <span class="kw">extends</span> Mammal {}
+<span class="kw">public final class</span> Tiger <span class="kw">extends</span> Mammal {}     <span class="err">// DOES NOT COMPILE — Tiger not in permits</span></code></pre>
+
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — subclass-এর modifier</span>
+      <p>সবচেয়ে বেশি যাচাই হওয়া নিয়ম: sealed class-এর direct subclass-কে <strong>অবশ্যই</strong> <code>final</code>, <code>sealed</code>, বা <code>non-sealed</code> ঘোষণা করতে হবে। এর কোনোটি ছাড়া সাধারণ <code>class Sub extends SealedParent {}</code> compile হয় না।</p>
+    </div>
+
+    <div class="vs-grid">
+      <div class="col left">
+        <h4>final subclass</h4>
+        <ul>
+          <li>নির্দিষ্ট — আর extend করা যায় না।</li>
+          <li><code>final class Gazelle extends Antelope {}</code></li>
+          <li><code>class DamaGazelle extends Gazelle {}</code> &rarr; <span class="no">DNC</span></li>
+        </ul>
+      </div>
+      <div class="col right">
+        <h4>sealed subclass</h4>
+        <ul>
+          <li>নিজের <code>permits</code> তালিকা দিতে হবে।</li>
+          <li>Indirect subclass শীর্ষ parent-এ থাকতে হয় না।</li>
+          <li>type-এর পুরো সেট তবুও compile-time-এ নির্দিষ্ট।</li>
+        </ul>
+      </div>
+    </div>
+<pre><code><span class="kw">abstract sealed class</span> Mammal <span class="kw">permits</span> Feline {}
+<span class="kw">non-sealed class</span> Feline <span class="kw">extends</span> Mammal {}
+<span class="kw">class</span> Tiger <span class="kw">extends</span> Feline {}            <span class="cm">// OK — Feline is non-sealed</span>
+<span class="kw">class</span> BengalTiger <span class="kw">extends</span> Tiger {}       <span class="cm">// OK — Tiger not final</span></code></pre>
+
+    <h3>permits বাদ দেওয়া ও nested subclass</h3>
+    <p>subclass গুলো sealed class-এর একই file-এ থাকলে, বা এর ভেতরে nested হলে <code>permits</code> বাদ দেওয়া যায়। তবে nested subclass নাম দিয়ে উল্লেখ করলে enclosing namespace দিয়ে qualify করতে হবে।</p>
+<pre><code><span class="kw">public sealed class</span> Snake <span class="kw">permits</span> Cobra {
+   <span class="kw">final class</span> Cobra <span class="kw">extends</span> Snake {}     <span class="err">// DOES NOT COMPILE — needs Snake.Cobra</span>
+}
+<span class="kw">public sealed class</span> Snake <span class="kw">permits</span> Snake.Cobra {
+   <span class="kw">final class</span> Cobra <span class="kw">extends</span> Snake {}     <span class="cm">// OK</span>
+}</code></pre>
+
+    <h3>Sealed type ও pattern-matching switch</h3>
+    <p>enum-এর মতোই, sealed type একটি <code>switch</code>-কে <code>default</code> ছাড়া exhaustive হতে দেয় — কিন্তু কেবল তখনই যখন compiler প্রতিটি সম্ভাবনা দেখতে পায়। sealed <strong>abstract</strong> parent তা নিশ্চিত করে।</p>
+<pre><code><span class="kw">abstract sealed class</span> Fish <span class="kw">permits</span> Trout, Bass {}
+<span class="kw">final class</span> Trout <span class="kw">extends</span> Fish {}
+<span class="kw">final class</span> Bass  <span class="kw">extends</span> Fish {}
+
+String getType(Fish fish) {
+   <span class="kw">return</span> <span class="kw">switch</span> (fish) {
+      <span class="kw">case</span> Trout t -> <span class="str">"Trout!"</span>;
+      <span class="kw">case</span> Bass  b -> <span class="str">"Bass!"</span>;
+   };  <span class="cm">// no default needed — but removing 'abstract' from Fish breaks this</span>
+}</code></pre>
+  </section>
+
+  <!-- ============ SECTION 4 ============ -->
+  <section id="s4">
+    <span class="secnum">SECTION 04</span>
+    <h2>Encapsulation ও Record</h2>
+
+    <p><strong>Encapsulation</strong> instance variable-গুলো <code>private</code> করে এবং method-এর মাধ্যমে access বাধ্যতামূলক করে class-এর member রক্ষা করে। যতক্ষণ instance variable গুলো private, ততক্ষণ class টি well-encapsulated — getter/setter optional। Immutable করতে setter বাদ দিন।</p>
+
+    <h3>Record boilerplate কমিয়ে দেয়</h3>
+    <p>একটি <strong>record</strong> হলো compact, immutable, encapsulated data carrier। Compiler একটি constructor, প্রতি field-এ একটি accessor, এবং <code>equals()</code>, <code>hashCode()</code>, <code>toString()</code> তৈরি করে দেয়।</p>
+<pre><code><span class="kw">public record</span> Crane(<span class="kw">int</span> numberEggs, String name) {}
+
+<span class="kw">var</span> mommy = <span class="kw">new</span> Crane(<span class="num">4</span>, <span class="str">"Cammy"</span>);
+System.out.println(mommy.numberEggs());   <span class="cm">// 4   (accessor is name(), NOT getName())</span>
+System.out.println(mommy.name());         <span class="cm">// Cammy</span>
+System.out.println(mommy);                <span class="cm">// Crane[numberEggs=4, name=Cammy]</span></code></pre>
+
+    <div class="card key-rule">
+      <span class="label">Key Rule — generated member</span>
+      <p>Constructor-এর parameter ঘোষণার ক্রম অনুসরণ করে। Accessor হলো শুধু field-এর নাম + <code>()</code> — কোনো <code>get</code>/<code>is</code> prefix নেই। সমান field-এর দুটি record <code>equals()</code> এবং একই <code>hashCode()</code> দেয়। field-হীন record বৈধ: <code>public record Crane() {}</code>।</p>
+    </div>
+<pre><code><span class="kw">var</span> m1 = <span class="kw">new</span> Crane(<span class="str">"Cammy"</span>, <span class="num">4</span>);  <span class="err">// DOES NOT COMPILE — wrong order</span>
+<span class="kw">var</span> m2 = <span class="kw">new</span> Crane(<span class="str">"Cammy"</span>);     <span class="err">// DOES NOT COMPILE — missing argument</span></code></pre>
+
+    <h3>Constructor: long, compact, overloaded</h3>
+    <div class="vs-grid">
+      <div class="col left">
+        <h4>Compact constructor</h4>
+        <ul>
+          <li><strong>বন্ধনী ছাড়া</strong> ঘোষণা: <code>public Crane {}</code></li>
+          <li><em>parameter</em>-কে validate/transform করে।</li>
+          <li>Java পরে আসল constructor চালায়।</li>
+          <li><code>this.x</code> দিয়ে field assign করা যায় না।</li>
+        </ul>
+      </div>
+      <div class="col right">
+        <h4>Long ও overloaded</h4>
+        <ul>
+          <li>Long: ঘোষণার মতো একই param; প্রতিটি field set করতে হবে।</li>
+          <li>Overloaded: ভিন্ন param; প্রথম লাইন অবশ্যই <code>this(...)</code>।</li>
+          <li>কেবল long form <code>this.x</code> দিয়ে field set করতে পারে।</li>
+        </ul>
+      </div>
+    </div>
+<pre><code><span class="cm">// Compact — transform the parameter, not the field:</span>
+<span class="kw">public record</span> Crane(<span class="kw">int</span> numberEggs, String name) {
+   <span class="kw">public</span> Crane {                          <span class="cm">// no parentheses!</span>
+      <span class="kw">if</span> (name == <span class="kw">null</span> || name.length() < <span class="num">1</span>)
+         <span class="kw">throw new</span> IllegalArgumentException();
+      name = name.substring(<span class="num">0</span>,<span class="num">1</span>).toUpperCase() + name.substring(<span class="num">1</span>).toLowerCase();
+      <span class="kw">this</span>.numberEggs = <span class="num">10</span>;                <span class="err">// DOES NOT COMPILE — can't set field in compact ctor</span>
+   }
+}
+
+<span class="cm">// Empty long constructor leaves fields unset:</span>
+<span class="kw">public record</span> Crane(<span class="kw">int</span> numberEggs, String name) {
+   <span class="kw">public</span> Crane(<span class="kw">int</span> numberEggs, String name) {}   <span class="err">// DOES NOT COMPILE — fields not assigned</span>
+}</code></pre>
+
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — record member</span>
+      <p>Record implicitly <code>final</code>, কিছু extend করতে পারে না, এবং header-এর বাইরে <strong>instance</strong> field ও <strong>instance</strong> initializer নিষিদ্ধ। Static field ও <em>static</em> initializer অনুমোদিত।</p>
+    </div>
+<pre><code><span class="kw">public record</span> Crane(<span class="kw">int</span> numberEggs, String name) {
+   <span class="kw">private static int</span> TYPE = <span class="num">10</span>;            <span class="cm">// OK — static field</span>
+   <span class="kw">public int</span> size;                          <span class="err">// DOES NOT COMPILE — instance field</span>
+   <span class="kw">static</span> { System.out.print(<span class="str">"Hi"</span>); }        <span class="cm">// OK — static initializer</span>
+   { System.out.print(<span class="str">"Bye"</span>); }              <span class="err">// DOES NOT COMPILE — instance initializer</span>
+}
+<span class="kw">public record</span> BlueCrane() <span class="kw">extends</span> Crane {}  <span class="err">// DOES NOT COMPILE — records are final</span></code></pre>
+
+    <h3>Record pattern matching (Java 21-এ নতুন)</h3>
+    <div class="rules-box">
+      <h4>Record deconstruction-এর নিয়ম</h4>
+      <ul>
+        <li>কোনো field দিলে, ক্রম অনুযায়ী <strong>সব</strong> field দিতে হবে।</li>
+        <li>field-এর নাম record-এর থেকে ভিন্ন হতে পারে।</li>
+        <li>প্রতিটি pattern type ঘোষিত type-এর সাথে compatible হতে হবে (numeric promotion নয়)।</li>
+        <li>record-এর নাম <em>অথবা</em> এর field — দুটোই একসাথে নয়।</li>
+      </ul>
+    </div>
+<pre><code><span class="kw">record</span> Monkey(String name, <span class="kw">int</span> age) {}
+
+<span class="kw">if</span> (animal <span class="kw">instanceof</span> Monkey m) {}                          <span class="cm">// OK — simple binding</span>
+<span class="kw">if</span> (animal <span class="kw">instanceof</span> Monkey(String n, <span class="kw">int</span> a) m) {}        <span class="err">// DOES NOT COMPILE — named record AND fields</span>
+<span class="kw">if</span> (animal <span class="kw">instanceof</span> Monkey(String n, <span class="kw">long</span> a)) {}         <span class="err">// DOES NOT COMPILE — numeric promotion</span>
+<span class="kw">if</span> (animal <span class="kw">instanceof</span> Monkey(Object n, <span class="kw">int</span> a)) {}         <span class="cm">// OK — String is compatible with Object</span></code></pre>
+    <div class="trace">
+      <h4>RECORD-এ SWITCH — showData(Snake)</h4>
+      <ul>
+        <li><code>record Snake(Object data) {}</code> — <code>Long</code>, <code>Integer</code>, <code>Number</code>, <code>Object</code> case দিয়ে match।</li>
+        <li><code>new Snake(1)</code> &rarr; <span class="out">11</span> &nbsp;·&nbsp; <code>new Snake(2L)</code> &rarr; <span class="out">3</span> &nbsp;·&nbsp; <code>new Snake(3.0)</code> &rarr; <span class="out">103</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 5 ============ -->
+  <section id="s5">
+    <span class="secnum">SECTION 05</span>
+    <h2>Nested Class তৈরি</h2>
+
+    <p>nested class হলো আরেকটি class-এর ভেতরে সংজ্ঞায়িত class। চার ধরনের হয়:</p>
+    <table>
+      <thead><tr><th>ধরন</th><th>কোথায়</th><th>outer instance দরকার?</th><th>access modifier</th></tr></thead>
+      <tbody>
+        <tr><td>Inner class</td><td>member level, non-static</td><td class="yes">হ্যাঁ</td><td>চারটিই</td></tr>
+        <tr><td>static nested class</td><td>member level, static</td><td class="no">না</td><td>চারটিই</td></tr>
+        <tr><td>Local class</td><td>method/block-এর ভেতরে</td><td>n/a</td><td>কোনোটিই নয়</td></tr>
+        <tr><td>Anonymous class</td><td>inline ঘোষণা ও তৈরি</td><td>n/a</td><td>কোনোটিই নয়</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Inner class-এর instance দরকার</h3>
+    <p>একটি inner class যেকোনো access level ব্যবহার করতে পারে, outer-এর সব member (এমনকি <code>private</code>) access করতে পারে, এবং outer class-এর instance থেকে তৈরি করতে হয় — static context-এ অদ্ভুত <code>outer.new Inner()</code> syntax দিয়ে।</p>
+<pre><code><span class="kw">public class</span> Fox {
+   <span class="kw">private class</span> Den {}
+   <span class="kw">public void</span> goHome() { <span class="kw">new</span> Den(); }            <span class="cm">// OK — instance context</span>
+   <span class="kw">public static void</span> visitFriend() { <span class="kw">new</span> Den(); }  <span class="err">// DOES NOT COMPILE — static, no Fox instance</span>
+}
+<span class="kw">public class</span> Squirrel {
+   <span class="kw">public void</span> visitFox() { <span class="kw">new</span> Den(); }         <span class="err">// DOES NOT COMPILE — not in Fox, and Den is private</span>
+}
+
+<span class="cm">// Creating an inner instance from outside / static:</span>
+<span class="kw">var</span> home = <span class="kw">new</span> Home();
+Room room = home.<span class="kw">new</span> Room();        <span class="cm">// or: new Home().new Room();</span></code></pre>
+    <p>একই নামের field বিভিন্ন nesting level-এ আলাদা করতে <code>EnclosingClass.this.field</code> ব্যবহার করুন: <code>A.this.x</code>, <code>B.this.x</code>।</p>
+
+    <h3>static nested class ও nested record</h3>
+    <p>static nested class outer instance ছাড়াই তৈরি হয় কিন্তু outer instance member-এ পৌঁছাতে পারে না। <strong>Nested record implicitly static</strong>, তাই একইভাবে আচরণ করে।</p>
+<pre><code><span class="kw">class</span> Emu1 {
+   String name = <span class="str">"Emmy"</span>;
+   <span class="kw">static</span> Feathers createFeathers() { <span class="kw">return new</span> Feathers(<span class="str">"grey"</span>); }  <span class="cm">// OK — record is static</span>
+   <span class="kw">record</span> Feathers(String color) {
+      <span class="kw">void</span> fly() { System.out.print(name + <span class="str">" is flying"</span>); }       <span class="err">// DOES NOT COMPILE — outer instance var</span>
+   }
+}</code></pre>
+
+    <h3>Local ও anonymous class</h3>
+    <div class="card key-rule">
+      <span class="label">Key Rule</span>
+      <p>একটি local class কেবল <strong>final বা effectively final</strong> local variable capture করতে পারে। একটি anonymous class ঠিক <strong>একটি class extend</strong> বা <strong>একটি interface implement</strong> করতে পারে — কখনো দুটোই নয় — এবং এর ঘোষণা semicolon দিয়ে শেষ হয়।</p>
+    </div>
+<pre><code><span class="kw">public void</span> processData() {
+   <span class="kw">final int</span> length = <span class="num">5</span>;
+   <span class="kw">int</span> width = <span class="num">10</span>;
+   <span class="kw">class</span> VolumeCalculator {
+      <span class="kw">public int</span> multiply() { <span class="kw">return</span> length * width; }  <span class="err">// DOES NOT COMPILE — width not effectively final</span>
+   }
+   width = <span class="num">2</span>;                                          <span class="cm">// this reassignment breaks it</span>
+}
+
+<span class="cm">// Anonymous class — note the trailing semicolon:</span>
+SaleTodayOnly sale = <span class="kw">new</span> SaleTodayOnly() {
+   <span class="kw">int</span> dollarsOff() { <span class="kw">return</span> <span class="num">3</span>; }
+};</code></pre>
+  </section>
+
+  <!-- ============ SECTION 6 ============ -->
+  <section id="s6">
+    <span class="secnum">SECTION 06</span>
+    <h2>Polymorphism বোঝা</h2>
+
+    <p>Polymorphism একটি object-কে তার নিজের type, supertype, বা implemented interface-এর reference দিয়ে access করতে দেয় — supertype-এ <em>উপরে</em> ওঠার সময় কোনো cast লাগে না।</p>
+<pre><code><span class="kw">public class</span> Lemur <span class="kw">extends</span> Primate <span class="kw">implements</span> HasTail {
+   <span class="kw">public boolean</span> isTailStriped() { <span class="kw">return false</span>; }
+   <span class="kw">public int</span> age = <span class="num">10</span>;
+   <span class="kw">public static void</span> main(String[] args) {
+      Lemur lemur = <span class="kw">new</span> Lemur();
+      System.out.println(lemur.age);            <span class="cm">// 10</span>
+      HasTail hasTail = lemur;
+      System.out.println(hasTail.isTailStriped()); <span class="cm">// false</span>
+      Primate primate = lemur;
+      System.out.println(primate.hasHair());    <span class="cm">// true</span>
+   }
+}</code></pre>
+
+    <div class="card key-rule">
+      <span class="label">Key Rule — object বনাম reference</span>
+      <p><strong>object type</strong> ঠিক করে memory-তে কোন property আছে; <strong>reference type</strong> ঠিক করে কোন member কল করা যাবে। Supertype-এ reassign করলে member লুকায়, কিন্তু কখনো মুছে যায় না। <code>hasTail.age</code> ও <code>primate.isTailStriped()</code> compile হয় না, কারণ সেই reference দিয়ে ঐ member দৃশ্যমান নয়।</p>
+    </div>
+
+    <h3>Casting-এর নিয়ম</h3>
+    <div class="rules-box">
+      <h4>চারটি casting নিয়ম</h4>
+      <ol>
+        <li>Subtype &rarr; supertype: explicit cast লাগে না।</li>
+        <li>Supertype &rarr; subtype: explicit cast লাগে।</li>
+        <li>Incompatible type-এ invalid cast runtime-এ <code>ClassCastException</code> ছুঁড়ে।</li>
+        <li>Compiler unrelated <em>class</em> type-এর মধ্যে cast নিষিদ্ধ করে।</li>
+      </ol>
+    </div>
+<pre><code>Lemur lemur3 = primate;            <span class="err">// DOES NOT COMPILE — missing explicit cast</span>
+Bird bird = (Bird) fish;           <span class="err">// DOES NOT COMPILE — Fish and Bird unrelated</span></code></pre>
+
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — interface cast</span>
+      <p>Compiler একটি <em>unrelated interface</em>-এ cast অনুমোদন করে (কোনো subclass হয়তো এটি implement করতে পারে), তাই compile হয় কিন্তু runtime-এ <code>ClassCastException</code> ছুঁড়ে। ব্যতিক্রম: source class যদি <code>final</code> হয়, compiler জানে কোনো subclass interface-টি implement করতে পারবে না, তাই compile হয় না। unrelated type-এ <code>instanceof</code>-ও compile হয় না।</p>
+    </div>
+
+    <h3>Overriding বনাম hiding</h3>
+    <p>একটি <em>instance method</em> override করলে তা সর্বত্র প্রতিস্থাপিত হয় — call object-এর প্রকৃত type-এ dispatch হয়। Hiding (<code>static</code> method ও <strong>সব variable</strong>) <em>reference type</em> দিয়ে নির্ধারিত হয়।</p>
+    <div class="vs-grid">
+      <div class="col left">
+        <h4>Overriding (instance method)</h4>
+        <ul>
+          <li><code>EmperorPenguin.getHeight()</code> = 8; parent-এর <code>printInfo()</code> <code>this.getHeight()</code> কল করে &rarr; <span class="out">8</span></li>
+          <li>object type-এ dispatch।</li>
+        </ul>
+      </div>
+      <div class="col right">
+        <h4>Hiding (static / variable)</h4>
+        <ul>
+          <li>static <code>getHeight()</code> hidden &rarr; parent-এর <code>printInfo()</code> প্রিন্ট করে <span class="out">3</span></li>
+          <li>reference type দিয়ে নির্ধারিত, object দিয়ে নয়।</li>
+        </ul>
+      </div>
+    </div>
+<pre><code><span class="kw">class</span> Marsupial {
+   <span class="kw">protected int</span> age = <span class="num">2</span>;
+   <span class="kw">public static boolean</span> isBiped() { <span class="kw">return false</span>; }
+}
+<span class="kw">public class</span> Kangaroo <span class="kw">extends</span> Marsupial {
+   <span class="kw">protected int</span> age = <span class="num">6</span>;
+   <span class="kw">public static boolean</span> isBiped() { <span class="kw">return true</span>; }
+   <span class="kw">public static void</span> main(String[] args) {
+      Kangaroo joey = <span class="kw">new</span> Kangaroo();
+      Marsupial moey = joey;
+      System.out.println(joey.isBiped());  <span class="cm">// true   (reference type Kangaroo)</span>
+      System.out.println(moey.isBiped());  <span class="cm">// false  (reference type Marsupial)</span>
+      System.out.println(joey.age);        <span class="cm">// 6      (variable hidden — ref type)</span>
+      System.out.println(moey.age);        <span class="cm">// 2      (variable hidden — ref type)</span>
+   }
+}</code></pre>
+    <div class="card remember">
+      <span class="label">Remember</span>
+      <p><code>super.super</code> দিয়ে grandparent-এর method-এ পৌঁছানো যায় না। <code>Penguin.printInfo()</code>-এর ভেতরে <code>super.getHeight()</code> <code>Object</code>-কে নির্দেশ করে এবং compile হয় না — child-এ <code>printInfo()</code> override করে সেখানে <code>super.getHeight()</code> কল করলে parent-এর value প্রিন্ট হবে।</p>
+    </div>
+  </section>
+
+  <!-- ============ RECAP ============ -->
+  <section class="recap">
+    <h3>সংক্ষিপ্ত রিভিউ</h3>
+    <ul>
+      <li>একটি class অনেক interface <code>implements</code> করে কিন্তু একটি class <code>extends</code> করে; একটি interface অনেক interface <code>extends</code> করে। class/interface-এর মধ্যে keyword মেশালে ব্যর্থ হয়।</li>
+      <li>Interface member implicitly <code>public</code>; variable <code>public static final</code>; body-হীন method <code>abstract</code>। <code>default</code>/<code>static</code>/<code>private</code> method-এ body লাগে; static method inherit হয় না (interface-এর নাম দিন)।</li>
+      <li>Enum: value আগে + semicolon; constructor implicitly <code>private</code> ও একবার চলে; interface implement করতে পারে কিন্তু extend করা যায় না; <code>valueOf</code> হুবহু-মিল।</li>
+      <li>Sealed: direct subclass <code>final</code>, <code>sealed</code>, বা <code>non-sealed</code>; একই package; same file বা nested হলে <code>permits</code> optional।</li>
+      <li>Record: implicitly <code>final</code>; compact constructor parameter transform করে (<code>this.field</code> নয়); header-এর বাইরে instance field/initializer নেই; accessor <code>name()</code>।</li>
+      <li>Nested: inner-এর outer instance দরকার; static nested ও nested record-এর নয়; local class কেবল effectively-final local capture করে; anonymous class একটি class বা একটি interface।</li>
+      <li>Polymorphism: object type data-র মালিক, reference type access নিয়ন্ত্রণ করে; instance method override হয় (object), static ও variable hide হয় (reference)।</li>
+    </ul>
+  </section>
+
+  <!-- ============ CHEAT SHEET ============ -->
+  <section>
+    <span class="secnum">CHEAT SHEET</span>
+    <h2>Exam Traps চিট-শিট</h2>
+    <table>
+      <thead><tr><th>পরিস্থিতি</th><th>কী টেস্ট হয়</th><th>রায়</th></tr></thead>
+      <tbody>
+        <tr><td><code>final interface X {}</code></td><td>interface final হয় না</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>class C extends SomeInterface</code></td><td>class interface extend করে</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>interface I extends SomeClass</code></td><td>interface class extend করে</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>interface method <code>protected</code>/<code>private int x</code></td><td>implicit public-এর সাথে conflict</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>একই-signature দুটি <code>default</code> inherit</td><td>ambiguity, override নেই</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>interface-নাম prefix ছাড়া static method</td><td>static inherit হয় না</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>enum E extends F</code> / <code>final enum</code></td><td>enum extend হয় না</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>Season.valueOf("summer")</code></td><td>case-sensitive হুবহু-মিল</td><td class="no">IllegalArgumentException</td></tr>
+        <tr><td>enum <code>case 0 -&gt;</code> / <code>SUMMER == 2</code></td><td>ordinal বনাম value</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>public class sealed Frog</code></td><td>modifier-এর ক্রম</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>final/sealed/non-sealed কোনোটি ছাড়া sealed subclass</td><td>required subclass modifier</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>record: খালি long ctor / ভুল-ক্রমে <code>new</code></td><td>field set করতে হবে; ক্রম জরুরি</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>record: instance field / instance initializer</td><td>immutability ভাঙে</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>compact constructor-এ <code>this.field</code></td><td>compact কেবল param transform করে</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>record pattern <code>(String n, long a)</code></td><td>numeric promotion অনুমোদিত নয়</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>static method থেকে <code>new Inner()</code></td><td>inner class-এর outer instance দরকার</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>reassigned local ব্যবহার করা local class</td><td>effectively final</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>cast ছাড়া supertype &rarr; subtype</td><td>explicit cast দরকার</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>unrelated class-এর মধ্যে cast</td><td>compiler জানে অসম্ভব</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>unrelated interface-এ cast (non-final class)</td><td>subclass হয়তো implement করে</td><td class="yes">Compiles → ClassCastException</td></tr>
+        <tr><td>reference দিয়ে static method / variable access</td><td>hiding reference type ব্যবহার করে</td><td class="yes">reference type-এর version চলে</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+</div>
+</body>
+</html>

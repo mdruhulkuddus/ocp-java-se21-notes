@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 · Chapter 6 — Class Design (MCQ Practice)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff; --ink:#2b2b32; --muted:#6e6a72;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --accent:#c96442; --accent2:#d4845e; --line:#ece3da;
+    --green:#3b7d57; --gold:#a9772a;
+    --purple:#7a5cb8; --purple-b:#9b7fd4; --purple-tag:#b29ad9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Source Sans 3',system-ui,sans-serif; line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:860px; margin:0 auto; padding:34px 20px 70px;}
+  h1,h2,h3,h4{font-family:'Merriweather',Georgia,serif; line-height:1.3; color:#22222a;}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+
+  /* ---------- header ---------- */
+  .header{
+    position:relative; overflow:hidden;
+    background:linear-gradient(135deg,#ffffff,#fdf8f3);
+    border-radius:18px; padding:30px 32px 26px; margin-bottom:30px;
+    box-shadow:0 10px 30px rgba(120,90,60,.10);
+  }
+  .header::after{
+    content:""; position:absolute; top:-60px; right:-40px; width:230px; height:230px;
+    background:radial-gradient(circle,rgba(201,100,66,.16),transparent 68%); pointer-events:none;
+  }
+  .pill{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-size:.72rem;
+    font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#fff;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    padding:6px 13px; border-radius:999px; margin-bottom:16px;
+  }
+  .header h1{font-size:1.85rem; margin:0 0 8px;}
+  .header .tagline{font-style:italic; color:var(--muted); margin:0 0 18px; font-size:1.04rem;}
+  .topics{display:flex; flex-wrap:wrap; gap:8px;}
+  .topics span{
+    font-family:'JetBrains Mono',monospace; font-size:.7rem; letter-spacing:.4px;
+    background:#f3ece4; color:#9a5030; padding:5px 11px; border-radius:999px;
+  }
+  .howto{
+    background:#f3ece4; border-radius:12px; padding:12px 18px; margin:22px 0 8px;
+    font-size:.92rem; color:#7a5a44;
+  }
+
+  /* ---------- question cards ---------- */
+  .q-card{
+    background:linear-gradient(135deg,#f4f0fa,#f9f6fd);
+    border-top:4px solid var(--purple-b); border-radius:14px;
+    padding:22px 24px 18px; margin-bottom:26px;
+    box-shadow:0 6px 20px rgba(110,90,150,.10);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .q-card:hover{transform:translateY(-3px); box-shadow:0 12px 28px rgba(110,90,150,.16);}
+  .q-head{display:flex; align-items:center; gap:12px; margin-bottom:12px; flex-wrap:wrap;}
+  .qnum{font-family:'JetBrains Mono',monospace; font-weight:700; font-size:1.02rem; color:var(--purple); letter-spacing:1px;}
+  .qtag{
+    font-family:'JetBrains Mono',monospace; font-size:.66rem; font-weight:700;
+    letter-spacing:.6px; text-transform:uppercase; color:#fff;
+    background:var(--purple-tag); padding:4px 10px; border-radius:999px;
+  }
+  .prompt{font-weight:600; margin:0 0 14px; color:#33303a;}
+  .prompt .multi{color:var(--purple); font-style:italic; font-weight:700;}
+  .q-card pre{
+    background:#fbf9fe; border-radius:12px; padding:15px 17px; margin:0 0 16px;
+    overflow-x:auto; box-shadow:inset 0 2px 8px rgba(110,90,150,.10);
+    font-size:.86rem; line-height:1.6;
+  }
+  .q-card pre code{background:none; color:inherit; padding:0;}
+  .opts{list-style:none; margin:0 0 4px; padding:0;}
+  .opts li{margin:0 0 7px; padding-left:30px; position:relative;}
+  .opts li .lab{
+    position:absolute; left:0; top:0; font-family:'JetBrains Mono',monospace;
+    font-weight:700; color:var(--purple);
+  }
+  .opts li code{background:#f3ece4; color:#9a5030; padding:1px 6px; border-radius:5px; font-size:.86em;}
+
+  /* syntax */
+  .kw{color:var(--kw); font-weight:600;}
+  .str{color:var(--str);}
+  .num{color:var(--num);}
+  .err{color:var(--err); font-weight:600;}
+  .cm{color:var(--cm); font-style:italic;}
+
+  /* reveal */
+  details{margin-top:14px; border-top:1px dashed #cdbce8; padding-top:4px;}
+  summary{
+    cursor:pointer; list-style:none; display:inline-block;
+    font-family:'JetBrains Mono',monospace; font-size:.78rem; font-weight:700;
+    letter-spacing:.5px; color:var(--purple); padding:8px 2px 4px;
+    user-select:none;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"\25B8  "; }
+  details[open] summary::before{content:"\25BE  ";}
+  .ans-body{padding:8px 2px 4px; font-size:.94rem; color:#3a3640;}
+  .ans-key{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-weight:700;
+    font-size:.84rem; background:#eef8f1; color:#3d8a5e;
+    padding:5px 12px; border-radius:8px; margin-bottom:8px; letter-spacing:.5px;
+  }
+  .ans-body code{background:#f3ece4; color:#9a5030; padding:1px 6px; border-radius:5px; font-size:.86em;}
+
+  /* closing */
+  .revision{
+    background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c;
+    border-radius:14px; padding:20px 24px; margin-top:34px;
+    box-shadow:0 6px 18px rgba(180,150,90,.10);
+  }
+  .revision h3{color:var(--gold); margin:0 0 10px; font-size:1.12rem;}
+  .revision ul{margin:0; padding-left:20px;}
+  .revision li{margin:0 0 7px;}
+  .revision code{background:#f3ece4; color:#9a5030; padding:1px 6px; border-radius:5px; font-size:.86em;}
+
+  @media(max-width:560px){
+    .header{padding:24px 20px;}
+    .header h1{font-size:1.5rem;}
+    .q-card{padding:18px 16px 14px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="header">
+    <span class="pill">OCP Java SE 21 · 1Z0-830</span>
+    <h1>Chapter 6 — Class Design</h1>
+    <p class="tagline">Exam-style multiple-choice practice with inline, self-verified answer keys.</p>
+    <div class="topics">
+      <span>INHERITANCE</span><span>this / super</span><span>CONSTRUCTORS</span>
+      <span>INITIALIZATION ORDER</span><span>OVERRIDING</span><span>HIDING</span>
+      <span>ABSTRACT CLASSES</span><span>IMMUTABILITY</span>
+    </div>
+    <div class="howto">28 questions. Predict the result before expanding <strong>Show Answer</strong>. Where a question says <em>“Choose all that apply,”</em> more than one option is correct.</div>
+  </header>
+
+  <!-- Q1 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q1</span><span class="qtag">INHERITANCE</span></div>
+    <p class="prompt">What is the result of compiling the following?</p>
+<pre><code><span class="kw">final class</span> Mammal {}
+<span class="kw">class</span> Rhinoceros <span class="kw">extends</span> Mammal {}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> It compiles successfully.</li>
+      <li><span class="lab">B.</span> It compiles but fails at runtime.</li>
+      <li><span class="lab">C.</span> <code>Mammal</code> does not compile.</li>
+      <li><span class="lab">D.</span> <code>Rhinoceros</code> does not compile.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">D</span><br>
+        A <code>final</code> class cannot be extended. <code>Mammal</code> itself is a legal declaration, so the compiler error lands on the <code>Rhinoceros</code> line that tries to extend it.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q2</span><span class="qtag">ACCESS</span></div>
+    <p class="prompt">Which line, if any, prevents this code from compiling?</p>
+<pre><code><span class="kw">class</span> Animal {
+   <span class="kw">private int</span> age = <span class="num">3</span>;            <span class="cm">// w</span>
+   <span class="kw">protected</span> String name = <span class="str">"Lion"</span>;  <span class="cm">// x</span>
+}
+<span class="kw">class</span> Lion <span class="kw">extends</span> Animal {
+   <span class="kw">void</span> roar() {
+      System.out.println(name + <span class="str">", age "</span> + age); <span class="cm">// y</span>
+   }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Line w</li>
+      <li><span class="lab">B.</span> Line x</li>
+      <li><span class="lab">C.</span> Line y</li>
+      <li><span class="lab">D.</span> None — it compiles.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">C</span><br>
+        <code>private</code> members are never inherited. <code>name</code> is <code>protected</code> and accessible, but referencing <code>age</code> inside <code>Lion</code> fails to compile.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q3</span><span class="qtag">CLASS DECLARATION</span></div>
+    <p class="prompt">Each snippet is the entire contents of its own <code>.java</code> file. Which one compiles?</p>
+<pre><code><span class="cm">// A</span>
+<span class="kw">protected class</span> ClownFish {}
+
+<span class="cm">// B</span>
+<span class="kw">private class</span> BlueTang {}
+
+<span class="cm">// C</span>
+<span class="kw">class</span> Angelfish {}
+
+<span class="cm">// D</span>
+<span class="kw">final protected class</span> Tang {}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Snippet A</li>
+      <li><span class="lab">B.</span> Snippet B</li>
+      <li><span class="lab">C.</span> Snippet C</li>
+      <li><span class="lab">D.</span> Snippet D</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">C</span><br>
+        A top-level class may only be <code>public</code>, package-private (no modifier), <code>final</code>, <code>abstract</code>, or <code>sealed</code>. <code>protected</code> and <code>private</code> are illegal at the top level, so only <code>Angelfish</code> compiles.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q4</span><span class="qtag">this</span></div>
+    <p class="prompt">What is printed?</p>
+<pre><code><span class="kw">public class</span> Flamingo {
+   <span class="kw">private</span> String color;
+   <span class="kw">public</span> Flamingo(String color) {
+      color = color;
+   }
+   <span class="kw">public static void</span> main(String[] a) {
+      System.out.println(<span class="kw">new</span> Flamingo(<span class="str">"pink"</span>).color);
+   }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>pink</code></li>
+      <li><span class="lab">B.</span> <code>null</code></li>
+      <li><span class="lab">C.</span> An empty string</li>
+      <li><span class="lab">D.</span> It does not compile.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">B</span><br>
+        <code>color = color</code> assigns the parameter to itself; the instance field is never touched, so it keeps its default of <code>null</code>. Writing <code>this.color = color</code> would have fixed it.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q5</span><span class="qtag">this</span></div>
+    <p class="prompt">What does this program print?</p>
+<pre><code><span class="kw">public class</span> Duck {
+   <span class="kw">private int</span> length;
+   <span class="kw">private int</span> height;
+   <span class="kw">private</span> String color;
+   <span class="kw">public</span> Duck(<span class="kw">int</span> length, <span class="kw">int</span> theHeight, String color) {
+      length = <span class="kw">this</span>.length;
+      height = theHeight;
+      <span class="kw">this</span>.color = <span class="str">"white"</span>;
+   }
+   <span class="kw">public static void</span> main(String[] a) {
+      Duck d = <span class="kw">new</span> Duck(<span class="num">5</span>, <span class="num">2</span>, <span class="str">"yellow"</span>);
+      System.out.println(d.length + <span class="str">" "</span> + d.height + <span class="str">" "</span> + d.color);
+   }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>5 2 yellow</code></li>
+      <li><span class="lab">B.</span> <code>0 2 white</code></li>
+      <li><span class="lab">C.</span> <code>0 2 yellow</code></li>
+      <li><span class="lab">D.</span> <code>5 2 white</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">B</span><br>
+        <code>length = this.length</code> is backwards: it copies the field's default (<code>0</code>) into the parameter, leaving the field <code>0</code>. <code>height = theHeight</code> correctly sets <code>2</code>, and <code>this.color = "white"</code> ignores the parameter. Result: <code>0 2 white</code>.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q6</span><span class="qtag">super</span></div>
+    <p class="prompt">What does <code>getSpeed()</code> return when called on a <code>Crocodile</code> instance?</p>
+<pre><code><span class="kw">class</span> Reptile {
+   <span class="kw">protected int</span> speed = <span class="num">10</span>;
+}
+<span class="kw">class</span> Crocodile <span class="kw">extends</span> Reptile {
+   <span class="kw">protected int</span> speed = <span class="num">20</span>;
+   <span class="kw">public int</span> getSpeed() { <span class="kw">return</span> <span class="kw">super</span>.speed; }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>10</code></li>
+      <li><span class="lab">B.</span> <code>20</code></li>
+      <li><span class="lab">C.</span> <code>0</code></li>
+      <li><span class="lab">D.</span> It does not compile.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">A</span><br>
+        Variables are hidden, not overridden. <code>super.speed</code> explicitly reaches the parent's field, which is <code>10</code>. Plain <code>speed</code> would have returned <code>20</code>.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q7</span><span class="qtag">CONSTRUCTORS</span></div>
+    <p class="prompt">What is the result?</p>
+<pre><code><span class="kw">public class</span> Bunny {
+   <span class="kw">public</span> bunny() {}
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> It compiles; <code>bunny()</code> is a constructor.</li>
+      <li><span class="lab">B.</span> It compiles; <code>bunny()</code> is a method.</li>
+      <li><span class="lab">C.</span> It does not compile.</li>
+      <li><span class="lab">D.</span> It compiles only if a body is added.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">C</span><br>
+        A constructor's name must match the class exactly, so lowercase <code>bunny</code> is treated as a <em>method</em> — but it has no return type, which is illegal for a method. The class fails to compile.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q8 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q8</span><span class="qtag">CONSTRUCTORS</span></div>
+    <p class="prompt">Is <code>new Bunny()</code> legal given this class?</p>
+<pre><code><span class="kw">public class</span> Bunny {
+   <span class="kw">public void</span> Bunny() {}
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Yes — <code>Bunny()</code> is the constructor.</li>
+      <li><span class="lab">B.</span> Yes — <code>Bunny()</code> is a method and a default constructor is supplied.</li>
+      <li><span class="lab">C.</span> No — there is no no-arg constructor.</li>
+      <li><span class="lab">D.</span> No — the class does not compile.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">B</span><br>
+        Because it declares a return type (<code>void</code>), <code>Bunny()</code> is an ordinary method, not a constructor. Since no constructor is declared, the compiler inserts a default no-arg one, so <code>new Bunny()</code> works.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q9 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q9</span><span class="qtag">CONSTRUCTORS</span></div>
+    <p class="prompt">What is the result?</p>
+<pre><code><span class="kw">public class</span> Bonobo {
+   <span class="kw">public</span> Bonobo(<span class="kw">var</span> food) {}
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> It compiles.</li>
+      <li><span class="lab">B.</span> It does not compile.</li>
+      <li><span class="lab">C.</span> It compiles only with a body.</li>
+      <li><span class="lab">D.</span> It compiles but <code>food</code> is <code>Object</code>.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">B</span><br>
+        <code>var</code> cannot be used as a method or constructor parameter type. The declaration does not compile.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q10 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q10</span><span class="qtag">CONSTRUCTORS</span></div>
+    <p class="prompt">A different class in another package writes <code>new Rabbit4()</code>. What happens?</p>
+<pre><code><span class="kw">public class</span> Rabbit4 {
+   <span class="kw">private</span> Rabbit4() {}
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> It compiles; a default constructor is also generated.</li>
+      <li><span class="lab">B.</span> The caller does not compile.</li>
+      <li><span class="lab">C.</span> <code>Rabbit4</code> itself does not compile.</li>
+      <li><span class="lab">D.</span> It compiles and runs.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">B</span><br>
+        A default constructor is generated only when <em>no</em> constructor is declared. Here one exists but is <code>private</code>, so external code cannot call it — the caller fails to compile.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q11 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q11</span><span class="qtag">CONSTRUCTORS</span></div>
+    <p class="prompt">What is the result?</p>
+<pre><code><span class="kw">public class</span> Hamster {
+   <span class="kw">private</span> String color;
+   <span class="kw">private int</span> weight;
+   <span class="kw">public</span> Hamster(<span class="kw">int</span> weight, String color) {
+      <span class="kw">this</span>.weight = weight; <span class="kw">this</span>.color = color;
+   }
+   <span class="kw">public</span> Hamster(<span class="kw">int</span> weight) {
+      <span class="kw">this</span>.weight = weight;
+      <span class="kw">this</span>(weight, <span class="str">"brown"</span>);
+   }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> It compiles.</li>
+      <li><span class="lab">B.</span> It does not compile.</li>
+      <li><span class="lab">C.</span> It compiles but loops infinitely.</li>
+      <li><span class="lab">D.</span> It compiles but throws at runtime.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">B</span><br>
+        A <code>this()</code> call must be the first statement in the constructor. The <code>this.weight = weight;</code> line precedes it, so it does not compile.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q12 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q12</span><span class="qtag">CONSTRUCTORS</span></div>
+    <p class="prompt">What is the result?</p>
+<pre><code><span class="kw">public class</span> Gopher {
+   <span class="kw">public</span> Gopher() { <span class="kw">this</span>(<span class="num">5</span>); }
+   <span class="kw">public</span> Gopher(<span class="kw">int</span> holes) { <span class="kw">this</span>(); }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> It compiles but causes infinite recursion at runtime.</li>
+      <li><span class="lab">B.</span> It does not compile.</li>
+      <li><span class="lab">C.</span> It compiles and runs normally.</li>
+      <li><span class="lab">D.</span> It throws <code>StackOverflowError</code> at runtime.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">B</span><br>
+        The compiler detects the cyclic <code>this()</code> calls (each constructor delegates to the other) and rejects the code at compile time — it never gets a chance to recurse at runtime.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q13 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q13</span><span class="qtag">CONSTRUCTORS</span></div>
+    <p class="prompt">What is the result?</p>
+<pre><code><span class="kw">class</span> Mammal {
+   <span class="kw">public</span> Mammal(<span class="kw">int</span> age) {}
+}
+<span class="kw">class</span> Elephant <span class="kw">extends</span> Mammal {}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Both classes compile.</li>
+      <li><span class="lab">B.</span> <code>Mammal</code> does not compile.</li>
+      <li><span class="lab">C.</span> <code>Elephant</code> does not compile.</li>
+      <li><span class="lab">D.</span> It compiles but fails at runtime.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">C</span><br>
+        <code>Elephant</code>'s implicit default constructor inserts a call to <code>super()</code>, but <code>Mammal</code> has only a one-arg constructor. With no matching no-arg parent constructor, <code>Elephant</code> does not compile. Adding <code>Elephant() { super(6); }</code> would fix it.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q14 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q14</span><span class="qtag">INIT ORDER</span></div>
+    <p class="prompt">What is printed?</p>
+<pre><code><span class="kw">public class</span> Hippo {
+   <span class="kw">static</span> { System.out.print(<span class="str">"A"</span>); }
+   <span class="kw">static int</span> x = init();
+   <span class="kw">static int</span> init() { System.out.print(<span class="str">"B"</span>); <span class="kw">return</span> <span class="num">1</span>; }
+   <span class="kw">public static void</span> main(String[] a) { System.out.print(<span class="str">"C"</span>); }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>ABC</code></li>
+      <li><span class="lab">B.</span> <code>BAC</code></li>
+      <li><span class="lab">C.</span> <code>BCA</code></li>
+      <li><span class="lab">D.</span> <code>CAB</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">A</span><br>
+        Static initializers and static variable initializers run top-to-bottom when the class loads, before <code>main()</code>. The block prints <code>A</code>, then <code>x = init()</code> prints <code>B</code>, then <code>main</code> prints <code>C</code>.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q15 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q15</span><span class="qtag">INIT ORDER</span></div>
+    <p class="prompt">What is printed?</p>
+<pre><code><span class="kw">public class</span> ZooTickets {
+   <span class="kw">private</span> String name = <span class="str">"BestZoo"</span>;
+   { System.out.print(name + <span class="str">"-"</span>); }
+   <span class="kw">private static int</span> COUNT = <span class="num">0</span>;
+   <span class="kw">static</span> { System.out.print(COUNT + <span class="str">"-"</span>); }
+   <span class="kw">static</span> { COUNT += <span class="num">10</span>; System.out.print(COUNT + <span class="str">"-"</span>); }
+   <span class="kw">public</span> ZooTickets() { System.out.print(<span class="str">"z-"</span>); }
+   <span class="kw">public static void</span> main(String[] a) {
+      <span class="kw">new</span> ZooTickets();
+      System.out.print(<span class="str">"done"</span>);
+   }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>BestZoo-0-10-z-done</code></li>
+      <li><span class="lab">B.</span> <code>0-10-BestZoo-z-done</code></li>
+      <li><span class="lab">C.</span> <code>0-10-z-BestZoo-done</code></li>
+      <li><span class="lab">D.</span> <code>BestZoo-z-0-10-done</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">B</span><br>
+        Static elements run first at class load: <code>0-</code> then <code>10-</code>. Then on <code>new ZooTickets()</code>, the instance field/initializer print <code>BestZoo-</code>, the constructor prints <code>z-</code>, and finally <code>main</code> prints <code>done</code>.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q16 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q16</span><span class="qtag">INIT ORDER</span></div>
+    <p class="prompt">What is the result?</p>
+<pre><code><span class="kw">public class</span> MouseHouse {
+   <span class="kw">private final</span> String type;
+   <span class="kw">public</span> MouseHouse() {}
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> It compiles; <code>type</code> is <code>null</code>.</li>
+      <li><span class="lab">B.</span> It compiles; <code>type</code> is an empty string.</li>
+      <li><span class="lab">C.</span> It does not compile.</li>
+      <li><span class="lab">D.</span> It compiles but throws at runtime.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">C</span><br>
+        A <code>final</code> instance field must be assigned exactly once by the time the constructor finishes — at its declaration, in an instance initializer, or in the constructor. It is never assigned here, so the code does not compile.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q17 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q17</span><span class="qtag">OVERRIDING</span></div>
+    <p class="prompt">What happens when <code>new Kangaroo().getAverageWeight()</code> is called?</p>
+<pre><code><span class="kw">class</span> Marsupial {
+   <span class="kw">public double</span> getAverageWeight() { <span class="kw">return</span> <span class="num">50</span>; }
+}
+<span class="kw">class</span> Kangaroo <span class="kw">extends</span> Marsupial {
+   <span class="kw">public double</span> getAverageWeight() {
+      <span class="kw">return</span> getAverageWeight() + <span class="num">20</span>;
+   }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Returns <code>70.0</code></li>
+      <li><span class="lab">B.</span> Returns <code>50.0</code></li>
+      <li><span class="lab">C.</span> Does not compile</li>
+      <li><span class="lab">D.</span> Throws <code>StackOverflowError</code> at runtime</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">D</span><br>
+        The unqualified <code>getAverageWeight()</code> call inside the override invokes itself, recursing forever — a <code>StackOverflowError</code> at runtime. Using <code>super.getAverageWeight() + 20</code> would correctly return <code>70.0</code>.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q18 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q18</span><span class="qtag">OVERRIDING</span></div>
+    <p class="prompt">Given <code>FileNotFoundException</code> is a subclass of <code>IOException</code>, what is the result?</p>
+<pre><code><span class="kw">class</span> Reptile {
+   <span class="kw">protected void</span> exitShell() <span class="kw">throws</span> FileNotFoundException {}
+}
+<span class="kw">class</span> Tortoise <span class="kw">extends</span> Reptile {
+   <span class="kw">protected void</span> exitShell() <span class="kw">throws</span> IOException {}
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> It compiles.</li>
+      <li><span class="lab">B.</span> <code>Tortoise</code> does not compile.</li>
+      <li><span class="lab">C.</span> <code>Reptile</code> does not compile.</li>
+      <li><span class="lab">D.</span> It compiles but fails at runtime.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">B</span><br>
+        An override may not throw a new or <em>broader</em> checked exception. The parent throws <code>FileNotFoundException</code>; the child throws the broader <code>IOException</code>, so <code>Tortoise</code> does not compile. Narrowing (parent <code>IOException</code> → child <code>FileNotFoundException</code>) would be fine.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q19 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q19</span><span class="qtag">OVERRIDING</span></div>
+    <p class="prompt"><span class="multi">Choose all that apply.</span> Each child method attempts to override the parent method directly above it. Which overrides compile?</p>
+<pre><code><span class="cm">// A</span>  parent: <span class="kw">public</span> CharSequence getName()
+       child:  <span class="kw">public</span> String getName()
+<span class="cm">// B</span>  parent: <span class="kw">public</span> String getColor()
+       child:  <span class="kw">public</span> CharSequence getColor()
+<span class="cm">// C</span>  parent: <span class="kw">public void</span> run()
+       child:  <span class="kw">public void</span> run()
+<span class="cm">// D</span>  parent: <span class="kw">public void</span> stop()
+       child:  <span class="kw">public int</span> stop()</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Override A</li>
+      <li><span class="lab">B.</span> Override B</li>
+      <li><span class="lab">C.</span> Override C</li>
+      <li><span class="lab">D.</span> Override D</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">A · C</span><br>
+        Return types must be <em>covariant</em> (same type or a subtype). A is fine because <code>String</code> is a subtype of <code>CharSequence</code>; C is an identical <code>void</code>/<code>void</code> match. B widens the return type (illegal) and D changes <code>void</code> to <code>int</code> (<code>void</code> is only covariant with <code>void</code>), so both fail.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q20 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q20</span><span class="qtag">HIDING</span></div>
+    <p class="prompt">What is printed?</p>
+<pre><code><span class="kw">class</span> Bear {
+   <span class="kw">public static void</span> eat() { System.out.println(<span class="str">"Bear is eating"</span>); }
+}
+<span class="kw">class</span> Panda <span class="kw">extends</span> Bear {
+   <span class="kw">public static void</span> eat() { System.out.println(<span class="str">"Panda is chewing"</span>); }
+}
+<span class="kw">public class</span> Test {
+   <span class="kw">public static void</span> main(String[] a) {
+      Bear b = <span class="kw">new</span> Panda();
+      b.eat();
+   }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>Bear is eating</code></li>
+      <li><span class="lab">B.</span> <code>Panda is chewing</code></li>
+      <li><span class="lab">C.</span> It does not compile.</li>
+      <li><span class="lab">D.</span> It throws at runtime.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">A</span><br>
+        <code>static</code> methods are <em>hidden</em>, not overridden, and are resolved by the <em>reference</em> type at compile time. The reference is <code>Bear</code>, so <code>Bear.eat()</code> runs — <code>Bear is eating</code>.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q21 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q21</span><span class="qtag">OVERRIDING</span></div>
+    <p class="prompt">The same program as Q20, but both <code>eat()</code> methods are now <em>instance</em> methods (the word <code>static</code> is removed from both). What is printed?</p>
+<pre><code>Bear b = <span class="kw">new</span> Panda();
+b.eat();</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>Bear is eating</code></li>
+      <li><span class="lab">B.</span> <code>Panda is chewing</code></li>
+      <li><span class="lab">C.</span> It does not compile.</li>
+      <li><span class="lab">D.</span> It throws at runtime.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">B</span><br>
+        Instance methods are overridden and dispatched on the <em>actual object</em> type at runtime. The object is a <code>Panda</code>, so the overridden method runs — <code>Panda is chewing</code>. This is the key contrast with hidden static methods.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q22 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q22</span><span class="qtag">HIDING</span></div>
+    <p class="prompt">What is printed?</p>
+<pre><code><span class="kw">class</span> Carnivore { <span class="kw">protected boolean</span> hasFur = <span class="kw">false</span>; }
+<span class="kw">class</span> Meerkat <span class="kw">extends</span> Carnivore { <span class="kw">protected boolean</span> hasFur = <span class="kw">true</span>; }
+<span class="kw">public class</span> Test {
+   <span class="kw">public static void</span> main(String[] a) {
+      Carnivore c = <span class="kw">new</span> Meerkat();
+      Meerkat m = <span class="kw">new</span> Meerkat();
+      System.out.println(c.hasFur + <span class="str">" "</span> + m.hasFur);
+   }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>true true</code></li>
+      <li><span class="lab">B.</span> <code>false false</code></li>
+      <li><span class="lab">C.</span> <code>false true</code></li>
+      <li><span class="lab">D.</span> <code>true false</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">C</span><br>
+        Fields are hidden and resolved by reference type. Through the <code>Carnivore</code> reference <code>c</code> you see <code>false</code>; through the <code>Meerkat</code> reference <code>m</code> you see <code>true</code> — even though both point at <code>Meerkat</code> objects.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q23 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q23</span><span class="qtag">ABSTRACT</span></div>
+    <p class="prompt">What is the result?</p>
+<pre><code><span class="kw">abstract class</span> Animal {
+   <span class="kw">abstract int</span> getSound();
+}
+<span class="kw">class</span> FennecFox <span class="kw">extends</span> Animal {
+   String getSound() { <span class="kw">return</span> <span class="str">"Squeak"</span>; }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> It compiles.</li>
+      <li><span class="lab">B.</span> It does not compile.</li>
+      <li><span class="lab">C.</span> It compiles but throws at runtime.</li>
+      <li><span class="lab">D.</span> It compiles only if <code>Animal</code> is made concrete.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">B</span><br>
+        The implementation must use a covariant return type. <code>String</code> is not the same as or a subtype of <code>int</code>, so the override is invalid and the code does not compile.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q24 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q24</span><span class="qtag">ABSTRACT</span></div>
+    <p class="prompt">What is the result?</p>
+<pre><code><span class="kw">abstract class</span> Alligator {}
+<span class="kw">public class</span> Test {
+   <span class="kw">public static void</span> main(String[] a) {
+      <span class="kw">var</span> x = <span class="kw">new</span> Alligator();
+   }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> It compiles and runs.</li>
+      <li><span class="lab">B.</span> It does not compile.</li>
+      <li><span class="lab">C.</span> <code>Alligator</code> does not compile (no abstract methods).</li>
+      <li><span class="lab">D.</span> It throws at runtime.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">B</span><br>
+        An abstract class cannot be instantiated, so <code>new Alligator()</code> does not compile. Note an abstract class is perfectly legal with zero abstract methods — the problem is only the instantiation.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q25 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q25</span><span class="qtag">ABSTRACT</span></div>
+    <p class="prompt"><span class="multi">Choose all that apply.</span> Which declarations do <strong>not</strong> compile?</p>
+<pre><code><span class="cm">// A</span>  <span class="kw">abstract final class</span> Whale {}
+<span class="cm">// B</span>  <span class="kw">abstract private void</span> sing();   <span class="cm">// inside an abstract class</span>
+<span class="cm">// C</span>  <span class="kw">abstract static void</span> swim();    <span class="cm">// inside an abstract class</span>
+<span class="cm">// D</span>  <span class="kw">abstract class</span> Llama {}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Declaration A</li>
+      <li><span class="lab">B.</span> Declaration B</li>
+      <li><span class="lab">C.</span> Declaration C</li>
+      <li><span class="lab">D.</span> Declaration D</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">A · B · C</span><br>
+        <code>abstract</code> conflicts with <code>final</code> (can't be extended), <code>private</code> (can't be overridden), and <code>static</code> (can't be overridden) — all illegal. D is a valid abstract class with no abstract methods, which is allowed.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q26 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q26</span><span class="qtag">ABSTRACT</span></div>
+    <p class="prompt"><span class="multi">Choose all that apply.</span> Which snippets compile?</p>
+<pre><code><span class="cm">// A</span>
+<span class="kw">abstract class</span> Animal { <span class="kw">abstract</span> String getName(); }
+<span class="kw">class</span> Walrus <span class="kw">extends</span> Animal {}
+
+<span class="cm">// B</span>
+<span class="kw">abstract class</span> Mammal { <span class="kw">abstract void</span> showHorn(); <span class="kw">abstract void</span> eatLeaf(); }
+<span class="kw">abstract class</span> Rhino <span class="kw">extends</span> Mammal { <span class="kw">void</span> showHorn() {} }
+<span class="kw">class</span> BlackRhino <span class="kw">extends</span> Rhino { <span class="kw">void</span> eatLeaf() {} }
+
+<span class="cm">// C</span>
+<span class="kw">abstract class</span> Llama {}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Snippet A</li>
+      <li><span class="lab">B.</span> Snippet B</li>
+      <li><span class="lab">C.</span> Snippet C</li>
+      <li><span class="lab">D.</span> None of them compile.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">B · C</span><br>
+        Only the <em>first concrete</em> subclass must implement all inherited abstract methods. In A, <code>Walrus</code> is concrete but leaves <code>getName()</code> unimplemented — it fails. In B the work is split across an intermediate abstract <code>Rhino</code>, and <code>BlackRhino</code> finishes it. C is a legal abstract class.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q27 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q27</span><span class="qtag">ABSTRACT</span></div>
+    <p class="prompt">What is printed by <code>new Platypus();</code>?</p>
+<pre><code><span class="kw">abstract class</span> Mammal {
+   <span class="kw">abstract</span> String chew();
+   <span class="kw">public</span> Mammal() { System.out.println(chew()); }
+}
+<span class="kw">class</span> Platypus <span class="kw">extends</span> Mammal {
+   String chew() { <span class="kw">return</span> <span class="str">"yummy!"</span>; }
+   <span class="kw">public static void</span> main(String[] a) { <span class="kw">new</span> Platypus(); }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>yummy!</code></li>
+      <li><span class="lab">B.</span> <code>null</code></li>
+      <li><span class="lab">C.</span> It does not compile (abstract classes can't have constructors).</li>
+      <li><span class="lab">D.</span> It throws at runtime.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">A</span><br>
+        Abstract classes can and do have constructors. <code>Platypus</code>'s implicit constructor calls <code>super()</code>, which runs <code>chew()</code>; the call dispatches to the overridden version, printing <code>yummy!</code>.
+      </div>
+    </details>
+  </div>
+
+  <!-- Q28 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q28</span><span class="qtag">IMMUTABILITY</span></div>
+    <p class="prompt">Which statement about this class is correct?</p>
+<pre><code><span class="kw">public final class</span> Animal {
+   <span class="kw">private final</span> List&lt;String&gt; foods;
+   <span class="kw">public</span> Animal(List&lt;String&gt; foods) {
+      <span class="kw">this</span>.foods = foods;
+   }
+   <span class="kw">public</span> List&lt;String&gt; getFoods() { <span class="kw">return</span> foods; }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> It is immutable because the field is <code>private final</code>.</li>
+      <li><span class="lab">B.</span> It is not immutable; callers can still mutate the list's contents.</li>
+      <li><span class="lab">C.</span> It does not compile.</li>
+      <li><span class="lab">D.</span> It is immutable because the class is <code>final</code>.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="ans-body">
+        <span class="ans-key">B</span><br>
+        <code>final</code> stops the <em>reference</em> from being reassigned, but the referenced <code>List</code> is still mutable. The caller who passed it in keeps a reference, and <code>getFoods()</code> hands out the same list — both can <code>add()</code> or <code>clear()</code> it. True immutability needs a defensive copy on the way in (<code>new ArrayList&lt;&gt;(foods)</code>) and no leaking of the internal reference on the way out.
+      </div>
+    </details>
+  </div>
+
+  <div class="revision">
+    <h3>Quick Revision — traps to memorize</h3>
+    <ul>
+      <li><code>private</code> members are never inherited; top-level classes can't be <code>protected</code>/<code>private</code>.</li>
+      <li><code>this()</code> and <code>super()</code> must be the <em>first</em> statement; cyclic <code>this()</code> is a compile error.</li>
+      <li>No default constructor is generated once <em>any</em> constructor is declared.</li>
+      <li>A parent with only a parameterized constructor breaks a child's implicit <code>super()</code>.</li>
+      <li>Static initializers/fields run top-to-bottom at class load, before <code>main()</code>; every <code>final</code> field must be assigned exactly once.</li>
+      <li>Overriding = runtime dispatch on the object; hiding (static methods &amp; all fields) = compile-time dispatch on the reference type.</li>
+      <li>Override rules: same signature, ≥ accessibility, no broader checked exception, covariant return (<code>void</code> only with <code>void</code>).</li>
+      <li><code>abstract</code> can't combine with <code>final</code>, <code>private</code>, or <code>static</code>; only the first concrete subclass must implement all abstract methods.</li>
+      <li>Abstract classes have constructors, and a constructor may call an overridden abstract method.</li>
+      <li><code>final</code> on a collection field protects the reference, not the contents — defensive-copy in and out for true immutability.</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

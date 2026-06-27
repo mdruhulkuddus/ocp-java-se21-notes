@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 · Chapter 9 — Collections and Generics (Detailed Handnote)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff; --ink:#2b2b32; --muted:#6e6a72;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --accent:#c96442; --accent2:#d4845e; --line:#ece3da;
+    --green:#3b7d57; --green-b:#5aab7b; --red:#c44d3e; --gold:#a9772a; --purple:#7c5cbf;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Source Sans 3',system-ui,sans-serif; line-height:1.65;
+    -webkit-font-smoothing:antialiased; padding:32px 16px;
+  }
+  .wrap{max-width:1020px; margin:0 auto;}
+  h1,h2,h3,h4{font-family:'Merriweather',Georgia,serif; line-height:1.3; color:#22222a;}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+
+  .header{
+    background:linear-gradient(135deg,#ffffff,#fbf7f4);
+    border-radius:18px; padding:34px 34px 30px; margin-bottom:26px;
+    box-shadow:0 10px 30px rgba(120,90,60,.08);
+  }
+  .badge{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-size:.72rem;
+    letter-spacing:.5px; text-transform:uppercase; color:#fff; font-weight:700;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    padding:6px 14px; border-radius:999px; box-shadow:0 4px 12px rgba(201,100,66,.28);
+  }
+  .header h1{font-size:2.1rem; margin:18px 0 4px;}
+  .header h1 .sub{color:var(--muted); font-weight:400; font-size:1.2rem;}
+  .header .tagline{font-style:italic; color:var(--muted); margin:0 0 20px; font-size:1.02rem;}
+  .objectives{
+    background:linear-gradient(135deg,#f0f9f3,#f7fcf8);
+    border-left:5px solid var(--green-b); border-radius:12px; padding:16px 20px;
+  }
+  .objectives h4{margin:0 0 8px; color:var(--green); font-size:.95rem; letter-spacing:.3px;}
+  .objectives ul{margin:0; padding-left:20px;}
+  .objectives li{margin:3px 0; font-size:.95rem;}
+
+  .toc{
+    background:var(--card); border-radius:16px; padding:22px 26px; margin-bottom:30px;
+    box-shadow:0 6px 20px rgba(120,90,60,.06);
+  }
+  .toc h3{margin:0 0 14px; font-size:1.05rem;}
+  .toc ol{columns:2; column-gap:34px; margin:0; padding-left:18px;}
+  .toc li{margin:6px 0; break-inside:avoid;}
+  .toc a{color:var(--accent); text-decoration:none; font-weight:600;}
+  .toc a:hover{text-decoration:underline;}
+
+  section{margin-bottom:40px;}
+  .secnum{font-family:'JetBrains Mono',monospace; font-size:.8rem; font-weight:700;
+    letter-spacing:2px; color:var(--accent); display:block; margin-bottom:2px;}
+  section h2{font-size:1.55rem; margin:0 0 18px; padding-bottom:10px; border-bottom:2px solid var(--line);}
+  section h3{font-size:1.18rem; margin:26px 0 10px;}
+  p{margin:12px 0;}
+
+  p code, li code, td code, .opt code{background:#f3ece4; color:#9a5030; padding:1.5px 6px; border-radius:5px; font-size:.86em;}
+
+  pre{
+    background:#fdfaf7; border-radius:12px; padding:16px 18px; overflow-x:auto;
+    box-shadow:inset 0 2px 8px rgba(120,90,60,.08); margin:14px 0; font-size:.85rem; line-height:1.55;
+  }
+  pre code{background:none; color:#3a3742; padding:0;}
+  .kw{color:var(--kw); font-weight:600;}
+  .str{color:var(--str);}
+  .num{color:var(--num);}
+  .err{color:var(--err); font-weight:600;}
+  .cm{color:var(--cm); font-style:italic;}
+
+  .card{border-radius:14px; padding:15px 19px; margin:16px 0; box-shadow:0 4px 14px rgba(120,90,60,.07);
+    transition:transform .18s ease, box-shadow .18s ease;}
+  .card:hover{transform:translateY(-2px); box-shadow:0 8px 22px rgba(120,90,60,.12);}
+  .card .label{font-family:'JetBrains Mono',monospace; font-size:.72rem; font-weight:700;
+    letter-spacing:.6px; text-transform:uppercase; display:block; margin-bottom:5px;}
+  .card p{margin:5px 0;}
+  .exam-trap{background:linear-gradient(135deg,#fef2f0,#fff8f7); border-left:5px solid #e06b5e;}
+  .exam-trap .label{color:#c0453a;}
+  .key-rule{background:linear-gradient(135deg,#f0f9f3,#f7fcf8); border-left:5px solid var(--green-b);}
+  .key-rule .label{color:var(--green);}
+  .remember{background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c;}
+  .remember .label{color:var(--gold);}
+
+  .rules-box{background:linear-gradient(135deg,#f0f9f3,#f7fcf8); border-top:4px solid var(--green-b);
+    border-radius:12px; padding:16px 22px; margin:18px 0; box-shadow:0 4px 14px rgba(120,90,60,.06);}
+  .rules-box h4{margin:0 0 8px; color:var(--green);}
+  .rules-box ol,.rules-box ul{margin:6px 0; padding-left:22px;}
+  .rules-box li{margin:5px 0;}
+
+  .vs-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0;}
+  .vs-grid .col{background:var(--card); border-radius:12px; padding:14px 18px; box-shadow:0 4px 14px rgba(120,90,60,.07);}
+  .vs-grid .col h4{margin:0 0 8px; font-size:1rem;}
+  .vs-grid .col.left h4{color:var(--purple);}
+  .vs-grid .col.right h4{color:var(--green);}
+  .vs-grid .col ul{margin:0; padding-left:18px;} .vs-grid .col li{margin:4px 0; font-size:.92rem;}
+
+  .trace{background:#fffdf9; border:1px dashed #e3d6c4; border-radius:12px; padding:12px 18px; margin:14px 0;}
+  .trace h4{margin:0 0 6px; font-size:.9rem; color:var(--accent); font-family:'JetBrains Mono',monospace; letter-spacing:.5px;}
+  .trace ul{margin:0; padding-left:20px;} .trace li{margin:4px 0; font-size:.9rem;}
+  .out{display:inline-block; background:#eef8f1; color:#2f7350; font-family:'JetBrains Mono',monospace;
+    padding:1px 8px; border-radius:5px; font-size:.85em; font-weight:600;}
+
+  table{width:100%; border-collapse:separate; border-spacing:0; background:var(--card);
+    border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(120,90,60,.08); margin:16px 0; font-size:.88rem;}
+  th,td{padding:9px 13px; text-align:left; border-bottom:1px solid #f0ebe4; vertical-align:top;}
+  thead th{background:#f0e8de; font-family:'Source Sans 3',sans-serif; font-weight:700; color:#5a5048;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:#fcfaf7;}
+  .yes{color:var(--green); font-weight:700;}
+  .no{color:var(--red); font-weight:700;}
+
+  .recap{background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c;
+    border-radius:14px; padding:22px 26px; box-shadow:0 6px 18px rgba(120,90,60,.08);}
+  .recap h3{color:var(--gold); margin:16px 0 4px; font-size:1.02rem;}
+  .recap h3:first-child{margin-top:0;}
+  .recap ul{margin:4px 0 0; padding-left:20px;} .recap li{margin:3px 0; font-size:.93rem;}
+
+  @media(max-width:680px){
+    body{padding:18px 10px;}
+    .header{padding:24px 20px;} .header h1{font-size:1.6rem;} .header h1 .sub{font-size:1rem;}
+    .toc ol{columns:1;} .vs-grid{grid-template-columns:1fr;}
+    section h2{font-size:1.3rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="header">
+    <span class="badge">OCP Java SE 21 Developer — Exam 1Z0-830</span>
+    <h1>Chapter 9 <span class="sub">— Collections and Generics</span></h1>
+    <p class="tagline">The Java Collections Framework end to end: List, Set, Queue/Deque, Map, sorting with Comparable and Comparator, the Java 21 sequenced collections, and generics with bounded wildcards.</p>
+    <div class="objectives">
+      <h4>WHAT THIS CHAPTER COVERS</h4>
+      <ul>
+        <li>Use the common <strong>Collection</strong> APIs and create collections with factory methods.</li>
+        <li>Choose between <strong>List, Set, Queue/Deque, and Map</strong> implementations and know their methods.</li>
+        <li>Sort and search with <strong>Comparable</strong> and <strong>Comparator</strong>, and use the Java 21 <strong>sequenced collections</strong>.</li>
+        <li>Write <strong>generic</strong> classes, records, interfaces, and methods, and understand <strong>type erasure</strong>.</li>
+        <li>Apply <strong>bounded wildcards</strong> (<code>?</code>, <code>? extends</code>, <code>? super</code>).</li>
+      </ul>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <h3>On this page</h3>
+    <ol>
+      <li><a href="#s1">Collection APIs &amp; Generics Basics</a></li>
+      <li><a href="#s2">The List Interface</a></li>
+      <li><a href="#s3">Set, Queue &amp; Deque</a></li>
+      <li><a href="#s4">The Map Interface</a></li>
+      <li><a href="#s5">Sorting, Searching &amp; Sequenced Collections</a></li>
+      <li><a href="#s6">Generics &amp; Wildcards</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ SECTION 1 ============ -->
+  <section id="s1">
+    <span class="secnum">SECTION 01</span>
+    <h2>Collection APIs &amp; Generics Basics</h2>
+
+    <p>The Java Collections Framework (in <code>java.util</code>) has four main interfaces. <strong>Map does not implement <code>Collection</code></strong> — it's part of the framework but keeps key/value methods of its own.</p>
+    <table>
+      <thead><tr><th>Interface</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><code>List</code></td><td>ordered, allows duplicates, accessed by <code>int</code> index</td></tr>
+        <tr><td><code>Set</code></td><td>no duplicate entries</td></tr>
+        <tr><td><code>Queue</code> / <code>Deque</code></td><td>orders elements for processing; <code>Deque</code> allows both ends</td></tr>
+        <tr><td><code>Map</code></td><td>maps keys to values; no duplicate keys</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Generics shorthand: diamond and var</h3>
+    <p>Generics are parameterized types. The <strong>diamond operator <code>&lt;&gt;</code></strong> infers from the left and is allowed only on the right of an assignment; <code>var</code> infers from the right. Don't specify the type on both sides.</p>
+<pre><code>List&lt;Integer&gt; list = new ArrayList&lt;&gt;();        <span class="cm">// diamond infers from left</span>
+var list = new ArrayList&lt;Integer&gt;();            <span class="cm">// var infers from right</span>
+
+List&lt;&gt; bad = new ArrayList&lt;Integer&gt;();          <span class="err">// DOES NOT COMPILE (diamond on left)</span>
+var map = new HashMap&lt;&gt;();                       <span class="cm">// compiles -> HashMap&lt;Object,Object&gt;</span></code></pre>
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — var + diamond together</span>
+      <p><code>var map = new HashMap&lt;&gt;();</code> compiles, but with nothing to infer from, the type becomes <code>HashMap&lt;Object, Object&gt;</code>.</p>
+    </div>
+
+    <h3>Common Collection methods</h3>
+    <table>
+      <thead><tr><th>Method</th><th>Behaviour</th></tr></thead>
+      <tbody>
+        <tr><td><code>boolean add(E e)</code></td><td>List always returns <code>true</code>; Set returns <code>false</code> on a duplicate</td></tr>
+        <tr><td><code>boolean remove(Object o)</code></td><td>removes one match, returns whether something was removed</td></tr>
+        <tr><td><code>boolean isEmpty()</code>, <code>int size()</code></td><td>count of elements</td></tr>
+        <tr><td><code>void clear()</code></td><td>discards all elements</td></tr>
+        <tr><td><code>boolean contains(Object o)</code></td><td>uses <code>equals()</code> on elements</td></tr>
+        <tr><td><code>boolean removeIf(Predicate&lt;? super E&gt;)</code></td><td>removes all matching elements</td></tr>
+        <tr><td><code>void forEach(Consumer&lt;? super T&gt;)</code></td><td>iterates without a loop</td></tr>
+      </tbody>
+    </table>
+<pre><code>Collection&lt;String&gt; set = new HashSet&lt;&gt;();
+set.add(<span class="str">"Sparrow"</span>);   <span class="cm">// true</span>
+set.add(<span class="str">"Sparrow"</span>);   <span class="cm">// false (duplicate in a Set)</span>
+set.removeIf(String::isEmpty);   <span class="cm">// s -> s.isEmpty()</span></code></pre>
+
+    <h3>equals() across collections</h3>
+    <div class="trace">
+      <h4>order sensitivity</h4>
+      <ul>
+        <li><code>List.of(1,2).equals(List.of(2,1))</code> &rarr; <span class="out">false</span> (a List cares about order)</li>
+        <li><code>Set.of(1,2).equals(Set.of(2,1))</code> &rarr; <span class="out">true</span> (a Set ignores order)</li>
+        <li><code>List.of(1,2).equals(Set.of(1,2))</code> &rarr; <span class="out">false</span> (different types)</li>
+      </ul>
+    </div>
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — unboxing null</span>
+      <p>Adding <code>null</code> to a <code>List&lt;Integer&gt;</code> is legal, but unboxing it to a primitive throws: <code>int h = heights.get(0);</code> &rarr; <strong>NullPointerException</strong>.</p>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 2 ============ -->
+  <section id="s2">
+    <span class="secnum">SECTION 02</span>
+    <h2>The List Interface</h2>
+
+    <p>A <strong>List</strong> is ordered and allows duplicates, with index-based access. Two implementations to know:</p>
+    <div class="vs-grid">
+      <div class="col left">
+        <h4>ArrayList</h4>
+        <ul>
+          <li>Resizable array; constant-time lookup by index.</li>
+          <li>Best when you read as often as (or more than) you write.</li>
+          <li>The default "when unsure" choice.</li>
+        </ul>
+      </div>
+      <div class="col right">
+        <h4>LinkedList</h4>
+        <ul>
+          <li>Implements both <code>List</code> and <code>Deque</code>.</li>
+          <li>Constant-time add/remove/access at the ends.</li>
+          <li>Arbitrary index access is linear time.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Factory methods</h3>
+    <table>
+      <thead><tr><th>Method</th><th>Result</th><th>Replace?</th><th>Add/Delete?</th></tr></thead>
+      <tbody>
+        <tr><td><code>Arrays.asList(varargs)</code></td><td>fixed-size list backed by the array</td><td class="yes">Yes</td><td class="no">No</td></tr>
+        <tr><td><code>List.of(varargs)</code></td><td>immutable list</td><td class="no">No</td><td class="no">No</td></tr>
+        <tr><td><code>List.copyOf(collection)</code></td><td>immutable copy</td><td class="no">No</td><td class="no">No</td></tr>
+      </tbody>
+    </table>
+    <div class="card key-rule">
+      <span class="label">Key Rule — backed array vs immutable</span>
+      <p><code>Arrays.asList()</code> is backed by the array: changing the array changes the list and <code>set()</code> changes the array back. <code>List.of()</code> and <code>List.copyOf()</code> are immutable — any <code>set()</code>, <code>add()</code>, or <code>remove()</code> throws <code>UnsupportedOperationException</code>. (And <code>Arrays.asList().add()</code> also throws, since the size is fixed.)</p>
+    </div>
+
+    <h3>List methods and the overloaded remove() trap</h3>
+    <p>Beyond the inherited <code>Collection</code> methods: <code>add(int, E)</code>, <code>get(int)</code>, <code>indexOf</code>, <code>lastIndexOf</code> (both return <code>-1</code> if not found), <code>remove(int)</code>, <code>set(int, E)</code>, <code>replaceAll(UnaryOperator)</code>, and <code>sort(Comparator)</code>. <code>set()</code> on an out-of-range index throws <code>IndexOutOfBoundsException</code>.</p>
+<pre><code>var list = new LinkedList&lt;Integer&gt;();
+list.add(<span class="num">3</span>); list.add(<span class="num">2</span>); list.add(<span class="num">1</span>);   <span class="cm">// [3, 2, 1]</span>
+list.remove(<span class="num">2</span>);                  <span class="cm">// removes INDEX 2 -> [3, 2]</span>
+list.remove(Integer.valueOf(<span class="num">2</span>));  <span class="cm">// removes VALUE 2 -> [3]</span></code></pre>
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — remove(int) vs remove(Object)</span>
+      <p>With an <code>Integer</code> list, <code>remove(int)</code> deletes by <em>index</em> and throws <code>IndexOutOfBoundsException</code> if missing; <code>remove(Object)</code> deletes by <em>value</em> and returns <code>false</code> if missing. <code>remove(Integer.valueOf(2))</code> forces the value version.</p>
+    </div>
+<pre><code>var nums = Arrays.asList(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>);
+nums.replaceAll(x -> x*<span class="num">2</span>);   <span class="cm">// [2, 4, 6]</span>
+
+String[] arr = list.toArray(<span class="kw">new</span> String[<span class="num">0</span>]);  <span class="cm">// typed array; size 0 lets Java size it</span></code></pre>
+    <p><code>toArray()</code> with no argument returns <code>Object[]</code>. The returned array is a copy — clearing the list does not affect it.</p>
+  </section>
+
+  <!-- ============ SECTION 3 ============ -->
+  <section id="s3">
+    <span class="secnum">SECTION 03</span>
+    <h2>Set, Queue &amp; Deque</h2>
+
+    <h3>Set implementations</h3>
+    <table>
+      <thead><tr><th>Class</th><th>Storage / order</th></tr></thead>
+      <tbody>
+        <tr><td><code>HashSet</code></td><td>hash table; uses <code>hashCode()</code>; iteration order is arbitrary</td></tr>
+        <tr><td><code>LinkedHashSet</code></td><td>hash table + insertion (encounter) order</td></tr>
+        <tr><td><code>TreeSet</code></td><td>sorted tree; always sorted; slower add/remove</td></tr>
+      </tbody>
+    </table>
+    <div class="trace">
+      <h4>same elements added 66, 10, 8</h4>
+      <ul>
+        <li><code>HashSet</code> &rarr; <span class="out">66,8,10</span> (arbitrary)</li>
+        <li><code>LinkedHashSet</code> &rarr; <span class="out">66,10,8</span> (insertion)</li>
+        <li><code>TreeSet</code> &rarr; <span class="out">8,10,66</span> (sorted)</li>
+      </ul>
+    </div>
+    <p>Immutable sets come from <code>Set.of(...)</code> and <code>Set.copyOf(...)</code>. Equality uses <code>equals()</code>; <code>hashCode()</code> chooses the bucket.</p>
+
+    <h3>Queue and Deque</h3>
+    <p>A <code>Queue</code> is FIFO. <code>LinkedList</code> and <code>ArrayDeque</code> both implement <code>Deque</code> (which extends <code>Queue</code>). Use <code>ArrayDeque</code> when you don't need <code>List</code> methods.</p>
+    <div class="rules-box">
+      <h4>Two flavours of each operation</h4>
+      <p>Each capability has a version that <strong>throws</strong> on failure and one that returns a sentinel (<code>null</code>/<code>false</code>):</p>
+      <ul>
+        <li>Add to back: <code>add(e)</code> (throws) · <code>offer(e)</code> (returns boolean)</li>
+        <li>Read front: <code>element()</code> (throws) · <code>peek()</code> (returns <code>null</code>)</li>
+        <li>Remove front: <code>remove()</code> (throws) · <code>poll()</code> (returns <code>null</code>)</li>
+      </ul>
+    </div>
+    <table>
+      <thead><tr><th>Deque purpose</th><th>Front methods</th><th>Back methods</th></tr></thead>
+      <tbody>
+        <tr><td>Add</td><td><code>addFirst</code> / <code>offerFirst</code></td><td><code>addLast</code> / <code>offerLast</code></td></tr>
+        <tr><td>Read (peek)</td><td><code>getFirst</code> / <code>peekFirst</code></td><td><code>getLast</code> / <code>peekLast</code></td></tr>
+        <tr><td>Remove</td><td><code>removeFirst</code> / <code>pollFirst</code></td><td><code>removeLast</code> / <code>pollLast</code></td></tr>
+      </tbody>
+    </table>
+    <div class="card remember">
+      <span class="label">Remember — Deque as a stack (LIFO)</span>
+      <p>Used as a stack, the methods are <code>push(e)</code> (add to front/top), <code>pop()</code> (remove front/top), and <code>peek()</code>. A FIFO queue is a line of people; a LIFO stack is a stack of plates.</p>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 4 ============ -->
+  <section id="s4">
+    <span class="secnum">SECTION 04</span>
+    <h2>The Map Interface</h2>
+
+    <p>A <strong>Map</strong> stores key/value pairs and does <strong>not</strong> extend <code>Collection</code>. Generics are <code>K</code> (key) and <code>V</code> (value).</p>
+    <table>
+      <thead><tr><th>Class</th><th>Order</th></tr></thead>
+      <tbody>
+        <tr><td><code>HashMap</code></td><td>uses <code>hashCode()</code> of keys; arbitrary order</td></tr>
+        <tr><td><code>LinkedHashMap</code></td><td>insertion (encounter) order</td></tr>
+        <tr><td><code>TreeMap</code></td><td>sorted by keys; no <code>null</code> keys</td></tr>
+      </tbody>
+    </table>
+<pre><code>Map.of(<span class="str">"key1"</span>, <span class="str">"value1"</span>, <span class="str">"key2"</span>, <span class="str">"value2"</span>);     <span class="cm">// up to 10 pairs</span>
+Map.ofEntries(Map.entry(<span class="str">"k1"</span>, <span class="str">"v1"</span>), Map.entry(<span class="str">"k2"</span>, <span class="str">"v2"</span>));  <span class="cm">// safer</span>
+Map.copyOf(map);</code></pre>
+
+    <h3>Map methods to know</h3>
+    <table>
+      <thead><tr><th>Method</th><th>Behaviour</th></tr></thead>
+      <tbody>
+        <tr><td><code>V get(Object key)</code></td><td>value or <code>null</code> if absent</td></tr>
+        <tr><td><code>V getOrDefault(key, default)</code></td><td>value or the default if absent</td></tr>
+        <tr><td><code>V put(K, V)</code></td><td>adds/replaces; returns previous value or <code>null</code></td></tr>
+        <tr><td><code>V putIfAbsent(K, V)</code></td><td>sets only if key absent or mapped to <code>null</code></td></tr>
+        <tr><td><code>V replace(K, V)</code> / <code>replaceAll(BiFunction)</code></td><td>changes value(s); skips a missing key</td></tr>
+        <tr><td><code>V merge(K, V, BiFunction)</code></td><td>combines values (see rules below)</td></tr>
+        <tr><td><code>containsKey</code> / <code>containsValue</code></td><td>keys and values checked separately</td></tr>
+        <tr><td><code>keySet</code> / <code>values</code> / <code>entrySet</code></td><td>views of keys / values / <code>Map.Entry</code> pairs</td></tr>
+        <tr><td><code>forEach(BiConsumer&lt;K,V&gt;)</code></td><td>iterates over key/value pairs</td></tr>
+      </tbody>
+    </table>
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — contains() is not on Map</span>
+      <p><code>map.contains("lion")</code> does <strong>not</strong> compile — <code>contains()</code> is a <code>Collection</code> method. Maps have <code>containsKey()</code> and <code>containsValue()</code>.</p>
+    </div>
+
+    <h3>merge() behaviour</h3>
+    <div class="rules-box">
+      <h4>What merge(key, value, fn) does</h4>
+      <ul>
+        <li>Key absent, or mapped to <code>null</code> &rarr; set to <code>value</code> (function <strong>not</strong> called).</li>
+        <li>Key has a non-null value &rarr; set to <code>fn(old, value)</code>.</li>
+        <li>If the function returns <code>null</code> &rarr; the key is <strong>removed</strong>.</li>
+      </ul>
+    </div>
+    <div class="trace">
+      <h4>longest-name mapper</h4>
+      <ul>
+        <li><code>favorites.put("Jenny","Bus Tour"); merge("Jenny","Skyride", longest)</code> &rarr; keeps <span class="out">Bus Tour</span> (longer).</li>
+        <li><code>favorites.put("Tom","Tram"); merge("Tom","Skyride", longest)</code> &rarr; <span class="out">Skyride</span> (longer).</li>
+      </ul>
+    </div>
+    <p><code>forEach</code> on a Map takes two parameters: <code>map.forEach((k, v) -&gt; ...)</code>. <code>entrySet()</code> yields <code>Map.Entry&lt;K,V&gt;</code> objects with <code>getKey()</code>/<code>getValue()</code>.</p>
+  </section>
+
+  <!-- ============ SECTION 5 ============ -->
+  <section id="s5">
+    <span class="secnum">SECTION 05</span>
+    <h2>Sorting, Searching &amp; Sequenced Collections</h2>
+
+    <h3>Comparable vs Comparator</h3>
+    <table>
+      <thead><tr><th>Difference</th><th>Comparable</th><th>Comparator</th></tr></thead>
+      <tbody>
+        <tr><td>Package</td><td><code>java.lang</code></td><td><code>java.util</code></td></tr>
+        <tr><td>Implemented by the class being compared?</td><td class="yes">Yes</td><td class="no">No</td></tr>
+        <tr><td>Method name</td><td><code>compareTo(T)</code></td><td><code>compare(T, T)</code></td></tr>
+        <tr><td># parameters</td><td>1</td><td>2</td></tr>
+        <tr><td>Commonly a lambda?</td><td class="no">No</td><td class="yes">Yes</td></tr>
+      </tbody>
+    </table>
+    <div class="card key-rule">
+      <span class="label">Key Rule — compareTo() return value</span>
+      <p>Return <strong>0</strong> when equal, a <strong>negative</strong> number when <code>this</code> is smaller, a <strong>positive</strong> number when larger. <code>id - d.id</code> sorts ascending; <code>d.id - id</code> sorts descending.</p>
+    </div>
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — wrong method name</span>
+      <p>A <code>Comparator</code> must implement <code>compare()</code>, not <code>compareTo()</code>. <code>new Comparator&lt;Duck&gt;(){ public int compareTo(...){} }</code> does <strong>not</strong> compile. Both are functional interfaces (one abstract method), but using a lambda for <code>Comparable</code> would be pointless.</p>
+    </div>
+
+    <h3>Building a Comparator</h3>
+<pre><code>Comparator&lt;Duck&gt; byWeight = Comparator.comparing(Duck::weight);
+Comparator&lt;Squirrel&gt; c = Comparator.comparing(Squirrel::species)
+                                   .thenComparingInt(Squirrel::weight);
+var desc = Comparator.comparing(Squirrel::species).reversed();</code></pre>
+    <p>Static builders: <code>comparing</code>, <code>comparingInt/Double/Long</code>, <code>naturalOrder()</code>, <code>reverseOrder()</code>. Chainable default methods: <code>reversed()</code>, <code>thenComparing</code>, <code>thenComparingInt/Double/Long</code>.</p>
+
+    <h3>Sorting and binarySearch</h3>
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — sorting needs Comparable</span>
+      <p><code>Collections.sort(rabbits)</code> on a non-<code>Comparable</code> type does <strong>not compile</strong>. But adding a non-<code>Comparable</code> element to a <code>TreeSet</code> compiles and throws <code>ClassCastException</code> at <em>runtime</em> (on the first add). Pass a <code>Comparator</code> to fix either case.</p>
+    </div>
+<pre><code>List&lt;Integer&gt; list = Arrays.asList(<span class="num">6</span>,<span class="num">9</span>,<span class="num">1</span>,<span class="num">8</span>);
+Collections.sort(list);                       <span class="cm">// [1, 6, 8, 9]</span>
+Collections.binarySearch(list, <span class="num">6</span>);            <span class="cm">// 1  (found at index)</span>
+Collections.binarySearch(list, <span class="num">3</span>);            <span class="cm">// -2  (-(insertion point)-1)</span></code></pre>
+    <p><code>binarySearch</code> requires a sorted list; a found element returns its index, otherwise <code>-(insertion point) - 1</code>. Searching with a comparator whose order doesn't match the list's order is <strong>undefined</strong>.</p>
+
+    <h3>Sequenced collections (Java 21)</h3>
+    <p><code>SequencedCollection</code>, <code>SequencedSet</code>, and <code>SequencedMap</code> have a well-defined <em>encounter order</em> (not necessarily sorted). Methods include <code>addFirst</code>/<code>addLast</code>, <code>getFirst</code>/<code>getLast</code>, <code>removeFirst</code>/<code>removeLast</code>, and <code>reversed()</code>; maps add <code>firstEntry</code>/<code>lastEntry</code>, <code>pollFirstEntry</code>/<code>pollLastEntry</code>, <code>putFirst</code>/<code>putLast</code>.</p>
+    <div class="card remember">
+      <span class="label">Remember — Hash types are not sequenced</span>
+      <p><code>HashSet</code> and <code>HashMap</code> are the notable exceptions with no encounter order, so a <code>HashMap</code> can't be a <code>SequencedMap</code> (won't compile). On a <code>TreeSet</code>, <code>addLast()</code> throws <code>UnsupportedOperationException</code> — you can't force position in a sorted structure. Sorted sets forbid <code>null</code> values; sorted maps forbid <code>null</code> keys.</p>
+    </div>
+    <p>An <strong>unmodifiable view</strong> (<code>Collections.unmodifiableList/Set/Map/Collection</code>) can't be changed through the view, but changes to the underlying collection still show through it.</p>
+  </section>
+
+  <!-- ============ SECTION 6 ============ -->
+  <section id="s6">
+    <span class="secnum">SECTION 06</span>
+    <h2>Generics &amp; Wildcards</h2>
+
+    <p>Declare a formal type parameter in angle brackets. Convention: <code>E</code> element, <code>K</code> key, <code>V</code> value, <code>N</code> number, <code>T</code> type, <code>S/U/V</code> for more.</p>
+<pre><code><span class="kw">public class</span> Crate&lt;T&gt; {
+   <span class="kw">private</span> T contents;
+   <span class="kw">public</span> T lookInCrate() { <span class="kw">return</span> contents; }
+   <span class="kw">public void</span> packCrate(T contents) { <span class="kw">this</span>.contents = contents; }
+}
+<span class="kw">public record</span> CrateRecord&lt;T&gt;(T contents) {}   <span class="cm">// generic record</span></code></pre>
+
+    <h3>Type erasure</h3>
+    <p>At compile time the compiler replaces each <code>T</code> with <code>Object</code> (or its bound) and inserts casts. There is only one class file. This has consequences for overloading and overriding.</p>
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — erasure breaks overloading</span>
+      <p>You can't have both <code>chew(List&lt;Object&gt;)</code> and <code>chew(List&lt;Double&gt;)</code> — after erasure both become <code>chew(List)</code> &rarr; does not compile. Same across parent/child. But <code>chew(List&lt;Object&gt;)</code> and <code>chew(ArrayList&lt;Double&gt;)</code> coexist (different raw types).</p>
+    </div>
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — covariant returns, exact generics</span>
+      <p>An overriding method's return type may be a subtype, but the <strong>generic parameter must match exactly</strong>. <code>ArrayList&lt;CharSequence&gt; play()</code> overriding <code>List&lt;CharSequence&gt; play()</code> compiles; <code>List&lt;String&gt; play()</code> does <strong>not</strong> (<code>String</code> ≠ <code>CharSequence</code>), even though <code>String sleep()</code> overriding <code>CharSequence sleep()</code> is fine.</p>
+    </div>
+
+    <h3>Generic methods</h3>
+<pre><code><span class="kw">public static</span> &lt;T&gt; <span class="kw">void</span> prepare(T t) { }
+<span class="kw">public static</span> &lt;T&gt; Crate&lt;T&gt; ship(T t) { <span class="kw">return new</span> Crate&lt;T&gt;(); }
+<span class="kw">public static</span> T noGood(T t) { <span class="kw">return</span> t; }   <span class="err">// DOES NOT COMPILE (missing &lt;T&gt;)</span></code></pre>
+    <p>The formal type parameter <code>&lt;T&gt;</code> goes immediately before the return type (unless inherited from the class). A method's <code>T</code> is independent of the class's <code>T</code>.</p>
+
+    <h3>Wildcards</h3>
+    <table>
+      <thead><tr><th>Bound</th><th>Syntax</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td>Unbounded</td><td><code>?</code></td><td><code>List&lt;?&gt; a = new ArrayList&lt;String&gt;();</code></td></tr>
+        <tr><td>Upper bound</td><td><code>? extends type</code></td><td><code>List&lt;? extends Number&gt; a = new ArrayList&lt;Integer&gt;();</code></td></tr>
+        <tr><td>Lower bound</td><td><code>? super type</code></td><td><code>List&lt;? super Exception&gt; a = new ArrayList&lt;Object&gt;();</code></td></tr>
+      </tbody>
+    </table>
+    <div class="card key-rule">
+      <span class="label">Key Rule — upper/unbounded are read-only</span>
+      <p><code>List&lt;String&gt;</code> can't be assigned to <code>List&lt;Object&gt;</code> (type safety). Use <code>List&lt;?&gt;</code> for "a list of anything." With an unbounded or upper-bounded wildcard the list is logically <strong>immutable</strong>: <code>birds.add(new Sparrow())</code> on a <code>List&lt;? extends Bird&gt;</code> does not compile. Upper bounds use <code>extends</code> for both classes and interfaces.</p>
+    </div>
+    <div class="card key-rule">
+      <span class="label">Key Rule — lower bound lets you add</span>
+      <p><code>List&lt;? super String&gt;</code> accepts a <code>List&lt;String&gt;</code> or any supertype list, so adding a <code>String</code> is safe. For <code>List&lt;? super IOException&gt;</code> you can add an <code>IOException</code> or its subclass <code>FileNotFoundException</code>, but not a plain <code>Exception</code> (it might really be a <code>List&lt;IOException&gt;</code>).</p>
+    </div>
+<pre><code>List&lt;? extends B&gt; l4 = <span class="kw">new</span> ArrayList&lt;A&gt;();    <span class="err">// DOES NOT COMPILE (A is not B/sub)</span>
+List&lt;?&gt; l6 = <span class="kw">new</span> ArrayList&lt;? extends A&gt;();    <span class="err">// DOES NOT COMPILE (can't instantiate a wildcard)</span>
+&lt;B extends A&gt; B third(List&lt;B&gt; list){ <span class="kw">return new</span> B(); }  <span class="err">// DOES NOT COMPILE (can't new a type param)</span>
+&lt;X&gt; <span class="kw">void</span> fifth(List&lt;X super B&gt; list){ }           <span class="err">// DOES NOT COMPILE (wildcard needs ?)</span></code></pre>
+    <div class="card remember">
+      <span class="label">Remember — what you can't do with generics</span>
+      <p>Because of erasure you can't: call <code>new T()</code>, create <code>new T[]</code>, use <code>instanceof</code> on a parameterized type, use a primitive as a type argument, declare a <code>static</code> field of the type parameter, or <code>catch</code> a <code>T</code>.</p>
+    </div>
+  </section>
+
+  <!-- ============ RECAP ============ -->
+  <section class="recap">
+    <h3>Short Recap</h3>
+    <ul>
+      <li>Four interfaces: List (ordered, dups), Set (no dups), Queue/Deque (processing order), Map (key/value, not a <code>Collection</code>).</li>
+      <li>Diamond <code>&lt;&gt;</code> infers from the left; <code>var</code> from the right; <code>var x = new HashMap&lt;&gt;()</code> gives <code>&lt;Object,Object&gt;</code>.</li>
+      <li><code>Arrays.asList</code> = fixed-size, backed array (set ok, add/remove throw); <code>List.of</code>/<code>copyOf</code> = fully immutable.</li>
+      <li><code>remove(int)</code> is by index (throws if missing); <code>remove(Object)</code> is by value (returns false). <code>Integer.valueOf(n)</code> forces the value version.</li>
+      <li>HashSet/HashMap unordered, Linked* insertion order, Tree* sorted (no null keys/values).</li>
+      <li>Queue/Deque: throwing vs sentinel pairs (<code>add</code>/<code>offer</code>, <code>element</code>/<code>peek</code>, <code>remove</code>/<code>poll</code>); stack uses <code>push</code>/<code>pop</code>/<code>peek</code>.</li>
+      <li><code>merge</code>: function runs only with two real values; returns null &rarr; remove. <code>putIfAbsent</code> updates a null mapping. <code>map.contains()</code> doesn't compile.</li>
+      <li>Comparable: <code>compareTo</code>, 1 param, <code>java.lang</code>, in the class. Comparator: <code>compare</code>, 2 params, <code>java.util</code>, usually a lambda.</li>
+      <li><code>Collections.sort</code> on a non-Comparable doesn't compile; a <code>TreeSet</code> add throws <code>ClassCastException</code> at runtime.</li>
+      <li>Type erasure replaces <code>T</code> with <code>Object</code>; blocks overloading by generic type; requires exact generic match for covariant overrides.</li>
+      <li>Wildcards: <code>?</code> / <code>? extends</code> (read-only) / <code>? super</code> (can add). Generic methods declare <code>&lt;T&gt;</code> before the return type.</li>
+    </ul>
+  </section>
+
+  <!-- ============ CHEAT SHEET ============ -->
+  <section>
+    <span class="secnum">CHEAT SHEET</span>
+    <h2>Exam Traps Cheat Sheet</h2>
+    <table>
+      <thead><tr><th>Scenario</th><th>What it tests</th><th>Verdict</th></tr></thead>
+      <tbody>
+        <tr><td><code>List&lt;&gt; x = new ArrayList&lt;Integer&gt;();</code></td><td>diamond on the left</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>var m = new HashMap&lt;&gt;();</code></td><td>nothing to infer</td><td class="yes"><code>HashMap&lt;Object,Object&gt;</code></td></tr>
+        <tr><td><code>List.of(...).add(x)</code></td><td>immutable list</td><td class="no">UnsupportedOperationException</td></tr>
+        <tr><td><code>Arrays.asList(...).add(x)</code></td><td>fixed-size backed array</td><td class="no">UnsupportedOperationException</td></tr>
+        <tr><td><code>list.remove(2)</code> on Integer list</td><td>remove by index, not value</td><td class="yes">removes index 2</td></tr>
+        <tr><td><code>int h = list.get(0)</code> where element is null</td><td>unboxing null</td><td class="no">NullPointerException</td></tr>
+        <tr><td><code>map.contains("x")</code></td><td>contains is on Collection</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>new Comparator&lt;&gt;(){ int compareTo(...) }</code></td><td>wrong method name</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>Collections.sort(nonComparableList)</code></td><td>needs Comparable</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>treeSet.add(nonComparable)</code></td><td>runtime sort failure</td><td class="no">ClassCastException</td></tr>
+        <tr><td><code>HashMap</code> as <code>SequencedMap</code></td><td>no encounter order</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>treeSet.addLast(x)</code></td><td>can't position in sorted</td><td class="no">UnsupportedOperationException</td></tr>
+        <tr><td><code>chew(List&lt;Object&gt;)</code> + <code>chew(List&lt;Double&gt;)</code></td><td>erasure clash</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>List&lt;String&gt; play()</code> overriding <code>List&lt;CharSequence&gt;</code></td><td>generic must match exactly</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>static T noGood(T t)</code></td><td>missing <code>&lt;T&gt;</code></td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>birds.add(new Sparrow())</code> on <code>List&lt;? extends Bird&gt;</code></td><td>upper bound is read-only</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>List&lt;? super Exception&gt;.add(new Exception())</code></td><td>could be List&lt;IOException&gt;</td><td class="no">DOES NOT COMPILE</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+</div>
+</body>
+</html>

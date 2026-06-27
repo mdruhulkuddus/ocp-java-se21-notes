@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 · অধ্যায় ৬ — Class Design (বিশদ স্টাডি নোট)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff; --ink:#2b2b32; --muted:#6e6a72;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --accent:#c96442; --accent2:#d4845e; --line:#ece3da;
+    --green:#3b7d57; --green-b:#5aab7b; --red:#c44d3e; --gold:#a9772a; --purple:#7c5cbf;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Noto Sans Bengali',system-ui,sans-serif; line-height:1.8;
+    -webkit-font-smoothing:antialiased; padding:32px 16px;
+  }
+  .wrap{max-width:1020px; margin:0 auto;}
+  h1,h2,h3,h4{font-family:'Noto Sans Bengali',sans-serif; line-height:1.5; color:#22222a; font-weight:700;}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+
+  .header{background:linear-gradient(135deg,#ffffff,#fbf7f4); border-radius:18px; padding:34px 34px 30px; margin-bottom:26px; box-shadow:0 10px 30px rgba(120,90,60,.08);}
+  .badge{display:inline-block; font-family:'JetBrains Mono',monospace; font-size:.72rem; letter-spacing:.5px; text-transform:uppercase; color:#fff; font-weight:700; background:linear-gradient(90deg,var(--accent),var(--accent2)); padding:6px 14px; border-radius:999px; box-shadow:0 4px 12px rgba(201,100,66,.28);}
+  .header h1{font-size:1.95rem; margin:18px 0 4px;}
+  .header h1 .sub{color:var(--muted); font-weight:400; font-size:1.15rem;}
+  .header .tagline{color:var(--muted); margin:0 0 20px; font-size:1rem;}
+  .objectives{background:linear-gradient(135deg,#f0f9f3,#f7fcf8); border-left:5px solid var(--green-b); border-radius:12px; padding:16px 20px;}
+  .objectives h4{margin:0 0 8px; color:var(--green); font-size:.95rem;}
+  .objectives ul{margin:0; padding-left:20px;} .objectives li{margin:4px 0; font-size:.93rem;}
+
+  .toc{background:var(--card); border-radius:16px; padding:22px 26px; margin-bottom:30px; box-shadow:0 6px 20px rgba(120,90,60,.06);}
+  .toc h3{margin:0 0 14px; font-size:1.05rem;}
+  .toc ol{columns:2; column-gap:34px; margin:0; padding-left:18px;}
+  .toc li{margin:7px 0; break-inside:avoid;}
+  .toc a{color:var(--accent); text-decoration:none; font-weight:600;}
+  .toc a:hover{text-decoration:underline;}
+
+  section{margin-bottom:40px;}
+  .secnum{font-family:'JetBrains Mono',monospace; font-size:.8rem; font-weight:700; letter-spacing:2px; color:var(--accent); display:block; margin-bottom:2px;}
+  section h2{font-size:1.5rem; margin:0 0 18px; padding-bottom:10px; border-bottom:2px solid var(--line);}
+  section h3{font-size:1.15rem; margin:26px 0 10px;}
+  p{margin:12px 0;}
+
+  p code, li code, td code, .opt code{background:#f3ece4; color:#9a5030; padding:1.5px 6px; border-radius:5px; font-size:.84em; font-family:'JetBrains Mono',monospace;}
+
+  pre{background:#fdfaf7; border-radius:12px; padding:16px 18px; overflow-x:auto; box-shadow:inset 0 2px 8px rgba(120,90,60,.08); margin:14px 0; font-size:.85rem; line-height:1.6;}
+  pre code{background:none; color:#3a3742; padding:0; font-family:'JetBrains Mono',monospace;}
+  .kw{color:var(--kw); font-weight:600;} .str{color:var(--str);} .num{color:var(--num);}
+  .err{color:var(--err); font-weight:600;} .cm{color:var(--cm); font-style:italic;}
+
+  .card{border-radius:14px; padding:15px 19px; margin:16px 0; box-shadow:0 4px 14px rgba(120,90,60,.07); transition:transform .18s ease, box-shadow .18s ease;}
+  .card:hover{transform:translateY(-2px); box-shadow:0 8px 22px rgba(120,90,60,.12);}
+  .card .label{font-family:'JetBrains Mono',monospace; font-size:.72rem; font-weight:700; letter-spacing:.6px; text-transform:uppercase; display:block; margin-bottom:5px;}
+  .card p{margin:5px 0;}
+  .exam-trap{background:linear-gradient(135deg,#fef2f0,#fff8f7); border-left:5px solid #e06b5e;} .exam-trap .label{color:#c0453a;}
+  .key-rule{background:linear-gradient(135deg,#f0f9f3,#f7fcf8); border-left:5px solid var(--green-b);} .key-rule .label{color:var(--green);}
+  .remember{background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c;} .remember .label{color:var(--gold);}
+
+  .rules-box{background:linear-gradient(135deg,#f0f9f3,#f7fcf8); border-top:4px solid var(--green-b); border-radius:12px; padding:16px 22px; margin:18px 0; box-shadow:0 4px 14px rgba(120,90,60,.06);}
+  .rules-box h4{margin:0 0 8px; color:var(--green);}
+  .rules-box ol,.rules-box ul{margin:6px 0; padding-left:22px;} .rules-box li{margin:6px 0;}
+
+  .vs-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0;}
+  .vs-grid .col{background:var(--card); border-radius:12px; padding:14px 18px; box-shadow:0 4px 14px rgba(120,90,60,.07);}
+  .vs-grid .col h4{margin:0 0 8px; font-size:1rem;}
+  .vs-grid .col.left h4{color:var(--purple);} .vs-grid .col.right h4{color:var(--green);}
+  .vs-grid .col ul{margin:0; padding-left:18px;} .vs-grid .col li{margin:5px 0; font-size:.9rem;}
+
+  .trace{background:#fffdf9; border:1px dashed #e3d6c4; border-radius:12px; padding:12px 18px; margin:14px 0;}
+  .trace h4{margin:0 0 6px; font-size:.92rem; color:var(--accent);}
+  .trace ul{margin:0; padding-left:20px;} .trace li{margin:5px 0; font-size:.9rem;}
+  .out{display:inline-block; background:#eef8f1; color:#2f7350; font-family:'JetBrains Mono',monospace; padding:1px 8px; border-radius:5px; font-size:.85em; font-weight:600;}
+
+  table{width:100%; border-collapse:separate; border-spacing:0; background:var(--card); border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(120,90,60,.08); margin:16px 0; font-size:.9rem;}
+  th,td{padding:10px 14px; text-align:left; border-bottom:1px solid #f0ebe4; vertical-align:top;}
+  thead th{background:#f0e8de; font-weight:700; color:#5a5048;}
+  tbody tr:last-child td{border-bottom:none;} tbody tr:hover{background:#fcfaf7;}
+  .yes{color:var(--green); font-weight:700;} .no{color:var(--red); font-weight:700;}
+
+  .recap{background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c; border-radius:14px; padding:22px 26px; box-shadow:0 6px 18px rgba(120,90,60,.08);}
+  .recap h3{color:var(--gold); margin:16px 0 4px; font-size:1.02rem;}
+  .recap h3:first-child{margin-top:0;}
+  .recap ul{margin:4px 0 0; padding-left:20px;} .recap li{margin:4px 0; font-size:.92rem;}
+
+  @media(max-width:680px){
+    body{padding:18px 10px;}
+    .header{padding:24px 20px;} .header h1{font-size:1.5rem;} .header h1 .sub{font-size:.95rem;}
+    .toc ol{columns:1;} .vs-grid{grid-template-columns:1fr;} section h2{font-size:1.25rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header class="header">
+    <span class="badge">OCP Java SE 21 Developer — Exam 1Z0-830</span>
+    <h1>অধ্যায় ৬ · Class Design <span class="sub">(বিশদ স্টাডি নোট)</span></h1>
+    <p class="tagline">Inheritance, constructors, order of initialization, overriding ও hiding, abstract classes এবং immutable objects — এই অধ্যায়টিই Java-র পুরো object model-কে একসুতোয় বাঁধে।</p>
+    <div class="objectives">
+      <h4>EXAM OBJECTIVES COVERED</h4>
+      <ul>
+        <li>Class তৈরি করা; instance/static field, method, constructor এবং instance/static initializer সংজ্ঞায়িত ও ব্যবহার করা।</li>
+        <li>Variable scope বোঝা, encapsulation প্রয়োগ করা এবং immutable object তৈরি করা।</li>
+        <li>Inheritance (abstract type সহ) implement করা; method override করা, এমনকি <code>Object</code> ক্লাসের method-ও।</li>
+        <li>Object type বনাম reference type-এর পার্থক্য (অধ্যায় ৭-এর polymorphism-এর ভিত্তি)।</li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- TOC -->
+  <nav class="toc">
+    <h3>সূচিপত্র</h3>
+    <ol>
+      <li><a href="#s1">Understanding Inheritance</a></li>
+      <li><a href="#s2">Creating Classes</a></li>
+      <li><a href="#s3">Declaring Constructors</a></li>
+      <li><a href="#s4">Initializing Objects</a></li>
+      <li><a href="#s5">Inheriting Members</a></li>
+      <li><a href="#s6">Creating Abstract Classes</a></li>
+      <li><a href="#s7">Creating Immutable Objects</a></li>
+      <li><a href="#recap">সংক্ষিপ্ত রিভিউ</a></li>
+      <li><a href="#cheat">Exam Traps চিট-শিট</a></li>
+    </ol>
+  </nav>
+
+  <!-- SECTION 1 -->
+  <section id="s1">
+    <span class="secnum">SECTION 01</span>
+    <h2>Understanding Inheritance</h2>
+    <p><strong>Inheritance</strong>-এর মাধ্যমে একটি <em>subclass</em> (child) তার <em>superclass</em>-এর (parent) কিছু member — field ও method — স্বয়ংক্রিয়ভাবে পেয়ে যায়। এটি ঘোষণা করতে হয় <code>extends</code> keyword দিয়ে। তবে শর্ত হলো, parent ক্লাসটি <code>final</code> হওয়া যাবে না।</p>
+
+    <h3>কোন member-গুলো inherit হয়</h3>
+    <table>
+      <thead><tr><th>Access level</th><th>subclass-এ inherit হয়?</th></tr></thead>
+      <tbody>
+        <tr><td><code>public</code></td><td class="yes">হ্যাঁ — সবসময়</td></tr>
+        <tr><td><code>protected</code></td><td class="yes">হ্যাঁ — সবসময়</td></tr>
+        <tr><td>package (default)</td><td>শুধু <strong>একই package</strong> হলে</td></tr>
+        <tr><td><code>private</code></td><td class="no">না — কখনোই inherit হয় না</td></tr>
+      </tbody>
+    </table>
+    <pre><code><span class="kw">public class</span> BigCat {
+    <span class="kw">protected double</span> size;
+}
+<span class="kw">public class</span> Jaguar <span class="kw">extends</span> BigCat {
+    <span class="kw">public</span> Jaguar() { size = <span class="num">10.2</span>; }       <span class="cm">// OK: size protected, তাই inherit হয়েছে</span>
+}
+<span class="kw">public class</span> Spider {
+    <span class="kw">public void</span> printDetails() {
+        System.out.println(size);            <span class="err">// DOES NOT COMPILE — Spider তো size inherit করেনি</span>
+    }
+}</code></pre>
+
+    <h3>Inheritance transitive</h3>
+    <p>যদি <code>X extends Y</code> এবং <code>Y extends Z</code> হয়, তাহলে <code>X</code> হলো <code>Z</code>-এর descendant। আর <em>direct</em> subclass হলো সেটাই যেটা সরাসরি <code>extends</code> লেখে — অর্থাৎ <code>X</code> শুধু <code>Y</code>-এর direct subclass, <code>Z</code>-এর নয়।</p>
+
+    <div class="card exam-trap">
+      <span class="label">⚠ EXAM TRAP</span>
+      <p>কোনো <code>final</code> ক্লাসকে extend করতে দেখলে কোডটা সঙ্গে সঙ্গে <strong>compile হবে না</strong> — এটা চোখে পড়লেই উত্তর দিয়ে দাও।</p>
+      <pre><code><span class="kw">public class</span> Mammal {}
+<span class="kw">public final class</span> Rhinoceros <span class="kw">extends</span> Mammal {}
+<span class="kw">public class</span> Clara <span class="kw">extends</span> Rhinoceros {}   <span class="err">// DOES NOT COMPILE — Rhinoceros final</span></code></pre>
+    </div>
+
+    <div class="vs-grid">
+      <div class="col left"><h4>Single inheritance (Java)</h4>
+        <ul><li>প্রতিটি class-এর ঠিক <strong>একটি direct parent</strong>।</li><li>একাধিক <em>level</em> চলে (X→Y→Z)।</li><li>এক parent-এর অনেক child থাকতে পারে।</li></ul></div>
+      <div class="col right"><h4>Multiple inheritance (Java-তে নেই)</h4>
+        <ul><li><strong>একাধিক direct parent</strong> — অনুমোদিত নয়।</li><li>কোন parent থেকে inherit করবে — তাতে ambiguity তৈরি হয়।</li><li>একমাত্র ব্যতিক্রম: একটি class একাধিক <code>interface</code> <code>implement</code> করতে পারে (অধ্যায় ৭)।</li></ul></div>
+    </div>
+
+    <h3><code>Object</code> থেকে inheritance</h3>
+    <p>প্রতিটি class-ই <code>java.lang.Object</code> থেকে inherit করে। <code>Object</code>-ই একমাত্র class যার কোনো parent নেই। তোমার class যদি কিছু extend না করে, compiler নিজে থেকেই <code>extends java.lang.Object</code> যোগ করে দেয়। তাই নিচের দুটো equivalent:</p>
+    <pre><code><span class="kw">public class</span> Zoo { }
+<span class="kw">public class</span> Zoo <span class="kw">extends</span> java.lang.Object { }   <span class="cm">// equivalent</span></code></pre>
+    <div class="card remember">
+      <span class="label">★ REMEMBER</span>
+      <p>যখন তুমি কোনো existing class extend করো, Java আবার <code>Object</code> যোগ করে <strong>না</strong> — chain-এর মাধ্যমে তুমি এমনিতেই <code>Object</code> পেয়ে যাও। primitive type (<code>int</code>, <code>boolean</code>) class নয়, তাই তারা <code>Object</code> inherit করে না; তবে তাদের wrapper class করে (autoboxing-এর মাধ্যমে)। <code>toString()</code> ও <code>equals()</code> method <code>Object</code>-এ থাকে, তাই সব class-এই এগুলো পাওয়া যায়।</p>
+    </div>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section id="s2">
+    <span class="secnum">SECTION 02</span>
+    <h2>Creating Classes</h2>
+
+    <h3>একটি class extend করা</h3>
+    <pre><code><span class="cm">// Animal.java</span>
+<span class="kw">public class</span> Animal {
+    <span class="kw">private int</span> age;                  <span class="cm">// private — সরাসরি inherit হয় না</span>
+    <span class="kw">protected</span> String name;          <span class="cm">// protected — inherit হয় ও সরাসরি accessible</span>
+    <span class="kw">public int</span> getAge() { <span class="kw">return</span> age; }
+    <span class="kw">public void</span> setAge(<span class="kw">int</span> newAge) { age = newAge; }
+}
+<span class="cm">// Lion.java</span>
+<span class="kw">public class</span> Lion <span class="kw">extends</span> Animal {
+    <span class="kw">protected void</span> setProperties(<span class="kw">int</span> age, String n) { setAge(age); name = n; }
+    <span class="kw">public void</span> roar() {
+        System.out.print(name + <span class="str">", age "</span> + getAge() + <span class="str">", says: Roar!"</span>);
+    }
+}</code></pre>
+    <p><code>lion.setProperties(3,"kion")</code>-এর পর <code>lion.roar()</code> প্রিন্ট করে <span class="out">kion, age 3, says: Roar!</span>। <code>age</code> হলো <code>private</code>, তাই শুধু <code>setAge()/getAge()</code> দিয়ে পৌঁছানো যায়; <code>name</code> হলো <code>protected</code>, তাই সরাসরি accessible। <code>Lion</code>-এর ভেতরে <code>age</code> সরাসরি ব্যবহার করলে <span class="err">compile হবে না</span>।</p>
+
+    <h3>Class access modifier (top-level)</h3>
+    <div class="rules-box">
+      <h4>Top-level class-এর নিয়ম</h4>
+      <ul>
+        <li>একটি <code>.java</code> ফাইলে <strong>সর্বোচ্চ একটি</strong> <code>public</code> top-level class থাকতে পারে।</li>
+        <li>যত খুশি package-access class রাখা যায়, যেকোনো order-এ — এমনকি একটা public class না থাকলেও চলে।</li>
+        <li>Top-level class শুধু <code>public</code> বা package হতে পারে — <code>protected</code>/<code>private</code> এখানে illegal (এগুলো শুধু <em>nested</em> class-এ চলে, অধ্যায় ৭)।</li>
+      </ul>
+    </div>
+    <pre><code><span class="kw">protected class</span> ClownFish {}    <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">private class</span> BlueTang {}       <span class="err">// DOES NOT COMPILE</span></code></pre>
+
+    <h3><code>this</code> reference</h3>
+    <p>parameter আর instance variable-এর নাম এক হয়ে গেলে Java সবচেয়ে <strong>granular (সংকীর্ণতম) scope</strong> ব্যবহার করে। এই trap-টা লক্ষ করো:</p>
+    <pre><code><span class="kw">public class</span> Flamingo {
+    <span class="kw">private</span> String color = <span class="kw">null</span>;
+    <span class="kw">public void</span> setColor(String color) {
+        color = color;                 <span class="cm">// parameter-কে নিজের ভেতরেই assign — instance var অপরিবর্তিত!</span>
+    }
+}
+<span class="cm">// f.setColor("PINK"); System.out.print(f.color);  =&gt;</span> <span class="out">null</span></code></pre>
+    <p>সমাধান: <code>this.color = color;</code> &rarr; তখন প্রিন্ট হবে <span class="out">PINK</span>। <code>this</code> reference current instance-কে নির্দেশ করে এবং যেকোনো instance method, constructor বা instance initializer-এ কাজ করে — কিন্তু static method বা static initializer-এ <strong>নয়</strong> (সেখানে কোনো implicit instance নেই)।</p>
+
+    <div class="trace">
+      <h4>TRACE — Duck উদাহরণ &rarr; প্রিন্ট হয় 0 2 white</h4>
+      <ul>
+        <li><code>length = this.length;</code> &mdash; উল্টো! instance <code>length</code> (0) parameter-এ assign হয়; instance <strong>0</strong>-ই থাকে।</li>
+        <li><code>height = theHeight;</code> &mdash; ভিন্ন নাম, <code>this</code> লাগে না; height হয় <strong>2</strong>।</li>
+        <li><code>this.color = "white";</code> &mdash; ঠিক আছে; নাম conflict না থাকলেও <code>this.</code> লেখা legal।</li>
+      </ul>
+    </div>
+
+    <h3><code>super</code> reference</h3>
+    <p>একই নামের variable/method parent ও child দুই জায়গায় থাকলে instance-এ <strong>দুটো আলাদা copy</strong> থাকে। <code>this</code> খোঁজে current → inherited; <code>super</code> খোঁজে শুধু inherited (current class-এর member বাদ দিয়ে)।</p>
+    <pre><code><span class="kw">public class</span> Reptile { <span class="kw">protected int</span> speed = <span class="num">10</span>; }
+<span class="kw">public class</span> Crocodile <span class="kw">extends</span> Reptile {
+    <span class="kw">protected int</span> speed = <span class="num">20</span>;
+    <span class="kw">public int</span> getSpeed() { <span class="kw">return</span> speed; }        <span class="cm">// =&gt; 20 (this.speed)</span>
+    <span class="cm">// return super.speed;  দিলে =&gt; 10</span>
+}</code></pre>
+    <div class="card exam-trap">
+      <span class="label">⚠ EXAM TRAP — Insect / Beetle</span>
+      <p>এই প্রোগ্রামটা মাত্র একটা লাইনের জন্য <strong>compile হবে না</strong>:</p>
+      <pre><code><span class="kw">class</span> Insect { <span class="kw">protected int</span> numberOfLegs = <span class="num">4</span>; String label = <span class="str">"buggy"</span>; }
+<span class="kw">public class</span> Beetle <span class="kw">extends</span> Insect {
+    <span class="kw">protected int</span> numberOfLegs = <span class="num">6</span>;
+    <span class="kw">short</span> age = <span class="num">3</span>;
+    <span class="kw">public void</span> printData() {
+        System.out.println(<span class="kw">this</span>.label);    <span class="cm">// buggy  (inherited)</span>
+        System.out.println(<span class="kw">super</span>.label);   <span class="cm">// buggy  (inherited)</span>
+        System.out.println(<span class="kw">this</span>.age);      <span class="cm">// 3      (current class)</span>
+        System.out.println(<span class="kw">super</span>.age);     <span class="err">// DOES NOT COMPILE — age inherited নয়</span>
+        System.out.println(numberOfLegs);   <span class="cm">// 6      (সংকীর্ণতম scope = Beetle)</span>
+    }
+}</code></pre>
+      <p><code>this</code> = current + inherited; <code>super</code> = শুধু inherited। <code>age</code> শুধু <code>Beetle</code>-এ আছে, তাই <code>super.age</code> illegal।</p>
+    </div>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section id="s3">
+    <span class="secnum">SECTION 03</span>
+    <h2>Declaring Constructors</h2>
+    <p>একটি constructor-এর নাম <strong>হুবহু class-এর নামের সমান</strong> এবং কোনো return type থাকে <strong>না</strong> (<code>void</code>-ও নয়)। <code>new</code> দিয়ে instance তৈরি করলে এটি চলে।</p>
+    <pre><code><span class="kw">public class</span> Bunny {
+    <span class="kw">public</span> bunny() {}          <span class="err">// DOES NOT COMPILE — ছোট হাতের নাম = method, কিন্তু return type নেই</span>
+    <span class="kw">public void</span> Bunny() {}     <span class="cm">// বৈধ METHOD (return type আছে) — constructor নয়</span>
+}</code></pre>
+    <div class="card exam-trap">
+      <span class="label">⚠ EXAM TRAP</span>
+      <p>Constructor parameter যেকোনো class, array, primitive বা generic হতে পারে — কিন্তু কখনোই <code>var</code> নয়: <code>public Bonobo(var food){}</code> <span class="err">compile হয় না</span>।</p>
+    </div>
+
+    <h3>Default constructor</h3>
+    <div class="rules-box">
+      <h4>Default no-arg constructor</h4>
+      <ul>
+        <li>class যদি <strong>একটাও constructor না লেখে</strong>, compiler একটি <code>public</code> no-argument constructor যোগ করে।</li>
+        <li>এটি <strong>compile time</strong>-এ তৈরি হয় — <code>.java</code> ফাইলে দেখা যায় না, শুধু <code>.class</code>-এ।</li>
+        <li>তুমি যদি <em>একটিও</em> constructor লেখো (এমনকি <code>private</code> হলেও), default যোগ হয় না।</li>
+      </ul>
+    </div>
+    <table>
+      <thead><tr><th>Class</th><th>constructor লেখা আছে?</th><th>default no-arg পায়?</th></tr></thead>
+      <tbody>
+        <tr><td><code>Rabbit1 {}</code></td><td>না</td><td class="yes">হ্যাঁ</td></tr>
+        <tr><td><code>Rabbit2</code> + <code>Rabbit2()</code></td><td>হ্যাঁ</td><td class="no">না</td></tr>
+        <tr><td><code>Rabbit3</code> + <code>Rabbit3(boolean)</code></td><td>হ্যাঁ</td><td class="no">না</td></tr>
+        <tr><td><code>Rabbit4</code> + <code>private Rabbit4()</code></td><td>হ্যাঁ (private)</td><td class="no">না</td></tr>
+      </tbody>
+    </table>
+    <p>অন্য class থেকে <code>new Rabbit4()</code> করলে <span class="err">compile হয় না</span> — constructor-টা private। শুধুই private constructor-ওয়ালা class বাইরে থেকে instantiate করা যায় না এবং default পায় না (static-only utility class-এর জন্য কাজে লাগে)।</p>
+
+    <h3>Overloaded constructor — <code>this()</code> দিয়ে call</h3>
+    <p>Constructor-রা একে অপরকে call করতে পারে, কিন্তু শুধু <code>this(...)</code> দিয়ে — নাম দিয়ে নয়, <code>new</code> দিয়েও নয় (তাতে একটা বাড়তি, ফেলে দেওয়া object তৈরি হবে)।</p>
+    <pre><code><span class="kw">public</span> Hamster(<span class="kw">int</span> weight) {
+    Hamster(weight, <span class="str">"brown"</span>);        <span class="err">// DOES NOT COMPILE — constructor method-এর মতো call করা যায় না</span>
+}
+<span class="kw">public</span> Hamster(<span class="kw">int</span> weight) {
+    <span class="kw">new</span> Hamster(weight, <span class="str">"brown"</span>);    <span class="cm">// compile হয়, কিন্তু বাড়তি object তৈরি হয় যা পরে discard হয়</span>
+}
+<span class="kw">public</span> Hamster(<span class="kw">int</span> weight) {
+    <span class="kw">this</span>(weight, <span class="str">"brown"</span>);          <span class="cm">// সঠিক — একই instance</span>
+}</code></pre>
+
+    <div class="vs-grid">
+      <div class="col left"><h4><code>this</code> বনাম <code>this()</code></h4>
+        <ul><li><code>this</code> &rarr; current instance-এর reference।</li><li><code>this()</code> &rarr; একই class-এর আরেকটি constructor-এ call।</li></ul></div>
+      <div class="col right"><h4><code>super</code> বনাম <code>super()</code></h4>
+        <ul><li><code>super</code> &rarr; parent-এর member reference।</li><li><code>super()</code> &rarr; parent constructor-এ call।</li></ul></div>
+    </div>
+
+    <div class="rules-box">
+      <h4>মুখস্থ রাখার constructor নিয়ম</h4>
+      <ol>
+        <li>একটি class-এ অনেক overloaded constructor থাকতে পারে, প্রতিটির signature আলাদা।</li>
+        <li>প্রতিটি constructor-এর প্রথম লাইন হলো <code>this()</code> অথবা <code>super()</code>-এ call।</li>
+        <li><code>this()</code>/<code>super()</code> থাকলে তা অবশ্যই <strong>প্রথম statement</strong> হবে (তাই প্রতি constructor-এ এমন একটাই call)।</li>
+        <li>কোনোটাই না লিখলে compiler প্রথম লাইনে no-arg <code>super()</code> বসিয়ে দেয়।</li>
+        <li>Cyclic constructor call নিষিদ্ধ।</li>
+        <li><code>super()</code> সবসময় <strong>সবচেয়ে কাছের direct</strong> parent-কে বোঝায়।</li>
+      </ol>
+    </div>
+
+    <div class="card exam-trap">
+      <span class="label">⚠ EXAM TRAP — this()-এর আগে statement</span>
+      <pre><code><span class="kw">public</span> Hamster(<span class="kw">int</span> weight) {
+    System.out.println(<span class="str">"chew"</span>);      <span class="cm">// একটা statement...</span>
+    <span class="kw">this</span>(weight, <span class="str">"brown"</span>);          <span class="err">// DOES NOT COMPILE — this() প্রথমে হতে হবে</span>
+}</code></pre>
+      <p>Comment statement হিসেবে গণ্য হয় না, তাই <code>this()</code>-এর আগে comment থাকলে সমস্যা নেই। Cyclic call-ও fail করে: <code>Gopher(int){ this(5); }</code> নিজেকেই call করছে &rarr; <span class="err">compile হয় না</span>।</p>
+    </div>
+
+    <h3>Parent constructor — <code>super()</code> দিয়ে call</h3>
+    <pre><code><span class="kw">public class</span> Zoo {
+    <span class="kw">public</span> Zoo() {
+        System.out.println(<span class="str">"Zoo created"</span>);
+        <span class="kw">super</span>();                       <span class="err">// DOES NOT COMPILE — super() প্রথমে হতে হবে</span>
+    }
+}</code></pre>
+    <p>Child constructor parent-এর <strong>যেকোনো</strong> accessible constructor call করতে পারে — নিজের signature-এর সঙ্গে মেলানোর দরকার নেই। argument-সহ <code>super()</code>-ও &ldquo;super call&rdquo; হিসেবেই গণ্য।</p>
+
+    <div class="card exam-trap">
+      <span class="label">⚠ EXAM TRAP — parent-এ no-arg constructor নেই</span>
+      <p>Parent যদি শুধু argument-সহ constructor রাখে এবং কোনো no-arg constructor <strong>না</strong> রাখে, তাহলে auto-inserted <code>super()</code>-এর call করার মতো কিছু থাকে না:</p>
+      <pre><code><span class="kw">public class</span> Mammal { <span class="kw">public</span> Mammal(<span class="kw">int</span> age) {} }
+<span class="kw">public class</span> Seal <span class="kw">extends</span> Mammal {}              <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">public class</span> Elephant <span class="kw">extends</span> Mammal {
+    <span class="kw">public</span> Elephant() {}                          <span class="err">// DOES NOT COMPILE — implicit super()-এর target নেই</span>
+}</code></pre>
+      <p>সমাধান: child constructor-এ explicit <code>super(6);</code> দাও। (Parent-এ no-arg না থাকলেও subclass-এ no-arg constructor থাকতে <em>পারে</em> — শুধু একটা existing parent constructor call করলেই হলো।)</p>
+    </div>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section id="s4">
+    <span class="secnum">SECTION 04</span>
+    <h2>Initializing Objects</h2>
+
+    <h3>Class initialization-এর order</h3>
+    <div class="rules-box">
+      <h4>Initialize Class X (সর্বোচ্চ একবার হয়)</h4>
+      <ol>
+        <li>প্রথমে X-এর <strong>superclass</strong> initialize হয়।</li>
+        <li>সব <strong>static variable declaration</strong> source order-এ process হয়।</li>
+        <li>সব <strong>static initializer</strong> source order-এ process হয়।</li>
+      </ol>
+    </div>
+    <p>প্রথম ব্যবহারের আগে class load হয়; <code>main()</code>-যুক্ত class <code>main()</code> চলার আগেই load হয়। <code>main()</code> যদি <code>Hippo</code>-র ভেতরে থাকে (যেটা <code>Animal</code> extend করে), প্রোগ্রাম প্রিন্ট করে <span class="out">ABC</span> — ঠিক একবার: class init থেকে <code>A</code>+<code>B</code>, তারপর <code>main()</code> থেকে <code>C</code>, যদিও তিনটি instance তৈরি হয়। আর <code>Hippo</code> অন্য class থেকে ব্যবহার করলে সম্ভবত <span class="out">CAB</span> দেখবে (দরকার পড়লেই load হয়)।</p>
+
+    <h3>final field</h3>
+    <div class="card key-rule">
+      <span class="label">✓ KEY RULE</span>
+      <p>constructor <strong>শেষ হওয়ার</strong> মধ্যে প্রতিটি <code>final</code> instance variable-কে ঠিক <strong>একবার</strong> value পেতে হবে — declaration-এ, instance initializer-এ, অথবা constructor-এ। default value শুধু <em>non-final</em> field-এ প্রযোজ্য।</p>
+    </div>
+    <pre><code><span class="kw">public class</span> MouseHouse {
+    <span class="kw">private final int</span> volume;
+    <span class="kw">private final</span> String type;
+    { <span class="kw">this</span>.volume = <span class="num">10</span>; }                <span class="cm">// instance initializer volume set করে</span>
+    <span class="kw">public</span> MouseHouse(String type) { <span class="kw">this</span>.type = type; }   <span class="cm">// OK</span>
+    <span class="kw">public</span> MouseHouse() {                  <span class="err">// DOES NOT COMPILE</span>
+        <span class="kw">this</span>.volume = <span class="num">2</span>;                   <span class="err">// volume আগেই set; আবার type কখনো set হয়নি</span>
+    }
+}</code></pre>
+    <p>প্রতিটি constructor <strong>আলাদাভাবে</strong> যাচাই হয়। no-arg version দুইভাবে fail করে: <code>type</code> কখনো set করে না, আর already-final <code>volume</code> আবার assign করে। <code>this(null)</code> দিয়ে delegate করলে ঠিক হয়ে যায় — final reference-এ <code>null</code> একবারের বৈধ assignment।</p>
+
+    <h3>Instance initialization-এর order</h3>
+    <div class="rules-box">
+      <h4>Initialize Instance of X</h4>
+      <ol>
+        <li>Class X initialize করো (আগে না হয়ে থাকলে)।</li>
+        <li>X-এর <strong>superclass instance</strong> initialize করো।</li>
+        <li><strong>instance variable declaration</strong> source order-এ process করো।</li>
+        <li><strong>instance initializer</strong> source order-এ process করো।</li>
+        <li><strong>constructor</strong> চালাও (<code>this()</code>-chained constructor সহ)।</li>
+      </ol>
+      <p style="margin:6px 0 0;">সংক্ষেপে: <strong>declaration → initializer → constructor</strong>, superclass আগে, subclass পরে।</p>
+    </div>
+
+    <div class="trace">
+      <h4>TRACE — ZooTickets &rarr; প্রিন্ট 0-10-BestZoo-z-</h4>
+      <ul>
+        <li>কোনো superclass declare করা নেই (অর্থাৎ <code>Object</code>)। <strong>আগে static:</strong> <code>COUNT=0</code>, static init প্রিন্ট <code>0-</code>, দ্বিতীয় static init <code>COUNT+=10</code> করে <code>10-</code> প্রিন্ট।</li>
+        <li><strong>তারপর instance:</strong> <code>name="BestZoo"</code>, instance init প্রিন্ট <code>BestZoo-</code>।</li>
+        <li><strong>constructor:</strong> প্রিন্ট <code>z-</code>। &rArr; <span class="out">0-10-BestZoo-z-</span></li>
+      </ul>
+    </div>
+
+    <div class="trace">
+      <h4>TRACE — Primate / Ape / Chimpanzee &rarr; প্রিন্ট Primate-Ape1-Chimpanzee-</h4>
+      <ul>
+        <li><code>new Chimpanzee()</code> &rarr; <code>super(2)</code> ডাকে <code>Ape(int)</code>।</li>
+        <li><code>Ape(int)</code>-এ inserted <code>super()</code> &rarr; <code>Primate()</code> প্রিন্ট <code>Primate-</code>।</li>
+        <li><code>Ape(int)</code>-এ ফিরে: প্রিন্ট <code>Ape1-</code>। তারপর <code>Chimpanzee()</code>: প্রিন্ট <code>Chimpanzee-</code>।</li>
+        <li>দুটি <code>Ape</code> constructor-এর মধ্যে শুধু একটাই চলে। &rArr; <span class="out">Primate-Ape1-Chimpanzee-</span></li>
+      </ul>
+    </div>
+
+    <div class="card exam-trap">
+      <span class="label">⚠ EXAM TRAP — কঠিনটা (Okapi)</span>
+      <p>Output হয় <span class="out">AFBECHG</span> তারপর <span class="out">BECHG</span>। ধীরে ধীরে ভাঙো:</p>
+      <ul style="margin:4px 0; padding-left:20px; font-size:.9rem;">
+        <li><strong>Class init:</strong> superclass <code>GiraffeFamily</code> static প্রিন্ট <code>A</code>; <code>Okapi</code> static প্রিন্ট <code>F</code>।</li>
+        <li><strong>new Okapi(1):</strong> super instance &rarr; <code>GiraffeFamily</code> instance init <code>B</code>; constructor <code>GiraffeFamily(String)</code> ডাকে <code>this(1)</code> &rarr; <code>GiraffeFamily(int)</code> প্রিন্ট <code>E</code>, তারপর ফিরে <code>C</code> &rArr; <code>BEC</code>।</li>
+        <li>তারপর <code>Okapi</code> instance init <code>H</code>, constructor <code>G</code> &rArr; <code>BECHG</code>। প্রথম লাইন মিলিয়ে: <code>AFBECHG</code>।</li>
+        <li><strong>দ্বিতীয় new Okapi(2):</strong> class আগেই load, তাই শুধু <code>BECHG</code>। <code>D</code> কখনো প্রিন্ট হয় না — no-arg <code>GiraffeFamily()</code> কখনো call হয় না।</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- SECTION 5 -->
+  <section id="s5">
+    <span class="secnum">SECTION 05</span>
+    <h2>Inheriting Members</h2>
+
+    <h3>Method override করা</h3>
+    <p>Override = subclass কোনো inherited method-এর জন্য নতুন implementation দেয়, <strong>same signature</strong> (name + parameter) ও compatible return type রেখে। signature-এ return type, access modifier, specifier ও exception ধরা হয় না।</p>
+    <pre><code><span class="kw">public class</span> Kangaroo <span class="kw">extends</span> Marsupial {
+    <span class="kw">public double</span> getAverageWeight() {
+        <span class="kw">return super</span>.getAverageWeight() + <span class="num">20</span>;   <span class="cm">// Marsupial=50.0, Kangaroo=70.0</span>
+    }
+}
+<span class="cm">// super ছাড়া নিজের ভেতরেই getAverageWeight() ডাকলে =&gt;</span> <span class="err">StackOverflowError</span> <span class="cm">(runtime-এ)</span></code></pre>
+
+    <div class="rules-box">
+      <h4>Override-এর ৪টি নিয়ম</h4>
+      <ol>
+        <li>parent method-এর সঙ্গে <strong>same signature</strong>।</li>
+        <li>parent-এর চেয়ে <strong>কম restrictive নয়</strong> (অন্তত সমান accessible)।</li>
+        <li>কোনো <strong>নতুন বা broader checked exception</strong> declare করা যাবে না।</li>
+        <li>return type <strong>same বা subtype</strong> হতে হবে (covariant)।</li>
+      </ol>
+    </div>
+
+    <table>
+      <thead><tr><th>লঙ্ঘিত নিয়ম</th><th>উদাহরণ</th><th>ফল</th></tr></thead>
+      <tbody>
+        <tr><td>#২ Access</td><td><code>public</code> parent → <code>private</code> child <code>getNumberOfHumps()</code></td><td class="no">compile হয় না</td></tr>
+        <tr><td>#৩ Exception (নতুন)</td><td><code>hide()</code>-এ <code>throws FileNotFoundException</code> যোগ (parent-এ নেই)</td><td class="no">compile হয় না</td></tr>
+        <tr><td>#৩ Exception (broader)</td><td><code>exitShell()</code> throws <code>IOException</code> (parent <code>FileNotFoundException</code>)</td><td class="no">compile হয় না</td></tr>
+        <tr><td>#৩ narrower exception</td><td><code>sleep()</code> throws <code>FileNotFoundException</code> (parent <code>IOException</code>)</td><td class="yes">OK</td></tr>
+        <tr><td>#৪ covariant OK</td><td><code>getName()</code>: child <code>String</code>, parent <code>CharSequence</code></td><td class="yes">OK</td></tr>
+        <tr><td>#৪ covariant fail</td><td><code>getColor()</code>: child <code>CharSequence</code>, parent <code>String</code></td><td class="no">compile হয় না</td></tr>
+      </tbody>
+    </table>
+    <div class="card remember">
+      <span class="label">★ REMEMBER</span>
+      <p>Covariance টেস্ট: cast ছাড়া <code>B</code>-কে <code>A</code> reference-এ assign করা যায় কি? পারলে <code>B</code>, <code>A</code>-র সঙ্গে covariant। <code>String</code> হলো <code>CharSequence</code>-এর subtype, তাই <code>String</code>→<code>CharSequence</code> চলে, উল্টোটা নয়। return type <code>void</code> হলে override-ও <code>void</code> হতে হবে। Override-এ নতুন <strong>unchecked</strong> exception যোগ করা যায় অবাধে।</p>
+    </div>
+
+    <h3>private method redeclare করা</h3>
+    <p><code>private</code> method override করা যায় না (এটা inherit হয় না)। child একই/ভিন্ন signature ও return type দিয়ে এটাকে <em>redeclare</em> করতে পারে — সেটা একটা নতুন, স্বাধীন method, কোনো override নিয়ম খাটে না।</p>
+    <pre><code><span class="kw">public class</span> Beetle { <span class="kw">private</span> String getSize() { <span class="kw">return</span> <span class="str">"Undefined"</span>; } }
+<span class="kw">public class</span> RhinocerosBeetle <span class="kw">extends</span> Beetle {
+    <span class="kw">private int</span> getSize() { <span class="kw">return</span> <span class="num">5</span>; }   <span class="cm">// compile হয় — override নয় (parent-এরটা private)</span>
+}</code></pre>
+
+    <h3>static method hiding</h3>
+    <div class="card key-rule">
+      <span class="label">✓ KEY RULE</span>
+      <p>Static method override হয় না — <strong>hide</strong> হয়। ৪টি override নিয়মই খাটে, সঙ্গে ৫ম: parent method <code>static</code> হলে child method-ও <code>static</code> হতে হবে। mismatch (একটা static, একটা নয়) &rArr; <span class="err">compile হয় না</span>।</p>
+    </div>
+    <pre><code><span class="kw">public class</span> Bear {
+    <span class="kw">public static void</span> sneeze() {}
+    <span class="kw">public void</span> hibernate() {}
+    <span class="kw">public static void</span> laugh() {}
+}
+<span class="kw">public class</span> SunBear <span class="kw">extends</span> Bear {
+    <span class="kw">public void</span> sneeze() {}            <span class="err">// DOES NOT COMPILE — parent static, child instance</span>
+    <span class="kw">public static void</span> hibernate() {}  <span class="err">// DOES NOT COMPILE — parent instance, child static</span>
+    <span class="kw">protected static void</span> laugh() {}   <span class="err">// DOES NOT COMPILE — বেশি restrictive (নিয়ম #২)</span>
+}</code></pre>
+
+    <h3>variable hiding</h3>
+    <p>Java variable override করে না — শুধু <strong>hide</strong> করে। একই নামের child variable দুটো আলাদা copy তৈরি করে; কোনটা দেখবে তা নির্ভর করে <strong>reference type</strong>-এর ওপর।</p>
+    <pre><code><span class="kw">class</span> Carnivore { <span class="kw">protected boolean</span> hasFur = <span class="kw">false</span>; }
+<span class="kw">public class</span> Meerkat <span class="kw">extends</span> Carnivore {
+    <span class="kw">protected boolean</span> hasFur = <span class="kw">true</span>;
+    <span class="kw">public static void</span> main(String[] args) {
+        Meerkat m = <span class="kw">new</span> Meerkat();
+        Carnivore c = m;
+        System.out.println(m.hasFur);   <span class="cm">// true  (Meerkat reference)</span>
+        System.out.println(c.hasFur);   <span class="cm">// false (Carnivore reference)</span>
+    }
+}</code></pre>
+    <div class="card remember">
+      <span class="label">★ REMEMBER</span>
+      <p>Method override <strong>সব</strong> reference-এর জন্য সেটাকে replace করে (<code>super</code> ছাড়া)। method/variable hiding শুধু তখনই খাটে যখন <strong>child reference type</strong> ব্যবহৃত হয়।</p>
+    </div>
+
+    <h3>final method</h3>
+    <p><code>final</code> method override করা যায় না — আর <code>final static</code> method hide-ও করা যায় না। child <code>final</code> লিখুক বা না লিখুক, তাতে কিছু যায় আসে না। (parent method <code>private</code> হলে child version বৈধ redeclaration হয়ে যেত।)</p>
+  </section>
+
+  <!-- SECTION 6 -->
+  <section id="s6">
+    <span class="secnum">SECTION 06</span>
+    <h2>Creating Abstract Classes</h2>
+    <p>একটি <strong>abstract class</strong> (<code>abstract</code> দিয়ে চিহ্নিত) সরাসরি instantiate করা যায় না এবং এতে <strong>abstract method</strong> থাকতে পারে — যেগুলো <code>abstract</code> দিয়ে ঘোষিত, body-হীন, এবং subclass-কে implement করতে বাধ্য করে।</p>
+    <pre><code><span class="kw">public abstract class</span> Canine {
+    <span class="kw">public abstract</span> String getSound();          <span class="cm">// body নেই, ; দিয়ে শেষ</span>
+    <span class="kw">public void</span> bark() { System.out.println(getSound()); }
+}
+<span class="cm">// Canine w = new Fox(); w.bark();  =&gt;</span> <span class="out">Squeak!</span></code></pre>
+
+    <div class="rules-box">
+      <h4>Abstract নিয়ম</h4>
+      <ul>
+        <li>শুধু <strong>instance method</strong> abstract হতে পারে — variable, constructor বা static method নয়।</li>
+        <li>abstract class-এ <strong>শূন্য বা একাধিক</strong> abstract method থাকতে পারে; non-abstract class-এ <strong>একটিও নয়</strong>।</li>
+        <li><strong>প্রথম concrete subclass</strong>-কে সব inherited abstract method implement করতে হবে।</li>
+        <li>abstract method override-এ স্বাভাবিক override নিয়ম খাটে।</li>
+        <li>concrete subclass instantiate হলে তবেই constructor দিয়ে abstract class initialize হয়।</li>
+      </ul>
+    </div>
+
+    <table>
+      <thead><tr><th>Declaration</th><th>কেন fail করে</th></tr></thead>
+      <tbody>
+        <tr><td><code>var a = new Alligator();</code> (Alligator abstract)</td><td>abstract class instantiate করা যায় না</td></tr>
+        <tr><td><code>FennecFox.getSound()</code> return করে <code>int</code></td><td><code>String</code>-এর সঙ্গে covariant নয়</td></tr>
+        <tr><td><code>ArcticFox extends Canine {}</code></td><td><code>getSound()</code> implement করেনি</td></tr>
+        <tr><td><code>Direwolf</code> (concrete)-এ <code>abstract rest();</code></td><td>non-abstract class-এ abstract method</td></tr>
+        <tr><td><code>Jackal</code>-এ <code>abstract String name;</code></td><td>variable abstract হতে পারে না</td></tr>
+        <tr><td><code>public class Egret { abstract void peck(); }</code></td><td>abstract class-এর বাইরে abstract method</td></tr>
+      </tbody>
+    </table>
+
+    <div class="card key-rule">
+      <span class="label">✓ KEY RULE</span>
+      <p>abstract class-এ কোনো abstract method না থাকলেও চলে (যেমন <code>abstract class Llama { void chew(){} }</code> compile হয়)। তবু এটা instantiate করা যায় না।</p>
+    </div>
+
+    <h3>ভুল abstract declaration চেনা</h3>
+    <pre><code><span class="kw">public abstract class</span> Turtle {
+    <span class="kw">public abstract long</span> eat()            <span class="err">// DOES NOT COMPILE — semicolon নেই</span>
+    <span class="kw">public abstract void</span> swim() {};       <span class="err">// DOES NOT COMPILE — abstract + body</span>
+    <span class="kw">public abstract int</span> getAge() { <span class="kw">return</span> <span class="num">10</span>; }  <span class="err">// DOES NOT COMPILE — abstract + body</span>
+    <span class="kw">public abstract void</span> sleep;          <span class="err">// DOES NOT COMPILE — () নেই</span>
+    <span class="kw">public void</span> goInShell();              <span class="err">// DOES NOT COMPILE — abstract নয়, তাই body লাগবে</span>
+}</code></pre>
+    <p><code>abstract</code> modifier access modifier-এর আগে বা পরে বসতে পারে (<code>abstract public class Tiger</code> ঠিক আছে), কিন্তু <code>class</code> keyword-এর <strong>পরে নয়</strong> (<code>public class abstract Bear</code> fail করে) এবং method-এর return type-এর পরেও নয়।</p>
+
+    <h3>অবৈধ modifier সংমিশ্রণ</h3>
+    <table>
+      <thead><tr><th>সংমিশ্রণ</th><th>অনুমোদিত?</th><th>কেন</th></tr></thead>
+      <tbody>
+        <tr><td><code>abstract</code> + <code>final</code></td><td class="no">না</td><td>বিরোধ: একটা extend চায়, অন্যটা নিষেধ করে</td></tr>
+        <tr><td><code>abstract</code> + <code>private</code></td><td class="no">না</td><td>private method inherit হয় না, তাই implement করা যায় না</td></tr>
+        <tr><td><code>abstract</code> + <code>static</code></td><td class="no">না</td><td>static override হয় না, তাই কখনো implement হয় না</td></tr>
+        <tr><td><code>final</code> + <code>private</code></td><td class="yes">হ্যাঁ</td><td>বৈধ কিন্তু redundant</td></tr>
+      </tbody>
+    </table>
+    <div class="card exam-trap">
+      <span class="label">⚠ EXAM TRAP — প্রথম concrete subclass</span>
+      <p>abstract method একাধিক abstract class-এর মধ্য দিয়ে নিচে নামতে পারে। <strong>প্রথম concrete</strong> subclass-কে তখনো-abstract সব method implement করতে হবে। মাঝের কোনো abstract class একটা method implement করলে concrete class-কে শুধু বাকিগুলো দিতে হয়। কিন্তু মাঝের একটা class-কে concrete বানালে সেটাকে হঠাৎ <em>সব</em> বাকি abstract method দিতে হয়।</p>
+    </div>
+  </section>
+
+  <!-- SECTION 7 -->
+  <section id="s7">
+    <span class="secnum">SECTION 07</span>
+    <h2>Creating Immutable Objects</h2>
+    <p>একটি <strong>immutable object</strong> তৈরি হওয়ার পর তার state বদলানো যায় না — security-র জন্য এবং একাধিক thread-এ নিরাপদে share করার জন্য দুর্দান্ত।</p>
+    <div class="rules-box">
+      <h4>প্রচলিত immutability কৌশল</h4>
+      <ol>
+        <li>class-কে <code>final</code> করো <strong>অথবা</strong> সব constructor <code>private</code> করো।</li>
+        <li>সব instance variable <code>private</code> ও <code>final</code> করো।</li>
+        <li>কোনো setter method রেখো না।</li>
+        <li>referenced mutable object-কে বদলাতে দিও না।</li>
+        <li>constructor দিয়ে সব field set করো, দরকার হলে <strong>copy</strong> বানিয়ে।</li>
+      </ol>
+    </div>
+
+    <div class="card exam-trap">
+      <span class="label">⚠ EXAM TRAP — mutable reference leak</span>
+      <p>নিয়ম ১–৩ মানলেও ভেতরের list সরাসরি return করলে immutability ভেঙে যায়:</p>
+      <pre><code><span class="kw">public</span> List&lt;String&gt; getFavoriteFoods() { <span class="kw">return</span> favoriteFoods; }  <span class="cm">// caller clear()/add() করতে পারবে!</span></code></pre>
+      <p>নিরাপদ বিকল্প: <strong>delegate method</strong> (<code>getFavoriteFoodsItem(int)</code>, <code>getFavoriteFoodsCount()</code>) অথবা <strong>copy-on-read</strong> getter: <code>return new ArrayList&lt;&gt;(this.favoriteFoods);</code>।</p>
+    </div>
+
+    <h3>Defensive copy (নিয়ম ৫)</h3>
+    <p>caller যদি data সরবরাহ করে, তার reference সংরক্ষণ করলে পরে সে সেটা mutate করতে পারে। তাই constructor-এ copy বানাও:</p>
+    <pre><code><span class="kw">public</span> Animal(List&lt;String&gt; favoriteFoods) {
+    <span class="kw">if</span> (favoriteFoods == <span class="kw">null</span> || favoriteFoods.size() == <span class="num">0</span>)
+        <span class="kw">throw new</span> RuntimeException(<span class="str">"favoriteFoods is required"</span>);
+    <span class="kw">this</span>.favoriteFoods = <span class="kw">new</span> ArrayList&lt;String&gt;(favoriteFoods);  <span class="cm">// defensive copy</span>
+}</code></pre>
+    <div class="card remember">
+      <span class="label">★ REMEMBER</span>
+      <p>defensive copy ছাড়া caller তার নিজের reference রেখে পরে <code>clear()</code>/<code>add()</code> করলে &ldquo;immutable&rdquo; object-ও বদলে যায় — এটাই ক্লাসিক exam trap।</p>
+    </div>
+  </section>
+
+  <!-- RECAP -->
+  <section id="recap">
+    <span class="secnum">RECAP</span>
+    <h2>সংক্ষিপ্ত রিভিউ</h2>
+    <div class="recap">
+      <h3>Inheritance</h3>
+      <ul><li><code>extends</code> = subclass; parent <code>final</code> হতে পারে না। public/protected সবসময় inherit, package শুধু same-package, private কখনোই নয়।</li><li>সব class <code>java.lang.Object</code> inherit করে; primitive করে না।</li></ul>
+      <h3>Creating classes</h3>
+      <ul><li>প্রতি ফাইলে একটি public top-level class; top-level protected/private হয় না।</li><li><code>this</code> = current+inherited; <code>super</code> = শুধু inherited; static context-এ কোনোটাই নেই (এমনকি <code>this</code>-ও নয়)।</li></ul>
+      <h3>Constructors</h3>
+      <ul><li>নাম class-এর সমান, return type নেই, <code>var</code> param নেই। default no-arg শুধু কোনো constructor না থাকলে।</li><li>প্রথম লাইন <code>this()</code> বা <code>super()</code> (নাহলে compiler <code>super()</code> বসায়); প্রথম statement হতে হবে; cycle নিষেধ।</li></ul>
+      <h3>Initialization order</h3>
+      <ul><li>Class: superclass → static var → static initializer (একবার)। Instance: superclass instance → instance var → instance initializer → constructor।</li><li>প্রতিটি <code>final</code> field constructor শেষ হওয়ার মধ্যে ঠিক একবার assign।</li></ul>
+      <h3>Overriding / hiding</h3>
+      <ul><li>Override: same signature, ≥ access, নতুন/broader checked exception নয়, covariant return।</li><li>static → hidden (static মিলতে হবে); variable → hidden (reference type ঠিক করে); <code>final</code> override/hide হয় না।</li></ul>
+      <h3>Abstract classes</h3>
+      <ul><li>instantiate হয় না; abstract method-এ body নেই, <code>;</code> দিয়ে শেষ। প্রথম concrete subclass সব implement করে। <code>abstract</code>+<code>final</code>/<code>private</code>/<code>static</code> নিষেধ।</li></ul>
+      <h3>Immutable objects</h3>
+      <ul><li>final class বা private constructor, private final field, setter নেই, mutable leak নেই, in/out defensive copy।</li></ul>
+    </div>
+  </section>
+
+  <!-- CHEAT SHEET -->
+  <section id="cheat">
+    <span class="secnum">CHEAT SHEET</span>
+    <h2>Exam Traps চিট-শিট</h2>
+    <table>
+      <thead><tr><th>পরিস্থিতি</th><th>কী টেস্ট হয়</th><th>রায়</th></tr></thead>
+      <tbody>
+        <tr><td>কোনো <code>final</code> class-কে extend</td><td>final modifier</td><td class="no">compile হয় না</td></tr>
+        <tr><td>subclass-এ parent-এর <code>private</code> field সরাসরি ব্যবহার</td><td>private inherit হয় না</td><td class="no">compile হয় না</td></tr>
+        <tr><td><code>super.x</code> যেখানে <code>x</code> শুধু current class-এ</td><td>super = শুধু inherited</td><td class="no">compile হয় না</td></tr>
+        <tr><td><code>color = color;</code> (param == field name)</td><td>scope / <code>this</code> মিসিং</td><td>field default-ই থাকে</td></tr>
+        <tr><td>constructor নামের case ভুল</td><td>method ধরা হয়, return type নেই</td><td class="no">compile হয় না</td></tr>
+        <tr><td><code>var</code> parameter-ওয়ালা constructor</td><td>constructor param-এ var illegal</td><td class="no">compile হয় না</td></tr>
+        <tr><td><code>this()</code>/<code>super()</code>-এর আগে statement</td><td>প্রথম statement হতে হবে</td><td class="no">compile হয় না</td></tr>
+        <tr><td>parent-এ শুধু arg constructor; child <code>super(arg)</code> বাদ</td><td>implicit <code>super()</code>-এর target নেই</td><td class="no">compile হয় না</td></tr>
+        <tr><td>cyclic <code>this()</code> constructor call</td><td>cycle নিষেধ</td><td class="no">compile হয় না</td></tr>
+        <tr><td><code>final</code> field দুবার set / কখনো set না</td><td>exactly-once নিয়ম</td><td class="no">compile হয় না</td></tr>
+        <tr><td><code>super</code> ছাড়া method নিজের ভেতরে</td><td>infinite recursion</td><td><span class="no">StackOverflowError</span></td></tr>
+        <tr><td>override access কমায় (public→private)</td><td>override নিয়ম #২</td><td class="no">compile হয় না</td></tr>
+        <tr><td>override নতুন/broader checked exception যোগ</td><td>override নিয়ম #৩</td><td class="no">compile হয় না</td></tr>
+        <tr><td>override return type চওড়া করে (String→CharSequence)</td><td>covariant return নিয়ম #৪</td><td class="no">compile হয় না</td></tr>
+        <tr><td>parent/child-এ static vs instance mismatch</td><td>hiding নিয়ম #৫</td><td class="no">compile হয় না</td></tr>
+        <tr><td>hidden variable parent reference দিয়ে পড়া</td><td>reference type ঠিক করে</td><td>parent-এর value</td></tr>
+        <tr><td>abstract method-এ body / <code>;</code> নেই / <code>()</code> নেই</td><td>abstract method syntax</td><td class="no">compile হয় না</td></tr>
+        <tr><td>concrete subclass কোনো inherited abstract method বাদ দেয়</td><td>প্রথম concrete সব implement করবে</td><td class="no">compile হয় না</td></tr>
+        <tr><td><code>abstract</code> + <code>final</code>/<code>private</code>/<code>static</code></td><td>অবৈধ সংমিশ্রণ</td><td class="no">compile হয় না</td></tr>
+        <tr><td>immutable class তার mutable field সরাসরি return করে</td><td>mutable reference leak</td><td>immutable নয়</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+</div>
+</body>
+</html>

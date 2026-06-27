@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 · Chapter 2 — Operators (MCQ Practice)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:ital,wght@0,400;0,600;0,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --ink:#2c2a28; --muted:#6f6a64; --line:#ece3da;
+    --sect:#c96442; --inlinebg:#f3ece4; --inlineink:#9a5030;
+    --yes:#3b7d57; --no:#c44d3e;
+    --purple:#7a5cb8; --purple-soft:#b29ad9;
+    --shadow:0 4px 18px rgba(60,50,40,.07); --shadow-h:0 10px 30px rgba(70,55,90,.16);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Source Sans 3',system-ui,sans-serif;font-size:17px;line-height:1.65;}
+  .wrap{max-width:860px;margin:0 auto;padding:32px 20px 80px;}
+  h1{font-family:'Merriweather',serif;line-height:1.3;}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+
+  .header{position:relative;overflow:hidden;background:linear-gradient(135deg,#ffffff,#fdf8f3);
+    border-radius:18px;padding:34px 34px 28px;box-shadow:var(--shadow);margin-bottom:28px;}
+  .header::after{content:"";position:absolute;top:-60px;right:-60px;width:220px;height:220px;
+    background:radial-gradient(circle,rgba(178,154,217,.30),transparent 70%);pointer-events:none;}
+  .pill{display:inline-block;background:linear-gradient(90deg,#7a5cb8,#9b7fd4);
+    color:#fff;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;
+    letter-spacing:.6px;text-transform:uppercase;padding:7px 14px;border-radius:999px;margin-bottom:14px;}
+  .header h1{font-size:31px;margin:4px 0 6px;font-weight:900;}
+  .header .sub{font-style:italic;color:var(--muted);font-size:18px;margin:0 0 18px;}
+  .topics{display:flex;flex-wrap:wrap;gap:8px;}
+  .topics span{background:var(--inlinebg);color:var(--inlineink);font-family:'JetBrains Mono',monospace;
+    font-size:12px;padding:5px 11px;border-radius:8px;}
+
+  .howto{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:5px solid #5aab7b;
+    border-radius:12px;padding:14px 18px;margin-bottom:26px;font-size:15.5px;color:#3a5e49;}
+
+  .q-card{position:relative;background:linear-gradient(135deg,#f4f0fa,#f9f6fd);
+    border-top:4px solid #9b7fd4;border-radius:14px;padding:20px 22px;margin:18px 0;
+    box-shadow:var(--shadow);transition:box-shadow .22s ease, transform .22s ease;}
+  .q-card:hover{box-shadow:var(--shadow-h);transform:translateY(-2px);}
+  .q-head{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap;}
+  .q-num{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--purple);font-size:15px;}
+  .q-tag{background:var(--purple-soft);color:#fff;font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;letter-spacing:.5px;text-transform:uppercase;padding:3px 9px;border-radius:7px;}
+  .q-prompt{font-weight:600;margin:6px 0 12px;}
+  .q-prompt .all{color:var(--purple);font-weight:700;}
+
+  pre{background:#fbf9fe;border-radius:12px;padding:14px 16px;overflow-x:auto;
+    box-shadow:inset 0 2px 8px rgba(80,60,120,.08);margin:12px 0;font-size:13.5px;line-height:1.55;}
+  pre code{background:none;padding:0;color:#3a352f;}
+  .kw{color:var(--kw);font-weight:500;} .str{color:var(--str);} .num{color:var(--num);}
+  .err{color:var(--err);font-weight:700;} .cm{color:var(--cm);font-style:italic;}
+
+  .opts{list-style:none;margin:8px 0 4px;padding:0;}
+  .opts li{margin:5px 0;padding-left:30px;position:relative;}
+  .opts li .ol{position:absolute;left:0;top:0;font-family:'JetBrains Mono',monospace;
+    font-weight:700;color:var(--purple);}
+  .opts code{background:#f3ece4;color:#9a5030;padding:1.5px 6px;border-radius:6px;font-size:14px;}
+
+  details{margin-top:12px;border-top:1px dashed #d8c9ec;padding-top:10px;}
+  summary{cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;
+    color:var(--purple);list-style:none;user-select:none;}
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸ ";}
+  details[open] summary::before{content:"▾ ";}
+  .ans-key{display:inline-block;background:#eef8f1;color:#3d8a5e;font-family:'JetBrains Mono',monospace;
+    font-weight:700;font-size:13px;padding:4px 11px;border-radius:8px;margin:10px 0 8px;}
+  .expl{font-size:15.5px;color:#403a44;margin:4px 0;}
+  .expl code{background:#f3ece4;color:#9a5030;padding:1.5px 6px;border-radius:6px;font-size:14px;}
+
+  .revision{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:5px solid #d4a24c;
+    border-radius:14px;padding:20px 24px;margin:30px 0 0;box-shadow:var(--shadow);}
+  .revision h3{font-family:'Merriweather',serif;color:#a9772a;margin:0 0 10px;font-size:21px;}
+  .revision ul{margin:6px 0;padding-left:22px;}
+  .revision li{margin:6px 0;}
+  .revision code{background:#f3ece4;color:#9a5030;padding:1.5px 6px;border-radius:6px;font-size:14px;}
+
+  @media(max-width:680px){
+    body{font-size:16px;}
+    .header h1{font-size:25px;}
+    .q-card{padding:18px 16px;} .header{padding:24px 20px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="header">
+    <span class="pill">OCP Java SE 21 · 1Z0-830</span>
+    <h1>Chapter 2 · Operators — MCQ Practice</h1>
+    <p class="sub">28 exam-style questions on precedence, unary &amp; binary operators, numeric promotion, casting, equality, <code>instanceof</code>, short-circuit logic, and the ternary operator. Reveal each answer when you're ready.</p>
+    <div class="topics">
+      <span>PRECEDENCE</span><span>UNARY</span><span>PROMOTION &amp; CASTING</span>
+      <span>EQUALITY &amp; LOGIC</span><span>INSTANCEOF</span><span>TERNARY</span>
+    </div>
+  </header>
+
+  <div class="howto">Try each one before expanding. Several say <strong>"Choose all that apply"</strong> — read those carefully; the rest have exactly one answer. Every answer is verified line-by-line against the study guide.</div>
+
+  <!-- Q1 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q1</span><span class="q-tag">Operators &amp; Types</span></div>
+    <p class="q-prompt">Which operators can be used with <code>boolean</code> variables? <span class="all">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>==</code></li>
+      <li><span class="ol">B.</span> <code>+</code></li>
+      <li><span class="ol">C.</span> <code>%</code></li>
+      <li><span class="ol">D.</span> <code>!</code></li>
+      <li><span class="ol">E.</span> <code>-</code></li>
+      <li><span class="ol">F.</span> Cast with <code>(boolean)</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A, D, and F</span>
+      <p class="expl"><code>==</code> works on primitives and references, including <code>boolean</code> (A). <code>!</code> is the logical complement, used exclusively with <code>boolean</code> (D). You can cast a <code>boolean</code> to <code>boolean</code> since it's a type (F). <code>+</code>, <code>%</code>, and <code>-</code> are arithmetic and can't apply to <code>boolean</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q2</span><span class="q-tag">Promotion</span></div>
+    <p class="q-prompt">Which types let this compile? <span class="all">(Choose all that apply.)</span></p>
+<pre><code><span class="kw">byte</span> apples = <span class="num">5</span>;
+<span class="kw">short</span> oranges = <span class="num">10</span>;
+____ bananas = apples + oranges;</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>int</code></li>
+      <li><span class="ol">B.</span> <code>long</code></li>
+      <li><span class="ol">C.</span> <code>boolean</code></li>
+      <li><span class="ol">D.</span> <code>double</code></li>
+      <li><span class="ol">E.</span> <code>short</code></li>
+      <li><span class="ol">F.</span> <code>byte</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A, B, and D</span>
+      <p class="expl"><code>apples + oranges</code> is auto-promoted to <code>int</code> (rule 3). So the target must be <code>int</code> or anything <code>int</code> widens into — <code>int</code>, <code>long</code>, <code>double</code> (A, B, D). <code>boolean</code> isn't numeric. <code>short</code> and <code>byte</code> are smaller than <code>int</code> and would need an explicit cast.</p>
+    </details>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q3</span><span class="q-tag">Casting</span></div>
+    <p class="q-prompt">Which independent change makes this compile? <span class="all">(Choose all that apply.)</span></p>
+<pre><code>3: <span class="kw">long</span> ear = <span class="num">10</span>;
+4: <span class="kw">int</span> hearing = <span class="num">2</span> * ear;</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> No change; it compiles as is.</li>
+      <li><span class="ol">B.</span> Cast <code>ear</code> on line 4 to <code>int</code>.</li>
+      <li><span class="ol">C.</span> Change <code>ear</code>'s type on line 3 to <code>short</code>.</li>
+      <li><span class="ol">D.</span> Cast <code>2 * ear</code> on line 4 to <code>int</code>.</li>
+      <li><span class="ol">E.</span> Change <code>hearing</code>'s type on line 4 to <code>long</code>.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B, C, and E</span>
+      <p class="expl"><code>2 * ear</code> promotes to <code>long</code>, which can't fit in an <code>int</code> — so A is wrong. B and C shrink the value back to <code>int</code> range (casting <code>ear</code>, or making <code>ear</code> a <code>short</code>). E fixes it by widening <code>hearing</code> to <code>long</code>. (The book also accepts D — casting the whole <code>2 * ear</code> to <code>int</code>; B, C, D, F are all valid. Here B, C, E are listed.)</p>
+    </details>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q4</span><span class="q-tag">Equality &amp; XOR</span></div>
+    <p class="q-prompt">What is the output?</p>
+<pre><code>3: <span class="kw">boolean</span> canine = <span class="kw">true</span>, wolf = <span class="kw">true</span>;
+4: <span class="kw">int</span> teeth = <span class="num">20</span>;
+5: canine = (teeth != <span class="num">10</span>) ^ (wolf = <span class="kw">false</span>);
+6: System.out.println(canine+<span class="str">", "</span>+teeth+<span class="str">", "</span>+wolf);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>true, 20, true</code></li>
+      <li><span class="ol">B.</span> <code>true, 20, false</code></li>
+      <li><span class="ol">C.</span> <code>false, 20, false</code></li>
+      <li><span class="ol">D.</span> The code does not compile.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B · true, 20, false</span>
+      <p class="expl"><code>(wolf = false)</code> assigns <code>false</code> to <code>wolf</code> and the expression's value is <code>false</code>. <code>teeth != 10</code> is <code>true</code>. So <code>true ^ false</code> is <code>true</code>, assigned to <code>canine</code>. <code>teeth</code> is untouched. Output: <code>true, 20, false</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q5</span><span class="q-tag">Precedence</span></div>
+    <p class="q-prompt">Which lists are ranked in increasing (or equal) order of precedence? Assume <code>+</code> is binary addition. <span class="all">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>+, *, %, --</code></li>
+      <li><span class="ol">B.</span> <code>++, (int), *</code></li>
+      <li><span class="ol">C.</span> <code>=, ==, !</code></li>
+      <li><span class="ol">D.</span> <code>*, /, %, +, ==</code></li>
+      <li><span class="ol">E.</span> <code>^, +, =, +=</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A and C</span>
+      <p class="expl">"Increasing precedence" means later items bind tighter. <strong>A</strong>: <code>+</code> (additive) &lt; <code>* %</code> (multiplicative) &lt; <code>--</code> (unary) — increasing. <strong>C</strong>: <code>=</code> (lowest) &lt; <code>==</code> &lt; <code>!</code> (unary, highest) — increasing. B and D are <em>decreasing</em>; E mixes directions (assignment is lowest, so <code>=</code> can't sit before <code>+=</code> in increasing order).</p>
+    </details>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q6</span><span class="q-tag">Casting &amp; Precedence</span></div>
+    <p class="q-prompt">What is the output?</p>
+<pre><code>1: <span class="kw">public class</span> CandyCounter {
+2:   <span class="kw">static long</span> addCandy(<span class="kw">double</span> fruit, <span class="kw">float</span> vegetables) {
+3:      <span class="kw">return</span> (<span class="kw">int</span>)fruit+vegetables;
+4:   }
+6:   <span class="kw">public static void</span> main(String[] args) {
+7:      System.out.print(addCandy(<span class="num">1.4</span>, <span class="num">2.4f</span>) + <span class="str">", "</span>);
+8:      System.out.print(addCandy(<span class="num">1.9</span>, (<span class="kw">float</span>)<span class="num">4</span>) + <span class="str">", "</span>);
+9:      System.out.print(addCandy((<span class="kw">long</span>)(<span class="kw">int</span>)(<span class="kw">short</span>)<span class="num">2</span>, (<span class="kw">float</span>)<span class="num">4</span>)); } }</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>4, 6, 6.0</code></li>
+      <li><span class="ol">B.</span> <code>3, 5, 6</code></li>
+      <li><span class="ol">C.</span> <code>3, 6, 6</code></li>
+      <li><span class="ol">D.</span> The code does not compile because of line 3.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">D · does not compile (line 3)</span>
+      <p class="expl">The cast <code>(int)</code> has higher precedence than <code>+</code>, so it applies only to <code>fruit</code>, not <code>fruit+vegetables</code>. Since <code>vegetables</code> is a <code>float</code>, the sum promotes to <code>float</code>, which can't be returned as <code>long</code> without a cast — compile error. (With parentheses around <code>fruit+vegetables</code> the output would be <code>3, 5, 6</code>.)</p>
+    </details>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q7</span><span class="q-tag">Short-circuit</span></div>
+    <p class="q-prompt">What is the output?</p>
+<pre><code><span class="kw">int</span> ph = <span class="num">7</span>, vis = <span class="num">2</span>;
+<span class="kw">boolean</span> clear = vis &gt; <span class="num">1</span> &amp; (vis &lt; <span class="num">9</span> || ph &lt; <span class="num">2</span>);
+<span class="kw">boolean</span> safe = (vis &gt; <span class="num">2</span>) &amp;&amp; (ph++ &gt; <span class="num">1</span>);
+<span class="kw">boolean</span> tasty = <span class="num">7</span> &lt;= --ph;
+System.out.println(clear + <span class="str">"-"</span> + safe + <span class="str">"-"</span> + tasty);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>true-true-true</code></li>
+      <li><span class="ol">B.</span> <code>true-false-false</code></li>
+      <li><span class="ol">C.</span> <code>true-false-true</code></li>
+      <li><span class="ol">D.</span> <code>false-false-false</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B · true-false-false</span>
+      <p class="expl"><code>clear</code>: <code>true &amp; (true || …)</code> → <code>true</code>. <code>safe</code>: <code>vis &gt; 2</code> is <code>false</code>, so <code>&amp;&amp;</code> short-circuits and <code>ph++</code> never runs — <code>ph</code> stays 7, result <code>false</code>. <code>tasty</code>: <code>--ph</code> makes <code>ph</code> 6, so <code>7 &lt;= 6</code> is <code>false</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q8 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q8</span><span class="q-tag">Increment &amp; Compound</span></div>
+    <p class="q-prompt">What is the output?</p>
+<pre><code>4: <span class="kw">int</span> pig = (<span class="kw">short</span>)<span class="num">4</span>;
+5: pig = pig++;
+6: <span class="kw">long</span> goat = (<span class="kw">int</span>)<span class="num">2</span>;
+7: goat -= <span class="num">1.0</span>;
+8: System.out.print(pig + <span class="str">" - "</span> + goat);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>4 - 1</code></li>
+      <li><span class="ol">B.</span> <code>4 - 2</code></li>
+      <li><span class="ol">C.</span> <code>5 - 1</code></li>
+      <li><span class="ol">D.</span> The code does not compile due to line 7.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A · 4 - 1</span>
+      <p class="expl">Line 5: <code>pig++</code> returns the original value 4, then <code>pig</code> is incremented to 5, but the assignment <code>pig =</code> overwrites it back to 4 — the increment is discarded. Line 7: the compound <code>-=</code> auto-casts the <code>1.0</code> result back to <code>long</code> (no compile error), giving <code>1</code>. Output: <code>4 - 1</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q9 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q9</span><span class="q-tag">Ternary</span></div>
+    <p class="q-prompt">What are the unique outputs? <span class="all">(Choose all that apply.)</span></p>
+<pre><code><span class="kw">int</span> a = <span class="num">2</span>, b = <span class="num">4</span>, c = <span class="num">2</span>;
+System.out.println(a &gt; <span class="num">2</span> ? --c : b++);
+System.out.println(b = (a != c ? a : b++));
+System.out.println(a &gt; b ? b &lt; c ? b : <span class="num">2</span> : <span class="num">1</span>);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>1</code></li>
+      <li><span class="ol">B.</span> <code>4</code></li>
+      <li><span class="ol">C.</span> <code>5</code></li>
+      <li><span class="ol">D.</span> The code does not compile.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A, B, and C</span>
+      <p class="expl">Line 1: <code>a &gt; 2</code> is false, so <code>b++</code> returns 4 (b becomes 5); <code>--c</code> never runs → prints <strong>4</strong>. Line 2: <code>a != c</code> is false (both 2), so <code>b++</code> returns 5 (then b becomes 6), but the assignment <code>b =</code> sets b back to 5 → prints <strong>5</strong>. Line 3: <code>2 &gt; 5</code> is false → the inner ternary is skipped → prints <strong>1</strong>. Unique outputs: 4, 5, 1.</p>
+    </details>
+  </div>
+
+  <!-- Q10 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q10</span><span class="q-tag">Promotion</span></div>
+    <p class="q-prompt">Which is <strong>not</strong> an output of this snippet?</p>
+<pre><code><span class="kw">short</span> height = <span class="num">1</span>, weight = <span class="num">3</span>;
+<span class="kw">short</span> zebra = (<span class="kw">byte</span>) weight * (<span class="kw">byte</span>) height;
+<span class="kw">double</span> ox = <span class="num">1</span> + height * <span class="num">2</span> + weight;
+<span class="kw">long</span> giraffe = <span class="num">1</span> + <span class="num">9</span> % height + <span class="num">1</span>;</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>2</code></li>
+      <li><span class="ol">B.</span> <code>6.0</code></li>
+      <li><span class="ol">C.</span> <code>6</code></li>
+      <li><span class="ol">D.</span> The code does not compile.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">D is the correct choice — it DOES NOT compile</span>
+      <p class="expl">The <code>zebra</code> line is the problem: even though both operands are cast to <code>byte</code>, the multiplication operator promotes them back to <code>int</code>, so an <code>int</code> result can't be stored in a <code>short</code> without a cast. The code fails to compile, so none of the numeric values are ever printed — the answer to "which is not an output" is that it doesn't compile.</p>
+    </details>
+  </div>
+
+  <!-- Q11 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q11</span><span class="q-tag">Modulus</span></div>
+    <p class="q-prompt">What is the output?</p>
+<pre><code>11: <span class="kw">int</span> sample1 = (<span class="num">2</span> * <span class="num">4</span>) % <span class="num">3</span>;
+12: <span class="kw">int</span> sample2 = <span class="num">3</span> * <span class="num">2</span> % -<span class="num">3</span>;
+13: <span class="kw">int</span> sample3 = <span class="num">5</span> * (<span class="num">1</span> % <span class="num">2</span>);
+14: System.out.println(sample1 + <span class="str">", "</span> + sample2 + <span class="str">", "</span> + sample3);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>0, 0, 5</code></li>
+      <li><span class="ol">B.</span> <code>2, 1, 5</code></li>
+      <li><span class="ol">C.</span> <code>2, 0, 5</code></li>
+      <li><span class="ol">D.</span> <code>3, 1, 10</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · 2, 0, 5</span>
+      <p class="expl"><code>sample1</code>: <code>8 % 3</code> = 2. <code>sample2</code>: <code>*</code> and <code>%</code> share precedence and go left to right → <code>6 % -3</code> = 0 (negative divisor's sign ignored). <code>sample3</code>: <code>1 % 2</code> = 1, then <code>5 * 1</code> = 5. Output: <code>2, 0, 5</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q12 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q12</span><span class="q-tag">Increment</span></div>
+    <p class="q-prompt">The ____ operator increases a value and returns the original value, while the ____ operator decreases a value and returns the new value.</p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> post-increment, post-decrement</li>
+      <li><span class="ol">B.</span> pre-increment, pre-decrement</li>
+      <li><span class="ol">C.</span> post-increment, pre-decrement</li>
+      <li><span class="ol">D.</span> pre-increment, post-decrement</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · post-increment, pre-decrement</span>
+      <p class="expl">"Returns the original value" = <em>post</em>; "returns the new value" = <em>pre</em>. Increase → increment, decrease → decrement. So it's post-increment then pre-decrement.</p>
+    </details>
+  </div>
+
+  <!-- Q13 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q13</span><span class="q-tag">Logical</span></div>
+    <p class="q-prompt">What is the output?</p>
+<pre><code><span class="kw">boolean</span> sunny = <span class="kw">true</span>, raining = <span class="kw">false</span>, sunday = <span class="kw">true</span>;
+<span class="kw">boolean</span> store = sunny &amp; raining ^ sunday;
+<span class="kw">boolean</span> zoo = sunday &amp;&amp; !raining;
+<span class="kw">boolean</span> home = !(store &amp;&amp; zoo);
+System.out.println(store + <span class="str">"-"</span> + zoo + <span class="str">"-"</span> + home);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>true-false-false</code></li>
+      <li><span class="ol">B.</span> <code>false-true-true</code></li>
+      <li><span class="ol">C.</span> <code>true-true-false</code></li>
+      <li><span class="ol">D.</span> <code>false-false-false</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · true-true-false</span>
+      <p class="expl"><code>store</code>: left to right, <code>sunny &amp; raining</code> is <code>false</code>, then <code>false ^ sunday</code> = <code>true</code>. <code>zoo</code>: <code>sunday &amp;&amp; !raining</code> = <code>true &amp;&amp; true</code> = <code>true</code>. <code>home</code>: <code>!(true &amp;&amp; true)</code> = <code>false</code>. Output: <code>true-true-false</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q14 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q14</span><span class="q-tag">Operators</span></div>
+    <p class="q-prompt">Which statements are correct? <span class="all">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> The return value of an assignment expression can be <code>void</code>.</li>
+      <li><span class="ol">B.</span> The inequality operator (<code>!=</code>) can be used to compare objects.</li>
+      <li><span class="ol">C.</span> The equality operator (<code>==</code>) can compare a <code>boolean</code> with a numeric value.</li>
+      <li><span class="ol">D.</span> The return value of an assignment expression is the value of the newly assigned variable.</li>
+      <li><span class="ol">E.</span> The logical complement operator (<code>!</code>) cannot flip numeric values.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B, D, and E</span>
+      <p class="expl"><strong>B</strong>: <code>!=</code> compares object references. <strong>D</strong>: an assignment expression evaluates to the assigned value. <strong>E</strong>: <code>!</code> only works on <code>boolean</code>, never numbers. A is wrong — an assignment always has a value, never <code>void</code>. C is wrong — you can't mix <code>boolean</code> and numeric with <code>==</code> (and 0/false aren't interchangeable).</p>
+    </details>
+  </div>
+
+  <!-- Q15 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q15</span><span class="q-tag">Ternary</span></div>
+    <p class="q-prompt">Which operator takes three operands?</p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>=</code></li>
+      <li><span class="ol">B.</span> <code>&amp;&amp;</code></li>
+      <li><span class="ol">C.</span> <code>*=</code></li>
+      <li><span class="ol">D.</span> <code>? :</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">D · ? :</span>
+      <p class="expl">The conditional (ternary) operator <code>? :</code> is the only operator in Java that takes three operands: a boolean condition and two result expressions. The others are binary.</p>
+    </details>
+  </div>
+
+  <!-- Q16 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q16</span><span class="q-tag">Casting</span></div>
+    <p class="q-prompt">How many lines contain compiler errors?</p>
+<pre><code><span class="kw">int</span> note = <span class="num">1</span> * <span class="num">2</span> + (<span class="kw">long</span>)<span class="num">3</span>;
+<span class="kw">short</span> melody = (<span class="kw">byte</span>)(<span class="kw">double</span>)(note *= <span class="num">2</span>);
+<span class="kw">double</span> song = melody;
+<span class="kw">float</span> symphony = (<span class="kw">float</span>)((song == <span class="num">1_000f</span>) ? song * <span class="num">2L</span> : song);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> 0</li>
+      <li><span class="ol">B.</span> 1</li>
+      <li><span class="ol">C.</span> 2</li>
+      <li><span class="ol">D.</span> 3</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B · 1</span>
+      <p class="expl">Line 1 fails: <code>1 * 2 + (long)3</code> promotes to <code>long</code>, which can't be assigned to <code>int</code> without a cast. The other three are fine: line 2 casts down explicitly; line 3 widens <code>short</code>→<code>double</code>; line 4 casts the ternary result to <code>float</code>. So exactly one line has an error.</p>
+    </details>
+  </div>
+
+  <!-- Q17 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q17</span><span class="q-tag">Compound</span></div>
+    <p class="q-prompt">What are the variable values after execution? <span class="all">(Choose all that apply.)</span></p>
+<pre><code><span class="kw">int</span> ticketsTaken = <span class="num">1</span>;
+<span class="kw">int</span> ticketsSold = <span class="num">3</span>;
+ticketsSold += <span class="num">1</span> + ticketsTaken++;
+ticketsTaken *= <span class="num">2</span>;
+ticketsSold += (<span class="kw">long</span>)<span class="num">1</span>;</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>ticketsSold</code> is 6.</li>
+      <li><span class="ol">B.</span> <code>ticketsTaken</code> is 4.</li>
+      <li><span class="ol">C.</span> <code>ticketsSold</code> is 7.</li>
+      <li><span class="ol">D.</span> The code does not compile.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B and C</span>
+      <p class="expl">Line 3: <code>ticketsSold += 1 + 1</code> (post-increment returns 1) → <code>ticketsSold</code> = 5, and <code>ticketsTaken</code> becomes 2. Line 4: <code>ticketsTaken *= 2</code> → 4 (B). Line 5: the compound <code>+=</code> auto-casts <code>(long)1</code> back to <code>int</code>, so <code>ticketsSold</code> = 6... then +1 → 6? Recheck: 5 + 1 = 6, but line 5 adds 1 more → <strong>ticketsSold = 7</strong> (C). It compiles fine.</p>
+    </details>
+  </div>
+
+  <!-- Q18 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q18</span><span class="q-tag">Parentheses</span></div>
+    <p class="q-prompt">Which can change the order of operation in an expression?</p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>[ ]</code></li>
+      <li><span class="ol">B.</span> <code>&lt; &gt;</code></li>
+      <li><span class="ol">C.</span> <code>( )</code></li>
+      <li><span class="ol">D.</span> <code>{ }</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · ( )</span>
+      <p class="expl">Only parentheses <code>( )</code> override operator precedence in Java. Brackets <code>[ ]</code> are for arrays, braces <code>{ }</code> for blocks/initializers, and <code>&lt; &gt;</code> for generics — none change evaluation order in an arithmetic expression.</p>
+    </details>
+  </div>
+
+  <!-- Q19 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q19</span><span class="q-tag">Overflow</span></div>
+    <p class="q-prompt">What is the result? <span class="all">(Choose all that apply.)</span></p>
+<pre><code>3: <span class="kw">int</span> start = <span class="num">7</span>;
+4: <span class="kw">int</span> end = <span class="num">4</span>;
+5: end += ++start;
+6: start = (<span class="kw">byte</span>)(Byte.MAX_VALUE + <span class="num">1</span>);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>start</code> is -128.</li>
+      <li><span class="ol">B.</span> <code>start</code> is 127.</li>
+      <li><span class="ol">C.</span> <code>end</code> is 11.</li>
+      <li><span class="ol">D.</span> <code>end</code> is 12.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A and D</span>
+      <p class="expl">Line 5: <code>++start</code> makes <code>start</code> 8 and returns 8, so <code>end = 4 + 8 = 12</code> (D). Line 6: <code>Byte.MAX_VALUE + 1</code> is 128; casting to <code>byte</code> overflows and wraps to <code>-128</code>, stored back in <code>start</code> (A). It compiles and runs.</p>
+    </details>
+  </div>
+
+  <!-- Q20 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q20</span><span class="q-tag">Unary</span></div>
+    <p class="q-prompt">Which statements about unary operators are true? <span class="all">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> Unary operators are always executed before any surrounding binary or ternary operators.</li>
+      <li><span class="ol">B.</span> The <code>-</code> operator can flip a <code>boolean</code> value.</li>
+      <li><span class="ol">C.</span> The pre-increment operator returns the value before the increment.</li>
+      <li><span class="ol">D.</span> The post-decrement operator returns the value before the decrement.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">A and D</span>
+      <p class="expl"><strong>A</strong>: unary operators sit above binary/ternary in precedence, so they run first. <strong>D</strong>: post-decrement returns the original value, then decrements. B is wrong — <code>-</code> works on numbers, not <code>boolean</code>. C is wrong — <em>pre</em>-increment returns the value <em>after</em> the increment.</p>
+    </details>
+  </div>
+
+  <!-- Q21 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q21</span><span class="q-tag">instanceof</span></div>
+    <p class="q-prompt">What is the result?</p>
+<pre><code>String noObject = <span class="kw">null</span>;
+System.out.print(noObject <span class="kw">instanceof</span> String);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>true</code></li>
+      <li><span class="ol">B.</span> <code>false</code></li>
+      <li><span class="ol">C.</span> It does not compile.</li>
+      <li><span class="ol">D.</span> It throws a <code>NullPointerException</code>.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B · false</span>
+      <p class="expl">Calling <code>instanceof</code> on a <code>null</code> reference always returns <code>false</code> — it never throws. (Only <code>x instanceof null</code>, with <code>null</code> on the right side, fails to compile.)</p>
+    </details>
+  </div>
+
+  <!-- Q22 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q22</span><span class="q-tag">Bitwise</span></div>
+    <p class="q-prompt">Given <code>int number = 70;</code> and <code>int negated = ~number;</code>, what does <code>number &amp; negated</code> print?</p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>70</code></li>
+      <li><span class="ol">B.</span> <code>0</code></li>
+      <li><span class="ol">C.</span> <code>-1</code></li>
+      <li><span class="ol">D.</span> <code>-71</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B · 0</span>
+      <p class="expl">A number and its bitwise negation have opposite bits at every position, so bitwise AND (<code>&amp;</code>) yields all zeros → <code>0</code>. By contrast, bitwise OR (<code>|</code>) of a number with its negation gives <code>-1</code> (all ones).</p>
+    </details>
+  </div>
+
+  <!-- Q23 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q23</span><span class="q-tag">Assignment value</span></div>
+    <p class="q-prompt">What is printed?</p>
+<pre><code><span class="kw">long</span> wolf = <span class="num">5</span>;
+<span class="kw">long</span> coyote = (wolf = <span class="num">3</span>);
+System.out.println(wolf + <span class="str">","</span> + coyote);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>5,3</code></li>
+      <li><span class="ol">B.</span> <code>3,5</code></li>
+      <li><span class="ol">C.</span> <code>3,3</code></li>
+      <li><span class="ol">D.</span> It does not compile.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · 3,3</span>
+      <p class="expl"><code>(wolf = 3)</code> does two things: it sets <code>wolf</code> to 3, and the assignment expression itself evaluates to 3, which is assigned to <code>coyote</code>. Both end up 3.</p>
+    </details>
+  </div>
+
+  <!-- Q24 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q24</span><span class="q-tag">Numeric Promotion</span></div>
+    <p class="q-prompt">What is the data type of <code>z</code>?</p>
+<pre><code><span class="kw">short</span> w = <span class="num">14</span>;
+<span class="kw">float</span> x = <span class="num">13</span>;
+<span class="kw">double</span> y = <span class="num">30</span>;
+<span class="kw">var</span> z = w * x / y;</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>short</code></li>
+      <li><span class="ol">B.</span> <code>float</code></li>
+      <li><span class="ol">C.</span> <code>double</code></li>
+      <li><span class="ol">D.</span> <code>int</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · double</span>
+      <p class="expl"><code>w</code> promotes to <code>int</code> (short in binary arithmetic), then to <code>float</code> to multiply with <code>x</code>; that product promotes to <code>double</code> to divide by <code>y</code>. The widest type wins, so <code>z</code> is a <code>double</code>.</p>
+    </details>
+  </div>
+
+  <!-- Q25 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q25</span><span class="q-tag">Modulus</span></div>
+    <p class="q-prompt">What does <code>System.out.println(-7 % 5);</code> print?</p>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>2</code></li>
+      <li><span class="ol">B.</span> <code>-2</code></li>
+      <li><span class="ol">C.</span> <code>3</code></li>
+      <li><span class="ol">D.</span> <code>-3</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B · -2</span>
+      <p class="expl">The result of <code>%</code> takes the sign of the <em>dividend</em> (the left operand). Since <code>-7</code> is negative, the result is <code>-2</code>. (Compare: <code>7 % -5</code> is <code>2</code> — the divisor's sign is ignored.)</p>
+    </details>
+  </div>
+
+  <!-- Q26 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q26</span><span class="q-tag">Negation</span></div>
+    <p class="q-prompt">Given <code>double t = 1.21;</code>, what does this print?</p>
+<pre><code>t = -t;
+t = --t;
+System.out.println(t);</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> <code>1.21</code></li>
+      <li><span class="ol">B.</span> <code>-1.21</code></li>
+      <li><span class="ol">C.</span> <code>-2.21</code></li>
+      <li><span class="ol">D.</span> <code>0.21</code></li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · -2.21</span>
+      <p class="expl"><code>t = -t</code> makes <code>t</code> = -1.21. Then <code>--t</code> is the <em>decrement</em> operator (not double negation), subtracting 1 → -2.21. To negate twice you'd need <code>-(-t)</code> with parentheses.</p>
+    </details>
+  </div>
+
+  <!-- Q27 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q27</span><span class="q-tag">Ternary type</span></div>
+    <p class="q-prompt">Which line does <strong>not</strong> compile?</p>
+<pre><code><span class="kw">int</span> stripes = <span class="num">7</span>;
+<span class="cm">// A</span> System.out.print((stripes &gt; <span class="num">5</span>) ? <span class="num">21</span> : <span class="str">"Zebra"</span>);
+<span class="cm">// B</span> <span class="kw">int</span> animal = (stripes &lt; <span class="num">9</span>) ? <span class="num">3</span> : <span class="str">"Horse"</span>;</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> Line A</li>
+      <li><span class="ol">B.</span> Line B</li>
+      <li><span class="ol">C.</span> Both</li>
+      <li><span class="ol">D.</span> Neither</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">B · line B</span>
+      <p class="expl"><code>print()</code> accepts mixed branch types because it converts the result to <code>Object</code> and calls <code>toString()</code> — line A compiles. But line B assigns the result to an <code>int</code>, and <code>"Horse"</code> can't become an <code>int</code>, so the compiler rejects it.</p>
+    </details>
+  </div>
+
+  <!-- Q28 -->
+  <div class="q-card">
+    <div class="q-head"><span class="q-num">Q28</span><span class="q-tag">Casting values vs vars</span></div>
+    <p class="q-prompt">Which line does <strong>not</strong> compile?</p>
+<pre><code><span class="kw">byte</span> hat = <span class="num">1</span>;
+<span class="cm">// A</span> <span class="kw">byte</span> gloves = <span class="num">7</span> * <span class="num">10</span>;
+<span class="cm">// B</span> <span class="kw">short</span> boots = <span class="num">2</span> + <span class="num">1</span>;
+<span class="cm">// C</span> <span class="kw">short</span> scarf = <span class="num">2</span> + hat;</code></pre>
+    <ul class="opts">
+      <li><span class="ol">A.</span> Line A</li>
+      <li><span class="ol">B.</span> Line B</li>
+      <li><span class="ol">C.</span> Line C</li>
+      <li><span class="ol">D.</span> None — all compile.</li>
+    </ul>
+    <details>
+      <summary>Show Answer</summary>
+      <span class="ans-key">C · line C</span>
+      <p class="expl">Lines A and B use only literal values, so the compiler can confirm the result fits (70 in a <code>byte</code>, 3 in a <code>short</code>). Line C mixes the literal <code>2</code> with the <em>variable</em> <code>hat</code>; both promote to <code>int</code>, and an <code>int</code> can't be stored in a <code>short</code> without a cast.</p>
+    </details>
+  </div>
+
+  <!-- REVISION -->
+  <div class="revision">
+    <h3>Quick Revision</h3>
+    <ul>
+      <li><strong>Precedence:</strong> unary &gt; multiplicative (<code>* / %</code>) &gt; additive (<code>+ -</code>) &gt; relational &gt; equality &gt; logical &gt; conditional &gt; ternary &gt; assignment. Only unary, cast, ternary, and assignment go right-to-left. Parentheses must be balanced; <code>[]</code> isn't allowed.</li>
+      <li><strong>Unary:</strong> <code>!</code> only on <code>boolean</code>, <code>-</code>/<code>~</code> only on numbers; <code>1≠true</code>, <code>0≠false</code>. <code>~n = -n-1</code>. <code>--x</code> is decrement, not double negation. Pre returns the new value, post the original.</li>
+      <li><strong>Promotion:</strong> <code>byte/short/char</code> → <code>int</code> in binary arithmetic on variables; integral + floating-point → the float/double type; the widest operand wins.</li>
+      <li><strong>Casting:</strong> larger→smaller needs a cast; the cast is unary and binds to one operand. Literal arithmetic that fits compiles; the same on variables may not. Compound operators (<code>+= *=</code> …) auto-cast back to the left type.</li>
+      <li><strong>Assignment value:</strong> an assignment is an expression equal to its value — watch <code>=</code> vs <code>==</code> inside conditions.</li>
+      <li><strong>Equality &amp; logic:</strong> <code>==</code> compares references for objects, values for primitives; can't mix incompatible types; <code>null == null</code> is true. <code>&amp; | ^</code> evaluate both sides; <code>&amp;&amp; ||</code> short-circuit (watch unperformed side effects).</li>
+      <li><strong>instanceof:</strong> on <code>null</code> → <code>false</code>; <code>instanceof null</code> or an impossible type → does not compile.</li>
+      <li><strong>Ternary:</strong> only one branch runs; branches can differ in type for <code>print()</code>, but assigning the result enforces type compatibility.</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

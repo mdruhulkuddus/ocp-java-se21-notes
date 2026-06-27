@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 · Chapter 8 — Lambdas and Functional Interfaces (MCQ Practice)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff; --ink:#2b2b32; --muted:#6e6a72;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --accent:#c96442; --accent2:#d4845e; --line:#ece3da;
+    --green:#3b7d57; --gold:#a9772a;
+    --purple:#7a5cb8; --purple-b:#9b7fd4; --purple-tag:#b29ad9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Source Sans 3',system-ui,sans-serif; line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:860px; margin:0 auto; padding:34px 20px 70px;}
+  h1,h2,h3,h4{font-family:'Merriweather',Georgia,serif; line-height:1.3; color:#22222a;}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+
+  .header{
+    position:relative; overflow:hidden;
+    background:linear-gradient(135deg,#ffffff,#fdf8f3);
+    border-radius:18px; padding:30px 32px 26px; margin-bottom:30px;
+    box-shadow:0 10px 30px rgba(120,90,60,.10);
+  }
+  .header::after{
+    content:""; position:absolute; top:-60px; right:-40px; width:230px; height:230px;
+    background:radial-gradient(circle,rgba(201,100,66,.16),transparent 68%); pointer-events:none;
+  }
+  .pill{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-size:.72rem;
+    font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#fff;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    padding:6px 13px; border-radius:999px; margin-bottom:16px;
+  }
+  .header h1{font-size:1.85rem; margin:0 0 8px;}
+  .header .tagline{font-style:italic; color:var(--muted); margin:0 0 18px; font-size:1.04rem;}
+  .topics{display:flex; flex-wrap:wrap; gap:8px;}
+  .topics span{
+    font-family:'JetBrains Mono',monospace; font-size:.7rem; letter-spacing:.4px;
+    background:#f3ece4; color:#9a5030; padding:5px 11px; border-radius:999px;
+  }
+  .howto{
+    background:#f3ece4; border-radius:12px; padding:12px 18px; margin:22px 0 8px;
+    font-size:.92rem; color:#7a5a44;
+  }
+
+  .q-card{
+    background:linear-gradient(135deg,#f4f0fa,#f9f6fd);
+    border-top:4px solid var(--purple-b); border-radius:14px;
+    padding:22px 24px 18px; margin-bottom:26px;
+    box-shadow:0 6px 20px rgba(110,90,150,.10);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .q-card:hover{transform:translateY(-3px); box-shadow:0 12px 28px rgba(110,90,150,.16);}
+  .q-head{display:flex; align-items:center; gap:12px; margin-bottom:12px; flex-wrap:wrap;}
+  .qnum{font-family:'JetBrains Mono',monospace; font-weight:700; font-size:1.02rem; color:var(--purple); letter-spacing:1px;}
+  .qtag{
+    font-family:'JetBrains Mono',monospace; font-size:.66rem; font-weight:700;
+    letter-spacing:.6px; text-transform:uppercase; color:#fff;
+    background:var(--purple-tag); padding:4px 10px; border-radius:999px;
+  }
+  .prompt{font-weight:600; margin:0 0 14px; color:#33303a;}
+  .prompt .multi{color:var(--purple); font-style:italic; font-weight:700;}
+  .q-card pre{
+    background:#fbf9fe; border-radius:12px; padding:15px 17px; margin:0 0 16px;
+    overflow-x:auto; box-shadow:inset 0 2px 8px rgba(110,90,150,.10);
+    font-size:.86rem; line-height:1.6;
+  }
+  .q-card pre code{background:none; color:inherit; padding:0;}
+  .opts{list-style:none; margin:0 0 4px; padding:0;}
+  .opts li{margin:0 0 7px; padding-left:30px; position:relative;}
+  .opts li .lab{
+    position:absolute; left:0; top:0; font-family:'JetBrains Mono',monospace;
+    font-weight:700; color:var(--purple);
+  }
+  .opts li code{background:#f3ece4; color:#9a5030; padding:1px 6px; border-radius:5px; font-size:.86em;}
+
+  .kw{color:var(--kw); font-weight:600;}
+  .str{color:var(--str);}
+  .num{color:var(--num);}
+  .err{color:var(--err); font-weight:600;}
+  .cm{color:var(--cm); font-style:italic;}
+
+  details{margin-top:14px; border-top:1px dashed #cdbce8; padding-top:4px;}
+  summary{
+    cursor:pointer; list-style:none; display:inline-block;
+    font-family:'JetBrains Mono',monospace; font-size:.78rem; font-weight:700;
+    letter-spacing:.5px; color:var(--purple); padding:8px 2px 4px;
+    user-select:none;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"\25B8  "; }
+  details[open] summary::before{content:"\25BE  ";}
+  .ans-body{padding:8px 2px 4px; font-size:.94rem; color:#3a3640;}
+  .ans-key{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-weight:700;
+    font-size:.84rem; background:#eef8f1; color:#3d8a5e;
+    padding:5px 12px; border-radius:8px; margin-bottom:8px; letter-spacing:.5px;
+  }
+  .ans-body code{background:#f3ece4; color:#9a5030; padding:1px 6px; border-radius:5px; font-size:.86em;}
+
+  .revision{
+    background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c;
+    border-radius:14px; padding:20px 24px; margin-top:34px;
+    box-shadow:0 6px 18px rgba(180,150,90,.10);
+  }
+  .revision h3{color:var(--gold); margin:0 0 10px; font-size:1.12rem;}
+  .revision ul{margin:0; padding-left:20px;}
+  .revision li{margin:0 0 7px;}
+  .revision code{background:#f3ece4; color:#9a5030; padding:1px 6px; border-radius:5px; font-size:.86em;}
+
+  @media(max-width:560px){
+    .header{padding:24px 20px;}
+    .header h1{font-size:1.5rem;}
+    .q-card{padding:18px 16px 14px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="header">
+    <span class="pill">OCP Java SE 21 · 1Z0-830</span>
+    <h1>Chapter 8 — Lambdas and Functional Interfaces</h1>
+    <p class="tagline">Twenty-eight exam-style questions on lambda syntax, the SAM rule, method references, and the built-in functional interfaces.</p>
+    <div class="topics">
+      <span>LAMBDA SYNTAX</span><span>var</span><span>FUNCTIONAL INTERFACE</span><span>SAM RULE</span>
+      <span>METHOD REF</span><span>BUILT-IN</span><span>CONVENIENCE</span><span>PRIMITIVE</span><span>VARIABLES</span>
+    </div>
+    <div class="howto">Try each question first, then tap <strong>Show Answer</strong> to reveal the key and explanation. Watch for "Choose all that apply."</div>
+  </header>
+
+  <!-- Q1 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q01</span><span class="qtag">LAMBDA SYNTAX</span></div>
+    <p class="prompt">Which lambdas are valid (each should return a <code>boolean</code>)? <span class="multi">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>() -&gt; true</code></li>
+      <li><span class="lab">B.</span> <code>x, y -&gt; x.startsWith("test")</code></li>
+      <li><span class="lab">C.</span> <code>(String x) -&gt; x.startsWith("test")</code></li>
+      <li><span class="lab">D.</span> <code>(x, y) -&gt; { return x.startsWith("test"); }</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: A, C, D</span>
+      <p>B fails: with more than one parameter, parentheses are required. A, C, and D are all valid forms (you don't have to use every parameter).</p></div>
+    </details>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q02</span><span class="qtag">LAMBDA SYNTAX</span></div>
+    <p class="prompt">What is wrong with this lambda?</p>
+<pre><code>x -> { <span class="kw">return</span> x.startsWith(<span class="str">"giraffe"</span>) }</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Nothing — it is valid</li>
+      <li><span class="lab">B.</span> Missing semicolon inside the braces</li>
+      <li><span class="lab">C.</span> Missing parentheses around <code>x</code></li>
+      <li><span class="lab">D.</span> Missing <code>return</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>When you use braces, the body is a normal block: the <code>return</code> statement needs a terminating semicolon.</p></div>
+    </details>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q03</span><span class="qtag">var</span></div>
+    <p class="prompt">What is the result?</p>
+<pre><code><span class="kw">var</span> invalid = (Animal a) -> a.canHop();</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Compiles; type is the lambda's interface</li>
+      <li><span class="lab">B.</span> Does not compile — not enough context for <code>var</code> + lambda</li>
+      <li><span class="lab">C.</span> Compiles; <code>invalid</code> has type <code>Object</code></li>
+      <li><span class="lab">D.</span> Does not compile — the lambda needs braces</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>A lambda takes its type from context, and <code>var</code> also needs context to infer a type. With both on the same line, there isn't enough information to determine the functional interface.</p></div>
+    </details>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q04</span><span class="qtag">SAM RULE</span></div>
+    <p class="prompt"><code>Sprint</code> has one abstract method <code>sprint()</code>. Which of these are functional interfaces? <span class="multi">(Choose all that apply.)</span></p>
+<pre><code><span class="num">A:</span> <span class="kw">interface</span> Dash <span class="kw">extends</span> Sprint {}
+<span class="num">B:</span> <span class="kw">interface</span> Skip <span class="kw">extends</span> Sprint { <span class="kw">void</span> skip(); }
+<span class="num">C:</span> <span class="kw">interface</span> Sleep { <span class="kw">private void</span> snore(){} <span class="kw">default int</span> getZzz(){<span class="kw">return</span> <span class="num">1</span>;} }
+<span class="num">D:</span> <span class="kw">interface</span> Climb { <span class="kw">void</span> reach(); <span class="kw">default void</span> fall(){} <span class="kw">static int</span> up(){<span class="kw">return</span> <span class="num">1</span>;} }</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Dash</li>
+      <li><span class="lab">B.</span> Skip</li>
+      <li><span class="lab">C.</span> Sleep</li>
+      <li><span class="lab">D.</span> Climb</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: A, D</span>
+      <p>Dash inherits the single abstract <code>sprint()</code>. Climb has exactly one abstract method, <code>reach()</code> (default/static methods don't count). Skip has two abstract methods; Sleep has none.</p></div>
+    </details>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q05</span><span class="qtag">FUNCTIONAL INTERFACE</span></div>
+    <p class="prompt">What is the result?</p>
+<pre><code><span class="cm">@FunctionalInterface</span>
+<span class="kw">public interface</span> Dance {
+   <span class="kw">void</span> move();
+   <span class="kw">void</span> rest();
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Compiles</li>
+      <li><span class="lab">B.</span> Does not compile — it has two abstract methods</li>
+      <li><span class="lab">C.</span> Compiles but emits a warning</li>
+      <li><span class="lab">D.</span> Does not compile — methods need bodies</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p><code>@FunctionalInterface</code> makes the compiler enforce the single-abstract-method rule. With two abstract methods, the annotation causes a compile error.</p></div>
+    </details>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q06</span><span class="qtag">FUNCTIONAL INTERFACE</span></div>
+    <p class="prompt">Is <code>Dive</code> a functional interface?</p>
+<pre><code><span class="kw">public interface</span> Dive {
+   String toString();
+   <span class="kw">public boolean</span> equals(Object o);
+   <span class="kw">public abstract int</span> hashCode();
+   <span class="kw">public void</span> dive();
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Yes — <code>dive()</code> is the single abstract method</li>
+      <li><span class="lab">B.</span> No — it has four abstract methods</li>
+      <li><span class="lab">C.</span> No — <code>toString()</code> can't be declared in an interface</li>
+      <li><span class="lab">D.</span> No — <code>equals()</code> makes it non-functional</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: A</span>
+      <p><code>toString()</code>, <code>equals(Object)</code>, and <code>hashCode()</code> match <code>public</code> methods of <code>Object</code>, so they don't count toward the SAM total. That leaves <code>dive()</code> as the only abstract method.</p></div>
+    </details>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q07</span><span class="qtag">FUNCTIONAL INTERFACE</span></div>
+    <p class="prompt">Is <code>Hibernate</code> a functional interface?</p>
+<pre><code><span class="kw">public interface</span> Hibernate {
+   String toString();
+   <span class="kw">public boolean</span> equals(Hibernate o);
+   <span class="kw">public abstract int</span> hashCode();
+   <span class="kw">public void</span> rest();
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Yes — <code>rest()</code> is the only abstract method</li>
+      <li><span class="lab">B.</span> No — <code>equals(Hibernate)</code> doesn't match <code>Object</code>, leaving two abstract methods</li>
+      <li><span class="lab">C.</span> No — <code>hashCode()</code> is not allowed</li>
+      <li><span class="lab">D.</span> No — <code>toString()</code> is not allowed</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p><code>equals(Hibernate)</code> has a different signature from <code>Object.equals(Object)</code>, so it counts. Combined with <code>rest()</code>, that's two abstract methods — not functional.</p></div>
+    </details>
+  </div>
+
+  <!-- Q8 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q08</span><span class="qtag">METHOD REF</span></div>
+    <p class="prompt">Which method reference is equivalent to the lambda <code>(s, p) -&gt; s.startsWith(p)</code>?</p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>str::startsWith</code></li>
+      <li><span class="lab">B.</span> <code>String::startsWith</code></li>
+      <li><span class="lab">C.</span> <code>String::new</code></li>
+      <li><span class="lab">D.</span> <code>Math::startsWith</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>This is an unbound instance reference: <code>String::startsWith</code>. The first parameter <code>s</code> is the instance, and <code>p</code> is the argument passed to <code>startsWith()</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q9 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q09</span><span class="qtag">METHOD REF</span></div>
+    <p class="prompt">For an unbound reference like <code>String::isEmpty</code> (assigned to an interface whose method is <code>boolean check(String text)</code>), what is the supplied parameter used as?</p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> A method argument</li>
+      <li><span class="lab">B.</span> The instance the method is called on</li>
+      <li><span class="lab">C.</span> A static class reference</li>
+      <li><span class="lab">D.</span> It is ignored</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>It looks like a static call, but <code>isEmpty()</code> is an instance method. Java uses the runtime parameter as the instance on which the method is invoked.</p></div>
+    </details>
+  </div>
+
+  <!-- Q10 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q10</span><span class="qtag">METHOD REF</span></div>
+    <p class="prompt">Given <code>var str = ""; StringChecker lambda = () -&gt; str.startsWith("Zoo");</code>, how can this be written as a method reference?</p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>str::startsWith</code></li>
+      <li><span class="lab">B.</span> <code>str::startsWith("Zoo")</code></li>
+      <li><span class="lab">C.</span> Both A and B work</li>
+      <li><span class="lab">D.</span> Neither — there's no way to pass the <code>"Zoo"</code> argument</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: D</span>
+      <p>A method reference can bind the instance (<code>str</code>) but cannot also supply the literal argument <code>"Zoo"</code>. Both attempts fail to compile, so this lambda cannot become a method reference.</p></div>
+    </details>
+  </div>
+
+  <!-- Q11 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q11</span><span class="qtag">METHOD REF</span></div>
+    <p class="prompt">What is printed?</p>
+<pre><code><span class="kw">interface</span> Converter { <span class="kw">long</span> round(<span class="kw">double</span> num); }
+Converter methodRef = Math::round;
+System.out.println(methodRef.round(<span class="num">100.1</span>));</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>100</code></li>
+      <li><span class="lab">B.</span> <code>100.1</code></li>
+      <li><span class="lab">C.</span> Does not compile</li>
+      <li><span class="lab">D.</span> <code>101</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: A</span>
+      <p>The <code>Converter</code> context (one <code>double</code> parameter, <code>long</code> return) tells Java to use <code>Math.round(double)</code>. <code>Math.round(100.1)</code> is <code>100</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q12 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q12</span><span class="qtag">BUILT-IN</span></div>
+    <p class="prompt">What is the method name and parameter count of <code>Supplier&lt;T&gt;</code>?</p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>get()</code>, 0 parameters</li>
+      <li><span class="lab">B.</span> <code>accept(T)</code>, 1 parameter</li>
+      <li><span class="lab">C.</span> <code>apply(T)</code>, 1 parameter</li>
+      <li><span class="lab">D.</span> <code>test(T)</code>, 1 parameter</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: A</span>
+      <p>A <code>Supplier</code> generates a value from nothing: <code>T get()</code> with zero parameters.</p></div>
+    </details>
+  </div>
+
+  <!-- Q13 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q13</span><span class="qtag">BUILT-IN</span></div>
+    <p class="prompt">Which functional interface fills the blank?</p>
+<pre><code>____________&lt;List&gt; ex = x -> <span class="str">""</span>.equals(x.get(<span class="num">0</span>));</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>Function&lt;List&gt;</code></li>
+      <li><span class="lab">B.</span> <code>Consumer&lt;List&gt;</code></li>
+      <li><span class="lab">C.</span> <code>Predicate&lt;List&gt;</code></li>
+      <li><span class="lab">D.</span> <code>Supplier&lt;List&gt;</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: C</span>
+      <p>One parameter in, a <code>boolean</code> out, and a single generic type — that's a <code>Predicate</code>. (A <code>Function</code> would need a second generic for the return type.)</p></div>
+    </details>
+  </div>
+
+  <!-- Q14 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q14</span><span class="qtag">BUILT-IN</span></div>
+    <p class="prompt">You need something that <strong>returns a <code>Boolean</code></strong> and takes a <code>String</code>. Which interface?</p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>Predicate&lt;String&gt;</code></li>
+      <li><span class="lab">B.</span> <code>Function&lt;String, Boolean&gt;</code></li>
+      <li><span class="lab">C.</span> <code>Supplier&lt;Boolean&gt;</code></li>
+      <li><span class="lab">D.</span> <code>Consumer&lt;String&gt;</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>A <code>Predicate</code> returns the <code>boolean</code> <em>primitive</em>, not a <code>Boolean</code> object. Returning a <code>Boolean</code> while taking a <code>String</code> is <code>Function&lt;String, Boolean&gt;</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q15 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q15</span><span class="qtag">BUILT-IN</span></div>
+    <p class="prompt">What is the result?</p>
+<pre><code>Function&lt;List&lt;String&gt;&gt; ex1 = x -> x.get(<span class="num">0</span>);</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Compiles</li>
+      <li><span class="lab">B.</span> Does not compile — <code>Function</code> needs two type arguments</li>
+      <li><span class="lab">C.</span> Does not compile — <code>x.get(0)</code> is invalid</li>
+      <li><span class="lab">D.</span> Compiles; returns a <code>String</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p><code>Function&lt;T, R&gt;</code> requires both the input type and the return type. Only one type argument is supplied, so it does not compile.</p></div>
+    </details>
+  </div>
+
+  <!-- Q16 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q16</span><span class="qtag">BUILT-IN</span></div>
+    <p class="prompt">What is the result?</p>
+<pre><code>UnaryOperator&lt;Long&gt; ex2 = (Long l) -> <span class="num">3.14</span>;</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Compiles</li>
+      <li><span class="lab">B.</span> Does not compile — it must return a <code>Long</code>, not a <code>double</code></li>
+      <li><span class="lab">C.</span> Does not compile — <code>UnaryOperator</code> needs two generics</li>
+      <li><span class="lab">D.</span> Compiles; the <code>double</code> is autoboxed</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>A <code>UnaryOperator&lt;Long&gt;</code> takes a <code>Long</code> and must return a <code>Long</code>. Returning <code>3.14</code> (a <code>double</code>) breaks that contract.</p></div>
+    </details>
+  </div>
+
+  <!-- Q17 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q17</span><span class="qtag">BUILT-IN</span></div>
+    <p class="prompt">Which statement about <code>UnaryOperator&lt;T&gt;</code> and <code>BinaryOperator&lt;T&gt;</code> is correct?</p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> They may use any types for inputs and output</li>
+      <li><span class="lab">B.</span> They force all type parameters to be the same type; <code>UnaryOperator extends Function</code>, <code>BinaryOperator extends BiFunction</code></li>
+      <li><span class="lab">C.</span> They return <code>void</code></li>
+      <li><span class="lab">D.</span> <code>UnaryOperator</code> takes two parameters</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p><code>UnaryOperator&lt;T&gt; extends Function&lt;T, T&gt;</code> and <code>BinaryOperator&lt;T&gt; extends BiFunction&lt;T, T, T&gt;</code>, so input(s) and output share one type.</p></div>
+    </details>
+  </div>
+
+  <!-- Q18 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q18</span><span class="qtag">CONVENIENCE</span></div>
+    <p class="prompt">What is printed?</p>
+<pre><code>Function&lt;Integer,Integer&gt; before = x -> x + <span class="num">1</span>;
+Function&lt;Integer,Integer&gt; after  = x -> x * <span class="num">2</span>;
+System.out.println(after.compose(before).apply(<span class="num">3</span>));</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>7</code></li>
+      <li><span class="lab">B.</span> <code>8</code></li>
+      <li><span class="lab">C.</span> <code>6</code></li>
+      <li><span class="lab">D.</span> <code>9</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p><code>compose</code> runs the argument first: <code>before</code> turns 3 into 4, then <code>after</code> doubles it to <strong>8</strong>. (With <code>andThen</code> the order would reverse.)</p></div>
+    </details>
+  </div>
+
+  <!-- Q19 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q19</span><span class="qtag">CONVENIENCE</span></div>
+    <p class="prompt">What is printed?</p>
+<pre><code>Consumer&lt;String&gt; c1 = x -> System.out.print(<span class="str">"1: "</span> + x);
+Consumer&lt;String&gt; c2 = x -> System.out.print(<span class="str">",2: "</span> + x);
+c1.andThen(c2).accept(<span class="str">"Annie"</span>);</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>1: Annie</code></li>
+      <li><span class="lab">B.</span> <code>1: Annie,2: Annie</code></li>
+      <li><span class="lab">C.</span> <code>,2: Annie1: Annie</code></li>
+      <li><span class="lab">D.</span> <code>2: Annie,1: Annie</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p><code>andThen</code> runs the two consumers in sequence, passing the <em>same</em> input <code>"Annie"</code> to each: <code>1: Annie</code> then <code>,2: Annie</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q20 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q20</span><span class="qtag">CONVENIENCE</span></div>
+    <p class="prompt"><code>egg</code> tests <code>contains("egg")</code> and <code>brown</code> tests <code>contains("brown")</code>. What does <code>egg.and(brown.negate())</code> match?</p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Strings containing both <code>egg</code> and <code>brown</code></li>
+      <li><span class="lab">B.</span> Strings containing <code>egg</code> but not <code>brown</code></li>
+      <li><span class="lab">C.</span> Strings containing neither</li>
+      <li><span class="lab">D.</span> Strings containing <code>brown</code> but not <code>egg</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p><code>negate()</code> inverts <code>brown</code>, and <code>and()</code> requires both — so the result matches strings that contain <code>egg</code> and do <em>not</em> contain <code>brown</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q21 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q21</span><span class="qtag">PRIMITIVE</span></div>
+    <p class="prompt">What is the single abstract method of <code>BooleanSupplier</code>?</p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>get()</code></li>
+      <li><span class="lab">B.</span> <code>getAsBoolean()</code></li>
+      <li><span class="lab">C.</span> <code>test()</code></li>
+      <li><span class="lab">D.</span> <code>apply()</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p><code>BooleanSupplier</code> — the only <code>boolean</code> functional interface — defines <code>boolean getAsBoolean()</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q22 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q22</span><span class="qtag">PRIMITIVE</span></div>
+    <p class="prompt">What is the single abstract method name of <code>IntUnaryOperator</code>?</p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>apply</code></li>
+      <li><span class="lab">B.</span> <code>applyAsInt</code></li>
+      <li><span class="lab">C.</span> <code>getAsInt</code></li>
+      <li><span class="lab">D.</span> <code>accept</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>When a primitive is returned, the method is renamed. The operator families use <code>applyAs…</code> — here <code>applyAsInt</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q23 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q23</span><span class="qtag">PRIMITIVE</span></div>
+    <p class="prompt">Which functional interfaces can fill the blank? <span class="multi">(Choose all that apply.)</span></p>
+<pre><code><span class="kw">var</span> d = <span class="num">1.0</span>;
+______________ f1 = x -> <span class="num">1</span>;
+f1.applyAsInt(d);</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>DoubleToIntFunction</code></li>
+      <li><span class="lab">B.</span> <code>ToIntFunction&lt;Double&gt;</code></li>
+      <li><span class="lab">C.</span> <code>IntToDoubleFunction</code></li>
+      <li><span class="lab">D.</span> <code>IntFunction&lt;Integer&gt;</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: A, B</span>
+      <p>The blank needs a method named <code>applyAsInt</code> returning <code>int</code>. <code>DoubleToIntFunction</code> takes a <code>double</code>; <code>ToIntFunction&lt;Double&gt;</code> takes an object that the <code>double</code> autoboxes into. <code>IntToDoubleFunction</code> returns a <code>double</code>, and <code>IntFunction</code>'s method is <code>apply</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q24 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q24</span><span class="qtag">PRIMITIVE</span></div>
+    <p class="prompt">How does <code>IntFunction&lt;R&gt;</code> differ from <code>Function&lt;T, R&gt;</code>?</p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> It returns <code>void</code></li>
+      <li><span class="lab">B.</span> It takes an <code>int</code> primitive, so only the return type generic <code>&lt;R&gt;</code> remains</li>
+      <li><span class="lab">C.</span> It takes two parameters</li>
+      <li><span class="lab">D.</span> Its method is named <code>getAsInt</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>Because the input is a primitive <code>int</code>, the input generic is gone — only <code>&lt;R&gt;</code> (the object return type) is needed. Its method is still <code>apply</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q25 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q25</span><span class="qtag">VARIABLES</span></div>
+    <p class="prompt">Which lambda parameter lists do <strong>not</strong> compile? <span class="multi">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>(var x, y) -&gt; "Hello"</code></li>
+      <li><span class="lab">B.</span> <code>(var x, Integer y) -&gt; true</code></li>
+      <li><span class="lab">C.</span> <code>(var x, var y) -&gt; true</code></li>
+      <li><span class="lab">D.</span> <code>(Integer x, y) -&gt; "goodbye"</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: A, B, D</span>
+      <p>All parameters must use one consistent format. A mixes <code>var</code> with none, B mixes <code>var</code> with a type, and D mixes a type with none. C is valid — all <code>var</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q26 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q26</span><span class="qtag">VARIABLES</span></div>
+    <p class="prompt">What is the result?</p>
+<pre><code>(a, b) -> { <span class="kw">int</span> a = <span class="num">0</span>; <span class="kw">return</span> <span class="num">5</span>; }</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Compiles</li>
+      <li><span class="lab">B.</span> Does not compile — it redeclares the parameter <code>a</code></li>
+      <li><span class="lab">C.</span> Does not compile — missing semicolon</li>
+      <li><span class="lab">D.</span> Compiles; the local <code>a</code> shadows the parameter</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>A lambda body can't declare a local variable with the same name as a lambda parameter already in scope.</p></div>
+    </details>
+  </div>
+
+  <!-- Q27 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q27</span><span class="qtag">VARIABLES</span></div>
+    <p class="prompt">Which variables can a lambda body access <strong>regardless</strong> of whether they're effectively final? <span class="multi">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Instance variables</li>
+      <li><span class="lab">B.</span> Static variables</li>
+      <li><span class="lab">C.</span> Local variables</li>
+      <li><span class="lab">D.</span> Lambda parameters</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: A, B, D</span>
+      <p>Instance variables, static variables, and lambda parameters are always accessible. Local variables (and method parameters) are accessible only when final or effectively final.</p></div>
+    </details>
+  </div>
+
+  <!-- Q28 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q28</span><span class="qtag">VARIABLES</span></div>
+    <p class="prompt">A method parameter is reassigned <em>after</em> a lambda references it. Where does the compiler report the error?</p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> At the reassignment line</li>
+      <li><span class="lab">B.</span> At the lambda's use of the variable</li>
+      <li><span class="lab">C.</span> At the method declaration</li>
+      <li><span class="lab">D.</span> There is no error</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>Reassigning a variable is fine in itself; the problem only exists from the lambda's perspective, so the error is reported at the line where the lambda <em>uses</em> the variable — even though the reassignment comes later.</p></div>
+    </details>
+  </div>
+
+  <!-- closing -->
+  <div class="revision">
+    <h3>Quick Revision</h3>
+    <ul>
+      <li><strong>Syntax:</strong> drop parentheses only for a single untyped parameter; drop braces/<code>return</code>/semicolon only for a single expression. <code>var x = lambda;</code> never compiles.</li>
+      <li><strong>SAM rule:</strong> exactly one abstract method. <code>Object</code> methods (<code>toString</code>, <code>equals(Object)</code>, <code>hashCode</code>) don't count — but <code>equals(SomeType)</code> does.</li>
+      <li><strong>Method refs:</strong> static (<code>Math::round</code>), bound (<code>str::startsWith</code>), unbound (<code>String::startsWith</code> — first param is the instance), constructor (<code>String::new</code>).</li>
+      <li><strong>Built-ins:</strong> <code>Supplier</code> get / <code>Consumer</code> accept / <code>Predicate</code> test / <code>Function</code> apply; <code>UnaryOperator</code> &amp; <code>BinaryOperator</code> force one shared type.</li>
+      <li><strong>Convenience:</strong> <code>compose</code> runs its argument first; <code>andThen</code> runs the caller first; <code>Predicate</code> has <code>and</code>/<code>or</code>/<code>negate</code>.</li>
+      <li><strong>Primitives &amp; variables:</strong> method renamed to <code>getAsInt</code>/<code>applyAsDouble</code>; parameters share one format; captured locals must be effectively final.</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

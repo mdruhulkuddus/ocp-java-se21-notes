@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 · Chapter 7 — Beyond Classes (Detailed Handnote)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff; --ink:#2b2b32; --muted:#6e6a72;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --accent:#c96442; --accent2:#d4845e; --line:#ece3da;
+    --green:#3b7d57; --green-b:#5aab7b; --red:#c44d3e; --gold:#a9772a; --purple:#7c5cbf;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Source Sans 3',system-ui,sans-serif; line-height:1.65;
+    -webkit-font-smoothing:antialiased; padding:32px 16px;
+  }
+  .wrap{max-width:1020px; margin:0 auto;}
+  h1,h2,h3,h4{font-family:'Merriweather',Georgia,serif; line-height:1.3; color:#22222a;}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+
+  /* ---- header ---- */
+  .header{
+    background:linear-gradient(135deg,#ffffff,#fbf7f4);
+    border-radius:18px; padding:34px 34px 30px; margin-bottom:26px;
+    box-shadow:0 10px 30px rgba(120,90,60,.08);
+  }
+  .badge{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-size:.72rem;
+    letter-spacing:.5px; text-transform:uppercase; color:#fff; font-weight:700;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    padding:6px 14px; border-radius:999px; box-shadow:0 4px 12px rgba(201,100,66,.28);
+  }
+  .header h1{font-size:2.1rem; margin:18px 0 4px;}
+  .header h1 .sub{color:var(--muted); font-weight:400; font-size:1.25rem;}
+  .header .tagline{font-style:italic; color:var(--muted); margin:0 0 20px; font-size:1.02rem;}
+  .objectives{
+    background:linear-gradient(135deg,#f0f9f3,#f7fcf8);
+    border-left:5px solid var(--green-b); border-radius:12px; padding:16px 20px;
+  }
+  .objectives h4{margin:0 0 8px; color:var(--green); font-size:.95rem; letter-spacing:.3px;}
+  .objectives ul{margin:0; padding-left:20px;}
+  .objectives li{margin:3px 0; font-size:.95rem;}
+
+  /* ---- toc ---- */
+  .toc{
+    background:var(--card); border-radius:16px; padding:22px 26px; margin-bottom:30px;
+    box-shadow:0 6px 20px rgba(120,90,60,.06);
+  }
+  .toc h3{margin:0 0 14px; font-size:1.05rem;}
+  .toc ol{columns:2; column-gap:34px; margin:0; padding-left:18px;}
+  .toc li{margin:6px 0; break-inside:avoid;}
+  .toc a{color:var(--accent); text-decoration:none; font-weight:600;}
+  .toc a:hover{text-decoration:underline;}
+
+  /* ---- section ---- */
+  section{margin-bottom:40px;}
+  .secnum{font-family:'JetBrains Mono',monospace; font-size:.8rem; font-weight:700;
+    letter-spacing:2px; color:var(--accent); display:block; margin-bottom:2px;}
+  section h2{font-size:1.55rem; margin:0 0 18px; padding-bottom:10px; border-bottom:2px solid var(--line);}
+  section h3{font-size:1.18rem; margin:26px 0 10px;}
+  p{margin:12px 0;}
+
+  /* ---- inline code ---- */
+  p code, li code, td code, .opt code{background:#f3ece4; color:#9a5030; padding:1.5px 6px; border-radius:5px; font-size:.86em;}
+
+  /* ---- code blocks ---- */
+  pre{
+    background:#fdfaf7; border-radius:12px; padding:16px 18px; overflow-x:auto;
+    box-shadow:inset 0 2px 8px rgba(120,90,60,.08); margin:14px 0; font-size:.86rem; line-height:1.55;
+  }
+  pre code{background:none; color:#3a3742; padding:0;}
+  .kw{color:var(--kw); font-weight:600;}
+  .str{color:var(--str);}
+  .num{color:var(--num);}
+  .err{color:var(--err); font-weight:600;}
+  .cm{color:var(--cm); font-style:italic;}
+
+  /* ---- cards ---- */
+  .card{border-radius:14px; padding:15px 19px; margin:16px 0; box-shadow:0 4px 14px rgba(120,90,60,.07);
+    transition:transform .18s ease, box-shadow .18s ease;}
+  .card:hover{transform:translateY(-2px); box-shadow:0 8px 22px rgba(120,90,60,.12);}
+  .card .label{font-family:'JetBrains Mono',monospace; font-size:.72rem; font-weight:700;
+    letter-spacing:.6px; text-transform:uppercase; display:block; margin-bottom:5px;}
+  .card p{margin:5px 0;}
+  .exam-trap{background:linear-gradient(135deg,#fef2f0,#fff8f7); border-left:5px solid #e06b5e;}
+  .exam-trap .label{color:#c0453a;}
+  .key-rule{background:linear-gradient(135deg,#f0f9f3,#f7fcf8); border-left:5px solid var(--green-b);}
+  .key-rule .label{color:var(--green);}
+  .remember{background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c;}
+  .remember .label{color:var(--gold);}
+
+  /* ---- rules box ---- */
+  .rules-box{background:linear-gradient(135deg,#f0f9f3,#f7fcf8); border-top:4px solid var(--green-b);
+    border-radius:12px; padding:16px 22px; margin:18px 0; box-shadow:0 4px 14px rgba(120,90,60,.06);}
+  .rules-box h4{margin:0 0 8px; color:var(--green);}
+  .rules-box ol,.rules-box ul{margin:6px 0; padding-left:22px;}
+  .rules-box li{margin:5px 0;}
+
+  /* ---- vs grid ---- */
+  .vs-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0;}
+  .vs-grid .col{background:var(--card); border-radius:12px; padding:14px 18px; box-shadow:0 4px 14px rgba(120,90,60,.07);}
+  .vs-grid .col h4{margin:0 0 8px; font-size:1rem;}
+  .vs-grid .col.left h4{color:var(--purple);}
+  .vs-grid .col.right h4{color:var(--green);}
+  .vs-grid .col ul{margin:0; padding-left:18px;} .vs-grid .col li{margin:4px 0; font-size:.92rem;}
+
+  /* ---- trace ---- */
+  .trace{background:#fffdf9; border:1px dashed #e3d6c4; border-radius:12px; padding:12px 18px; margin:14px 0;}
+  .trace h4{margin:0 0 6px; font-size:.9rem; color:var(--accent); font-family:'JetBrains Mono',monospace; letter-spacing:.5px;}
+  .trace ul{margin:0; padding-left:20px;} .trace li{margin:4px 0; font-size:.9rem;}
+  .out{display:inline-block; background:#eef8f1; color:#2f7350; font-family:'JetBrains Mono',monospace;
+    padding:1px 8px; border-radius:5px; font-size:.85em; font-weight:600;}
+
+  /* ---- tables ---- */
+  table{width:100%; border-collapse:separate; border-spacing:0; background:var(--card);
+    border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(120,90,60,.08); margin:16px 0; font-size:.9rem;}
+  th,td{padding:10px 14px; text-align:left; border-bottom:1px solid #f0ebe4; vertical-align:top;}
+  thead th{background:#f0e8de; font-family:'Source Sans 3',sans-serif; font-weight:700; color:#5a5048;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:#fcfaf7;}
+  .yes{color:var(--green); font-weight:700;}
+  .no{color:var(--red); font-weight:700;}
+
+  /* ---- recap ---- */
+  .recap{background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c;
+    border-radius:14px; padding:22px 26px; box-shadow:0 6px 18px rgba(120,90,60,.08);}
+  .recap h3{color:var(--gold); margin:16px 0 4px; font-size:1.02rem;}
+  .recap h3:first-child{margin-top:0;}
+  .recap ul{margin:4px 0 0; padding-left:20px;} .recap li{margin:3px 0; font-size:.93rem;}
+
+  @media(max-width:680px){
+    body{padding:18px 10px;}
+    .header{padding:24px 20px;} .header h1{font-size:1.6rem;} .header h1 .sub{font-size:1rem;}
+    .toc ol{columns:1;} .vs-grid{grid-template-columns:1fr;}
+    section h2{font-size:1.3rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="header">
+    <span class="badge">OCP Java SE 21 Developer — Exam 1Z0-830</span>
+    <h1>Chapter 7 <span class="sub">— Beyond Classes</span></h1>
+    <p class="tagline">Interfaces, enums, sealed classes, records, nested classes, and polymorphism — the type system beyond ordinary classes.</p>
+    <div class="objectives">
+      <h4>WHAT THIS CHAPTER COVERS</h4>
+      <ul>
+        <li>Create and use <strong>interfaces</strong>; identify functional interfaces; use private, static, and default interface methods.</li>
+        <li>Create and use <strong>enum</strong> types with fields, methods, and constructors.</li>
+        <li>Implement inheritance with <strong>abstract and sealed types</strong> and <strong>record classes</strong>.</li>
+        <li>Apply <strong>encapsulation</strong> and create immutable objects; declare <strong>nested class</strong> objects.</li>
+        <li>Implement <strong>polymorphism</strong>; differentiate object type vs reference type; cast and use <code>instanceof</code> with pattern matching.</li>
+      </ul>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <h3>On this page</h3>
+    <ol>
+      <li><a href="#s1">Implementing Interfaces</a></li>
+      <li><a href="#s2">Working with Enums</a></li>
+      <li><a href="#s3">Sealing Classes</a></li>
+      <li><a href="#s4">Encapsulation &amp; Records</a></li>
+      <li><a href="#s5">Creating Nested Classes</a></li>
+      <li><a href="#s6">Understanding Polymorphism</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ SECTION 1 ============ -->
+  <section id="s1">
+    <span class="secnum">SECTION 01</span>
+    <h2>Implementing Interfaces</h2>
+
+    <p>An <strong>interface</strong> is an abstract data type that declares a list of abstract methods any implementing class must provide. A class can <code>extends</code> only one class, but it may <code>implements</code> any number of interfaces, separated by commas. This is how Java gets multiple inheritance of <em>type</em>.</p>
+
+    <h3>Declaring and using an interface</h3>
+    <p>An interface is declared with the <code>interface</code> keyword. Interface variables are <strong>constants</strong> — implicitly <code>public static final</code> — and must be initialized with a constant value. Abstract methods are implicitly <code>public</code>.</p>
+<pre><code><span class="kw">public abstract interface</span> WalksOnTwoLegs {}   <span class="cm">// compiles; abstract is optional</span>
+
+<span class="kw">final interface</span> WalksOnEightLegs {}            <span class="err">// DOES NOT COMPILE — interface can't be final</span>
+
+<span class="kw">public class</span> Biped {
+   <span class="kw">public static void</span> main(String[] args) {
+      <span class="kw">var</span> e = <span class="kw">new</span> WalksOnTwoLegs();           <span class="err">// DOES NOT COMPILE — can't instantiate interface</span>
+   }
+}</code></pre>
+
+    <div class="card exam-trap">
+      <span class="label">Exam Trap</span>
+      <p>An interface can no more be <code>final</code> than an abstract class can — marking it <code>final</code> implies nothing could ever implement it. And you can never write <code>new SomeInterface()</code>.</p>
+    </div>
+
+    <p>A concrete class implementing an interface must override every inherited abstract method, declaring it explicitly <code>public</code> (the interface's implicit <code>public</code> is not inherited as a free pass — the override must restate it). Return types may be covariant.</p>
+<pre><code><span class="kw">public interface</span> Climb {
+   Number getSpeed(<span class="kw">int</span> age);
+}
+<span class="kw">public class</span> FieldMouse <span class="kw">implements</span> Climb {
+   <span class="cm">@Override</span>
+   <span class="kw">public</span> Float getSpeed(<span class="kw">int</span> age) { <span class="kw">return</span> <span class="num">2.0f</span>; }  <span class="cm">// Float is covariant with Number; must be public</span>
+}</code></pre>
+
+    <h3>Extending interfaces &amp; mixing keywords</h3>
+    <p>An interface can <code>extends</code> <strong>multiple</strong> interfaces (unlike a class). The exam loves to swap <code>extends</code> / <code>implements</code> between classes and interfaces.</p>
+    <div class="vs-grid">
+      <div class="col left">
+        <h4>Allowed</h4>
+        <ul>
+          <li>class <code>implements</code> interface(s)</li>
+          <li>class <code>extends</code> one class</li>
+          <li>interface <code>extends</code> interface(s)</li>
+        </ul>
+      </div>
+      <div class="col right">
+        <h4>DOES NOT COMPILE</h4>
+        <ul>
+          <li>class <code>extends</code> interface</li>
+          <li>interface <code>implements</code> interface</li>
+          <li>interface <code>extends</code> a class</li>
+        </ul>
+      </div>
+    </div>
+<pre><code><span class="kw">public interface</span> CanRun {}
+<span class="kw">public class</span> Cheetah <span class="kw">extends</span> CanRun {}      <span class="err">// DOES NOT COMPILE — class can't extend interface</span>
+
+<span class="kw">public class</span> Hyena {}
+<span class="kw">public interface</span> HasFur <span class="kw">extends</span> Hyena {}     <span class="err">// DOES NOT COMPILE — interface can't extend class</span></code></pre>
+
+    <h3>Inheriting duplicate abstract methods</h3>
+    <p>Two inherited abstract methods are fine if a single override can satisfy both (compatible signatures, covariant returns). Parameter <em>names</em> need not match — only types.</p>
+<pre><code><span class="kw">public interface</span> Herbivore { <span class="kw">int</span> eatPlants(<span class="kw">int</span> plantsLeft); }
+<span class="kw">public interface</span> Omnivore  { <span class="kw">int</span> eatPlants(<span class="kw">int</span> foodRemaining); }
+<span class="kw">public class</span> Bear <span class="kw">implements</span> Herbivore, Omnivore {
+   <span class="kw">public int</span> eatPlants(<span class="kw">int</span> plants) { <span class="kw">return</span> plants - <span class="num">1</span>; }  <span class="cm">// satisfies both</span>
+}
+
+<span class="cm">// Incompatible — one returns void, the other int:</span>
+<span class="kw">public interface</span> Herbivore { <span class="kw">void</span> eatPlants(<span class="kw">int</span> p); }
+<span class="kw">public interface</span> Omnivore  { <span class="kw">int</span>  eatPlants(<span class="kw">int</span> p); }
+<span class="kw">public class</span> Tiger <span class="kw">implements</span> Herbivore, Omnivore {}  <span class="err">// DOES NOT COMPILE — impossible to override both</span></code></pre>
+
+    <h3>Implicit modifiers &amp; conflicts</h3>
+    <div class="rules-box">
+      <h4>Implicit modifiers the compiler inserts</h4>
+      <ul>
+        <li>Interfaces are implicitly <code>abstract</code>.</li>
+        <li>Interface variables are implicitly <code>public static final</code> (constants).</li>
+        <li>Interface methods without a body are implicitly <code>abstract</code>.</li>
+        <li>Interface methods without <code>private</code> are implicitly <code>public</code>.</li>
+      </ul>
+    </div>
+    <p>Because members are implicitly <code>public</code>, declaring them <code>protected</code> or <code>private</code> in a way that conflicts fails to compile. Interfaces do <strong>not</strong> support <code>protected</code> or package members.</p>
+<pre><code><span class="kw">public interface</span> Dance {
+   <span class="kw">private int</span> count = <span class="num">4</span>;       <span class="err">// DOES NOT COMPILE — conflicts with implicit public</span>
+   <span class="kw">protected void</span> step();        <span class="err">// DOES NOT COMPILE — conflicts with implicit public</span>
+}</code></pre>
+
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — reducing visibility</span>
+      <p>An interface method is <code>public</code>. If an implementing class declares the override with weaker (package) access, it does not compile: <code>class Georgette implements Poodle { void play() {} }</code> fails because <code>play()</code> is public in <code>Poodle</code>. Overriding an <em>abstract class</em>'s package-access method with package access is fine.</p>
+    </div>
+
+    <h3>The six interface member types</h3>
+    <table>
+      <thead><tr><th>Member</th><th>Required modifier</th><th>Membership</th><th>Has body?</th></tr></thead>
+      <tbody>
+        <tr><td>Constant variable</td><td><code>—</code> (implicit <code>public static final</code>)</td><td>Class</td><td class="yes">Value</td></tr>
+        <tr><td>abstract method</td><td><code>—</code> (implicit <code>public abstract</code>)</td><td>Instance</td><td class="no">No</td></tr>
+        <tr><td>default method</td><td><code>default</code></td><td>Instance</td><td class="yes">Yes</td></tr>
+        <tr><td>static method</td><td><code>static</code></td><td>Class</td><td class="yes">Yes</td></tr>
+        <tr><td>private method</td><td><code>private</code></td><td>Instance</td><td class="yes">Yes</td></tr>
+        <tr><td>private static method</td><td><code>private static</code></td><td>Class</td><td class="yes">Yes</td></tr>
+      </tbody>
+    </table>
+
+    <h3>default methods</h3>
+    <div class="rules-box">
+      <h4>default method rules</h4>
+      <ol>
+        <li>Declared only within an interface.</li>
+        <li>Must use the <code>default</code> keyword and include a body.</li>
+        <li>Implicitly <code>public</code>.</li>
+        <li>Cannot be <code>abstract</code>, <code>final</code>, or <code>static</code>.</li>
+        <li>May be overridden by an implementing class.</li>
+        <li>If a class inherits two with the same signature, it <strong>must</strong> override.</li>
+      </ol>
+    </div>
+<pre><code><span class="kw">public interface</span> Walk { <span class="kw">default int</span> getSpeed() { <span class="kw">return</span> <span class="num">5</span>; } }
+<span class="kw">public interface</span> Run  { <span class="kw">default int</span> getSpeed() { <span class="kw">return</span> <span class="num">10</span>; } }
+<span class="kw">public class</span> Cat <span class="kw">implements</span> Walk, Run {}   <span class="err">// DOES NOT COMPILE — duplicate default, ambiguous</span>
+
+<span class="cm">// Fix by overriding, and reach a "hidden" version with InterfaceName.super:</span>
+<span class="kw">public class</span> Cat <span class="kw">implements</span> Walk, Run {
+   <span class="kw">public int</span> getSpeed() { <span class="kw">return</span> <span class="num">1</span>; }
+   <span class="kw">public int</span> getWalkSpeed() { <span class="kw">return</span> Walk.<span class="kw">super</span>.getSpeed(); }  <span class="cm">// not Walk.this</span>
+}</code></pre>
+    <div class="card key-rule">
+      <span class="label">Key Rule</span>
+      <p>A default method belongs to an <em>instance</em>. You cannot call it on the interface: <code>Dance.getRhythm()</code> does not compile. Use the special <code>InterfaceName.super.method()</code> syntax to call an inherited (hidden) default.</p>
+    </div>
+
+    <h3>static and private interface methods</h3>
+    <div class="rules-box">
+      <h4>static interface method rules</h4>
+      <ol>
+        <li>Must use <code>static</code> and include a body.</li>
+        <li>Implicitly <code>public</code> if no access modifier.</li>
+        <li>Cannot be <code>abstract</code> or <code>final</code>.</li>
+        <li><strong>Not inherited</strong> — must be called with the interface name reference.</li>
+      </ol>
+    </div>
+<pre><code><span class="kw">public interface</span> Hop { <span class="kw">static int</span> getJumpHeight() { <span class="kw">return</span> <span class="num">8</span>; } }
+
+<span class="kw">public class</span> Bunny <span class="kw">implements</span> Hop {
+   <span class="kw">public void</span> printDetails() {
+      System.out.println(getJumpHeight());        <span class="err">// DOES NOT COMPILE — needs Hop. prefix</span>
+      System.out.println(Hop.getJumpHeight());    <span class="cm">// OK</span>
+   }
+}</code></pre>
+    <p><strong>private</strong> and <strong>private static</strong> methods exist only to reduce duplication inside the interface. A <code>private static</code> method may be called by any method in the interface; a non-static <code>private</code> method may be called only by <code>default</code> and other non-static <code>private</code> methods. Neither is callable from an implementing class. Note: a <code>static</code> method cannot call a <code>default</code>/<code>private</code> instance method without an object reference.</p>
+  </section>
+
+  <!-- ============ SECTION 2 ============ -->
+  <section id="s2">
+    <span class="secnum">SECTION 02</span>
+    <h2>Working with Enums</h2>
+
+    <p>An <strong>enum</strong> is a fixed set of constants, giving compile-time type safety. Values are commonly <code>SNAKE_CASE</code>. You compare them with <code>==</code> or <code>equals()</code> because each value is created once in the JVM.</p>
+<pre><code><span class="kw">public enum</span> Season { WINTER, SPRING, SUMMER, FALL }
+
+<span class="kw">var</span> s = Season.SUMMER;
+System.out.println(Season.SUMMER);        <span class="cm">// SUMMER (name via toString)</span>
+System.out.println(s == Season.SUMMER);   <span class="cm">// true</span></code></pre>
+
+    <h3>Common methods</h3>
+    <table>
+      <thead><tr><th>Method</th><th>Returns</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td><code>values()</code></td><td>array of all values</td><td>usable in a for-each loop</td></tr>
+        <tr><td><code>name()</code></td><td><code>String</code></td><td>the declared name</td></tr>
+        <tr><td><code>ordinal()</code></td><td><code>int</code></td><td>0-based declaration order</td></tr>
+        <tr><td><code>valueOf(String)</code></td><td>matching value</td><td>must match <strong>exactly</strong> or throws <code>IllegalArgumentException</code></td></tr>
+      </tbody>
+    </table>
+<pre><code>Season.valueOf(<span class="str">"SUMMER"</span>);   <span class="cm">// SUMMER</span>
+Season.valueOf(<span class="str">"summer"</span>);   <span class="err">// IllegalArgumentException at runtime</span></code></pre>
+
+    <div class="card exam-trap">
+      <span class="label">Exam Trap</span>
+      <p>You cannot compare an enum to an <code>int</code> or use its ordinal where a value is expected:</p>
+      <p><code>if (Season.SUMMER == 2) {}</code> &rarr; <span class="no">DOES NOT COMPILE</span>. Inside a switch, <code>case 0 -&gt;</code> for an enum &rarr; <span class="no">DOES NOT COMPILE</span>.</p>
+    </div>
+
+    <p>Enums can't be extended or marked <code>final</code>, but they <strong>can implement an interface</strong>.</p>
+<pre><code><span class="kw">public enum</span> ExtendedSeason <span class="kw">extends</span> Season {}  <span class="err">// DOES NOT COMPILE — can't extend an enum</span></code></pre>
+
+    <h3>Enums in switch</h3>
+    <p>Enum switches do not require a <code>default</code> branch if every value is handled (exhaustive). In Java 21 the enum name in the <code>case</code> label is optional.</p>
+<pre><code>String getWeather(Season value) {
+   <span class="kw">return</span> <span class="kw">switch</span> (value) {
+      <span class="kw">case</span> SUMMER        -> <span class="str">"Too hot"</span>;
+      <span class="kw">case</span> Season.WINTER -> <span class="str">"Too cold"</span>;   <span class="cm">// name optional but allowed</span>
+      <span class="kw">case</span> SPRING, FALL  -> <span class="str">"Just right"</span>;
+   };  <span class="cm">// no default needed — all values covered</span>
+}</code></pre>
+
+    <h3>Complex enums: fields, constructors, methods</h3>
+    <div class="card key-rule">
+      <span class="label">Key Rule</span>
+      <p>For any enum with more than a value list, the <strong>list of values comes first and ends with a semicolon</strong>. Enum constructors are <strong>implicitly <code>private</code></strong>; marking one <code>public</code>/<code>protected</code> does not compile. Each constructor runs once, the first time the enum is used.</p>
+    </div>
+<pre><code><span class="kw">enum</span> SeasonWithVisitors <span class="kw">implements</span> Visitors {
+   WINTER(<span class="str">"Low"</span>), SPRING(<span class="str">"Medium"</span>), SUMMER(<span class="str">"High"</span>), FALL(<span class="str">"Medium"</span>);  <span class="cm">// ; required</span>
+   <span class="kw">private final</span> String visitors;
+   <span class="kw">public static final</span> String DESCRIPTION = <span class="str">"Weather enum"</span>;
+   <span class="kw">private</span> SeasonWithVisitors(String visitors) {     <span class="cm">// implicitly private</span>
+      System.out.print(<span class="str">"constructing,"</span>);
+      <span class="kw">this</span>.visitors = visitors;
+   }
+   <span class="cm">@Override</span> <span class="kw">public void</span> printVisitors() { System.out.println(visitors); }
+}</code></pre>
+    <div class="trace">
+      <h4>CONSTRUCTOR RUNS ONCE PER VALUE</h4>
+      <ul>
+        <li>Calling <code>SeasonWithVisitors.SUMMER</code> twice prints <span class="out">begin,constructing,constructing,constructing,constructing,middle,end</span></li>
+        <li>All four values are constructed on first use; the second reference constructs nothing.</li>
+      </ul>
+    </div>
+
+    <h3>Value-specific method bodies</h3>
+    <p>If the enum declares an <code>abstract</code> method, every value must implement it. Or provide a default body and override only special cases.</p>
+<pre><code><span class="kw">public enum</span> SeasonWithTimes {
+   WINTER { <span class="kw">public</span> String getHours() { <span class="kw">return</span> <span class="str">"10am-3pm"</span>; } },
+   SUMMER { <span class="kw">public</span> String getHours() { <span class="kw">return</span> <span class="str">"9am-7pm"</span>; } },
+   SPRING, FALL;
+   <span class="kw">public</span> String getHours() { <span class="kw">return</span> <span class="str">"9am-5pm"</span>; }   <span class="cm">// default for the rest</span>
+}</code></pre>
+  </section>
+
+  <!-- ============ SECTION 3 ============ -->
+  <section id="s3">
+    <span class="secnum">SECTION 03</span>
+    <h2>Sealing Classes</h2>
+
+    <p>A <strong>sealed</strong> class restricts which classes may extend it. Three keywords matter: <code>sealed</code> (limits extension to named types), <code>permits</code> (lists those types), and <code>non-sealed</code> (reopens a sealed parent to unknown subclasses).</p>
+
+    <div class="rules-box">
+      <h4>Sealed class rules</h4>
+      <ul>
+        <li>Declared with <code>sealed</code> and (optionally) <code>permits</code>.</li>
+        <li>The sealed class and its direct subclasses must be in the <strong>same package</strong> (or named module).</li>
+        <li>Every direct subclass must be exactly one of <code>final</code>, <code>sealed</code>, or <code>non-sealed</code>.</li>
+        <li><code>permits</code> is optional if subclasses are in the same file or nested inside the sealed class.</li>
+        <li>Interfaces can be sealed too; extending interfaces may only be <code>sealed</code> or <code>non-sealed</code> (never <code>final</code>).</li>
+      </ul>
+    </div>
+
+<pre><code><span class="kw">public class sealed</span> Frog <span class="kw">permits</span> GlassFrog {}   <span class="err">// DOES NOT COMPILE — modifier order (sealed before class)</span>
+
+<span class="kw">public abstract sealed class</span> Mammal <span class="kw">permits</span> Wolf {}
+<span class="kw">public final class</span> Wolf <span class="kw">extends</span> Mammal {}
+<span class="kw">public final class</span> Tiger <span class="kw">extends</span> Mammal {}     <span class="err">// DOES NOT COMPILE — Tiger not in permits</span></code></pre>
+
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — the subclass modifier</span>
+      <p>The most-tested rule: a direct subclass of a sealed class <strong>must</strong> declare <code>final</code>, <code>sealed</code>, or <code>non-sealed</code>. A plain <code>class Sub extends SealedParent {}</code> with none of these does not compile.</p>
+    </div>
+
+    <div class="vs-grid">
+      <div class="col left">
+        <h4>final subclass</h4>
+        <ul>
+          <li>Fixed — cannot be extended further.</li>
+          <li><code>final class Gazelle extends Antelope {}</code></li>
+          <li><code>class DamaGazelle extends Gazelle {}</code> &rarr; <span class="no">DNC</span></li>
+        </ul>
+      </div>
+      <div class="col right">
+        <h4>sealed subclass</h4>
+        <ul>
+          <li>Must define its own <code>permits</code> list.</li>
+          <li>Indirect subclasses needn't appear in the top parent.</li>
+          <li>The full set of types is still fixed at compile time.</li>
+        </ul>
+      </div>
+    </div>
+<pre><code><span class="kw">abstract sealed class</span> Mammal <span class="kw">permits</span> Feline {}
+<span class="kw">non-sealed class</span> Feline <span class="kw">extends</span> Mammal {}
+<span class="kw">class</span> Tiger <span class="kw">extends</span> Feline {}            <span class="cm">// OK — Feline is non-sealed</span>
+<span class="kw">class</span> BengalTiger <span class="kw">extends</span> Tiger {}       <span class="cm">// OK — Tiger not final</span></code></pre>
+
+    <h3>Omitting permits &amp; nested subclasses</h3>
+    <p>The <code>permits</code> clause may be omitted when subclasses live in the same file as the sealed class, or are nested inside it. If you <em>do</em> name a nested subclass, you must qualify it with the enclosing namespace.</p>
+<pre><code><span class="kw">public sealed class</span> Snake <span class="kw">permits</span> Cobra {
+   <span class="kw">final class</span> Cobra <span class="kw">extends</span> Snake {}     <span class="err">// DOES NOT COMPILE — needs Snake.Cobra</span>
+}
+<span class="kw">public sealed class</span> Snake <span class="kw">permits</span> Snake.Cobra {
+   <span class="kw">final class</span> Cobra <span class="kw">extends</span> Snake {}     <span class="cm">// OK</span>
+}</code></pre>
+
+    <h3>Sealed types and pattern-matching switch</h3>
+    <p>Like enums, a sealed type lets a <code>switch</code> be exhaustive without a <code>default</code> — but only if the compiler can see every possibility. A sealed <strong>abstract</strong> parent guarantees that.</p>
+<pre><code><span class="kw">abstract sealed class</span> Fish <span class="kw">permits</span> Trout, Bass {}
+<span class="kw">final class</span> Trout <span class="kw">extends</span> Fish {}
+<span class="kw">final class</span> Bass  <span class="kw">extends</span> Fish {}
+
+String getType(Fish fish) {
+   <span class="kw">return</span> <span class="kw">switch</span> (fish) {
+      <span class="kw">case</span> Trout t -> <span class="str">"Trout!"</span>;
+      <span class="kw">case</span> Bass  b -> <span class="str">"Bass!"</span>;
+   };  <span class="cm">// no default needed — but removing 'abstract' from Fish breaks this</span>
+}</code></pre>
+  </section>
+
+  <!-- ============ SECTION 4 ============ -->
+  <section id="s4">
+    <span class="secnum">SECTION 04</span>
+    <h2>Encapsulation &amp; Records</h2>
+
+    <p><strong>Encapsulation</strong> protects class members by making instance variables <code>private</code> and forcing access through methods. A class is well-encapsulated as long as its instance variables are private — getters and setters are optional. Omit setters to make it immutable.</p>
+
+    <h3>Records remove the boilerplate</h3>
+    <p>A <strong>record</strong> is a compact, immutable, encapsulated data carrier. The compiler generates a constructor, an accessor per field, and <code>equals()</code>, <code>hashCode()</code>, <code>toString()</code>.</p>
+<pre><code><span class="kw">public record</span> Crane(<span class="kw">int</span> numberEggs, String name) {}
+
+<span class="kw">var</span> mommy = <span class="kw">new</span> Crane(<span class="num">4</span>, <span class="str">"Cammy"</span>);
+System.out.println(mommy.numberEggs());   <span class="cm">// 4   (accessor is name(), NOT getName())</span>
+System.out.println(mommy.name());         <span class="cm">// Cammy</span>
+System.out.println(mommy);                <span class="cm">// Crane[numberEggs=4, name=Cammy]</span></code></pre>
+
+    <div class="card key-rule">
+      <span class="label">Key Rule — generated members</span>
+      <p>Constructor parameters follow the declaration order. Accessors are the bare field name plus <code>()</code> — no <code>get</code>/<code>is</code> prefix. Two records with equal fields are <code>equals()</code> and share a <code>hashCode()</code>. A field-less record is legal: <code>public record Crane() {}</code>.</p>
+    </div>
+<pre><code><span class="kw">var</span> m1 = <span class="kw">new</span> Crane(<span class="str">"Cammy"</span>, <span class="num">4</span>);  <span class="err">// DOES NOT COMPILE — wrong order</span>
+<span class="kw">var</span> m2 = <span class="kw">new</span> Crane(<span class="str">"Cammy"</span>);     <span class="err">// DOES NOT COMPILE — missing argument</span></code></pre>
+
+    <h3>Constructors: long, compact, overloaded</h3>
+    <div class="vs-grid">
+      <div class="col left">
+        <h4>Compact constructor</h4>
+        <ul>
+          <li>Declared with <strong>no parentheses</strong>: <code>public Crane {}</code></li>
+          <li>Validates / transforms the <em>parameters</em>.</li>
+          <li>Java runs the real constructor afterward.</li>
+          <li>Cannot assign fields via <code>this.x</code>.</li>
+        </ul>
+      </div>
+      <div class="col right">
+        <h4>Long &amp; overloaded</h4>
+        <ul>
+          <li>Long: same params as declaration; must set every field.</li>
+          <li>Overloaded: different params; first line must be <code>this(...)</code>.</li>
+          <li>Only the long form may set fields with <code>this.x</code>.</li>
+        </ul>
+      </div>
+    </div>
+<pre><code><span class="cm">// Compact — transform the parameter, not the field:</span>
+<span class="kw">public record</span> Crane(<span class="kw">int</span> numberEggs, String name) {
+   <span class="kw">public</span> Crane {                          <span class="cm">// no parentheses!</span>
+      <span class="kw">if</span> (name == <span class="kw">null</span> || name.length() < <span class="num">1</span>)
+         <span class="kw">throw new</span> IllegalArgumentException();
+      name = name.substring(<span class="num">0</span>,<span class="num">1</span>).toUpperCase() + name.substring(<span class="num">1</span>).toLowerCase();
+      <span class="kw">this</span>.numberEggs = <span class="num">10</span>;                <span class="err">// DOES NOT COMPILE — can't set field in compact ctor</span>
+   }
+}
+
+<span class="cm">// Empty long constructor leaves fields unset:</span>
+<span class="kw">public record</span> Crane(<span class="kw">int</span> numberEggs, String name) {
+   <span class="kw">public</span> Crane(<span class="kw">int</span> numberEggs, String name) {}   <span class="err">// DOES NOT COMPILE — fields not assigned</span>
+}</code></pre>
+
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — record members</span>
+      <p>Records are implicitly <code>final</code>, can't extend anything, and forbid <strong>instance</strong> fields outside the header and <strong>instance</strong> initializers. Static fields and <em>static</em> initializers are allowed.</p>
+    </div>
+<pre><code><span class="kw">public record</span> Crane(<span class="kw">int</span> numberEggs, String name) {
+   <span class="kw">private static int</span> TYPE = <span class="num">10</span>;            <span class="cm">// OK — static field</span>
+   <span class="kw">public int</span> size;                          <span class="err">// DOES NOT COMPILE — instance field</span>
+   <span class="kw">static</span> { System.out.print(<span class="str">"Hi"</span>); }        <span class="cm">// OK — static initializer</span>
+   { System.out.print(<span class="str">"Bye"</span>); }              <span class="err">// DOES NOT COMPILE — instance initializer</span>
+}
+<span class="kw">public record</span> BlueCrane() <span class="kw">extends</span> Crane {}  <span class="err">// DOES NOT COMPILE — records are final</span></code></pre>
+
+    <h3>Record pattern matching (new in Java 21)</h3>
+    <div class="rules-box">
+      <h4>Record deconstruction rules</h4>
+      <ul>
+        <li>If any field is included, <strong>all</strong> fields must be included, in order.</li>
+        <li>Field names may differ from the record's.</li>
+        <li>Each pattern type must be compatible with the declared type (no numeric promotion).</li>
+        <li>You can name the record <em>or</em> its fields — not both.</li>
+      </ul>
+    </div>
+<pre><code><span class="kw">record</span> Monkey(String name, <span class="kw">int</span> age) {}
+
+<span class="kw">if</span> (animal <span class="kw">instanceof</span> Monkey m) {}                          <span class="cm">// OK — simple binding</span>
+<span class="kw">if</span> (animal <span class="kw">instanceof</span> Monkey(String n, <span class="kw">int</span> a) m) {}        <span class="err">// DOES NOT COMPILE — named record AND fields</span>
+<span class="kw">if</span> (animal <span class="kw">instanceof</span> Monkey(String n, <span class="kw">long</span> a)) {}         <span class="err">// DOES NOT COMPILE — numeric promotion</span>
+<span class="kw">if</span> (animal <span class="kw">instanceof</span> Monkey(Object n, <span class="kw">int</span> a)) {}         <span class="cm">// OK — String is compatible with Object</span></code></pre>
+    <div class="trace">
+      <h4>SWITCH ON A RECORD — showData(Snake)</h4>
+      <ul>
+        <li><code>record Snake(Object data) {}</code> matched by <code>Long</code>, <code>Integer</code>, <code>Number</code>, <code>Object</code> cases.</li>
+        <li><code>new Snake(1)</code> &rarr; <span class="out">11</span> &nbsp;·&nbsp; <code>new Snake(2L)</code> &rarr; <span class="out">3</span> &nbsp;·&nbsp; <code>new Snake(3.0)</code> &rarr; <span class="out">103</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 5 ============ -->
+  <section id="s5">
+    <span class="secnum">SECTION 05</span>
+    <h2>Creating Nested Classes</h2>
+
+    <p>A nested class is defined inside another class. There are four flavors:</p>
+    <table>
+      <thead><tr><th>Type</th><th>Where</th><th>Needs outer instance?</th><th>Access modifiers</th></tr></thead>
+      <tbody>
+        <tr><td>Inner class</td><td>member level, non-static</td><td class="yes">Yes</td><td>all four</td></tr>
+        <tr><td>static nested class</td><td>member level, static</td><td class="no">No</td><td>all four</td></tr>
+        <tr><td>Local class</td><td>inside a method/block</td><td>n/a</td><td>none</td></tr>
+        <tr><td>Anonymous class</td><td>declared &amp; instantiated inline</td><td>n/a</td><td>none</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Inner classes require an instance</h3>
+    <p>An inner class can use any access level, can access all outer members (even <code>private</code>), and must be created from an instance of the outer class — using the odd <code>outer.new Inner()</code> syntax from a static context.</p>
+<pre><code><span class="kw">public class</span> Fox {
+   <span class="kw">private class</span> Den {}
+   <span class="kw">public void</span> goHome() { <span class="kw">new</span> Den(); }            <span class="cm">// OK — instance context</span>
+   <span class="kw">public static void</span> visitFriend() { <span class="kw">new</span> Den(); }  <span class="err">// DOES NOT COMPILE — static, no Fox instance</span>
+}
+<span class="kw">public class</span> Squirrel {
+   <span class="kw">public void</span> visitFox() { <span class="kw">new</span> Den(); }         <span class="err">// DOES NOT COMPILE — not in Fox, and Den is private</span>
+}
+
+<span class="cm">// Creating an inner instance from outside / static:</span>
+<span class="kw">var</span> home = <span class="kw">new</span> Home();
+Room room = home.<span class="kw">new</span> Room();        <span class="cm">// or: new Home().new Room();</span></code></pre>
+    <p>To disambiguate same-named fields across nesting levels, use <code>EnclosingClass.this.field</code>: <code>A.this.x</code>, <code>B.this.x</code>.</p>
+
+    <h3>static nested classes &amp; nested records</h3>
+    <p>A static nested class is created without an outer instance but cannot reach the outer instance members. <strong>Nested records are implicitly static</strong>, so they behave the same way.</p>
+<pre><code><span class="kw">class</span> Emu1 {
+   String name = <span class="str">"Emmy"</span>;
+   <span class="kw">static</span> Feathers createFeathers() { <span class="kw">return new</span> Feathers(<span class="str">"grey"</span>); }  <span class="cm">// OK — record is static</span>
+   <span class="kw">record</span> Feathers(String color) {
+      <span class="kw">void</span> fly() { System.out.print(name + <span class="str">" is flying"</span>); }       <span class="err">// DOES NOT COMPILE — outer instance var</span>
+   }
+}</code></pre>
+
+    <h3>Local and anonymous classes</h3>
+    <div class="card key-rule">
+      <span class="label">Key Rule</span>
+      <p>A local class can capture only <strong>final or effectively final</strong> local variables. An anonymous class must extend <strong>exactly one class</strong> or implement <strong>exactly one interface</strong> — never both — and its declaration ends with a semicolon.</p>
+    </div>
+<pre><code><span class="kw">public void</span> processData() {
+   <span class="kw">final int</span> length = <span class="num">5</span>;
+   <span class="kw">int</span> width = <span class="num">10</span>;
+   <span class="kw">class</span> VolumeCalculator {
+      <span class="kw">public int</span> multiply() { <span class="kw">return</span> length * width; }  <span class="err">// DOES NOT COMPILE — width not effectively final</span>
+   }
+   width = <span class="num">2</span>;                                          <span class="cm">// this reassignment breaks it</span>
+}
+
+<span class="cm">// Anonymous class — note the trailing semicolon:</span>
+SaleTodayOnly sale = <span class="kw">new</span> SaleTodayOnly() {
+   <span class="kw">int</span> dollarsOff() { <span class="kw">return</span> <span class="num">3</span>; }
+};</code></pre>
+  </section>
+
+  <!-- ============ SECTION 6 ============ -->
+  <section id="s6">
+    <span class="secnum">SECTION 06</span>
+    <h2>Understanding Polymorphism</h2>
+
+    <p>Polymorphism lets one object be accessed through a reference of its own type, a supertype, or an implemented interface — no cast needed when moving <em>up</em> to a supertype.</p>
+<pre><code><span class="kw">public class</span> Lemur <span class="kw">extends</span> Primate <span class="kw">implements</span> HasTail {
+   <span class="kw">public boolean</span> isTailStriped() { <span class="kw">return false</span>; }
+   <span class="kw">public int</span> age = <span class="num">10</span>;
+   <span class="kw">public static void</span> main(String[] args) {
+      Lemur lemur = <span class="kw">new</span> Lemur();
+      System.out.println(lemur.age);            <span class="cm">// 10</span>
+      HasTail hasTail = lemur;
+      System.out.println(hasTail.isTailStriped()); <span class="cm">// false</span>
+      Primate primate = lemur;
+      System.out.println(primate.hasHair());    <span class="cm">// true</span>
+   }
+}</code></pre>
+
+    <div class="card key-rule">
+      <span class="label">Key Rule — object vs reference</span>
+      <p>The <strong>object type</strong> determines which properties exist in memory; the <strong>reference type</strong> determines which members you can call. Reassigning to a supertype hides members but never destroys them. <code>hasTail.age</code> and <code>primate.isTailStriped()</code> do not compile because those members aren't visible through that reference.</p>
+    </div>
+
+    <h3>Casting rules</h3>
+    <div class="rules-box">
+      <h4>Four casting rules</h4>
+      <ol>
+        <li>Subtype &rarr; supertype: no explicit cast.</li>
+        <li>Supertype &rarr; subtype: explicit cast required.</li>
+        <li>An invalid cast to an incompatible type throws <code>ClassCastException</code> at runtime.</li>
+        <li>The compiler disallows casts between unrelated <em>class</em> types.</li>
+      </ol>
+    </div>
+<pre><code>Lemur lemur3 = primate;            <span class="err">// DOES NOT COMPILE — missing explicit cast</span>
+Bird bird = (Bird) fish;           <span class="err">// DOES NOT COMPILE — Fish and Bird unrelated</span></code></pre>
+
+    <div class="card exam-trap">
+      <span class="label">Exam Trap — interface casts</span>
+      <p>The compiler permits a cast to an <em>unrelated interface</em> (a subclass might implement it), so it compiles but throws <code>ClassCastException</code> at runtime. The exception: if the source class is <code>final</code>, the compiler knows no subclass can implement the interface, so it fails to compile. <code>instanceof</code> with unrelated types does not compile either.</p>
+    </div>
+
+    <h3>Overriding vs hiding</h3>
+    <p>Overriding an <em>instance method</em> replaces it everywhere — calls dispatch on the object's actual type. Hiding (<code>static</code> methods and <strong>all variables</strong>) is resolved by the <em>reference type</em>.</p>
+    <div class="vs-grid">
+      <div class="col left">
+        <h4>Overriding (instance method)</h4>
+        <ul>
+          <li><code>EmperorPenguin.getHeight()</code> = 8; <code>printInfo()</code> in parent calls <code>this.getHeight()</code> &rarr; <span class="out">8</span></li>
+          <li>Dispatched on the object type.</li>
+        </ul>
+      </div>
+      <div class="col right">
+        <h4>Hiding (static / variable)</h4>
+        <ul>
+          <li>Static <code>getHeight()</code> hidden &rarr; parent's <code>printInfo()</code> prints <span class="out">3</span></li>
+          <li>Resolved by reference type, not object.</li>
+        </ul>
+      </div>
+    </div>
+<pre><code><span class="kw">class</span> Marsupial {
+   <span class="kw">protected int</span> age = <span class="num">2</span>;
+   <span class="kw">public static boolean</span> isBiped() { <span class="kw">return false</span>; }
+}
+<span class="kw">public class</span> Kangaroo <span class="kw">extends</span> Marsupial {
+   <span class="kw">protected int</span> age = <span class="num">6</span>;
+   <span class="kw">public static boolean</span> isBiped() { <span class="kw">return true</span>; }
+   <span class="kw">public static void</span> main(String[] args) {
+      Kangaroo joey = <span class="kw">new</span> Kangaroo();
+      Marsupial moey = joey;
+      System.out.println(joey.isBiped());  <span class="cm">// true   (reference type Kangaroo)</span>
+      System.out.println(moey.isBiped());  <span class="cm">// false  (reference type Marsupial)</span>
+      System.out.println(joey.age);        <span class="cm">// 6      (variable hidden — ref type)</span>
+      System.out.println(moey.age);        <span class="cm">// 2      (variable hidden — ref type)</span>
+   }
+}</code></pre>
+    <div class="card remember">
+      <span class="label">Remember</span>
+      <p>You can't reach a grandparent's method through <code>super.super</code>. <code>super.getHeight()</code> inside <code>Penguin.printInfo()</code> refers to <code>Object</code> and does not compile — override <code>printInfo()</code> in the child and call <code>super.getHeight()</code> there to print the parent's value.</p>
+    </div>
+  </section>
+
+  <!-- ============ RECAP ============ -->
+  <section class="recap">
+    <h3>Short Recap</h3>
+    <ul>
+      <li>A class <code>implements</code> many interfaces but <code>extends</code> one class; an interface <code>extends</code> many interfaces. Mixing the keywords across class/interface fails.</li>
+      <li>Interface members are implicitly <code>public</code>; variables are <code>public static final</code>; bodyless methods are <code>abstract</code>. <code>default</code>/<code>static</code>/<code>private</code> methods need bodies; static methods aren't inherited (use the interface name).</li>
+      <li>Enums: values first + semicolon; constructors implicitly <code>private</code> and run once; can implement interfaces but can't be extended; <code>valueOf</code> is exact-match.</li>
+      <li>Sealed: direct subclasses must be <code>final</code>, <code>sealed</code>, or <code>non-sealed</code>; same package; <code>permits</code> optional when in the same file or nested.</li>
+      <li>Records: implicitly <code>final</code>; compact constructors transform parameters (no <code>this.field</code>); no instance fields/initializers outside the header; accessors are <code>name()</code>.</li>
+      <li>Nested: inner needs an outer instance; static nested and nested records don't; local classes capture only effectively-final locals; anonymous classes extend one class or one interface.</li>
+      <li>Polymorphism: object type owns the data, reference type controls access; instance methods override (object), statics and variables hide (reference).</li>
+    </ul>
+  </section>
+
+  <!-- ============ CHEAT SHEET ============ -->
+  <section>
+    <span class="secnum">CHEAT SHEET</span>
+    <h2>Exam Traps Cheat Sheet</h2>
+    <table>
+      <thead><tr><th>Scenario</th><th>What it tests</th><th>Verdict</th></tr></thead>
+      <tbody>
+        <tr><td><code>final interface X {}</code></td><td>interfaces can't be final</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>class C extends SomeInterface</code></td><td>class extends interface</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>interface I extends SomeClass</code></td><td>interface extends class</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>interface method <code>protected</code>/<code>private int x</code></td><td>conflicts with implicit public</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>class inherits two same-signature <code>default</code> methods</td><td>ambiguity, no override</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>static interface method without interface-name prefix</td><td>static not inherited</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>enum E extends F</code> / <code>final enum</code></td><td>enums can't be extended</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>Season.valueOf("summer")</code></td><td>case-sensitive exact match</td><td class="no">IllegalArgumentException</td></tr>
+        <tr><td>enum <code>case 0 -&gt;</code> / <code>SUMMER == 2</code></td><td>ordinal vs value</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>public class sealed Frog</code></td><td>modifier order</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>sealed subclass with none of final/sealed/non-sealed</td><td>required subclass modifier</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>record: empty long ctor / wrong-order <code>new</code></td><td>fields must be set; order matters</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>record: instance field / instance initializer</td><td>breaks immutability</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>this.field</code> in compact constructor</td><td>compact transforms params only</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>record pattern <code>(String n, long a)</code></td><td>numeric promotion not allowed</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td><code>new Inner()</code> from a static method</td><td>inner class needs outer instance</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>local class using reassigned local</td><td>effectively final</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>supertype &rarr; subtype without cast</td><td>explicit cast required</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>cast between unrelated classes</td><td>compiler-known impossible</td><td class="no">DOES NOT COMPILE</td></tr>
+        <tr><td>cast to unrelated interface (non-final class)</td><td>subclass might implement</td><td class="yes">Compiles → ClassCastException</td></tr>
+        <tr><td>static method / variable accessed via reference</td><td>hiding uses reference type</td><td class="yes">Uses reference type's version</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+</div>
+</body>
+</html>

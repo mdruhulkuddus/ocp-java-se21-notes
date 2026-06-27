@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 · Chapter 9 — Collections and Generics (MCQ Practice)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff; --ink:#2b2b32; --muted:#6e6a72;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --accent:#c96442; --accent2:#d4845e; --line:#ece3da;
+    --green:#3b7d57; --gold:#a9772a;
+    --purple:#7a5cb8; --purple-b:#9b7fd4; --purple-tag:#b29ad9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Source Sans 3',system-ui,sans-serif; line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:860px; margin:0 auto; padding:34px 20px 70px;}
+  h1,h2,h3,h4{font-family:'Merriweather',Georgia,serif; line-height:1.3; color:#22222a;}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+
+  .header{
+    position:relative; overflow:hidden;
+    background:linear-gradient(135deg,#ffffff,#fdf8f3);
+    border-radius:18px; padding:30px 32px 26px; margin-bottom:30px;
+    box-shadow:0 10px 30px rgba(120,90,60,.10);
+  }
+  .header::after{
+    content:""; position:absolute; top:-60px; right:-40px; width:230px; height:230px;
+    background:radial-gradient(circle,rgba(201,100,66,.16),transparent 68%); pointer-events:none;
+  }
+  .pill{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-size:.72rem;
+    font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#fff;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    padding:6px 13px; border-radius:999px; margin-bottom:16px;
+  }
+  .header h1{font-size:1.8rem; margin:0 0 8px;}
+  .header .tagline{font-style:italic; color:var(--muted); margin:0 0 18px; font-size:1.02rem;}
+  .topics{display:flex; flex-wrap:wrap; gap:8px;}
+  .topics span{
+    font-family:'JetBrains Mono',monospace; font-size:.7rem; letter-spacing:.4px;
+    background:#f3ece4; color:#9a5030; padding:5px 11px; border-radius:999px;
+  }
+  .howto{
+    background:#f3ece4; border-radius:12px; padding:12px 18px; margin:22px 0 8px;
+    font-size:.92rem; color:#7a5a44;
+  }
+
+  .q-card{
+    background:linear-gradient(135deg,#f4f0fa,#f9f6fd);
+    border-top:4px solid var(--purple-b); border-radius:14px;
+    padding:22px 24px 18px; margin-bottom:26px;
+    box-shadow:0 6px 20px rgba(110,90,150,.10);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .q-card:hover{transform:translateY(-3px); box-shadow:0 12px 28px rgba(110,90,150,.16);}
+  .q-head{display:flex; align-items:center; gap:12px; margin-bottom:12px; flex-wrap:wrap;}
+  .qnum{font-family:'JetBrains Mono',monospace; font-weight:700; font-size:1.02rem; color:var(--purple); letter-spacing:1px;}
+  .qtag{
+    font-family:'JetBrains Mono',monospace; font-size:.66rem; font-weight:700;
+    letter-spacing:.6px; text-transform:uppercase; color:#fff;
+    background:var(--purple-tag); padding:4px 10px; border-radius:999px;
+  }
+  .prompt{font-weight:600; margin:0 0 14px; color:#33303a;}
+  .prompt .multi{color:var(--purple); font-style:italic; font-weight:700;}
+  .q-card pre{
+    background:#fbf9fe; border-radius:12px; padding:15px 17px; margin:0 0 16px;
+    overflow-x:auto; box-shadow:inset 0 2px 8px rgba(110,90,150,.10);
+    font-size:.85rem; line-height:1.6;
+  }
+  .q-card pre code{background:none; color:inherit; padding:0;}
+  .opts{list-style:none; margin:0 0 4px; padding:0;}
+  .opts li{margin:0 0 7px; padding-left:30px; position:relative;}
+  .opts li .lab{
+    position:absolute; left:0; top:0; font-family:'JetBrains Mono',monospace;
+    font-weight:700; color:var(--purple);
+  }
+  .opts li code{background:#f3ece4; color:#9a5030; padding:1px 6px; border-radius:5px; font-size:.86em;}
+
+  .kw{color:var(--kw); font-weight:600;}
+  .str{color:var(--str);}
+  .num{color:var(--num);}
+  .err{color:var(--err); font-weight:600;}
+  .cm{color:var(--cm); font-style:italic;}
+
+  details{margin-top:14px; border-top:1px dashed #cdbce8; padding-top:4px;}
+  summary{
+    cursor:pointer; list-style:none; display:inline-block;
+    font-family:'JetBrains Mono',monospace; font-size:.78rem; font-weight:700;
+    letter-spacing:.5px; color:var(--purple); padding:8px 2px 4px;
+    user-select:none;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"\25B8  "; }
+  details[open] summary::before{content:"\25BE  ";}
+  .ans-body{padding:8px 2px 4px; font-size:.94rem; color:#3a3640;}
+  .ans-key{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-weight:700;
+    font-size:.84rem; background:#eef8f1; color:#3d8a5e;
+    padding:5px 12px; border-radius:8px; margin-bottom:8px; letter-spacing:.5px;
+  }
+  .ans-body code{background:#f3ece4; color:#9a5030; padding:1px 6px; border-radius:5px; font-size:.86em;}
+
+  .revision{
+    background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c;
+    border-radius:14px; padding:20px 24px; margin-top:34px;
+    box-shadow:0 6px 18px rgba(180,150,90,.10);
+  }
+  .revision h3{color:var(--gold); margin:0 0 10px; font-size:1.12rem;}
+  .revision ul{margin:0; padding-left:20px;}
+  .revision li{margin:0 0 7px;}
+  .revision code{background:#f3ece4; color:#9a5030; padding:1px 6px; border-radius:5px; font-size:.86em;}
+
+  @media(max-width:560px){
+    .header{padding:24px 20px;}
+    .header h1{font-size:1.45rem;}
+    .q-card{padding:18px 16px 14px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="header">
+    <span class="pill">OCP Java SE 21 · 1Z0-830</span>
+    <h1>Chapter 9 — Collections and Generics</h1>
+    <p class="tagline">Thirty exam-style questions on the Collections Framework, Comparable/Comparator, sequenced collections, and generics.</p>
+    <div class="topics">
+      <span>COLLECTION API</span><span>LIST</span><span>SET</span><span>QUEUE/DEQUE</span><span>MAP</span>
+      <span>COMPARATOR</span><span>SORTING</span><span>SEQUENCED</span><span>GENERICS</span><span>WILDCARDS</span>
+    </div>
+    <div class="howto">Try each question first, then tap <strong>Show Answer</strong> to reveal the key and explanation. Watch for "Choose all that apply."</div>
+  </header>
+
+  <!-- Q1 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q01</span><span class="qtag">COLLECTION API</span></div>
+    <p class="prompt">Which statements about the four main interfaces are true? <span class="multi">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>Map</code> implements <code>Collection</code></li>
+      <li><span class="lab">B.</span> A <code>List</code> allows duplicates and index access</li>
+      <li><span class="lab">C.</span> A <code>Set</code> does not allow duplicates</li>
+      <li><span class="lab">D.</span> <code>Deque</code> extends <code>Queue</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B, C, D</span>
+      <p>A is false — <code>Map</code> does <strong>not</strong> implement <code>Collection</code>; it's part of the framework but keeps key/value methods. The rest are correct.</p></div>
+    </details>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q02</span><span class="qtag">GENERICS</span></div>
+    <p class="prompt">What is the type of <code>map</code>?</p>
+<pre><code><span class="kw">var</span> map = <span class="kw">new</span> HashMap&lt;&gt;();</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Does not compile</li>
+      <li><span class="lab">B.</span> <code>HashMap&lt;Object, Object&gt;</code></li>
+      <li><span class="lab">C.</span> <code>HashMap&lt;String, String&gt;</code></li>
+      <li><span class="lab">D.</span> <code>HashMap&lt;?, ?&gt;</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p><code>var</code> infers from the right and the diamond infers from the left — with neither having information, both type parameters become <code>Object</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q03</span><span class="qtag">GENERICS</span></div>
+    <p class="prompt">Which line does not compile?</p>
+<pre><code><span class="num">1:</span> List&lt;Integer&gt; a = <span class="kw">new</span> ArrayList&lt;&gt;();
+<span class="num">2:</span> var b = <span class="kw">new</span> ArrayList&lt;Integer&gt;();
+<span class="num">3:</span> List&lt;&gt; c = <span class="kw">new</span> ArrayList&lt;Integer&gt;();
+<span class="num">4:</span> List&lt;Integer&gt; d = <span class="kw">new</span> ArrayList&lt;Integer&gt;();</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Line 1</li>
+      <li><span class="lab">B.</span> Line 2</li>
+      <li><span class="lab">C.</span> Line 3</li>
+      <li><span class="lab">D.</span> Line 4</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: C</span>
+      <p>The diamond operator can't be used on the left of a declaration — <code>List&lt;&gt;</code> is illegal. It works only on the right of an assignment.</p></div>
+    </details>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q04</span><span class="qtag">COLLECTION API</span></div>
+    <p class="prompt">What is printed?</p>
+<pre><code>var list = List.of(<span class="num">1</span>, <span class="num">2</span>);
+var set  = Set.of(<span class="num">2</span>, <span class="num">1</span>);
+System.out.println(list.equals(set));</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>true</code></li>
+      <li><span class="lab">B.</span> <code>false</code></li>
+      <li><span class="lab">C.</span> Does not compile</li>
+      <li><span class="lab">D.</span> Throws an exception</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>A <code>List</code> and a <code>Set</code> are different types, so <code>equals()</code> returns <code>false</code> regardless of contents.</p></div>
+    </details>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q05</span><span class="qtag">COLLECTION API</span></div>
+    <p class="prompt">What is the result of line 5?</p>
+<pre><code><span class="num">3:</span> var heights = <span class="kw">new</span> ArrayList&lt;Integer&gt;();
+<span class="num">4:</span> heights.add(<span class="kw">null</span>);
+<span class="num">5:</span> <span class="kw">int</span> h = heights.get(<span class="num">0</span>);</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>h</code> is <code>0</code></li>
+      <li><span class="lab">B.</span> Does not compile</li>
+      <li><span class="lab">C.</span> NullPointerException</li>
+      <li><span class="lab">D.</span> <code>h</code> is <code>null</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: C</span>
+      <p>Adding <code>null</code> is legal, but unboxing it into an <code>int</code> primitive throws a <code>NullPointerException</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q06</span><span class="qtag">LIST</span></div>
+    <p class="prompt">Which factory method produces a fixed-size list backed by the array, where <code>set()</code> works but <code>add()</code> throws?</p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>List.of(array)</code></li>
+      <li><span class="lab">B.</span> <code>List.copyOf(coll)</code></li>
+      <li><span class="lab">C.</span> <code>Arrays.asList(array)</code></li>
+      <li><span class="lab">D.</span> <code>new ArrayList&lt;&gt;(coll)</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: C</span>
+      <p><code>Arrays.asList()</code> is backed by the array: you can replace elements with <code>set()</code>, but adding or removing throws <code>UnsupportedOperationException</code>. <code>List.of</code>/<code>copyOf</code> are fully immutable.</p></div>
+    </details>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q07</span><span class="qtag">LIST</span></div>
+    <p class="prompt">What is printed?</p>
+<pre><code>var list = <span class="kw">new</span> LinkedList&lt;Integer&gt;();
+list.add(<span class="num">3</span>); list.add(<span class="num">2</span>); list.add(<span class="num">1</span>);
+list.remove(<span class="num">2</span>);
+list.remove(Integer.valueOf(<span class="num">2</span>));
+System.out.println(list);</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>[3]</code></li>
+      <li><span class="lab">B.</span> <code>[3, 1]</code></li>
+      <li><span class="lab">C.</span> <code>[2, 1]</code></li>
+      <li><span class="lab">D.</span> <code>[1]</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: A</span>
+      <p><code>remove(2)</code> takes an <code>int</code> index, deleting the element at index 2 (the <code>1</code>) &rarr; <code>[3, 2]</code>. Then <code>remove(Integer.valueOf(2))</code> deletes the value <code>2</code> &rarr; <code>[3]</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q8 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q08</span><span class="qtag">LIST</span></div>
+    <p class="prompt">For an <code>Integer</code> list, how do <code>remove(int)</code> and <code>remove(Object)</code> behave when the target is missing?</p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Both return <code>false</code></li>
+      <li><span class="lab">B.</span> <code>remove(int)</code> throws <code>IndexOutOfBoundsException</code>; <code>remove(Object)</code> returns <code>false</code></li>
+      <li><span class="lab">C.</span> Both throw an exception</li>
+      <li><span class="lab">D.</span> <code>remove(int)</code> returns <code>false</code>; <code>remove(Object)</code> throws</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>The index version throws if the index is out of range; the object version simply returns <code>false</code> when no matching element is found.</p></div>
+    </details>
+  </div>
+
+  <!-- Q9 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q09</span><span class="qtag">SET</span></div>
+    <p class="prompt">The values <code>66, 10, 8</code> are added in that order. Which implementation prints them as <code>8, 10, 66</code>?</p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>HashSet</code></li>
+      <li><span class="lab">B.</span> <code>LinkedHashSet</code></li>
+      <li><span class="lab">C.</span> <code>TreeSet</code></li>
+      <li><span class="lab">D.</span> <code>ArrayList</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: C</span>
+      <p><code>TreeSet</code> keeps elements in natural sorted order. <code>HashSet</code> is arbitrary, <code>LinkedHashSet</code> uses insertion order (<code>66, 10, 8</code>).</p></div>
+    </details>
+  </div>
+
+  <!-- Q10 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q10</span><span class="qtag">SET</span></div>
+    <p class="prompt">What does <code>set.add(66)</code> return the second time <code>66</code> is added to a <code>HashSet</code>?</p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>true</code></li>
+      <li><span class="lab">B.</span> <code>false</code></li>
+      <li><span class="lab">C.</span> Throws an exception</li>
+      <li><span class="lab">D.</span> <code>null</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>A <code>Set</code> preserves uniqueness, so adding a duplicate returns <code>false</code>. (A <code>List</code> would return <code>true</code>.)</p></div>
+    </details>
+  </div>
+
+  <!-- Q11 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q11</span><span class="qtag">QUEUE/DEQUE</span></div>
+    <p class="prompt">Which <code>Queue</code> methods return a sentinel value (rather than throwing) on failure? <span class="multi">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>offer(e)</code></li>
+      <li><span class="lab">B.</span> <code>element()</code></li>
+      <li><span class="lab">C.</span> <code>peek()</code></li>
+      <li><span class="lab">D.</span> <code>poll()</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: A, C, D</span>
+      <p><code>offer</code> returns a boolean, <code>peek</code> and <code>poll</code> return <code>null</code> when empty. <code>element()</code> (like <code>add</code> and <code>remove</code>) throws on failure.</p></div>
+    </details>
+  </div>
+
+  <!-- Q12 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q12</span><span class="qtag">QUEUE/DEQUE</span></div>
+    <p class="prompt">When using a <code>Deque</code> as a stack (LIFO), which methods do you use?</p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>offer</code>, <code>poll</code>, <code>peek</code></li>
+      <li><span class="lab">B.</span> <code>push</code>, <code>pop</code>, <code>peek</code></li>
+      <li><span class="lab">C.</span> <code>addLast</code>, <code>removeLast</code>, <code>getLast</code></li>
+      <li><span class="lab">D.</span> <code>add</code>, <code>remove</code>, <code>element</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>A stack adds and removes at the front/top: <code>push(e)</code>, <code>pop()</code>, and <code>peek()</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q13 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q13</span><span class="qtag">QUEUE/DEQUE</span></div>
+    <p class="prompt">Which classes implement the <code>Deque</code> interface? <span class="multi">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>ArrayDeque</code></li>
+      <li><span class="lab">B.</span> <code>LinkedList</code></li>
+      <li><span class="lab">C.</span> <code>ArrayList</code></li>
+      <li><span class="lab">D.</span> <code>HashSet</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: A, B</span>
+      <p><code>ArrayDeque</code> and <code>LinkedList</code> both implement <code>Deque</code>. <code>LinkedList</code> also implements <code>List</code>; use <code>ArrayDeque</code> when you don't need <code>List</code> methods.</p></div>
+    </details>
+  </div>
+
+  <!-- Q14 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q14</span><span class="qtag">MAP</span></div>
+    <p class="prompt">What is the result?</p>
+<pre><code>Map&lt;String,Integer&gt; map = <span class="kw">new</span> HashMap&lt;&gt;();
+map.put(<span class="str">"lion"</span>, <span class="num">1</span>);
+System.out.println(map.contains(<span class="str">"lion"</span>));</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>true</code></li>
+      <li><span class="lab">B.</span> <code>false</code></li>
+      <li><span class="lab">C.</span> Does not compile</li>
+      <li><span class="lab">D.</span> <code>null</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: C</span>
+      <p><code>contains()</code> is a <code>Collection</code> method and isn't on <code>Map</code>. Use <code>containsKey()</code> or <code>containsValue()</code> instead.</p></div>
+    </details>
+  </div>
+
+  <!-- Q15 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q15</span><span class="qtag">MAP</span></div>
+    <p class="prompt">After this code, what is printed?</p>
+<pre><code>Map&lt;String,String&gt; m = <span class="kw">new</span> HashMap&lt;&gt;();
+m.put(<span class="str">"Jenny"</span>, <span class="str">"Bus Tour"</span>);
+m.put(<span class="str">"Tom"</span>, <span class="kw">null</span>);
+m.putIfAbsent(<span class="str">"Jenny"</span>, <span class="str">"Tram"</span>);
+m.putIfAbsent(<span class="str">"Tom"</span>, <span class="str">"Tram"</span>);
+System.out.println(m.get(<span class="str">"Jenny"</span>) + <span class="str">","</span> + m.get(<span class="str">"Tom"</span>));</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>Tram,Tram</code></li>
+      <li><span class="lab">B.</span> <code>Bus Tour,Tram</code></li>
+      <li><span class="lab">C.</span> <code>Bus Tour,null</code></li>
+      <li><span class="lab">D.</span> <code>Tram,null</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p><code>putIfAbsent</code> skips Jenny (already a non-null value) but updates Tom, whose value was <code>null</code> &rarr; <code>Bus Tour,Tram</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q16 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q16</span><span class="qtag">MAP</span></div>
+    <p class="prompt">Using a longest-name mapper, what is the value of <code>Tom</code> after these calls?</p>
+<pre><code>BiFunction&lt;String,String,String&gt; mapper =
+   (v1, v2) -> v1.length() &gt; v2.length() ? v1 : v2;
+favorites.put(<span class="str">"Tom"</span>, <span class="str">"Tram"</span>);
+favorites.merge(<span class="str">"Tom"</span>, <span class="str">"Skyride"</span>, mapper);</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>Tram</code></li>
+      <li><span class="lab">B.</span> <code>Skyride</code></li>
+      <li><span class="lab">C.</span> <code>null</code></li>
+      <li><span class="lab">D.</span> Key is removed</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>Both values are non-null, so the mapper runs. <code>"Skyride"</code> (7) is longer than <code>"Tram"</code> (4), so the value becomes <code>Skyride</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q17 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q17</span><span class="qtag">MAP</span></div>
+    <p class="prompt">In <code>merge()</code>, what happens when the mapping function returns <code>null</code>?</p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> The value is set to <code>null</code></li>
+      <li><span class="lab">B.</span> The key is removed from the map</li>
+      <li><span class="lab">C.</span> A <code>NullPointerException</code> is thrown</li>
+      <li><span class="lab">D.</span> The new value parameter is used</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>When the mapping function returns <code>null</code>, <code>merge()</code> removes the key from the map.</p></div>
+    </details>
+  </div>
+
+  <!-- Q18 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q18</span><span class="qtag">MAP</span></div>
+    <p class="prompt">Which lambda shape does <code>Map.forEach()</code> expect?</p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> One parameter (the value)</li>
+      <li><span class="lab">B.</span> Two parameters (the key and the value)</li>
+      <li><span class="lab">C.</span> One parameter (a <code>Map.Entry</code>)</li>
+      <li><span class="lab">D.</span> No parameters</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p><code>Map.forEach</code> uses a <code>BiConsumer</code>: <code>map.forEach((k, v) -&gt; ...)</code>. (The <code>Collection.forEach</code> uses a one-parameter <code>Consumer</code>.)</p></div>
+    </details>
+  </div>
+
+  <!-- Q19 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q19</span><span class="qtag">COMPARATOR</span></div>
+    <p class="prompt">Which statements about <code>Comparable</code> vs <code>Comparator</code> are correct? <span class="multi">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>Comparable.compareTo</code> takes 1 parameter; <code>Comparator.compare</code> takes 2</li>
+      <li><span class="lab">B.</span> <code>Comparable</code> is in <code>java.lang</code>; <code>Comparator</code> is in <code>java.util</code></li>
+      <li><span class="lab">C.</span> <code>Comparator</code> must be implemented by the class being compared</li>
+      <li><span class="lab">D.</span> <code>Comparator</code> is commonly written as a lambda</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: A, B, D</span>
+      <p>C is false — <code>Comparator</code> is defined outside the class (often as a lambda), which is exactly why it's useful for sorting types you don't control.</p></div>
+    </details>
+  </div>
+
+  <!-- Q20 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q20</span><span class="qtag">COMPARATOR</span></div>
+    <p class="prompt">What is wrong with this code?</p>
+<pre><code>var byWeight = <span class="kw">new</span> Comparator&lt;Duck&gt;() {
+   <span class="kw">public int</span> compareTo(Duck d1, Duck d2) {
+      <span class="kw">return</span> d1.weight() - d2.weight();
+   }
+};</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Nothing — it compiles</li>
+      <li><span class="lab">B.</span> A <code>Comparator</code> must implement <code>compare()</code>, not <code>compareTo()</code></li>
+      <li><span class="lab">C.</span> <code>Comparator</code> can't be an anonymous class</li>
+      <li><span class="lab">D.</span> <code>compare</code> takes only one parameter</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>The method name is wrong. <code>Comparator</code>'s abstract method is <code>compare(T, T)</code>; <code>compareTo</code> belongs to <code>Comparable</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q21 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q21</span><span class="qtag">COMPARATOR</span></div>
+    <p class="prompt">Which builds a comparator that sorts by species ascending, breaking ties by weight?</p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>Comparator.comparing(Squirrel::species).reversed()</code></li>
+      <li><span class="lab">B.</span> <code>Comparator.comparing(Squirrel::species).thenComparingInt(Squirrel::weight)</code></li>
+      <li><span class="lab">C.</span> <code>Comparator.comparingInt(Squirrel::weight).thenComparing(Squirrel::species)</code></li>
+      <li><span class="lab">D.</span> <code>Comparator.naturalOrder()</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>Start with <code>comparing(species)</code>, then chain <code>thenComparingInt(weight)</code> for the tie-breaker. Option C reverses the priority.</p></div>
+    </details>
+  </div>
+
+  <!-- Q22 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q22</span><span class="qtag">SORTING</span></div>
+    <p class="prompt">What does <code>compareTo()</code> return when the current object is smaller than the argument?</p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>0</code></li>
+      <li><span class="lab">B.</span> A negative number</li>
+      <li><span class="lab">C.</span> A positive number</li>
+      <li><span class="lab">D.</span> <code>false</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>Negative means smaller, <code>0</code> means equal, positive means larger. <code>id - d.id</code> sorts ascending.</p></div>
+    </details>
+  </div>
+
+  <!-- Q23 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q23</span><span class="qtag">SORTING</span></div>
+    <p class="prompt">What is printed?</p>
+<pre><code>List&lt;Integer&gt; list = Arrays.asList(<span class="num">6</span>,<span class="num">9</span>,<span class="num">1</span>,<span class="num">8</span>);
+Collections.sort(list);
+System.out.println(Collections.binarySearch(list, <span class="num">3</span>));</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>3</code></li>
+      <li><span class="lab">B.</span> <code>-2</code></li>
+      <li><span class="lab">C.</span> <code>1</code></li>
+      <li><span class="lab">D.</span> <code>-1</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>Sorted list is <code>[1, 6, 8, 9]</code>. The value <code>3</code> would go at index 1; the result is <code>-(insertion point) - 1 = -(1) - 1 = -2</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q24 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q24</span><span class="qtag">SORTING</span></div>
+    <p class="prompt"><code>Rabbit</code> does not implement <code>Comparable</code>. What happens in each case?</p>
+<pre><code><span class="cm">// Case 1</span> Collections.sort(rabbitList);
+<span class="cm">// Case 2</span> new TreeSet&lt;Rabbit&gt;().add(new Rabbit(1));</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Both fail to compile</li>
+      <li><span class="lab">B.</span> Case 1 doesn't compile; Case 2 throws <code>ClassCastException</code> at runtime</li>
+      <li><span class="lab">C.</span> Both throw at runtime</li>
+      <li><span class="lab">D.</span> Both compile and run fine</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p><code>Collections.sort</code> requires <code>Comparable</code> at compile time. A <code>TreeSet</code> doesn't check at compile time, so it throws <code>ClassCastException</code> on the first add.</p></div>
+    </details>
+  </div>
+
+  <!-- Q25 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q25</span><span class="qtag">SEQUENCED</span></div>
+    <p class="prompt">Which is true about Java 21 sequenced collections? <span class="multi">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> A <code>HashMap</code> cannot be used as a <code>SequencedMap</code></li>
+      <li><span class="lab">B.</span> <code>TreeSet.addLast()</code> throws <code>UnsupportedOperationException</code></li>
+      <li><span class="lab">C.</span> An <code>ArrayList</code> is a <code>SequencedCollection</code></li>
+      <li><span class="lab">D.</span> Sequenced means the same thing as sorted</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: A, B, C</span>
+      <p>D is false — sequenced means a well-defined <em>encounter order</em>, not necessarily sorted. <code>HashMap</code> has no order (so it can't be a <code>SequencedMap</code>), and you can't force position in a sorted <code>TreeSet</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q26 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q26</span><span class="qtag">GENERICS</span></div>
+    <p class="prompt">Why doesn't this class compile?</p>
+<pre><code><span class="kw">public class</span> LongTailAnimal {
+   <span class="kw">protected void</span> chew(List&lt;Object&gt; input) {}
+   <span class="kw">protected void</span> chew(List&lt;Double&gt; input) {}
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>List</code> can't be a parameter type</li>
+      <li><span class="lab">B.</span> After type erasure both become <code>chew(List)</code></li>
+      <li><span class="lab">C.</span> <code>Double</code> is not a subtype of <code>Object</code></li>
+      <li><span class="lab">D.</span> Methods can't be <code>protected</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>Type erasure removes the generic type, so both methods reduce to <code>chew(List)</code> — an illegal duplicate. (<code>chew(List&lt;Object&gt;)</code> + <code>chew(ArrayList&lt;Double&gt;)</code> would be fine.)</p></div>
+    </details>
+  </div>
+
+  <!-- Q27 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q27</span><span class="qtag">GENERICS</span></div>
+    <p class="prompt"><code>Mammal</code> declares <code>List&lt;CharSequence&gt; play()</code>. Which overrides compile? <span class="multi">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>ArrayList&lt;CharSequence&gt; play()</code></li>
+      <li><span class="lab">B.</span> <code>List&lt;String&gt; play()</code></li>
+      <li><span class="lab">C.</span> <code>List&lt;CharSequence&gt; play()</code></li>
+      <li><span class="lab">D.</span> <code>Collection&lt;CharSequence&gt; play()</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: A, C</span>
+      <p>Return types may be covariant (a subtype), but the generic parameter must match exactly. <code>ArrayList&lt;CharSequence&gt;</code> (subtype of <code>List</code>) works; <code>List&lt;String&gt;</code> fails because <code>String</code> ≠ <code>CharSequence</code>; <code>Collection</code> is a supertype, not a subtype.</p></div>
+    </details>
+  </div>
+
+  <!-- Q28 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q28</span><span class="qtag">GENERICS</span></div>
+    <p class="prompt">Which method does not compile?</p>
+<pre><code><span class="num">3:</span> <span class="kw">public static</span> &lt;T&gt; <span class="kw">void</span> sink(T t) { }
+<span class="num">4:</span> <span class="kw">public static</span> &lt;T&gt; T identity(T t) { <span class="kw">return</span> t; }
+<span class="num">5:</span> <span class="kw">public static</span> T noGood(T t) { <span class="kw">return</span> t; }</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Line 3</li>
+      <li><span class="lab">B.</span> Line 4</li>
+      <li><span class="lab">C.</span> Line 5</li>
+      <li><span class="lab">D.</span> None — all compile</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: C</span>
+      <p>Line 5 uses <code>T</code> without declaring the formal type parameter <code>&lt;T&gt;</code> before the return type. Lines 3 and 4 declare it correctly.</p></div>
+    </details>
+  </div>
+
+  <!-- Q29 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q29</span><span class="qtag">WILDCARDS</span></div>
+    <p class="prompt">What is the result?</p>
+<pre><code>List&lt;? extends Bird&gt; birds = <span class="kw">new</span> ArrayList&lt;Bird&gt;();
+birds.add(<span class="kw">new</span> Sparrow());</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Compiles and adds the Sparrow</li>
+      <li><span class="lab">B.</span> Does not compile — upper-bounded lists are effectively read-only</li>
+      <li><span class="lab">C.</span> Throws at runtime</li>
+      <li><span class="lab">D.</span> Compiles only if <code>Sparrow extends Bird</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>With <code>? extends Bird</code>, Java can't know the exact list type (it could be <code>List&lt;Sparrow&gt;</code> or another), so adding is disallowed. Upper-bounded and unbounded wildcards are logically immutable.</p></div>
+    </details>
+  </div>
+
+  <!-- Q30 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q30</span><span class="qtag">WILDCARDS</span></div>
+    <p class="prompt">Which lines compile? <span class="multi">(Choose all that apply.)</span></p>
+<pre><code><span class="num">A:</span> List&lt;? super IOException&gt; e = <span class="kw">new</span> ArrayList&lt;Exception&gt;();
+<span class="num">B:</span> e.add(<span class="kw">new</span> Exception());
+<span class="num">C:</span> e.add(<span class="kw">new</span> IOException());
+<span class="num">D:</span> e.add(<span class="kw">new</span> FileNotFoundException());</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Line A</li>
+      <li><span class="lab">B.</span> Line B</li>
+      <li><span class="lab">C.</span> Line C</li>
+      <li><span class="lab">D.</span> Line D</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: A, C, D</span>
+      <p>The list could be <code>List&lt;IOException&gt;</code>, so a plain <code>Exception</code> (a supertype) can't be added (line B fails). <code>IOException</code> and its subclass <code>FileNotFoundException</code> are always safe to add.</p></div>
+    </details>
+  </div>
+
+  <!-- closing -->
+  <div class="revision">
+    <h3>Quick Revision</h3>
+    <ul>
+      <li><strong>Diamond/var:</strong> diamond infers left, var infers right; <code>var x = new HashMap&lt;&gt;()</code> &rarr; <code>&lt;Object,Object&gt;</code>.</li>
+      <li><strong>Lists:</strong> <code>Arrays.asList</code> = fixed-size backed array; <code>List.of</code>/<code>copyOf</code> = immutable; <code>remove(int)</code> by index vs <code>remove(Object)</code> by value.</li>
+      <li><strong>Order:</strong> Hash* unordered, Linked* insertion, Tree* sorted (no null keys/values).</li>
+      <li><strong>Queue/Deque:</strong> throwing vs sentinel pairs; stack = <code>push</code>/<code>pop</code>/<code>peek</code>.</li>
+      <li><strong>Map:</strong> <code>merge</code> runs the function only with two real values (returns null &rarr; remove); <code>map.contains()</code> doesn't compile.</li>
+      <li><strong>Sorting:</strong> Comparable = <code>compareTo</code>/1 param/in class; Comparator = <code>compare</code>/2 params/lambda. Non-Comparable: sort won't compile, TreeSet throws at runtime.</li>
+      <li><strong>Generics:</strong> erasure blocks generic-type overloading and needs exact generic match for covariant overrides; declare <code>&lt;T&gt;</code> before the return type.</li>
+      <li><strong>Wildcards:</strong> <code>? extends</code>/unbounded are read-only; <code>? super</code> lets you add the bound type or its subclasses.</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>
