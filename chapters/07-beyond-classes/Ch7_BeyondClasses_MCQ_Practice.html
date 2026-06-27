@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 · Chapter 7 — Beyond Classes (MCQ Practice)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff; --ink:#2b2b32; --muted:#6e6a72;
+    --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+    --accent:#c96442; --accent2:#d4845e; --line:#ece3da;
+    --green:#3b7d57; --gold:#a9772a;
+    --purple:#7a5cb8; --purple-b:#9b7fd4; --purple-tag:#b29ad9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Source Sans 3',system-ui,sans-serif; line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:860px; margin:0 auto; padding:34px 20px 70px;}
+  h1,h2,h3,h4{font-family:'Merriweather',Georgia,serif; line-height:1.3; color:#22222a;}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+
+  /* ---------- header ---------- */
+  .header{
+    position:relative; overflow:hidden;
+    background:linear-gradient(135deg,#ffffff,#fdf8f3);
+    border-radius:18px; padding:30px 32px 26px; margin-bottom:30px;
+    box-shadow:0 10px 30px rgba(120,90,60,.10);
+  }
+  .header::after{
+    content:""; position:absolute; top:-60px; right:-40px; width:230px; height:230px;
+    background:radial-gradient(circle,rgba(201,100,66,.16),transparent 68%); pointer-events:none;
+  }
+  .pill{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-size:.72rem;
+    font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#fff;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    padding:6px 13px; border-radius:999px; margin-bottom:16px;
+  }
+  .header h1{font-size:1.85rem; margin:0 0 8px;}
+  .header .tagline{font-style:italic; color:var(--muted); margin:0 0 18px; font-size:1.04rem;}
+  .topics{display:flex; flex-wrap:wrap; gap:8px;}
+  .topics span{
+    font-family:'JetBrains Mono',monospace; font-size:.7rem; letter-spacing:.4px;
+    background:#f3ece4; color:#9a5030; padding:5px 11px; border-radius:999px;
+  }
+  .howto{
+    background:#f3ece4; border-radius:12px; padding:12px 18px; margin:22px 0 8px;
+    font-size:.92rem; color:#7a5a44;
+  }
+
+  /* ---------- question cards ---------- */
+  .q-card{
+    background:linear-gradient(135deg,#f4f0fa,#f9f6fd);
+    border-top:4px solid var(--purple-b); border-radius:14px;
+    padding:22px 24px 18px; margin-bottom:26px;
+    box-shadow:0 6px 20px rgba(110,90,150,.10);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .q-card:hover{transform:translateY(-3px); box-shadow:0 12px 28px rgba(110,90,150,.16);}
+  .q-head{display:flex; align-items:center; gap:12px; margin-bottom:12px; flex-wrap:wrap;}
+  .qnum{font-family:'JetBrains Mono',monospace; font-weight:700; font-size:1.02rem; color:var(--purple); letter-spacing:1px;}
+  .qtag{
+    font-family:'JetBrains Mono',monospace; font-size:.66rem; font-weight:700;
+    letter-spacing:.6px; text-transform:uppercase; color:#fff;
+    background:var(--purple-tag); padding:4px 10px; border-radius:999px;
+  }
+  .prompt{font-weight:600; margin:0 0 14px; color:#33303a;}
+  .prompt .multi{color:var(--purple); font-style:italic; font-weight:700;}
+  .q-card pre{
+    background:#fbf9fe; border-radius:12px; padding:15px 17px; margin:0 0 16px;
+    overflow-x:auto; box-shadow:inset 0 2px 8px rgba(110,90,150,.10);
+    font-size:.86rem; line-height:1.6;
+  }
+  .q-card pre code{background:none; color:inherit; padding:0;}
+  .opts{list-style:none; margin:0 0 4px; padding:0;}
+  .opts li{margin:0 0 7px; padding-left:30px; position:relative;}
+  .opts li .lab{
+    position:absolute; left:0; top:0; font-family:'JetBrains Mono',monospace;
+    font-weight:700; color:var(--purple);
+  }
+  .opts li code{background:#f3ece4; color:#9a5030; padding:1px 6px; border-radius:5px; font-size:.86em;}
+
+  /* syntax */
+  .kw{color:var(--kw); font-weight:600;}
+  .str{color:var(--str);}
+  .num{color:var(--num);}
+  .err{color:var(--err); font-weight:600;}
+  .cm{color:var(--cm); font-style:italic;}
+
+  /* reveal */
+  details{margin-top:14px; border-top:1px dashed #cdbce8; padding-top:4px;}
+  summary{
+    cursor:pointer; list-style:none; display:inline-block;
+    font-family:'JetBrains Mono',monospace; font-size:.78rem; font-weight:700;
+    letter-spacing:.5px; color:var(--purple); padding:8px 2px 4px;
+    user-select:none;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"\25B8  "; }
+  details[open] summary::before{content:"\25BE  ";}
+  .ans-body{padding:8px 2px 4px; font-size:.94rem; color:#3a3640;}
+  .ans-key{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-weight:700;
+    font-size:.84rem; background:#eef8f1; color:#3d8a5e;
+    padding:5px 12px; border-radius:8px; margin-bottom:8px; letter-spacing:.5px;
+  }
+  .ans-body code{background:#f3ece4; color:#9a5030; padding:1px 6px; border-radius:5px; font-size:.86em;}
+
+  /* closing */
+  .revision{
+    background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c;
+    border-radius:14px; padding:20px 24px; margin-top:34px;
+    box-shadow:0 6px 18px rgba(180,150,90,.10);
+  }
+  .revision h3{color:var(--gold); margin:0 0 10px; font-size:1.12rem;}
+  .revision ul{margin:0; padding-left:20px;}
+  .revision li{margin:0 0 7px;}
+  .revision code{background:#f3ece4; color:#9a5030; padding:1px 6px; border-radius:5px; font-size:.86em;}
+
+  @media(max-width:560px){
+    .header{padding:24px 20px;}
+    .header h1{font-size:1.5rem;}
+    .q-card{padding:18px 16px 14px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="header">
+    <span class="pill">OCP Java SE 21 · 1Z0-830</span>
+    <h1>Chapter 7 — Beyond Classes</h1>
+    <p class="tagline">Thirty exam-style questions on interfaces, enums, sealed classes, records, nested classes, and polymorphism.</p>
+    <div class="topics">
+      <span>INTERFACES</span><span>this/super</span><span>ENUMS</span><span>SEALED</span>
+      <span>RECORDS</span><span>NESTED</span><span>POLYMORPHISM</span><span>HIDING</span><span>OVERRIDING</span><span>CASTING</span>
+    </div>
+    <div class="howto">Try each question first, then tap <strong>Show Answer</strong> to reveal the key and explanation. Watch for "Choose all that apply."</div>
+  </header>
+
+  <!-- Q1 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q01</span><span class="qtag">INTERFACES</span></div>
+    <p class="prompt">Which of the following are valid interface-related declarations? <span class="multi">(Choose all that apply.)</span></p>
+<pre><code><span class="num">1:</span> <span class="kw">public abstract interface</span> WalksOnTwoLegs {}
+<span class="num">2:</span> <span class="kw">final interface</span> WalksOnEightLegs {}
+<span class="num">3:</span> <span class="kw">public interface</span> Climb { Number getSpeed(<span class="kw">int</span> age); }
+<span class="num">4:</span> <span class="kw">public interface</span> Dance { <span class="kw">protected void</span> step(); }</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Line 1</li>
+      <li><span class="lab">B.</span> Line 2</li>
+      <li><span class="lab">C.</span> Line 3</li>
+      <li><span class="lab">D.</span> Line 4</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: A, C</span>
+      <p>Line 1 compiles — <code>abstract</code> is optional on an interface. Line 3 compiles — a bodyless abstract method is fine. Line 2 fails: an interface cannot be <code>final</code>. Line 4 fails: <code>protected</code> conflicts with the implicit <code>public</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q02</span><span class="qtag">INTERFACES</span></div>
+    <p class="prompt">Given the types below, which declarations compile? <span class="multi">(Choose all that apply.)</span></p>
+<pre><code><span class="kw">interface</span> CanRun {}
+<span class="kw">class</span> Hyena {}
+<span class="kw">interface</span> Nocturnal {}
+
+<span class="num">A:</span> <span class="kw">class</span> Cheetah <span class="kw">extends</span> CanRun {}
+<span class="num">B:</span> <span class="kw">interface</span> HasFur <span class="kw">extends</span> Hyena {}
+<span class="num">C:</span> <span class="kw">interface</span> HasBigEyes <span class="kw">extends</span> Nocturnal {}
+<span class="num">D:</span> <span class="kw">class</span> Owl <span class="kw">implements</span> Nocturnal {}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Cheetah</li>
+      <li><span class="lab">B.</span> HasFur</li>
+      <li><span class="lab">C.</span> HasBigEyes</li>
+      <li><span class="lab">D.</span> Owl</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: C, D</span>
+      <p>An interface may <code>extends</code> another interface (C), and a class may <code>implements</code> an interface (D). A class cannot <code>extends</code> an interface (A), and an interface cannot <code>extends</code> a class (B).</p></div>
+    </details>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q03</span><span class="qtag">INTERFACES</span></div>
+    <p class="prompt">What is the result of compiling the following?</p>
+<pre><code><span class="kw">interface</span> Herbivore { <span class="kw">void</span> eatPlants(<span class="kw">int</span> p); }
+<span class="kw">interface</span> Omnivore  { <span class="kw">int</span>  eatPlants(<span class="kw">int</span> p); }
+<span class="kw">public class</span> Tiger <span class="kw">implements</span> Herbivore, Omnivore {}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Everything compiles</li>
+      <li><span class="lab">B.</span> <code>Tiger</code> does not compile</li>
+      <li><span class="lab">C.</span> <code>Herbivore</code> does not compile</li>
+      <li><span class="lab">D.</span> <code>Omnivore</code> does not compile</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>The two inherited methods are incompatible — one returns <code>void</code>, the other <code>int</code>. No single override can satisfy both, so <code>Tiger</code> does not compile regardless of its body. The interfaces themselves are fine.</p></div>
+    </details>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q04</span><span class="qtag">INTERFACES</span></div>
+    <p class="prompt">Which lines do <strong>not</strong> compile? <span class="multi">(Choose all that apply.)</span></p>
+<pre><code><span class="kw">public interface</span> Dance {
+   <span class="num">1:</span> <span class="kw">int</span> MAX = <span class="num">4</span>;
+   <span class="num">2:</span> <span class="kw">private int</span> count = <span class="num">4</span>;
+   <span class="num">3:</span> <span class="kw">protected void</span> step();
+   <span class="num">4:</span> <span class="kw">default void</span> move() {}
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Line 1</li>
+      <li><span class="lab">B.</span> Line 2</li>
+      <li><span class="lab">C.</span> Line 3</li>
+      <li><span class="lab">D.</span> Line 4</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B, C</span>
+      <p>Line 1 is a valid constant (implicitly <code>public static final</code>) and Line 4 is a valid <code>default</code> method. Line 2 fails: interface variables are implicitly <code>public</code>, so <code>private</code> conflicts. Line 3 fails: <code>protected</code> conflicts with the implicit <code>public</code> (interfaces have no protected members).</p></div>
+    </details>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q05</span><span class="qtag">this/super</span></div>
+    <p class="prompt"><code>Cat</code> inherits two conflicting <code>default</code> methods and overrides them. Which expression correctly calls <code>Walk</code>'s hidden version?</p>
+<pre><code><span class="kw">interface</span> Walk { <span class="kw">default int</span> getSpeed() { <span class="kw">return</span> <span class="num">5</span>; } }
+<span class="kw">interface</span> Run  { <span class="kw">default int</span> getSpeed() { <span class="kw">return</span> <span class="num">10</span>; } }
+<span class="kw">public class</span> Cat <span class="kw">implements</span> Walk, Run {
+   <span class="kw">public int</span> getSpeed() { <span class="kw">return</span> <span class="num">1</span>; }
+   <span class="kw">public int</span> getWalkSpeed() { <span class="kw">return</span> ________; }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>Walk.getSpeed()</code></li>
+      <li><span class="lab">B.</span> <code>Walk.this.getSpeed()</code></li>
+      <li><span class="lab">C.</span> <code>Walk.super.getSpeed()</code></li>
+      <li><span class="lab">D.</span> <code>super.Walk.getSpeed()</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: C</span>
+      <p>The special syntax is <code>InterfaceName.super.method()</code>. <code>Walk.getSpeed()</code> would call it as a static method (it isn't one), and <code>Walk.this.getSpeed()</code> does not work for default methods.</p></div>
+    </details>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q06</span><span class="qtag">INTERFACES</span></div>
+    <p class="prompt">What is the result?</p>
+<pre><code><span class="kw">public interface</span> Hop { <span class="kw">static int</span> getJumpHeight() { <span class="kw">return</span> <span class="num">8</span>; } }
+<span class="kw">public class</span> Bunny <span class="kw">implements</span> Hop {
+   <span class="kw">public int</span> test() { <span class="kw">return</span> getJumpHeight(); }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Compiles; <code>test()</code> returns 8</li>
+      <li><span class="lab">B.</span> Does not compile — must be <code>Hop.getJumpHeight()</code></li>
+      <li><span class="lab">C.</span> Compiles; <code>test()</code> returns 0</li>
+      <li><span class="lab">D.</span> <code>Hop</code> does not compile</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>Static interface methods are <strong>not inherited</strong>. Even though <code>Bunny</code> implements <code>Hop</code>, the call must be qualified with the interface name: <code>Hop.getJumpHeight()</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q07</span><span class="qtag">INTERFACES</span></div>
+    <p class="prompt">Which method does <strong>not</strong> compile?</p>
+<pre><code><span class="kw">public interface</span> ZooTrainTour {
+   <span class="kw">abstract int</span> getTrainName();
+   <span class="kw">private static void</span> ride() {}
+   <span class="kw">default void</span> playHorn() { getTrainName(); ride(); }
+   <span class="kw">public static void</span> slowDown() { playHorn(); }
+   <span class="kw">static void</span> speedUp() { ride(); }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>playHorn()</code></li>
+      <li><span class="lab">B.</span> <code>slowDown()</code></li>
+      <li><span class="lab">C.</span> <code>speedUp()</code></li>
+      <li><span class="lab">D.</span> All compile</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p><code>slowDown()</code> is <code>static</code> and tries to call the <code>default</code> method <code>playHorn()</code> without an instance reference, so it fails. <code>playHorn()</code> (a default method) may call the abstract method and the private static <code>ride()</code>; <code>speedUp()</code> (static) may call the private static <code>ride()</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q8 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q08</span><span class="qtag">ENUMS</span></div>
+    <p class="prompt">Given <code>enum Season { WINTER, SPRING, SUMMER, FALL }</code>, what is the result of:</p>
+<pre><code>Season t = Season.valueOf(<span class="str">"summer"</span>);</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Returns <code>SUMMER</code></li>
+      <li><span class="lab">B.</span> Returns <code>null</code></li>
+      <li><span class="lab">C.</span> Throws <code>IllegalArgumentException</code> at runtime</li>
+      <li><span class="lab">D.</span> Does not compile</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: C</span>
+      <p><code>valueOf()</code> requires an <strong>exact</strong> match. There is no value named <code>summer</code> (only <code>SUMMER</code>), so it throws <code>IllegalArgumentException</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q9 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q09</span><span class="qtag">ENUMS</span></div>
+    <p class="prompt">Which lines do <strong>not</strong> compile? <span class="multi">(Choose all that apply.)</span></p>
+<pre><code><span class="cm">// Season s is a Season enum value</span>
+<span class="num">1:</span> <span class="kw">if</span> (Season.SUMMER == <span class="num">2</span>) {}
+<span class="num">2:</span> <span class="kw">if</span> (Season.SUMMER == Season.FALL) {}
+<span class="num">3:</span> <span class="kw">switch</span>(s) { <span class="kw">case</span> <span class="num">0</span> -> <span class="str">"x"</span>; <span class="kw">default</span> -> <span class="str">"y"</span>; }
+<span class="num">4:</span> System.out.println(Season.SUMMER.ordinal());</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Line 1</li>
+      <li><span class="lab">B.</span> Line 2</li>
+      <li><span class="lab">C.</span> Line 3</li>
+      <li><span class="lab">D.</span> Line 4</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: A, C</span>
+      <p>Line 1 compares an enum to an <code>int</code> — illegal. Line 3 uses an ordinal literal in a <code>case</code> — illegal. Line 2 (enum-to-enum <code>==</code>) and Line 4 (<code>ordinal()</code>) are both fine.</p></div>
+    </details>
+  </div>
+
+  <!-- Q10 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q10</span><span class="qtag">ENUMS</span></div>
+    <p class="prompt">Which statements about enums are valid? <span class="multi">(Choose all that apply.)</span></p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>public enum Color extends Base {}</code></li>
+      <li><span class="lab">B.</span> <code>public final enum Color {}</code></li>
+      <li><span class="lab">C.</span> <code>public enum Color implements Paintable {}</code></li>
+      <li><span class="lab">D.</span> Two enum values can be compared with <code>==</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: C, D</span>
+      <p>An enum may implement an interface (C) and its values compare safely with <code>==</code> (D). An enum cannot <code>extends</code> anything (A) and cannot be marked <code>final</code> (B).</p></div>
+    </details>
+  </div>
+
+  <!-- Q11 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q11</span><span class="qtag">ENUMS</span></div>
+    <p class="prompt">What is the result?</p>
+<pre><code><span class="kw">public class</span> Favorites {
+   <span class="kw">enum</span> Flavors {
+      VANILLA, CHOCOLATE, STRAWBERRY;
+      <span class="kw">public</span> Flavors() {}
+   }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Compiles fine</li>
+      <li><span class="lab">B.</span> Does not compile — an enum constructor cannot be <code>public</code></li>
+      <li><span class="lab">C.</span> Does not compile — missing semicolon after the values</li>
+      <li><span class="lab">D.</span> Compiles but throws at runtime</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>Enum constructors are implicitly <code>private</code>; marking one <code>public</code> (or <code>protected</code>) does not compile. The semicolon after the values is present, so C is wrong.</p></div>
+    </details>
+  </div>
+
+  <!-- Q12 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q12</span><span class="qtag">ENUMS</span></div>
+    <p class="prompt">The constructor prints <code>"c,"</code>. What is the output of <code>main</code>?</p>
+<pre><code><span class="kw">enum</span> SeasonV {
+   WINTER(<span class="str">"Low"</span>), SPRING(<span class="str">"Med"</span>), SUMMER(<span class="str">"High"</span>), FALL(<span class="str">"Med"</span>);
+   SeasonV(String v) { System.out.print(<span class="str">"c,"</span>); }
+}
+<span class="cm">// main:</span>
+System.out.print(<span class="str">"begin,"</span>);
+<span class="kw">var</span> a = SeasonV.SUMMER;
+System.out.print(<span class="str">"middle,"</span>);
+<span class="kw">var</span> b = SeasonV.SUMMER;
+System.out.print(<span class="str">"end"</span>);</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>begin,c,middle,c,end</code></li>
+      <li><span class="lab">B.</span> <code>begin,c,c,c,c,middle,end</code></li>
+      <li><span class="lab">C.</span> <code>begin,middle,end</code></li>
+      <li><span class="lab">D.</span> <code>begin,c,middle,end</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>The first time any value is referenced, <strong>all four</strong> values are constructed (4 × <code>c,</code>). The second reference to <code>SUMMER</code> constructs nothing.</p></div>
+    </details>
+  </div>
+
+  <!-- Q13 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q13</span><span class="qtag">ENUMS</span></div>
+    <p class="prompt">What is the result?</p>
+<pre><code><span class="kw">public enum</span> SeasonWithTimes {
+   WINTER { <span class="kw">public</span> String getHours() { <span class="kw">return</span> <span class="str">"10am-3pm"</span>; } },
+   SUMMER { <span class="kw">public</span> String getHours() { <span class="kw">return</span> <span class="str">"9am-7pm"</span>; } },
+   SPRING, FALL;
+   <span class="kw">public abstract</span> String getHours();
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Compiles</li>
+      <li><span class="lab">B.</span> Does not compile — <code>SPRING</code> and <code>FALL</code> must implement <code>getHours()</code></li>
+      <li><span class="lab">C.</span> Does not compile — an enum cannot declare an abstract method</li>
+      <li><span class="lab">D.</span> Compiles but throws at runtime</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>When an enum declares an <code>abstract</code> method, <em>every</em> value must implement it. <code>WINTER</code> and <code>SUMMER</code> do, but <code>SPRING</code> and <code>FALL</code> don't — so it fails. (Giving <code>getHours()</code> a concrete body instead would fix it.)</p></div>
+    </details>
+  </div>
+
+  <!-- Q14 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q14</span><span class="qtag">SEALED</span></div>
+    <p class="prompt">What is the result?</p>
+<pre><code><span class="kw">public class sealed</span> Frog <span class="kw">permits</span> GlassFrog {}
+<span class="kw">public final class</span> GlassFrog <span class="kw">extends</span> Frog {}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Compiles</li>
+      <li><span class="lab">B.</span> Does not compile — should be <code>public sealed class Frog</code></li>
+      <li><span class="lab">C.</span> Does not compile — <code>GlassFrog</code> must be <code>non-sealed</code></li>
+      <li><span class="lab">D.</span> Does not compile — <code>permits</code> isn't allowed here</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>The modifier order is wrong — <code>sealed</code> must come before <code>class</code>. A <code>final</code> subclass is a valid choice, so C is wrong.</p></div>
+    </details>
+  </div>
+
+  <!-- Q15 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q15</span><span class="qtag">SEALED</span></div>
+    <p class="prompt">What is the result, assuming both types are in the same file?</p>
+<pre><code><span class="kw">public sealed class</span> Bird <span class="kw">permits</span> Eagle {}
+<span class="kw">class</span> Eagle <span class="kw">extends</span> Bird {}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Compiles</li>
+      <li><span class="lab">B.</span> Does not compile — <code>Eagle</code> must be <code>final</code>, <code>sealed</code>, or <code>non-sealed</code></li>
+      <li><span class="lab">C.</span> Does not compile — <code>Eagle</code> must be in a different package</li>
+      <li><span class="lab">D.</span> Compiles, but <code>Eagle</code> cannot be extended</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>Every direct subclass of a sealed class must declare exactly one of <code>final</code>, <code>sealed</code>, or <code>non-sealed</code>. Plain <code>class Eagle</code> has none, so it fails.</p></div>
+    </details>
+  </div>
+
+  <!-- Q16 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q16</span><span class="qtag">SEALED</span></div>
+    <p class="prompt">What is the result (all in one file)?</p>
+<pre><code><span class="kw">abstract sealed class</span> Mammal <span class="kw">permits</span> Feline {}
+<span class="kw">non-sealed class</span> Feline <span class="kw">extends</span> Mammal {}
+<span class="kw">class</span> Tiger <span class="kw">extends</span> Feline {}
+<span class="kw">class</span> BengalTiger <span class="kw">extends</span> Tiger {}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> All four compile</li>
+      <li><span class="lab">B.</span> <code>Tiger</code> does not compile</li>
+      <li><span class="lab">C.</span> <code>BengalTiger</code> does not compile</li>
+      <li><span class="lab">D.</span> <code>Feline</code> does not compile</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: A</span>
+      <p><code>Feline</code> is <code>non-sealed</code>, which reopens the hierarchy. <code>Tiger</code> and <code>BengalTiger</code> need no special modifier and may extend freely. <code>Mammal</code> is still effectively sealed to <code>Feline</code> and its subclasses via polymorphism.</p></div>
+    </details>
+  </div>
+
+  <!-- Q17 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q17</span><span class="qtag">SEALED</span></div>
+    <p class="prompt">This does not compile. What is the fix?</p>
+<pre><code><span class="kw">public sealed class</span> Snake <span class="kw">permits</span> Cobra {
+   <span class="kw">final class</span> Cobra <span class="kw">extends</span> Snake {}
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> It already compiles</li>
+      <li><span class="lab">B.</span> Use <code>permits Snake.Cobra</code></li>
+      <li><span class="lab">C.</span> Make <code>Cobra</code> <code>non-sealed</code></li>
+      <li><span class="lab">D.</span> A nested class cannot be <code>final</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>A nested permitted subclass must be referenced through the enclosing namespace: <code>permits Snake.Cobra</code>. (When all subclasses are nested, omitting <code>permits</code> entirely is the cleaner option.)</p></div>
+    </details>
+  </div>
+
+  <!-- Q18 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q18</span><span class="qtag">RECORDS</span></div>
+    <p class="prompt">What is printed?</p>
+<pre><code><span class="kw">public record</span> Crane(<span class="kw">int</span> numberEggs, String name) {}
+<span class="kw">var</span> c = <span class="kw">new</span> Crane(<span class="num">0</span>, <span class="str">"Craig"</span>);
+System.out.println(c.name());
+System.out.println(c);</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>getName()</code> form; then <code>Crane(0, Craig)</code></li>
+      <li><span class="lab">B.</span> <code>Craig</code>; then <code>Crane[numberEggs=0, name=Craig]</code></li>
+      <li><span class="lab">C.</span> <code>name</code>; then <code>{numberEggs=0, name=Craig}</code></li>
+      <li><span class="lab">D.</span> Does not compile — accessor must be <code>getName()</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>Record accessors are the bare field name plus <code>()</code> — <code>name()</code>, not <code>getName()</code>. The generated <code>toString()</code> prints <code>Crane[numberEggs=0, name=Craig]</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q19 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q19</span><span class="qtag">RECORDS</span></div>
+    <p class="prompt">Given <code>record Crane(int numberEggs, String name) {}</code>, which lines do <strong>not</strong> compile? <span class="multi">(Choose all that apply.)</span></p>
+<pre><code><span class="num">1:</span> <span class="kw">new</span> Crane(<span class="num">4</span>, <span class="str">"Cammy"</span>);
+<span class="num">2:</span> <span class="kw">new</span> Crane(<span class="str">"Cammy"</span>, <span class="num">4</span>);
+<span class="num">3:</span> <span class="kw">new</span> Crane(<span class="str">"Cammy"</span>);
+<span class="num">4:</span> <span class="kw">new</span> Crane(<span class="num">0</span>, <span class="str">"Craig"</span>);</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Line 1</li>
+      <li><span class="lab">B.</span> Line 2</li>
+      <li><span class="lab">C.</span> Line 3</li>
+      <li><span class="lab">D.</span> Line 4</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B, C</span>
+      <p>The generated constructor expects <code>(int, String)</code> in that order. Line 2 has the arguments reversed; Line 3 is missing one. Lines 1 and 4 match the declaration.</p></div>
+    </details>
+  </div>
+
+  <!-- Q20 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q20</span><span class="qtag">RECORDS</span></div>
+    <p class="prompt">What is the result?</p>
+<pre><code><span class="kw">public record</span> Crane(<span class="kw">int</span> numberEggs, String name) {
+   <span class="kw">public</span> Crane {
+      <span class="kw">this</span>.numberEggs = <span class="num">10</span>;
+   }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Compiles; <code>numberEggs</code> is always 10</li>
+      <li><span class="lab">B.</span> Does not compile — a compact constructor cannot assign fields via <code>this</code></li>
+      <li><span class="lab">C.</span> Does not compile — a compact constructor needs parentheses</li>
+      <li><span class="lab">D.</span> Compiles but throws at runtime</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>A compact constructor can transform the constructor <em>parameters</em> but cannot set the record's fields with <code>this.field</code>. Note that a compact constructor is correctly written <strong>without</strong> parentheses, so C is wrong.</p></div>
+    </details>
+  </div>
+
+  <!-- Q21 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q21</span><span class="qtag">RECORDS</span></div>
+    <p class="prompt">Which lines do <strong>not</strong> compile? <span class="multi">(Choose all that apply.)</span></p>
+<pre><code><span class="kw">public record</span> Crane(<span class="kw">int</span> numberEggs, String name) {
+   <span class="num">1:</span> <span class="kw">private static int</span> TYPE = <span class="num">10</span>;
+   <span class="num">2:</span> <span class="kw">public int</span> size;
+   <span class="num">3:</span> <span class="kw">static</span> { System.out.print(<span class="str">"Hi"</span>); }
+   <span class="num">4:</span> { System.out.print(<span class="str">"Bye"</span>); }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Line 1</li>
+      <li><span class="lab">B.</span> Line 2</li>
+      <li><span class="lab">C.</span> Line 3</li>
+      <li><span class="lab">D.</span> Line 4</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B, D</span>
+      <p>Records forbid <strong>instance</strong> fields outside the header (Line 2) and <strong>instance</strong> initializers (Line 4). Static fields (Line 1) and static initializers (Line 3) are allowed.</p></div>
+    </details>
+  </div>
+
+  <!-- Q22 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q22</span><span class="qtag">RECORDS</span></div>
+    <p class="prompt">Given <code>record Monkey(String name, int age) {}</code> and an <code>Object animal</code>, which lines do <strong>not</strong> compile? <span class="multi">(Choose all that apply.)</span></p>
+<pre><code><span class="num">1:</span> <span class="kw">if</span> (animal <span class="kw">instanceof</span> Monkey m) {}
+<span class="num">2:</span> <span class="kw">if</span> (animal <span class="kw">instanceof</span> Monkey(String n, <span class="kw">int</span> a) m) {}
+<span class="num">3:</span> <span class="kw">if</span> (animal <span class="kw">instanceof</span> Monkey(String n, <span class="kw">long</span> a)) {}
+<span class="num">4:</span> <span class="kw">if</span> (animal <span class="kw">instanceof</span> Monkey(Object n, <span class="kw">int</span> a)) {}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Line 1</li>
+      <li><span class="lab">B.</span> Line 2</li>
+      <li><span class="lab">C.</span> Line 3</li>
+      <li><span class="lab">D.</span> Line 4</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B, C</span>
+      <p>Line 2 names both the record <em>and</em> its fields — not allowed. Line 3 uses <code>long</code> where the field is <code>int</code> — numeric promotion isn't supported in record patterns. Line 1 is simple binding; Line 4 works because <code>String</code> is compatible with <code>Object</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q23 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q23</span><span class="qtag">RECORDS</span></div>
+    <p class="prompt">What does the program print, in order?</p>
+<pre><code><span class="kw">record</span> Snake(Object data) {}
+<span class="kw">long</span> showData(Snake snake) {
+   <span class="kw">return</span> <span class="kw">switch</span>(snake) {
+      <span class="kw">case</span> Snake(Long hiss)   -> hiss + <span class="num">1</span>;
+      <span class="kw">case</span> Snake(Integer nag) -> nag + <span class="num">10</span>;
+      <span class="kw">case</span> Snake(Number crow) -> crow.intValue() + <span class="num">100</span>;
+      <span class="kw">case</span> Snake(Object kaa)  -> <span class="num">-1</span>;
+   };
+}
+<span class="cm">// showData(new Snake(1)), showData(new Snake(2L)), showData(new Snake(3.0))</span></code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>1, 2, 3</code></li>
+      <li><span class="lab">B.</span> <code>11, 3, 103</code></li>
+      <li><span class="lab">C.</span> <code>11, 3, 100</code></li>
+      <li><span class="lab">D.</span> <code>-1, -1, -1</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p><code>new Snake(1)</code> autoboxes to <code>Integer</code> → 1 + 10 = <strong>11</strong>. <code>2L</code> is a <code>Long</code> → 2 + 1 = <strong>3</strong>. <code>3.0</code> is a <code>Double</code> (not Long/Integer) but is a <code>Number</code> → 3 + 100 = <strong>103</strong>.</p></div>
+    </details>
+  </div>
+
+  <!-- Q24 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q24</span><span class="qtag">NESTED</span></div>
+    <p class="prompt">Which lines do <strong>not</strong> compile? <span class="multi">(Choose all that apply.)</span></p>
+<pre><code><span class="kw">public class</span> Fox {
+   <span class="kw">private class</span> Den {}
+   <span class="num">1:</span> <span class="kw">public void</span> goHome() { <span class="kw">new</span> Den(); }
+   <span class="num">2:</span> <span class="kw">public static void</span> visitFriend() { <span class="kw">new</span> Den(); }
+}
+<span class="kw">public class</span> Squirrel {
+   <span class="num">3:</span> <span class="kw">public void</span> visitFox() { <span class="kw">new</span> Den(); }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Line 1</li>
+      <li><span class="lab">B.</span> Line 2</li>
+      <li><span class="lab">C.</span> Line 3</li>
+      <li><span class="lab">D.</span> None of them</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B, C</span>
+      <p>An inner class needs an instance of the outer class. Line 1 has one (instance method). Line 2 is in a <code>static</code> method with no <code>Fox</code> instance. Line 3 is outside <code>Fox</code> entirely, and <code>Den</code> is <code>private</code> — two reasons to fail.</p></div>
+    </details>
+  </div>
+
+  <!-- Q25 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q25</span><span class="qtag">NESTED</span></div>
+    <p class="prompt">Which is true about lines A and B?</p>
+<pre><code><span class="kw">class</span> Emu1 {
+   String name = <span class="str">"Emmy"</span>;
+   <span class="num">A:</span> <span class="kw">static</span> Feathers createFeathers() { <span class="kw">return new</span> Feathers(<span class="str">"grey"</span>); }
+   <span class="kw">record</span> Feathers(String color) {
+      <span class="num">B:</span> <span class="kw">void</span> fly() { System.out.print(name + <span class="str">" is flying"</span>); }
+   }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Both A and B compile</li>
+      <li><span class="lab">B.</span> Line A compiles; line B does not</li>
+      <li><span class="lab">C.</span> Line A does not compile; line B does</li>
+      <li><span class="lab">D.</span> Neither compiles</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>A nested record is implicitly <code>static</code>, so <code>createFeathers()</code> can build one with no outer instance (A compiles). But a static nested type cannot reach the outer instance variable <code>name</code>, so line B does not compile.</p></div>
+    </details>
+  </div>
+
+  <!-- Q26 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q26</span><span class="qtag">NESTED</span></div>
+    <p class="prompt">What is the result?</p>
+<pre><code><span class="kw">public void</span> processData() {
+   <span class="kw">final int</span> length = <span class="num">5</span>;
+   <span class="kw">int</span> width = <span class="num">10</span>;
+   <span class="kw">class</span> VolumeCalculator {
+      <span class="kw">public int</span> multiply() { <span class="kw">return</span> length * width; }
+   }
+   width = <span class="num">2</span>;
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Compiles</li>
+      <li><span class="lab">B.</span> Does not compile — <code>width</code> is not effectively final</li>
+      <li><span class="lab">C.</span> Does not compile — <code>length</code> cannot be <code>final</code></li>
+      <li><span class="lab">D.</span> Does not compile — a local class needs an access modifier</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>A local class may capture only final or effectively final locals. Because <code>width</code> is reassigned (<code>width = 2</code>), it is not effectively final, so the local class does not compile. Local classes have no access modifier — that is normal, not an error.</p></div>
+    </details>
+  </div>
+
+  <!-- Q27 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q27</span><span class="qtag">NESTED</span></div>
+    <p class="prompt">Which statement about anonymous classes is correct?</p>
+    <ul class="opts">
+      <li><span class="lab">A.</span> It may extend one class and implement one interface at the same time</li>
+      <li><span class="lab">B.</span> It must extend exactly one class <em>or</em> implement exactly one interface</li>
+      <li><span class="lab">C.</span> It can be declared <code>abstract</code></li>
+      <li><span class="lab">D.</span> It requires an access modifier</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p>An anonymous class extends a single class or implements a single interface — never both (unless the class is <code>java.lang.Object</code>). It cannot be <code>abstract</code> or <code>final</code> and takes no access modifier.</p></div>
+    </details>
+  </div>
+
+  <!-- Q28 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q28</span><span class="qtag">POLYMORPHISM</span></div>
+    <p class="prompt"><code>Lemur extends Primate implements HasTail</code> and declares <code>int age</code>. Which lines do <strong>not</strong> compile? <span class="multi">(Choose all that apply.)</span></p>
+<pre><code>Lemur lemur = <span class="kw">new</span> Lemur();
+Primate primate = lemur;
+HasTail hasTail = lemur;
+<span class="num">1:</span> System.out.println(hasTail.age);
+<span class="num">2:</span> System.out.println(primate.hasHair());
+<span class="num">3:</span> Lemur l3 = primate;
+<span class="num">4:</span> System.out.println(hasTail.isTailStriped());</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Line 1</li>
+      <li><span class="lab">B.</span> Line 2</li>
+      <li><span class="lab">C.</span> Line 3</li>
+      <li><span class="lab">D.</span> Line 4</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: A, C</span>
+      <p>Line 1 fails because <code>age</code> isn't visible through a <code>HasTail</code> reference. Line 3 fails because assigning a supertype to a subtype needs an explicit cast. Lines 2 and 4 call members visible through their reference types.</p></div>
+    </details>
+  </div>
+
+  <!-- Q29 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q29</span><span class="qtag">CASTING</span></div>
+    <p class="prompt">What is the result?</p>
+<pre><code><span class="kw">interface</span> Canine {}
+<span class="kw">interface</span> Dog {}
+<span class="kw">class</span> Wolf <span class="kw">implements</span> Canine {}
+
+Wolf wolfy = <span class="kw">new</span> Wolf();
+Dog badWolf = (Dog) wolfy;</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> Does not compile</li>
+      <li><span class="lab">B.</span> Compiles and runs without error</li>
+      <li><span class="lab">C.</span> Compiles but throws <code>ClassCastException</code> at runtime</li>
+      <li><span class="lab">D.</span> Compiles only because <code>Wolf</code> is <code>final</code></li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: C</span>
+      <p>Because some subclass of <code>Wolf</code> <em>could</em> implement <code>Dog</code>, the compiler allows the cast — but at runtime the actual object isn't a <code>Dog</code>, so it throws <code>ClassCastException</code>. If <code>Wolf</code> were <code>final</code>, the cast would fail to compile instead.</p></div>
+    </details>
+  </div>
+
+  <!-- Q30 -->
+  <div class="q-card">
+    <div class="q-head"><span class="qnum">Q30</span><span class="qtag">HIDING</span></div>
+    <p class="prompt">What is the output?</p>
+<pre><code><span class="kw">class</span> Penguin {
+   <span class="kw">public static int</span> getHeight() { <span class="kw">return</span> <span class="num">3</span>; }
+   <span class="kw">public void</span> printInfo() { System.out.println(<span class="kw">this</span>.getHeight()); }
+}
+<span class="kw">public class</span> CrestedPenguin <span class="kw">extends</span> Penguin {
+   <span class="kw">public static int</span> getHeight() { <span class="kw">return</span> <span class="num">8</span>; }
+   <span class="kw">public static void</span> main(String[] args) {
+      <span class="kw">new</span> CrestedPenguin().printInfo();
+   }
+}</code></pre>
+    <ul class="opts">
+      <li><span class="lab">A.</span> <code>8</code></li>
+      <li><span class="lab">B.</span> <code>3</code></li>
+      <li><span class="lab">C.</span> Does not compile</li>
+      <li><span class="lab">D.</span> Throws at runtime</li>
+    </ul>
+    <details><summary>Show Answer</summary>
+      <div class="ans-body"><span class="ans-key">ANSWER: B</span>
+      <p><code>getHeight()</code> is <code>static</code>, so it is <strong>hidden</strong>, not overridden. <code>printInfo()</code> is defined in <code>Penguin</code>, so its call to <code>getHeight()</code> resolves to <code>Penguin</code>'s version → <code>3</code>. (Had it been an instance method, the answer would be 8.)</p></div>
+    </details>
+  </div>
+
+  <!-- closing -->
+  <div class="revision">
+    <h3>Quick Revision</h3>
+    <ul>
+      <li><strong>Interfaces:</strong> implicit <code>public</code>; constants are <code>public static final</code>; static methods need the interface-name prefix; <code>InterfaceName.super.m()</code> reaches a hidden default.</li>
+      <li><strong>Enums:</strong> values first + semicolon; constructors implicitly <code>private</code> and run once; <code>valueOf</code> is exact-match; an abstract enum method forces every value to implement it.</li>
+      <li><strong>Sealed:</strong> direct subclasses are <code>final</code>/<code>sealed</code>/<code>non-sealed</code>; same package; <code>permits</code> optional in the same file or when nested (then use <code>Outer.Inner</code>).</li>
+      <li><strong>Records:</strong> implicitly <code>final</code>; accessor is <code>name()</code>; compact constructors transform parameters only; no instance fields/initializers outside the header.</li>
+      <li><strong>Nested:</strong> inner needs an outer instance; nested records are implicitly static; local classes capture only effectively-final locals; anonymous classes extend one class or one interface.</li>
+      <li><strong>Polymorphism:</strong> object type owns the data, reference type controls access; instance methods <em>override</em> (object), statics &amp; variables <em>hide</em> (reference); unrelated-interface casts compile but may throw <code>ClassCastException</code>.</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>
