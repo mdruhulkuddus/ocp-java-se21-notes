@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 — Chapter 10: Streams · MCQ Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6f8; --ink:#2d2a26; --muted:#7a746c;
+  --purple:#9b7fd4; --purpledeep:#7a5cb8; --tagbg:#b29ad9;
+  --gold:#d4a24c; --goldlbl:#a9772a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:'Source Sans 3',sans-serif;font-size:16.5px;line-height:1.65;padding:28px 14px}
+.wrap{max-width:860px;margin:0 auto}
+h1,h2{font-family:'Merriweather',serif}
+code,pre,.mono{font-family:'JetBrains Mono',monospace}
+
+/* header */
+.header{position:relative;overflow:hidden;background:linear-gradient(135deg,#ffffff,#fdf8f3);border-radius:18px;padding:34px 36px;box-shadow:0 6px 24px rgba(80,60,40,.09);margin-bottom:28px}
+.header::after{content:"";position:absolute;top:-70px;right:-70px;width:230px;height:230px;border-radius:50%;background:radial-gradient(circle,rgba(201,100,66,.14),transparent 70%)}
+.badge{display:inline-block;background:linear-gradient(90deg,#c96442,#d4845e);color:#fff;font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;padding:7px 16px;border-radius:999px;font-weight:600;margin-bottom:16px}
+.header h1{font-size:1.9rem;font-weight:900}
+.subtitle{font-style:italic;color:var(--muted);margin:10px 0 18px}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{background:#f3ece4;color:#9a5030;font-family:'JetBrains Mono',monospace;font-size:.74rem;padding:5px 12px;border-radius:999px}
+
+/* q-cards */
+.q-card{background:linear-gradient(135deg,#f4f0fa,#f9f6fd);border-top:4px solid #9b7fd4;border-radius:14px;padding:24px 26px;margin-bottom:22px;box-shadow:0 4px 14px rgba(90,70,130,.08);transition:transform .2s,box-shadow .2s}
+.q-card:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(90,70,130,.14)}
+.q-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.q-num{font-family:'JetBrains Mono',monospace;color:#7a5cb8;font-weight:600;font-size:1rem}
+.q-tag{background:#b29ad9;color:#fff;font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:999px}
+.prompt{font-weight:600;margin-bottom:10px}
+.prompt .caa{color:#7a5cb8;font-style:italic;font-weight:600}
+pre{background:#fbf9fe;border-radius:12px;padding:14px 18px;box-shadow:inset 0 2px 8px rgba(110,85,160,.09);overflow-x:auto;font-size:.86rem;line-height:1.6;margin:12px 0}
+.kw{color:#7c5cbf;font-weight:600}.str{color:#3a8a5c}.num{color:#b8860b}.err{color:#c44d3e;font-weight:600}.cm{color:#a89a8a;font-style:italic}
+.opts{margin:12px 0 6px}
+.opts div{padding:4px 0}
+.opts .ol{font-family:'JetBrains Mono',monospace;color:#7a5cb8;font-weight:600;margin-right:10px}
+.opts code, .expl code, .prompt code{background:#f3ece4;color:#9a5030;padding:1.5px 6px;border-radius:6px;font-size:.85em}
+details{border-top:1px dashed #cbbde6;margin-top:14px;padding-top:10px}
+summary{cursor:pointer;font-weight:600;color:#7a5cb8;font-size:.92rem;user-select:none}
+summary:hover{color:#5d3fa0}
+.ans-key{display:inline-block;background:#eef8f1;color:#3d8a5e;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.85rem;padding:5px 14px;border-radius:8px;margin:10px 0 6px}
+.expl{font-size:.94rem;color:#4a4038}
+
+/* revision */
+.revision{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:4px solid #d4a24c;border-radius:16px;padding:26px 30px;box-shadow:0 4px 16px rgba(80,60,40,.07);margin-top:30px}
+.revision h2{font-size:1.3rem;color:#3d3629;margin-bottom:12px}
+.revision ul{margin-left:22px}
+.revision li{margin:6px 0}
+.revision strong{color:#a9772a}
+
+@media(max-width:640px){
+  .header,.q-card,.revision{padding:20px 18px}
+  body{font-size:15.5px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="header">
+  <span class="badge">OCP Java SE 21 · 1Z0-830</span>
+  <h1>Chapter 10 · Streams — MCQ Practice</h1>
+  <p class="subtitle">30 exam-style questions with inline reveal answers. Trace every pipeline before peeking!</p>
+  <div class="pills">
+    <span class="pill">Optional</span><span class="pill">pipeline</span><span class="pill">sources</span>
+    <span class="pill">terminal ops</span><span class="pill">intermediate ops</span><span class="pill">primitive streams</span>
+    <span class="pill">collectors</span><span class="pill">groupingBy / partitioningBy</span><span class="pill">teeing</span><span class="pill">spliterator</span>
+  </div>
+</div>
+
+<!-- Q1 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q1</span><span class="q-tag">Optional</span></div>
+  <p class="prompt">What is the result of the following?</p>
+<pre>Optional&lt;Double&gt; opt = Optional.empty();
+System.out.println(opt.get());</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span>It prints <code>null</code></div>
+    <div><span class="ol">B.</span>It prints <code>Optional.empty</code></div>
+    <div><span class="ol">C.</span>A <code>NoSuchElementException</code> is thrown at runtime</div>
+    <div><span class="ol">D.</span>The code does not compile</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C · NoSuchElementException</div>
+    <p class="expl">Calling <code>get()</code> on an empty Optional throws <code>java.util.NoSuchElementException: No value present</code>. The code compiles fine (A/D wrong), and Optional never hands you <code>null</code> from <code>get()</code>.</p>
+  </details>
+</div>
+
+<!-- Q2 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q2</span><span class="q-tag">Optional</span></div>
+  <p class="prompt">Given <code>Optional&lt;Double&gt; opt</code>, which is true of this statement?</p>
+<pre>System.out.println(opt.orElseGet(
+   () -&gt; <span class="kw">new</span> IllegalStateException()));</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span>It throws <code>IllegalStateException</code> if <code>opt</code> is empty</div>
+    <div><span class="ol">B.</span>It prints the exception's toString if <code>opt</code> is empty</div>
+    <div><span class="ol">C.</span>It does not compile</div>
+    <div><span class="ol">D.</span>It prints the value if present, otherwise nothing</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C · Does not compile</div>
+    <p class="expl"><code>orElseGet()</code> takes a Supplier that must return the Optional's type — a <code>Double</code> here. A Supplier returning an <code>IllegalStateException</code> is a type mismatch. To throw, use <code>orElseThrow(Supplier)</code> instead.</p>
+  </details>
+</div>
+
+<!-- Q3 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q3</span><span class="q-tag">Optional</span></div>
+  <p class="prompt">What does the following print, given <code>average(90, 100)</code> returns <code>Optional.of(95.0)</code>?</p>
+<pre>Optional&lt;Double&gt; opt = average(<span class="num">90</span>, <span class="num">100</span>);
+System.out.println(opt.orElse(Double.NaN));
+System.out.println(opt.orElseGet(() -&gt; Math.random()));
+System.out.println(opt.orElseThrow());</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span><code>NaN</code>, a random number, then an exception</div>
+    <div><span class="ol">B.</span><code>95.0</code> three times</div>
+    <div><span class="ol">C.</span><code>95.0</code> twice, then <code>NoSuchElementException</code></div>
+    <div><span class="ol">D.</span>The code does not compile</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · 95.0 three times</div>
+    <p class="expl">A value is present, so all three "or else" methods simply return it — the fallback logic never runs. A describes empty-Optional behavior.</p>
+  </details>
+</div>
+
+<!-- Q4 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q4</span><span class="q-tag">Sources</span></div>
+  <p class="prompt">What is the result of the following?</p>
+<pre>Stream&lt;Integer&gt; s = Stream.iterate(<span class="num">1</span>; n -&gt; n &lt; <span class="num">50</span>; n -&gt; n + <span class="num">2</span>);
+System.out.println(s.count());</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span><code>25</code></div>
+    <div><span class="ol">B.</span><code>50</code></div>
+    <div><span class="ol">C.</span>The code does not compile</div>
+    <div><span class="ol">D.</span>The code hangs</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C · Does not compile</div>
+    <p class="expl">The three-argument <code>iterate()</code> is a regular method call — its parameters are separated by <strong>commas</strong>, not semicolons. The semicolons make it look like a <code>for</code> loop, which is exactly the trick the exam plays.</p>
+  </details>
+</div>
+
+<!-- Q5 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q5</span><span class="q-tag">Pipeline</span></div>
+  <p class="prompt">Which are true statements about terminal operations in a stream pipeline that runs successfully? <span class="caa">(Choose all that apply.)</span></p>
+  <div class="opts">
+    <div><span class="ol">A.</span>At most one terminal operation can exist in a stream pipeline</div>
+    <div><span class="ol">B.</span>Terminal operations are a required part of the pipeline in order to get a result</div>
+    <div><span class="ol">C.</span>Terminal operations have <code>Stream</code> as their return type</div>
+    <div><span class="ol">D.</span><code>peek()</code> is an example of a terminal operation</div>
+    <div><span class="ol">E.</span>The stream may be used again after calling a terminal operation</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A, B</div>
+    <p class="expl">A pipeline has exactly one terminal operation, and without it no result is produced (intermediate ops never even run). C is wrong — returning a stream type is the mark of an <em>intermediate</em> operation. D is wrong — <code>peek()</code> is intermediate. E is wrong — a stream is invalid after its terminal operation.</p>
+  </details>
+</div>
+
+<!-- Q6 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q6</span><span class="q-tag">Terminal Ops</span></div>
+  <p class="prompt">What is the result of the following?</p>
+<pre>Stream&lt;String&gt; s = Stream.generate(() -&gt; <span class="str">"chimp"</span>);
+System.out.println(s.count());</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span><code>0</code></div>
+    <div><span class="ol">B.</span><code>1</code></div>
+    <div><span class="ol">C.</span>The code does not compile</div>
+    <div><span class="ol">D.</span>The code hangs</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">D · Hangs</div>
+    <p class="expl"><code>count()</code> is a reduction — it must look at every element, and an infinite stream never runs out. Same fate awaits <code>min()</code>, <code>max()</code>, <code>forEach()</code>, <code>reduce()</code>, and <code>collect()</code> on infinite streams.</p>
+  </details>
+</div>
+
+<!-- Q7 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q7</span><span class="q-tag">Terminal Ops</span></div>
+  <p class="prompt">What does the following print?</p>
+<pre>Optional&lt;?&gt; minEmpty = Stream.empty().min((s1, s2) -&gt; <span class="num">0</span>);
+System.out.println(minEmpty.isPresent());</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span><code>true</code></div>
+    <div><span class="ol">B.</span><code>false</code></div>
+    <div><span class="ol">C.</span>A <code>NoSuchElementException</code> is thrown</div>
+    <div><span class="ol">D.</span>The code does not compile</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · false</div>
+    <p class="expl">The stream is empty, so the comparator is never called and <code>min()</code> returns an empty Optional. <code>isPresent()</code> on an empty Optional is <code>false</code> — no exception, because we never called <code>get()</code>.</p>
+  </details>
+</div>
+
+<!-- Q8 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q8</span><span class="q-tag">Terminal Ops</span></div>
+  <p class="prompt">What is the output of the following?</p>
+<pre><span class="kw">var</span> list = List.of(<span class="str">"monkey"</span>, <span class="str">"2"</span>, <span class="str">"chimp"</span>);
+Predicate&lt;String&gt; pred = x -&gt; Character.isLetter(x.charAt(<span class="num">0</span>));
+System.out.print(list.stream().anyMatch(pred) + <span class="str">" "</span>);
+System.out.print(list.stream().allMatch(pred) + <span class="str">" "</span>);
+System.out.print(list.stream().noneMatch(pred));</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span><code>true true false</code></div>
+    <div><span class="ol">B.</span><code>true false false</code></div>
+    <div><span class="ol">C.</span><code>true false true</code></div>
+    <div><span class="ol">D.</span>An exception is thrown — the stream is reused</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · true false false</div>
+    <p class="expl">Two of three elements start with a letter → <code>anyMatch</code> true; <code>"2"</code> fails → <code>allMatch</code> false; at least one matches → <code>noneMatch</code> false. No reuse problem: each call creates a <em>new</em> stream from the list (D wrong).</p>
+  </details>
+</div>
+
+<!-- Q9 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q9</span><span class="q-tag">Terminal Ops</span></div>
+  <p class="prompt">What is the result of the following?</p>
+<pre>Stream&lt;String&gt; infinite = Stream.generate(() -&gt; <span class="str">"chimp"</span>);
+Predicate&lt;String&gt; pred = x -&gt; Character.isLetter(x.charAt(<span class="num">0</span>));
+System.out.println(infinite.allMatch(pred));</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span><code>true</code></div>
+    <div><span class="ol">B.</span><code>false</code></div>
+    <div><span class="ol">C.</span>The code does not compile</div>
+    <div><span class="ol">D.</span>The code never terminates</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">D · Never terminates</div>
+    <p class="expl">Every generated element matches, so <code>allMatch()</code> can never prove or disprove the claim without checking them all — and there are infinitely many. Had one element <em>failed</em> the predicate, it would have returned <code>false</code> and stopped.</p>
+  </details>
+</div>
+
+<!-- Q10 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q10</span><span class="q-tag">Terminal Ops</span></div>
+  <p class="prompt">What is the result of the following?</p>
+<pre>Stream&lt;Integer&gt; s = Stream.of(<span class="num">1</span>);
+<span class="kw">for</span> (Integer i : s) {
+   System.out.println(i);
+}</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span><code>1</code></div>
+    <div><span class="ol">B.</span>Nothing is printed</div>
+    <div><span class="ol">C.</span>The code does not compile</div>
+    <div><span class="ol">D.</span>An exception is thrown at runtime</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C · Does not compile</div>
+    <p class="expl">A for-each loop requires the source to implement <code>Iterable</code> — streams don't. Use <code>forEach()</code> instead; despite the name similarity, it is a terminal operation, not a loop.</p>
+  </details>
+</div>
+
+<!-- Q11 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q11</span><span class="q-tag">Terminal Ops</span></div>
+  <p class="prompt">What does the following print?</p>
+<pre>Stream&lt;Integer&gt; stream = Stream.of(<span class="num">3</span>, <span class="num">5</span>, <span class="num">6</span>);
+System.out.println(stream.reduce(<span class="num">1</span>, (a, b) -&gt; a * b));</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span><code>14</code></div>
+    <div><span class="ol">B.</span><code>90</code></div>
+    <div><span class="ol">C.</span><code>Optional[90]</code></div>
+    <div><span class="ol">D.</span>The code does not compile</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · 90</div>
+    <p class="expl">Identity 1, accumulator multiplication: 1×3×5×6 = 90. Because an identity is supplied, the return type is <code>T</code> (Integer), not <code>Optional&lt;T&gt;</code> — so C is wrong.</p>
+  </details>
+</div>
+
+<!-- Q12 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q12</span><span class="q-tag">Terminal Ops</span></div>
+  <p class="prompt">What does the following print?</p>
+<pre>Stream&lt;String&gt; stream = Stream.of(<span class="str">"w"</span>, <span class="str">"o"</span>, <span class="str">"l"</span>, <span class="str">"f!"</span>);
+<span class="kw">int</span> length = stream.reduce(<span class="num">0</span>, (i, s) -&gt; i + s.length(), (a, b) -&gt; a + b);
+System.out.println(length);</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span><code>4</code></div>
+    <div><span class="ol">B.</span><code>5</code></div>
+    <div><span class="ol">C.</span><code>0</code></div>
+    <div><span class="ol">D.</span>The code does not compile — the accumulator mixes types</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · 5</div>
+    <p class="expl">The three-arg <code>reduce()</code> exists precisely to mix types: the accumulator combines an <code>Integer</code> running total with each <code>String</code>. Lengths 1+1+1+2 = 5. The combiner merges partial totals (used with parallel streams).</p>
+  </details>
+</div>
+
+<!-- Q13 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q13</span><span class="q-tag">Collect</span></div>
+  <p class="prompt">What does the following print?</p>
+<pre>Stream&lt;String&gt; stream = Stream.of(<span class="str">"w"</span>, <span class="str">"o"</span>, <span class="str">"l"</span>, <span class="str">"f"</span>);
+TreeSet&lt;String&gt; set = stream.collect(
+   TreeSet::<span class="kw">new</span>, TreeSet::add, TreeSet::addAll);
+System.out.println(set);</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span><code>[w, o, l, f]</code></div>
+    <div><span class="ol">B.</span><code>[f, l, o, w]</code></div>
+    <div><span class="ol">C.</span><code>wolf</code></div>
+    <div><span class="ol">D.</span>The code does not compile</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · [f, l, o, w]</div>
+    <p class="expl">This is the supplier/accumulator/combiner form of <code>collect()</code>. A <code>TreeSet</code> keeps natural sorted order, so the letters come out alphabetically, not in insertion order (A wrong).</p>
+  </details>
+</div>
+
+<!-- Q14 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q14</span><span class="q-tag">Intermediate Ops</span></div>
+  <p class="prompt">What does the following print?</p>
+<pre>Stream&lt;Integer&gt; s = Stream.iterate(<span class="num">1</span>, n -&gt; n + <span class="num">1</span>);
+s.skip(<span class="num">5</span>)
+ .limit(<span class="num">2</span>)
+ .forEach(System.out::print);</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span><code>12</code></div>
+    <div><span class="ol">B.</span><code>56</code></div>
+    <div><span class="ol">C.</span><code>67</code></div>
+    <div><span class="ol">D.</span>The code hangs</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C · 67</div>
+    <p class="expl">The infinite stream counts 1, 2, 3, …; <code>skip(5)</code> drops 1–5 so it now starts at 6; <code>limit(2)</code> makes it finite with elements 6 and 7. It doesn't hang because <code>limit()</code> tells the foreperson to stop the line.</p>
+  </details>
+</div>
+
+<!-- Q15 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q15</span><span class="q-tag">Intermediate Ops</span></div>
+  <p class="prompt">What does the following print?</p>
+<pre>Stream&lt;String&gt; s = Stream.of(<span class="str">"monkey"</span>, <span class="str">"gorilla"</span>, <span class="str">"bonobo"</span>);
+s.map(String::length)
+ .forEach(System.out::print);</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span><code>667</code></div>
+    <div><span class="ol">B.</span><code>676</code></div>
+    <div><span class="ol">C.</span><code>monkeygorillabonobo</code></div>
+    <div><span class="ol">D.</span>The code does not compile</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · 676</div>
+    <p class="expl"><code>String::length</code> is shorthand for <code>x -&gt; x.length()</code>: monkey=6, gorilla=7, bonobo=6 → <code>676</code>. Watch the element order — A reverses two of the lengths.</p>
+  </details>
+</div>
+
+<!-- Q16 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q16</span><span class="q-tag">Intermediate Ops</span></div>
+  <p class="prompt">Which is true of the following?</p>
+<pre>List&lt;Integer&gt; x1 = List.of(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>);
+List&lt;Integer&gt; x2 = List.of(<span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>);
+List&lt;Integer&gt; x3 = List.of();
+Stream.of(x1, x2, x3).map(x -&gt; x + <span class="num">1</span>)
+   .flatMap(x -&gt; x.stream())
+   .forEach(System.out::print);</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span>It prints <code>123456</code></div>
+    <div><span class="ol">B.</span>It prints <code>234567</code></div>
+    <div><span class="ol">C.</span>It prints nothing</div>
+    <div><span class="ol">D.</span>The code does not compile</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">D · Does not compile</div>
+    <p class="expl">Inside <code>map()</code>, each element <code>x</code> is a <code>List&lt;Integer&gt;</code>, not an Integer — and you can't add <code>1</code> to a List. Had the <code>map()</code> call been removed, <code>flatMap</code> would flatten the lists and print <code>123456</code>.</p>
+  </details>
+</div>
+
+<!-- Q17 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q17</span><span class="q-tag">Intermediate Ops</span></div>
+  <p class="prompt">What is the result of the following?</p>
+<pre>Stream&lt;String&gt; s = Stream.of(<span class="str">"brown bear-"</span>, <span class="str">"grizzly-"</span>);
+s.sorted(Comparator::reverseOrder)
+ .forEach(System.out::print);</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span><code>grizzly-brown bear-</code></div>
+    <div><span class="ol">B.</span><code>brown bear-grizzly-</code></div>
+    <div><span class="ol">C.</span>The code does not compile</div>
+    <div><span class="ol">D.</span>An exception is thrown at runtime</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C · Does not compile</div>
+    <p class="expl"><code>Comparator::reverseOrder</code> references a method taking no arguments and returning a Comparator — equivalent to a <code>Supplier&lt;Comparator&gt;</code>, which is not a <code>Comparator</code>. With <code>Comparator.reverseOrder()</code> (a method <em>call</em>), the output would be A.</p>
+  </details>
+</div>
+
+<!-- Q18 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q18</span><span class="q-tag">Pipeline</span></div>
+  <p class="prompt">What is the result of the following?</p>
+<pre>Stream.generate(() -&gt; <span class="str">"Elsa"</span>)
+   .filter(n -&gt; n.length() == <span class="num">4</span>)
+   .sorted()
+   .limit(<span class="num">2</span>)
+   .forEach(System.out::println);</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span>It prints <code>Elsa</code> twice</div>
+    <div><span class="ol">B.</span>It prints <code>Elsa</code> once</div>
+    <div><span class="ol">C.</span>It hangs (or eventually runs out of memory)</div>
+    <div><span class="ol">D.</span>The code does not compile</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C · Hangs</div>
+    <p class="expl"><code>sorted()</code> sits <em>before</em> <code>limit()</code>, and it can't emit anything until it has seen every element — which never happens on an infinite stream. Compare with Q19.</p>
+  </details>
+</div>
+
+<!-- Q19 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q19</span><span class="q-tag">Pipeline</span></div>
+  <p class="prompt">What is the result of the following?</p>
+<pre>Stream.generate(() -&gt; <span class="str">"Elsa"</span>)
+   .filter(n -&gt; n.length() == <span class="num">4</span>)
+   .limit(<span class="num">2</span>)
+   .sorted()
+   .forEach(System.out::println);</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span>It prints <code>Elsa</code> twice</div>
+    <div><span class="ol">B.</span>It prints <code>Elsa</code> once</div>
+    <div><span class="ol">C.</span>It hangs</div>
+    <div><span class="ol">D.</span>The code does not compile</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · Elsa twice</div>
+    <p class="expl">Now <code>limit(2)</code> comes first, making the stream finite before <code>sorted()</code> runs. Two "Elsa" strings pass the filter, get sorted (trivially), and print. If the generated string were <code>"Olaf Lazisson"</code>, the filter would pass nothing, <code>limit(2)</code> would never fill, and the code <em>would</em> hang.</p>
+  </details>
+</div>
+
+<!-- Q20 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q20</span><span class="q-tag">Intermediate Ops</span></div>
+  <p class="prompt">What does the following print?</p>
+<pre><span class="kw">var</span> numbers = <span class="kw">new</span> ArrayList&lt;&gt;();
+<span class="kw">var</span> letters = <span class="kw">new</span> ArrayList&lt;&gt;();
+numbers.add(<span class="num">1</span>);
+letters.add(<span class="str">'a'</span>);
+Stream&lt;List&lt;?&gt;&gt; bad = Stream.of(numbers, letters);
+bad.peek(x -&gt; x.remove(<span class="num">0</span>))
+   .map(List::size)
+   .forEach(System.out::print);</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span><code>11</code></div>
+    <div><span class="ol">B.</span><code>00</code></div>
+    <div><span class="ol">C.</span>The code does not compile</div>
+    <div><span class="ol">D.</span>A <code>ConcurrentModificationException</code> is thrown</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · 00</div>
+    <p class="expl">Java doesn't stop <code>peek()</code> from mutating the data — each list loses its only element before <code>map(List::size)</code> runs, so both sizes are 0. Without the peek, the output would be <code>11</code>. Bad practice, valid Java.</p>
+  </details>
+</div>
+
+<!-- Q21 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q21</span><span class="q-tag">Pipeline</span></div>
+  <p class="prompt">What does the following print?</p>
+<pre><span class="kw">long</span> count = Stream.of(<span class="str">"goldfish"</span>, <span class="str">"finch"</span>)
+   .filter(s -&gt; s.length() &gt; <span class="num">5</span>)
+   .collect(Collectors.toList())
+   .stream()
+   .count();
+System.out.println(count);</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span><code>0</code></div>
+    <div><span class="ol">B.</span><code>1</code></div>
+    <div><span class="ol">C.</span><code>2</code></div>
+    <div><span class="ol">D.</span>An <code>IllegalStateException</code> — the stream is reused</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · 1</div>
+    <p class="expl">These are two <em>chained pipelines</em>, not one reused stream: pipeline 1 ends at <code>collect()</code>, and <code>.stream()</code> starts a brand-new pipeline from the collected list. Only <code>goldfish</code> (8 chars) beats the length-5 filter; <code>finch</code> has exactly 5 and <code>&gt; 5</code> is strict.</p>
+  </details>
+</div>
+
+<!-- Q22 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q22</span><span class="q-tag">Primitive Streams</span></div>
+  <p class="prompt">Which of the following print exactly <code>12345</code>? <span class="caa">(Choose all that apply.)</span></p>
+  <div class="opts">
+    <div><span class="ol">A.</span><code>IntStream.range(1, 5).forEach(System.out::print);</code></div>
+    <div><span class="ol">B.</span><code>IntStream.range(1, 6).forEach(System.out::print);</code></div>
+    <div><span class="ol">C.</span><code>IntStream.rangeClosed(1, 5).forEach(System.out::print);</code></div>
+    <div><span class="ol">D.</span><code>IntStream.rangeClosed(1, 6).forEach(System.out::print);</code></div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B, C</div>
+    <p class="expl"><code>range()</code> is inclusive-exclusive, so B gives 1–5; <code>rangeClosed()</code> is inclusive-inclusive, so C gives 1–5 too. A prints <code>1234</code> and D prints <code>123456</code>.</p>
+  </details>
+</div>
+
+<!-- Q23 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q23</span><span class="q-tag">Primitive Streams</span></div>
+  <p class="prompt">Which is true of the following?</p>
+<pre><span class="num">4:</span> Stream&lt;Integer&gt; s = Stream.of(<span class="num">1</span>);
+<span class="num">5:</span> IntStream is = s.boxed();</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span>The code compiles and <code>is</code> contains one element</div>
+    <div><span class="ol">B.</span>Line 5 does not compile</div>
+    <div><span class="ol">C.</span>Line 4 does not compile</div>
+    <div><span class="ol">D.</span>The code compiles but throws an exception at runtime</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · Line 5 does not compile</div>
+    <p class="expl"><code>boxed()</code> exists only on the primitive streams (<code>IntStream</code>, <code>LongStream</code>, <code>DoubleStream</code>) to convert <em>toward</em> objects — a <code>Stream&lt;Integer&gt;</code> has no such method, and its result would be a <code>Stream</code> anyway, not an <code>IntStream</code>. To go object→primitive, use <code>mapToInt()</code>.</p>
+  </details>
+</div>
+
+<!-- Q24 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q24</span><span class="q-tag">Primitive Streams</span></div>
+  <p class="prompt">Given <code>var is = IntStream.empty();</code> which are true? <span class="caa">(Choose all that apply.)</span></p>
+  <div class="opts">
+    <div><span class="ol">A.</span><code>is.average()</code> returns the type <code>OptionalDouble</code></div>
+    <div><span class="ol">B.</span><code>is.average()</code> returns the type <code>OptionalInt</code></div>
+    <div><span class="ol">C.</span><code>is.sum()</code> returns the type <code>int</code>, with value <code>0</code></div>
+    <div><span class="ol">D.</span><code>is.sum()</code> returns the type <code>OptionalInt</code></div>
+    <div><span class="ol">E.</span><code>is.findAny()</code> returns the type <code>OptionalInt</code></div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A, C, E</div>
+    <p class="expl"><code>average()</code> <em>always</em> returns <code>OptionalDouble</code> regardless of stream type (averages can be fractional). <code>sum()</code> returns the primitive — an empty stream sums to 0, no Optional involved. Element-returning methods like <code>findAny()</code> on an IntStream use <code>OptionalInt</code>.</p>
+  </details>
+</div>
+
+<!-- Q25 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q25</span><span class="q-tag">Pipeline</span></div>
+  <p class="prompt">What does the following print?</p>
+<pre><span class="kw">var</span> cats = <span class="kw">new</span> ArrayList&lt;String&gt;();
+cats.add(<span class="str">"Annie"</span>);
+cats.add(<span class="str">"Ripley"</span>);
+<span class="kw">var</span> stream = cats.stream();
+cats.add(<span class="str">"KC"</span>);
+System.out.println(stream.count());</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span><code>2</code></div>
+    <div><span class="ol">B.</span><code>3</code></div>
+    <div><span class="ol">C.</span>A <code>ConcurrentModificationException</code> is thrown</div>
+    <div><span class="ol">D.</span>The code does not compile</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · 3</div>
+    <p class="expl">Streams are lazily evaluated: <code>cats.stream()</code> only records <em>where</em> to find the data. When <code>count()</code> finally runs the pipeline, the list already contains three cats.</p>
+  </details>
+</div>
+
+<!-- Q26 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q26</span><span class="q-tag">Optional</span></div>
+  <p class="prompt">Given the method below, what prints when it is called with <code>Optional.of(4)</code>?</p>
+<pre><span class="kw">private static void</span> threeDigit(Optional&lt;Integer&gt; optional) {
+   optional.map(n -&gt; <span class="str">""</span> + n)
+      .filter(s -&gt; s.length() == <span class="num">3</span>)
+      .ifPresent(System.out::println);
+}</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span><code>4</code></div>
+    <div><span class="ol">B.</span><code>004</code></div>
+    <div><span class="ol">C.</span>Nothing is printed</div>
+    <div><span class="ol">D.</span>A <code>NoSuchElementException</code> is thrown</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C · Nothing</div>
+    <p class="expl">4 is mapped to the String <code>"4"</code>, whose length is 1, so <code>filter()</code> returns an empty Optional and <code>ifPresent()</code> silently does nothing. With <code>Optional.of(123)</code> it would print <code>123</code>; with an empty Optional, still nothing — no exception either way.</p>
+  </details>
+</div>
+
+<!-- Q27 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q27</span><span class="q-tag">Optional</span></div>
+  <p class="prompt">The helper below returns <code>Optional&lt;Integer&gt;</code>. Which assignment compiles?</p>
+<pre><span class="kw">public static</span> Optional&lt;Integer&gt; calculator(String text) { … }
+
+Optional&lt;String&gt; optional = Optional.of(<span class="str">"95"</span>);
+<span class="cm">// which line?</span></pre>
+  <div class="opts">
+    <div><span class="ol">A.</span><code>Optional&lt;Integer&gt; r = optional.map(ChainingOptionals::calculator);</code></div>
+    <div><span class="ol">B.</span><code>Optional&lt;Integer&gt; r = optional.flatMap(ChainingOptionals::calculator);</code></div>
+    <div><span class="ol">C.</span>Both A and B</div>
+    <div><span class="ol">D.</span>Neither A nor B</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · flatMap</div>
+    <p class="expl"><code>map()</code> wraps the method's result in <em>another</em> Optional, producing <code>Optional&lt;Optional&lt;Integer&gt;&gt;</code> — a type mismatch, so A does not compile. <code>flatMap()</code> flattens that extra layer, which is exactly its job when chaining Optional-returning methods.</p>
+  </details>
+</div>
+
+<!-- Q28 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q28</span><span class="q-tag">Collectors</span></div>
+  <p class="prompt">What is the result of the following?</p>
+<pre><span class="kw">var</span> ohMy = Stream.of(<span class="str">"lions"</span>, <span class="str">"tigers"</span>, <span class="str">"bears"</span>);
+Map&lt;Integer, String&gt; map = ohMy.collect(
+   Collectors.toMap(String::length, k -&gt; k));
+System.out.println(map);</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span><code>{5=lions, 6=tigers}</code></div>
+    <div><span class="ol">B.</span><code>{5=bears, 6=tigers}</code></div>
+    <div><span class="ol">C.</span><code>{5=lions,bears, 6=tigers}</code></div>
+    <div><span class="ol">D.</span>The code compiles but throws an <code>IllegalStateException</code> at runtime</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">D · IllegalStateException</div>
+    <p class="expl"><code>"lions"</code> and <code>"bears"</code> both map to key 5, and without a merge function the collector refuses to choose: <em>Duplicate key 5 (attempted merging values lions and bears)</em>. Adding a third argument like <code>(s1, s2) -&gt; s1 + "," + s2</code> produces C.</p>
+  </details>
+</div>
+
+<!-- Q29 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q29</span><span class="q-tag">Collectors</span></div>
+  <p class="prompt">Which are true about <code>partitioningBy()</code>? <span class="caa">(Choose all that apply.)</span></p>
+<pre><span class="kw">var</span> ohMy = Stream.of(<span class="str">"lions"</span>, <span class="str">"tigers"</span>, <span class="str">"bears"</span>);
+Map&lt;Boolean, List&lt;String&gt;&gt; map = ohMy.collect(
+   Collectors.partitioningBy(s -&gt; s.length() &lt;= <span class="num">7</span>));
+System.out.println(map);</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span>The output is <code>{true=[lions, tigers, bears]}</code></div>
+    <div><span class="ol">B.</span>The output is <code>{false=[], true=[lions, tigers, bears]}</code></div>
+    <div><span class="ol">C.</span>A downstream collector could change the values to a <code>Set</code></div>
+    <div><span class="ol">D.</span>A map supplier such as <code>TreeMap::new</code> could change the Map type, like <code>groupingBy()</code></div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B, C</div>
+    <p class="expl">A partitioned map <em>always</em> has both keys, even when one holds an empty list — so B, not A. A downstream collector (e.g. <code>Collectors.toSet()</code>) may change the value type (C). But unlike <code>groupingBy()</code>, <code>partitioningBy()</code> has no overload accepting a Map supplier (D wrong).</p>
+  </details>
+</div>
+
+<!-- Q30 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q30</span><span class="q-tag">Collectors · Spliterator</span></div>
+  <p class="prompt">What does the following print?</p>
+<pre><span class="kw">var</span> list = List.of(<span class="str">"bird-"</span>, <span class="str">"bunny-"</span>, <span class="str">"cat-"</span>, <span class="str">"dog-"</span>, <span class="str">"fish-"</span>, <span class="str">"lamb-"</span>, <span class="str">"mouse-"</span>);
+Spliterator&lt;String&gt; original = list.spliterator();
+Spliterator&lt;String&gt; emmasBag = original.trySplit();
+emmasBag.forEachRemaining(System.out::print);</pre>
+  <div class="opts">
+    <div><span class="ol">A.</span><code>bird-bunny-cat-</code></div>
+    <div><span class="ol">B.</span><code>dog-fish-lamb-mouse-</code></div>
+    <div><span class="ol">C.</span><code>bird-bunny-cat-dog-fish-lamb-mouse-</code></div>
+    <div><span class="ol">D.</span>Nothing — <code>trySplit()</code> returns an empty Spliterator</div>
+  </div>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · bird-bunny-cat-</div>
+    <p class="expl"><code>trySplit()</code> removes roughly the <em>front</em> half of the seven elements into the new Spliterator — bird-, bunny-, cat-. The original keeps the remaining four (dog- onward). Bonus rule: <code>tryAdvance()</code> processes one element and returns a boolean; <code>trySplit()</code> even works on infinite streams (it just won't take "half").</p>
+  </details>
+</div>
+
+<!-- QUICK REVISION -->
+<div class="revision">
+  <h2>★ Quick Revision — Chapter 10 Core Traps</h2>
+  <ul>
+    <li><strong>Optional:</strong> <code>get()</code>/<code>orElseThrow()</code> on empty → <code>NoSuchElementException</code>; <code>orElseGet</code> Supplier must return the value's type, never an exception.</li>
+    <li><strong>Pipeline:</strong> one terminal op per stream; stream dead afterwards; intermediate ops are lazy; streams are not <code>Iterable</code> (no for-each).</li>
+    <li><strong>Infinite streams:</strong> find methods terminate; match methods sometimes; count/min/max/forEach/reduce/collect hang. <code>sorted()</code> before <code>limit()</code> hangs; a filter that passes nothing before <code>limit()</code> hangs.</li>
+    <li><strong>Method references:</strong> <code>Comparator::reverseOrder</code> is a Supplier, not a Comparator — compile error in <code>sorted()</code>.</li>
+    <li><strong>Lazy link:</strong> elements added to the source List <em>before</em> the terminal op runs are included.</li>
+    <li><strong>Primitive streams:</strong> <code>range</code> end-exclusive / <code>rangeClosed</code> end-inclusive; <code>boxed()</code> only on primitive streams; <code>sum()</code> → primitive (0 when empty); <code>average()</code> → always <code>OptionalDouble</code>.</li>
+    <li><strong>Optional chaining:</strong> a method that already returns Optional needs <code>flatMap</code>, not <code>map</code>.</li>
+    <li><strong>Collectors:</strong> <code>toMap</code> with duplicate keys and no merge function → <code>IllegalStateException</code>; <code>groupingBy</code> forbids null keys and accepts a Map supplier; <code>partitioningBy</code> always yields both Boolean keys and accepts <em>no</em> Map supplier; <code>stream.toList()</code> is unmodifiable while <code>Collectors.toList()</code> is mutable.</li>
+    <li><strong>Spliterator:</strong> <code>trySplit()</code> removes ~the front half; <code>tryAdvance()</code> one element (boolean); <code>forEachRemaining()</code> the rest — never on an infinite Spliterator.</li>
+  </ul>
+</div>
+
+</div>
+</body>
+</html>
