@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 — Chapter 10: Streams (Detailed Handnote)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6f8; --card:#ffffff; --ink:#2d2a26; --muted:#7a746c;
+  --accent:#c96442; --accent2:#d4845e;
+  --kw:#7c5cbf; --str:#3a8a5c; --num:#b8860b; --err:#c44d3e; --cm:#a89a8a;
+  --green:#5aab7b; --greenlbl:#3b7d57; --gold:#d4a24c; --goldlbl:#a9772a; --red:#e06b5e; --redlbl:#c0453a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:'Source Sans 3',sans-serif;font-size:16.5px;line-height:1.65;padding:28px 16px}
+.wrap{max-width:920px;margin:0 auto}
+h1,h2,h3{font-family:'Merriweather',serif}
+code,pre,.mono{font-family:'JetBrains Mono',monospace}
+
+/* header */
+.header{background:linear-gradient(135deg,#ffffff,#fbf7f4);border-radius:18px;padding:34px 36px;box-shadow:0 6px 24px rgba(80,60,40,.09);margin-bottom:26px}
+.badge{display:inline-block;background:linear-gradient(90deg,#c96442,#d4845e);color:#fff;font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;padding:7px 16px;border-radius:999px;font-weight:600;margin-bottom:16px}
+.header h1{font-size:2rem;font-weight:900;line-height:1.25}
+.header h1 .mutedt{color:var(--muted);font-weight:400;font-size:1.15rem}
+.subtitle{font-style:italic;color:var(--muted);margin:10px 0 20px}
+.objectives{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:4px solid var(--green);border-radius:12px;padding:18px 22px}
+.objectives h3{font-family:'Source Sans 3',sans-serif;color:var(--greenlbl);font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.objectives ul{margin-left:20px}
+.objectives li{margin:4px 0}
+
+/* TOC */
+.toc{background:var(--card);border-radius:14px;padding:24px 28px;box-shadow:0 4px 16px rgba(80,60,40,.07);margin-bottom:30px}
+.toc h2{font-size:1.05rem;margin-bottom:14px;border:none}
+.toc-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px}
+.toc a{color:#9a5030;text-decoration:none;font-size:.95rem;padding:4px 8px;border-radius:8px;display:block;transition:background .2s}
+.toc a:hover{background:#f8f1ea}
+.toc a .n{font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:.8rem;margin-right:8px}
+
+/* sections */
+.section{background:var(--card);border-radius:16px;padding:30px 34px;box-shadow:0 4px 16px rgba(80,60,40,.07);margin-bottom:28px;transition:box-shadow .25s}
+.section:hover{box-shadow:0 8px 28px rgba(80,60,40,.11)}
+.secnum{font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:.8rem;letter-spacing:.15em;font-weight:600}
+.section h2{font-size:1.5rem;font-weight:700;padding-bottom:12px;border-bottom:2px solid #ece3da;margin:6px 0 18px}
+.section h3{font-size:1.13rem;margin:24px 0 10px;color:#4a4038}
+.section p{margin:10px 0}
+.section ul,.section ol{margin:10px 0 10px 24px}
+.section li{margin:5px 0}
+
+/* code */
+pre{background:#fdfaf7;border-radius:12px;padding:16px 20px;box-shadow:inset 0 2px 8px rgba(120,90,60,.08);overflow-x:auto;font-size:.87rem;line-height:1.6;margin:14px 0}
+.kw{color:#7c5cbf;font-weight:600}.str{color:#3a8a5c}.num{color:#b8860b}.err{color:#c44d3e;font-weight:600}.cm{color:#a89a8a;font-style:italic}
+p code,li code,td code,.card code{background:#f3ece4;color:#9a5030;padding:1.5px 6px;border-radius:6px;font-size:.85em}
+
+/* cards */
+.card{border-radius:14px;padding:16px 20px;margin:16px 0;box-shadow:0 3px 12px rgba(80,60,40,.06);transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(80,60,40,.12)}
+.card .lbl{font-family:'Source Sans 3',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;display:block;margin-bottom:6px}
+.exam-trap{background:linear-gradient(135deg,#fef2f0,#fff8f7);border-left:4px solid #e06b5e}
+.exam-trap .lbl{color:#c0453a}
+.key-rule{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:4px solid #5aab7b}
+.key-rule .lbl{color:#3b7d57}
+.remember{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:4px solid #d4a24c}
+.remember .lbl{color:#a9772a}
+
+/* rules-box */
+.rules-box{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-top:4px solid var(--green);border-radius:14px;padding:18px 24px;margin:18px 0;box-shadow:0 3px 12px rgba(80,60,40,.06)}
+.rules-box h4{color:var(--greenlbl);font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.rules-box ol,.rules-box ul{margin-left:22px}
+
+/* vs-grid */
+.vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+.vs-grid .col{background:#fff;border-radius:12px;padding:16px 18px;box-shadow:0 3px 12px rgba(80,60,40,.08)}
+.vs-grid .col h4{font-size:.95rem;margin-bottom:8px}
+.vs-grid .col:first-child h4{color:#7c5cbf}
+.vs-grid .col:last-child h4{color:#3b7d57}
+.vs-grid ul{margin-left:18px;font-size:.93rem}
+
+/* tables */
+table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 3px 12px rgba(80,60,40,.08);margin:14px 0;font-size:.92rem}
+th{background:#f0e8de;text-align:left;padding:10px 14px;font-weight:700;font-size:.85rem}
+td{padding:9px 14px;border-top:1px solid #f2ece5;vertical-align:top}
+.yes{color:#3b7d57;font-weight:700}.no{color:#c44d3e;font-weight:700}
+
+/* trace */
+.trace{background:#faf7f3;border-radius:12px;padding:14px 20px;margin:12px 0;font-size:.93rem}
+.trace li{margin:4px 0}
+
+/* recap */
+.recap{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:4px solid var(--gold);border-radius:16px;padding:28px 32px;box-shadow:0 4px 16px rgba(80,60,40,.07);margin-bottom:28px}
+.recap h2{font-size:1.4rem;border-bottom:2px solid #f0e2c8;padding-bottom:10px;margin-bottom:16px}
+.recap h4{color:var(--goldlbl);font-size:1rem;margin:16px 0 4px}
+.recap ul{margin-left:22px}
+
+@media(max-width:680px){
+  .toc-grid,.vs-grid{grid-template-columns:1fr}
+  .section,.header,.recap{padding:22px 20px}
+  body{font-size:15.5px}
+  table{font-size:.82rem}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ============ HEADER ============ -->
+<div class="header">
+  <span class="badge">OCP Java SE 21 Developer — Exam 1Z0-830</span>
+  <h1>Chapter 10 · Streams <span class="mutedt">(Detailed Handnote)</span></h1>
+  <p class="subtitle">Optional, stream pipelines, primitive streams, collectors, grouping &amp; partitioning, and the Spliterator — everything the exam tests, in one place.</p>
+  <div class="objectives">
+    <h3>✓ Exam Objectives Covered</h3>
+    <ul>
+      <li>Use Java object and primitive Streams, including lambdas implementing functional interfaces, to <strong>create, filter, transform, process, and sort</strong> data.</li>
+      <li>Perform <strong>decomposition, concatenation, and reduction</strong>, and <strong>grouping and partitioning</strong> on sequential and parallel streams.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ TOC ============ -->
+<div class="toc">
+  <h2>Table of Contents</h2>
+  <div class="toc-grid">
+    <a href="#s1"><span class="n">01</span>Returning an Optional</a>
+    <a href="#s2"><span class="n">02</span>The Stream Pipeline Flow</a>
+    <a href="#s3"><span class="n">03</span>Creating Stream Sources</a>
+    <a href="#s4"><span class="n">04</span>Common Terminal Operations</a>
+    <a href="#s5"><span class="n">05</span>Common Intermediate Operations</a>
+    <a href="#s6"><span class="n">06</span>Putting Together the Pipeline</a>
+    <a href="#s7"><span class="n">07</span>Working with Primitive Streams</a>
+    <a href="#s8"><span class="n">08</span>Primitive Optionals &amp; Summary Statistics</a>
+    <a href="#s9"><span class="n">09</span>Lazy Data Link &amp; Chaining Optionals</a>
+    <a href="#s10"><span class="n">10</span>Collecting Results — Basic Collectors &amp; toMap</a>
+    <a href="#s11"><span class="n">11</span>Grouping, Partitioning, Mapping &amp; Teeing</a>
+    <a href="#s12"><span class="n">12</span>Using a Spliterator</a>
+    <a href="#recap"><span class="n">★</span>Short Recap</a>
+    <a href="#cheats"><span class="n">⚠</span>Exam Traps Cheat Sheet</a>
+  </div>
+</div>
+
+<!-- ============ SECTION 01 ============ -->
+<div class="section" id="s1">
+  <span class="secnum">SECTION 01</span>
+  <h2>Returning an Optional</h2>
+  <p>An <code>Optional&lt;T&gt;</code> is a <em>box</em> that may contain a value or may be empty. It expresses "we don't know / not applicable" cleanly — e.g., the average of zero exam scores isn't <code>0</code>; it simply doesn't exist.</p>
+
+  <h3>Creating an Optional</h3>
+  <p><code>Optional</code> uses a <strong>factory pattern</strong> — it has <em>no public constructor</em>. Three static factories:</p>
+<pre><span class="kw">public static</span> Optional&lt;Double&gt; average(<span class="kw">int</span>… scores) {
+   <span class="kw">if</span> (scores.length == <span class="num">0</span>) <span class="kw">return</span> Optional.empty();
+   <span class="kw">int</span> sum = <span class="num">0</span>;
+   <span class="kw">for</span> (<span class="kw">int</span> score : scores) sum += score;
+   <span class="kw">return</span> Optional.of((<span class="kw">double</span>) sum / scores.length);
+}
+System.out.println(average(<span class="num">90</span>, <span class="num">100</span>)); <span class="cm">// Optional[95.0]</span>
+System.out.println(average());        <span class="cm">// Optional.empty</span></pre>
+  <p>Wrapping a possibly-<code>null</code> value? The ternary pattern <code>(value == null) ? Optional.empty() : Optional.of(value)</code> is so common that Java provides:</p>
+<pre>Optional o = Optional.ofNullable(value);</pre>
+
+  <div class="card exam-trap"><span class="lbl">⚠ Exam Trap</span>
+    Calling <code>get()</code> on an <strong>empty</strong> Optional throws <code>NoSuchElementException</code> at runtime. Always guard with <code>isPresent()</code> — or use a safer method below.
+  </div>
+
+  <h3>Instance methods you must know</h3>
+  <table>
+    <tr><th>Method</th><th>When Optional is empty</th><th>When Optional contains value</th></tr>
+    <tr><td><code>get()</code></td><td class="no">Throws exception</td><td>Returns value</td></tr>
+    <tr><td><code>ifPresent(Consumer c)</code></td><td>Does nothing</td><td>Calls Consumer with value</td></tr>
+    <tr><td><code>isPresent()</code></td><td>Returns <code>false</code></td><td>Returns <code>true</code></td></tr>
+    <tr><td><code>orElse(T other)</code></td><td>Returns <code>other</code> parameter</td><td>Returns value</td></tr>
+    <tr><td><code>orElseGet(Supplier s)</code></td><td>Returns result of calling Supplier</td><td>Returns value</td></tr>
+    <tr><td><code>orElseThrow()</code></td><td class="no">Throws NoSuchElementException</td><td>Returns value</td></tr>
+    <tr><td><code>orElseThrow(Supplier s)</code></td><td class="no">Throws exception created by Supplier</td><td>Returns value</td></tr>
+  </table>
+
+  <h3>Dealing with an empty Optional</h3>
+<pre>Optional&lt;Double&gt; opt = average();
+System.out.println(opt.orElse(Double.NaN));            <span class="cm">// NaN</span>
+System.out.println(opt.orElseGet(() -&gt; Math.random()));<span class="cm">// e.g. 0.4977…</span>
+System.out.println(opt.orElseThrow());                 <span class="cm">// NoSuchElementException</span>
+System.out.println(opt.orElseThrow(
+   () -&gt; <span class="kw">new</span> IllegalStateException()));               <span class="cm">// IllegalStateException</span></pre>
+  <p>Note in <code>orElseThrow(Supplier)</code> you do <strong>not</strong> write <code>throw new …</code> — the Supplier merely <em>creates</em> the exception; <code>orElseThrow()</code> throws it for you.</p>
+
+  <div class="card exam-trap"><span class="lbl">⚠ Exam Trap — orElseGet type mismatch</span>
+<pre style="margin:8px 0 4px">System.out.println(opt.orElseGet(
+   () -&gt; <span class="kw">new</span> IllegalStateException())); <span class="err">// DOES NOT COMPILE</span></pre>
+    <code>opt</code> is an <code>Optional&lt;Double&gt;</code>, so the Supplier must return a <code>Double</code>. A Supplier returning an exception is a type mismatch. Don't confuse <code>orElseGet</code> (returns a fallback <em>value</em>) with <code>orElseThrow</code> (creates an exception).
+  </div>
+
+  <div class="card key-rule"><span class="lbl">✓ Key Rule</span>
+    If the Optional <strong>has</strong> a value, all of <code>orElse(…)</code>, <code>orElseGet(…)</code>, and <code>orElseThrow(…)</code> simply return the value — the "or else" logic never runs. <code>average(90,100)</code> prints <code>95.0</code> three times through all three methods.
+  </div>
+</div>
+
+<!-- ============ SECTION 02 ============ -->
+<div class="section" id="s2">
+  <span class="secnum">SECTION 02</span>
+  <h2>The Stream Pipeline Flow</h2>
+  <p>A <strong>stream</strong> is a sequence of data; a <strong>stream pipeline</strong> is the set of operations that run on it to produce a result. Think of it as an <em>assembly line</em>: each worker (operation) handles one element and passes it on — once an element passes a station, it doesn't come back. Data is created <em>when needed</em>: this is <strong>lazy evaluation</strong>.</p>
+  <p>Every pipeline has three parts:</p>
+  <ul>
+    <li><strong>Source</strong> — where the stream comes from.</li>
+    <li><strong>Intermediate operations</strong> — transform the stream into another stream. Zero or many; they <em>do not run</em> until the terminal operation runs.</li>
+    <li><strong>Terminal operation</strong> — produces a result. A stream can be used <em>only once</em>; after the terminal operation completes, the stream is no longer valid.</li>
+  </ul>
+
+  <h3>Intermediate vs. terminal — the exam wants this cold</h3>
+  <table>
+    <tr><th>Scenario</th><th>Intermediate operation</th><th>Terminal operation</th></tr>
+    <tr><td>Required part of useful pipeline?</td><td class="no">No</td><td class="yes">Yes</td></tr>
+    <tr><td>Can exist multiple times in pipeline?</td><td class="yes">Yes</td><td class="no">No</td></tr>
+    <tr><td>Return type is stream type?</td><td class="yes">Yes</td><td class="no">No</td></tr>
+    <tr><td>Executed upon method call?</td><td class="no">No</td><td class="yes">Yes</td></tr>
+    <tr><td>Stream valid after call?</td><td class="yes">Yes</td><td class="no">No</td></tr>
+  </table>
+
+  <div class="card remember"><span class="lbl">★ Remember — the foreperson</span>
+    Java acts as a factory <em>foreperson</em>: it reads the whole pipeline first, sets up the workers, and only starts them when it sees the terminal operation. With a <code>limit(2)</code> in the pipeline, the foreperson <strong>stops the line</strong> as soon as two elements pass — remaining elements in the source are never processed. This is why lazy evaluation makes infinite streams usable.
+  </div>
+</div>
+
+<!-- ============ SECTION 03 ============ -->
+<div class="section" id="s3">
+  <span class="secnum">SECTION 03</span>
+  <h2>Creating Stream Sources</h2>
+  <p>Streams live in <code>java.util.stream</code>; the object stream interface is <code>Stream&lt;T&gt;</code>.</p>
+  <h3>Finite streams</h3>
+<pre>Stream&lt;String&gt;  empty         = Stream.empty();          <span class="cm">// count = 0</span>
+Stream&lt;Integer&gt; singleElement = Stream.of(<span class="num">1</span>);            <span class="cm">// count = 1</span>
+Stream&lt;Integer&gt; fromArray     = Stream.of(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>);      <span class="cm">// count = 3 (varargs)</span>
+
+<span class="kw">var</span> list = List.of(<span class="str">"a"</span>, <span class="str">"b"</span>, <span class="str">"c"</span>);
+Stream&lt;String&gt; fromList         = list.stream();
+Stream&lt;String&gt; fromListParallel = list.parallelStream(); <span class="cm">// parallel variant</span></pre>
+
+  <h3>Infinite streams</h3>
+<pre>Stream&lt;Double&gt;  randoms    = Stream.generate(Math::random);
+Stream&lt;Integer&gt; oddNumbers = Stream.iterate(<span class="num">1</span>, n -&gt; n + <span class="num">2</span>);
+
+Stream&lt;Integer&gt; oddUnder100 = Stream.iterate(
+   <span class="num">1</span>,              <span class="cm">// seed</span>
+   n -&gt; n &lt; <span class="num">100</span>,   <span class="cm">// Predicate to specify when done</span>
+   n -&gt; n + <span class="num">2</span>);    <span class="cm">// UnaryOperator to get next value</span></pre>
+
+  <div class="card exam-trap"><span class="lbl">⚠ Exam Trap</span>
+    The 3-arg <code>iterate()</code> parameters are separated by <strong>commas</strong>, like any method call. The exam may sneak in <strong>semicolons</strong> to make it look like a <code>for</code> loop — that does not compile. Also: printing a stream reference gives something like <code>java.util.stream.ReferencePipeline$3@4517d9a3</code>, not the contents.
+  </div>
+
+  <table>
+    <tr><th>Method</th><th>Finite or infinite?</th><th>Notes</th></tr>
+    <tr><td><code>Stream.empty()</code></td><td>Finite</td><td>Stream with zero elements.</td></tr>
+    <tr><td><code>Stream.of(varargs)</code></td><td>Finite</td><td>Stream with the elements listed.</td></tr>
+    <tr><td><code>coll.stream()</code></td><td>Finite</td><td>Stream from a Collection.</td></tr>
+    <tr><td><code>coll.parallelStream()</code></td><td>Finite</td><td>Stream from a Collection that can run in parallel.</td></tr>
+    <tr><td><code>Stream.generate(supplier)</code></td><td class="no">Infinite</td><td>Calls the Supplier for each element upon request.</td></tr>
+    <tr><td><code>Stream.iterate(seed, unaryOperator)</code></td><td class="no">Infinite</td><td>Seed first, then UnaryOperator for each next element.</td></tr>
+    <tr><td><code>Stream.iterate(seed, predicate, unaryOperator)</code></td><td>Finite or infinite</td><td>Stops if the Predicate returns <code>false</code>.</td></tr>
+  </table>
+</div>
+
+<!-- ============ SECTION 04 ============ -->
+<div class="section" id="s4">
+  <span class="secnum">SECTION 04</span>
+  <h2>Common Terminal Operations</h2>
+  <p>A terminal operation can exist without intermediate operations, but not the other way around. A <strong>reduction</strong> is a special terminal operation that combines the <em>entire</em> stream contents into a single primitive or Object.</p>
+
+  <table>
+    <tr><th>Method</th><th>Infinite streams</th><th>Return value</th><th>Reduction?</th></tr>
+    <tr><td><code>count()</code></td><td class="no">Does not terminate</td><td><code>long</code></td><td class="yes">Yes</td></tr>
+    <tr><td><code>min()</code> / <code>max()</code></td><td class="no">Does not terminate</td><td><code>Optional&lt;T&gt;</code></td><td class="yes">Yes</td></tr>
+    <tr><td><code>findAny()</code> / <code>findFirst()</code></td><td class="yes">Terminates</td><td><code>Optional&lt;T&gt;</code></td><td class="no">No</td></tr>
+    <tr><td><code>allMatch()</code> / <code>anyMatch()</code> / <code>noneMatch()</code></td><td>Sometimes terminates</td><td><code>boolean</code></td><td class="no">No</td></tr>
+    <tr><td><code>forEach()</code></td><td class="no">Does not terminate</td><td><code>void</code></td><td class="no">No</td></tr>
+    <tr><td><code>reduce()</code></td><td class="no">Does not terminate</td><td>Varies</td><td class="yes">Yes</td></tr>
+    <tr><td><code>collect()</code></td><td class="no">Does not terminate</td><td>Varies</td><td class="yes">Yes</td></tr>
+  </table>
+
+  <h3>count(), min() and max()</h3>
+<pre>Stream&lt;String&gt; s = Stream.of(<span class="str">"monkey"</span>, <span class="str">"gorilla"</span>, <span class="str">"bonobo"</span>);
+System.out.println(s.count()); <span class="cm">// 3</span>
+
+Stream&lt;String&gt; t = Stream.of(<span class="str">"monkey"</span>, <span class="str">"ape"</span>, <span class="str">"bonobo"</span>);
+Optional&lt;String&gt; min = t.min((s1, s2) -&gt; s1.length() - s2.length());
+min.ifPresent(System.out::println); <span class="cm">// ape</span>
+
+Optional&lt;?&gt; minEmpty = Stream.empty().min((s1, s2) -&gt; <span class="num">0</span>);
+System.out.println(minEmpty.isPresent()); <span class="cm">// false</span></pre>
+  <div class="card key-rule"><span class="lbl">✓ Key Rule</span>
+    You can't get <em>both</em> min and max from the same stream with these methods — <strong>one terminal operation per stream</strong>. (Primitive streams solve this with <code>summaryStatistics()</code>, Section 08.)
+  </div>
+
+  <h3>findAny() / findFirst()</h3>
+  <p>Return an element in an <code>Optional</code> (empty Optional for an empty stream). These are the first methods that <strong>can terminate on an infinite stream</strong> — only one element needs generating. <code>findAny()</code> commonly returns the first element on serial streams, but that is <em>not guaranteed</em> (especially with parallel streams). They are terminal operations but <strong>not reductions</strong>, since they may not process all elements.</p>
+<pre>Stream&lt;String&gt; infinite = Stream.generate(() -&gt; <span class="str">"chimp"</span>);
+infinite.findAny().ifPresent(System.out::println); <span class="cm">// chimp</span></pre>
+
+  <h3>Matching</h3>
+<pre><span class="kw">var</span> list = List.of(<span class="str">"monkey"</span>, <span class="str">"2"</span>, <span class="str">"chimp"</span>);
+Stream&lt;String&gt; infinite = Stream.generate(() -&gt; <span class="str">"chimp"</span>);
+Predicate&lt;String&gt; pred = x -&gt; Character.isLetter(x.charAt(<span class="num">0</span>));
+
+System.out.println(list.stream().anyMatch(pred));  <span class="cm">// true</span>
+System.out.println(list.stream().allMatch(pred));  <span class="cm">// false</span>
+System.out.println(list.stream().noneMatch(pred)); <span class="cm">// false</span>
+System.out.println(infinite.anyMatch(pred));       <span class="cm">// true</span></pre>
+  <div class="card exam-trap"><span class="lbl">⚠ Exam Trap — sometimes hangs</span>
+    <code>allMatch()</code>, <code>anyMatch()</code>, <code>noneMatch()</code> <em>may or may not</em> terminate on infinite streams — it depends on the data. <code>infinite.anyMatch(pred)</code> above returns <code>true</code> immediately; but <code>infinite.allMatch(pred)</code> <strong>never terminates</strong> because every element matches, so it must check them all.
+  </div>
+  <div class="card remember"><span class="lbl">★ Remember</span>
+    Match methods return a <code>boolean</code>; find methods return an <code>Optional</code> (they return an actual element).
+  </div>
+
+  <h3>forEach()</h3>
+  <p>The only terminal operation with a <code>void</code> return. Doesn't terminate on infinite streams.</p>
+<pre>Stream&lt;String&gt; s = Stream.of(<span class="str">"Monkey"</span>, <span class="str">"Gorilla"</span>, <span class="str">"Bonobo"</span>);
+s.forEach(System.out::print); <span class="cm">// MonkeyGorillaBonobo</span>
+
+Stream&lt;Integer&gt; s2 = Stream.of(<span class="num">1</span>);
+<span class="kw">for</span> (Integer i : s2) {} <span class="err">// DOES NOT COMPILE</span></pre>
+  <div class="card exam-trap"><span class="lbl">⚠ Exam Trap</span>
+    A <code>Stream</code> cannot be the source of a for-each loop — streams do <strong>not implement <code>Iterable</code></strong>. Also, <code>forEach()</code> exists on both <code>Collection</code> and <code>Stream</code> — don't be confused when you see either.
+  </div>
+
+  <h3>reduce() — three signatures</h3>
+<pre><span class="kw">public</span> T reduce(T identity, BinaryOperator&lt;T&gt; accumulator)
+<span class="kw">public</span> Optional&lt;T&gt; reduce(BinaryOperator&lt;T&gt; accumulator)
+<span class="kw">public</span> &lt;U&gt; U reduce(U identity, BiFunction&lt;U,? <span class="kw">super</span> T,U&gt; accumulator,
+                    BinaryOperator&lt;U&gt; combiner)</pre>
+<pre>Stream&lt;String&gt; stream = Stream.of(<span class="str">"w"</span>, <span class="str">"o"</span>, <span class="str">"l"</span>, <span class="str">"f"</span>);
+String word = stream.reduce(<span class="str">""</span>, (s, c) -&gt; s + c);   <span class="cm">// or String::concat</span>
+System.out.println(word); <span class="cm">// wolf</span>
+
+Stream&lt;Integer&gt; nums = Stream.of(<span class="num">3</span>, <span class="num">5</span>, <span class="num">6</span>);
+System.out.println(nums.reduce(<span class="num">1</span>, (a, b) -&gt; a*b)); <span class="cm">// 90</span></pre>
+  <p>Without an identity, the result is an <code>Optional&lt;T&gt;</code> with three possible outcomes:</p>
+  <div class="rules-box">
+    <h4>reduce(BinaryOperator) — Optional rules</h4>
+    <ul>
+      <li>Stream empty → <strong>empty Optional</strong> returned.</li>
+      <li>One element → that element is returned.</li>
+      <li>Multiple elements → the accumulator combines them.</li>
+    </ul>
+  </div>
+<pre>BinaryOperator&lt;Integer&gt; op = (a, b) -&gt; a * b;
+Stream.&lt;Integer&gt;empty().reduce(op).ifPresent(System.out::println); <span class="cm">// no output</span>
+Stream.of(<span class="num">3</span>).reduce(op).ifPresent(System.out::println);            <span class="cm">// 3</span>
+Stream.of(<span class="num">3</span>, <span class="num">5</span>, <span class="num">6</span>).reduce(op).ifPresent(System.out::println);      <span class="cm">// 90</span></pre>
+  <p>The three-argument form handles <em>different types</em> and helps parallel streams (partial results are merged by the <strong>combiner</strong>):</p>
+<pre>Stream&lt;String&gt; stream = Stream.of(<span class="str">"w"</span>, <span class="str">"o"</span>, <span class="str">"l"</span>, <span class="str">"f!"</span>);
+<span class="kw">int</span> length = stream.reduce(<span class="num">0</span>, (i, s) -&gt; i + s.length(), (a, b) -&gt; a + b);
+System.out.println(length); <span class="cm">// 5</span></pre>
+
+  <h3>collect() — mutable reduction</h3>
+  <p><code>collect()</code> accumulates into the <em>same mutable object</em> (e.g. <code>StringBuilder</code>, <code>ArrayList</code>) — more efficient than a regular reduction. Long form takes <strong>supplier, accumulator, combiner</strong>:</p>
+<pre>Stream&lt;String&gt; stream = Stream.of(<span class="str">"w"</span>, <span class="str">"o"</span>, <span class="str">"l"</span>, <span class="str">"f"</span>);
+StringBuilder word = stream.collect(
+   StringBuilder::<span class="kw">new</span>,      <span class="cm">// supplier</span>
+   StringBuilder::append,   <span class="cm">// accumulator</span>
+   StringBuilder::append);  <span class="cm">// combiner</span>
+System.out.println(word);   <span class="cm">// wolf</span>
+
+Stream&lt;String&gt; s2 = Stream.of(<span class="str">"w"</span>, <span class="str">"o"</span>, <span class="str">"l"</span>, <span class="str">"f"</span>);
+TreeSet&lt;String&gt; set = s2.collect(TreeSet::<span class="kw">new</span>, TreeSet::add, TreeSet::addAll);
+System.out.println(set);    <span class="cm">// [f, l, o, w]</span></pre>
+  <p>Or pass a predefined <code>Collector</code> from the <code>Collectors</code> class:</p>
+<pre>TreeSet&lt;String&gt; set = stream.collect(Collectors.toCollection(TreeSet::<span class="kw">new</span>));
+Set&lt;String&gt;     any = stream.collect(Collectors.toSet()); <span class="cm">// no guaranteed impl/order</span></pre>
+  <div class="card remember"><span class="lbl">★ Remember</span>
+    <code>Collectors.toSet()</code> gives no guarantee about the <code>Set</code> implementation you get. The exam expects you to know common predefined collectors <em>and</em> to write your own supplier/accumulator/combiner triple.
+  </div>
+</div>
+
+<!-- ============ SECTION 05 ============ -->
+<div class="section" id="s5">
+  <span class="secnum">SECTION 05</span>
+  <h2>Common Intermediate Operations</h2>
+  <p>An intermediate operation produces <em>a stream</em> as its result, and can happily handle an infinite stream by returning another infinite stream (elements are produced only as needed).</p>
+
+  <h3>filter(), distinct(), limit() &amp; skip()</h3>
+<pre>Stream.of(<span class="str">"monkey"</span>, <span class="str">"gorilla"</span>, <span class="str">"bonobo"</span>)
+   .filter(x -&gt; x.startsWith(<span class="str">"m"</span>))
+   .forEach(System.out::print);       <span class="cm">// monkey</span>
+
+Stream.of(<span class="str">"duck"</span>, <span class="str">"duck"</span>, <span class="str">"duck"</span>, <span class="str">"goose"</span>)
+   .distinct()                        <span class="cm">// uses equals(); dups need not be adjacent</span>
+   .forEach(System.out::print);       <span class="cm">// duckgoose</span>
+
+Stream&lt;Integer&gt; s = Stream.iterate(<span class="num">1</span>, n -&gt; n + <span class="num">1</span>);  <span class="cm">// infinite: 1,2,3,…</span>
+s.skip(<span class="num">5</span>)      <span class="cm">// now starts at 6</span>
+ .limit(<span class="num">2</span>)     <span class="cm">// finite: two elements</span>
+ .forEach(System.out::print);         <span class="cm">// 67</span></pre>
+  <div class="card key-rule"><span class="lbl">✓ Key Rule</span>
+    <code>limit()</code> can turn an infinite stream into a finite one. <code>skip(n)</code> drops the first <em>n</em> elements but leaves an infinite stream infinite.
+  </div>
+
+  <h3>map() and flatMap()</h3>
+<pre>Stream.of(<span class="str">"monkey"</span>, <span class="str">"gorilla"</span>, <span class="str">"bonobo"</span>)
+   .map(String::length)
+   .forEach(System.out::print);       <span class="cm">// 676</span></pre>
+  <p><code>map()</code> is a one-to-one transformation via <code>Function&lt;T,R&gt;</code>. Don't confuse it with the <code>Map</code> interface. <code>flatMap()</code> lifts nested elements to the top level of a single stream, and removes empty elements:</p>
+<pre>List&lt;String&gt; zero = List.of();
+<span class="kw">var</span> one = List.of(<span class="str">"Bonobo"</span>);
+<span class="kw">var</span> two = List.of(<span class="str">"Mama Gorilla"</span>, <span class="str">"Baby Gorilla"</span>);
+Stream&lt;List&lt;String&gt;&gt; animals = Stream.of(zero, one, two);
+
+animals.flatMap(m -&gt; m.stream())
+   .forEach(System.out::println);
+<span class="cm">// Bonobo
+// Mama Gorilla
+// Baby Gorilla</span></pre>
+  <div class="card remember"><span class="lbl">★ Remember — Stream.concat()</span>
+    To concatenate exactly two streams, <code>Stream.concat(one, two)</code> is more convenient than <code>flatMap()</code>.
+  </div>
+
+  <h3>sorted()</h3>
+<pre>Stream.of(<span class="str">"brown-"</span>, <span class="str">"bear-"</span>).sorted()
+   .forEach(System.out::print);                    <span class="cm">// bear-brown-</span>
+
+Stream.of(<span class="str">"brown bear-"</span>, <span class="str">"grizzly-"</span>)
+   .sorted(Comparator.reverseOrder())
+   .forEach(System.out::print);                    <span class="cm">// grizzly-brown bear-</span>
+
+s.sorted(Comparator::reverseOrder); <span class="err">// DOES NOT COMPILE</span></pre>
+  <div class="card exam-trap"><span class="lbl">⚠ Exam Trap — Comparator::reverseOrder</span>
+    <code>sorted()</code> needs a <code>Comparator</code> (two params → int). But <code>Comparator::reverseOrder</code> refers to a method that takes <em>no arguments and returns a Comparator</em> — it's equivalent to <code>() -&gt; Comparator.reverseOrder()</code>, i.e., a <code>Supplier&lt;Comparator&gt;</code>. Wrong functional shape → compile error. <code>Comparator.reverseOrder()</code> (with parentheses) is correct.
+  </div>
+
+  <h3>peek()</h3>
+  <p>An intermediate "forEach" for debugging: performs a <code>Consumer</code> on each element flowing past, then passes the <em>same</em> element on.</p>
+<pre><span class="kw">var</span> stream = Stream.of(<span class="str">"black bear"</span>, <span class="str">"brown bear"</span>, <span class="str">"grizzly"</span>);
+<span class="kw">long</span> count = stream.filter(s -&gt; s.startsWith(<span class="str">"g"</span>))
+   .peek(System.out::println).count();   <span class="cm">// grizzly</span>
+System.out.println(count);               <span class="cm">// 1</span></pre>
+  <div class="card exam-trap"><span class="lbl">⚠ Exam Trap — peek() with side effects</span>
+<pre style="margin:8px 0 4px"><span class="kw">var</span> numbers = <span class="kw">new</span> ArrayList&lt;&gt;(); numbers.add(<span class="num">1</span>);
+<span class="kw">var</span> letters = <span class="kw">new</span> ArrayList&lt;&gt;(); letters.add(<span class="str">'a'</span>);
+Stream&lt;List&lt;?&gt;&gt; stream = Stream.of(numbers, letters);
+stream.map(List::size).forEach(System.out::print);   <span class="cm">// 11</span>
+
+Stream&lt;List&lt;?&gt;&gt; bad = Stream.of(numbers, letters);
+bad.peek(x -&gt; x.remove(<span class="num">0</span>))
+   .map(List::size)
+   .forEach(System.out::print);                      <span class="cm">// 00</span></pre>
+    Java doesn't stop you from mutating data inside <code>peek()</code> — but it changes the pipeline's result. Bad practice; the exam still shows it.
+  </div>
+</div>
+
+<!-- ============ SECTION 06 ============ -->
+<div class="section" id="s6">
+  <span class="secnum">SECTION 06</span>
+  <h2>Putting Together the Pipeline</h2>
+  <p>Streams let you express <em>what</em> you want rather than <em>how</em>. First two 4-letter names, alphabetically:</p>
+<pre><span class="kw">var</span> list = List.of(<span class="str">"Toby"</span>, <span class="str">"Anna"</span>, <span class="str">"Leroy"</span>, <span class="str">"Alex"</span>);
+list.stream()
+   .filter(n -&gt; n.length() == <span class="num">4</span>)
+   .sorted()
+   .limit(<span class="num">2</span>)
+   .forEach(System.out::println);  <span class="cm">// Alex Anna</span></pre>
+  <div class="trace"><strong>Trace (foreperson's view):</strong>
+    <ol>
+      <li><code>Toby</code> passes filter → held by <code>sorted()</code> (needs all data before sorting).</li>
+      <li><code>Anna</code> passes filter → held by <code>sorted()</code>.</li>
+      <li><code>Leroy</code> fails filter → removed from the line.</li>
+      <li><code>Alex</code> passes filter → held by <code>sorted()</code>.</li>
+      <li>Source exhausted → <code>sorted()</code> sorts everything at once.</li>
+      <li><code>Alex</code> → <code>limit()</code> counts 1 → <code>forEach</code> prints Alex.</li>
+      <li><code>Anna</code> → <code>limit()</code> counts 2 → prints Anna.</li>
+      <li><code>limit()</code> reached its quota → foreperson stops the line.</li>
+    </ol>
+  </div>
+
+  <h3>Three infinite-stream classics</h3>
+<pre>Stream.generate(() -&gt; <span class="str">"Elsa"</span>)
+   .filter(n -&gt; n.length() == <span class="num">4</span>)
+   .sorted().limit(<span class="num">2</span>)
+   .forEach(System.out::println);  <span class="cm">// hangs (or OutOfMemory)</span></pre>
+  <p><code>sorted()</code> must see <em>all</em> elements before emitting anything — impossible on an infinite stream sitting <em>before</em> the <code>limit()</code>.</p>
+<pre>Stream.generate(() -&gt; <span class="str">"Elsa"</span>)
+   .filter(n -&gt; n.length() == <span class="num">4</span>)
+   .limit(<span class="num">2</span>).sorted()
+   .forEach(System.out::println);  <span class="cm">// Elsa
+                                   // Elsa</span></pre>
+  <p>Here <code>limit(2)</code> makes the stream finite <em>before</em> the sort → prints <code>Elsa</code> twice.</p>
+<pre>Stream.generate(() -&gt; <span class="str">"Olaf Lazisson"</span>)
+   .filter(n -&gt; n.length() == <span class="num">4</span>)
+   .limit(<span class="num">2</span>).sorted()
+   .forEach(System.out::println);  <span class="cm">// hangs</span></pre>
+  <p>The filter never lets anything through, so <code>limit(2)</code> never sees two elements — the pipeline waits forever.</p>
+  <div class="card key-rule"><span class="lbl">✓ Key Rule</span>
+    On infinite streams, ask two questions: (1) is there a <code>limit()</code> <em>before</em> any all-elements operation like <code>sorted()</code>? (2) can the filter actually deliver enough elements to satisfy the limit? Both must be yes or the code hangs.
+  </div>
+
+  <h3>Chained pipelines</h3>
+<pre><span class="num">30:</span> <span class="kw">long</span> count = Stream.of(<span class="str">"goldfish"</span>, <span class="str">"finch"</span>)
+<span class="num">31:</span>    .filter(s -&gt; s.length() &gt; <span class="num">5</span>)
+<span class="num">32:</span>    .collect(Collectors.toList())
+<span class="num">33:</span>    .stream()
+<span class="num">34:</span>    .count();
+<span class="num">35:</span> System.out.println(count);   <span class="cm">// 1</span></pre>
+  <p>Two pipelines: lines 30–32 (source line 30, terminal <code>collect</code> line 32) and lines 33–34 (source line 33, terminal <code>count</code> line 34). Only <code>goldfish</code> (8 letters) survives the filter, so the count is 1. On long answer options, <strong>focus on the differences between the choices</strong> — that's where the answer hides.</p>
+</div>
+
+<!-- ============ SECTION 07 ============ -->
+<div class="section" id="s7">
+  <span class="secnum">SECTION 07</span>
+  <h2>Working with Primitive Streams</h2>
+  <p>Three primitive stream interfaces exist:</p>
+  <ul>
+    <li><code>IntStream</code> — for <code>int</code>, <code>short</code>, <code>byte</code>, and <code>char</code></li>
+    <li><code>LongStream</code> — for <code>long</code></li>
+    <li><code>DoubleStream</code> — for <code>double</code> and <code>float</code></li>
+  </ul>
+  <p>Why? Numeric convenience methods:</p>
+<pre>Stream&lt;Integer&gt; stream = Stream.of(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>);
+System.out.println(stream.mapToInt(x -&gt; x).sum());  <span class="cm">// 6</span>
+
+IntStream intStream = IntStream.of(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>);
+OptionalDouble avg = intStream.average();
+System.out.println(avg.getAsDouble());              <span class="cm">// 2.0</span></pre>
+  <div class="card remember"><span class="lbl">★ Remember — case matters</span>
+    Capital-<code>S</code> <code>Stream</code> is the object-stream interface. Lowercase "stream" is the concept, covering <code>Stream</code>, <code>IntStream</code>, <code>LongStream</code>, and <code>DoubleStream</code>.
+  </div>
+
+  <h3>Creating primitive streams</h3>
+<pre>DoubleStream empty    = DoubleStream.empty();
+DoubleStream oneValue = DoubleStream.of(<span class="num">3.14</span>);
+DoubleStream varargs  = DoubleStream.of(<span class="num">1.0</span>, <span class="num">1.1</span>, <span class="num">1.2</span>);
+<span class="kw">var</span> random    = DoubleStream.generate(Math::random);   <span class="cm">// infinite</span>
+<span class="kw">var</span> fractions = DoubleStream.iterate(<span class="num">.5</span>, d -&gt; d / <span class="num">2</span>);  <span class="cm">// infinite</span></pre>
+  <h3>range() and rangeClosed()</h3>
+<pre>IntStream.iterate(<span class="num">1</span>, n -&gt; n + <span class="num">1</span>).limit(<span class="num">5</span>)
+   .forEach(System.out::print);          <span class="cm">// 12345 (verbose)</span>
+IntStream.range(<span class="num">1</span>, <span class="num">6</span>)
+   .forEach(System.out::print);          <span class="cm">// 12345 (6 exclusive)</span>
+IntStream.rangeClosed(<span class="num">1</span>, <span class="num">5</span>)
+   .forEach(System.out::print);          <span class="cm">// 12345 (5 inclusive)</span></pre>
+  <div class="card key-rule"><span class="lbl">✓ Key Rule</span>
+    <code>range(a, b)</code>: <code>a</code> inclusive, <code>b</code> <strong>exclusive</strong>. <code>rangeClosed(a, b)</code>: both <strong>inclusive</strong>. Only on <code>IntStream</code> and <code>LongStream</code> — not <code>DoubleStream</code>.
+  </div>
+
+  <h3>Mapping between stream types — memorize both tables</h3>
+  <table>
+    <tr><th>Source stream</th><th>To Stream</th><th>To DoubleStream</th><th>To IntStream</th><th>To LongStream</th></tr>
+    <tr><td><code>Stream&lt;T&gt;</code></td><td><code>map()</code></td><td><code>mapToDouble()</code></td><td><code>mapToInt()</code></td><td><code>mapToLong()</code></td></tr>
+    <tr><td><code>DoubleStream</code></td><td><code>mapToObj()</code></td><td><code>map()</code></td><td><code>mapToInt()</code></td><td><code>mapToLong()</code></td></tr>
+    <tr><td><code>IntStream</code></td><td><code>mapToObj()</code></td><td><code>mapToDouble()</code></td><td><code>map()</code></td><td><code>mapToLong()</code></td></tr>
+    <tr><td><code>LongStream</code></td><td><code>mapToObj()</code></td><td><code>mapToDouble()</code></td><td><code>mapToInt()</code></td><td><code>map()</code></td></tr>
+  </table>
+  <table>
+    <tr><th>Source stream</th><th>To Stream</th><th>To DoubleStream</th><th>To IntStream</th><th>To LongStream</th></tr>
+    <tr><td><code>Stream&lt;T&gt;</code></td><td><code>Function&lt;T,R&gt;</code></td><td><code>ToDoubleFunction&lt;T&gt;</code></td><td><code>ToIntFunction&lt;T&gt;</code></td><td><code>ToLongFunction&lt;T&gt;</code></td></tr>
+    <tr><td><code>DoubleStream</code></td><td><code>DoubleFunction&lt;R&gt;</code></td><td><code>DoubleUnaryOperator</code></td><td><code>DoubleToIntFunction</code></td><td><code>DoubleToLongFunction</code></td></tr>
+    <tr><td><code>IntStream</code></td><td><code>IntFunction&lt;R&gt;</code></td><td><code>IntToDoubleFunction</code></td><td><code>IntUnaryOperator</code></td><td><code>IntToLongFunction</code></td></tr>
+    <tr><td><code>LongStream</code></td><td><code>LongFunction&lt;R&gt;</code></td><td><code>LongToDoubleFunction</code></td><td><code>LongToIntFunction</code></td><td><code>LongUnaryOperator</code></td></tr>
+  </table>
+  <div class="rules-box">
+    <h4>Naming patterns to remember</h4>
+    <ul>
+      <li>Same type → just <code>map()</code>. Target is an object stream → <code>mapToObj()</code>. Otherwise → <code>mapTo</code> + primitive name.</li>
+      <li>Function names: target is an object → drop the "To" (<code>IntFunction</code>, not IntToObjFunction). Same primitive type → <strong>UnaryOperator</strong>, not Function.</li>
+      <li>flatMap for primitives: <code>flatMapToInt()</code>, <code>flatMapToDouble()</code>, <code>flatMapToLong()</code>.</li>
+    </ul>
+  </div>
+<pre>Stream&lt;String&gt; objStream = Stream.of(<span class="str">"penguin"</span>, <span class="str">"fish"</span>);
+IntStream intStream = objStream.mapToInt(s -&gt; s.length());
+
+<span class="cm">// From primitive stream back to Stream&lt;Integer&gt;: two ways</span>
+Stream&lt;Integer&gt; a = ints.mapToObj(x -&gt; x);
+Stream&lt;Integer&gt; b = ints.boxed();   <span class="cm">// autoboxes, no mapping function needed</span></pre>
+  <div class="card exam-trap"><span class="lbl">⚠ Exam Trap</span>
+    <code>boxed()</code> exists on the three <em>primitive</em> streams only — calling it on a <code>Stream&lt;Integer&gt;</code> <span class="err">DOES NOT COMPILE</span>. Likewise, <code>mapToInt()</code> on a <code>DoubleStream</code> needs an explicit narrowing (e.g. <code>x -&gt; (int) x</code>), because double→int is a lossy conversion.
+  </div>
+</div>
+
+<!-- ============ SECTION 08 ============ -->
+<div class="section" id="s8">
+  <span class="secnum">SECTION 08</span>
+  <h2>Primitive Optionals &amp; Summary Statistics</h2>
+  <p>Primitive streams return primitive optionals: <code>OptionalDouble</code>, <code>OptionalInt</code>, <code>OptionalLong</code> (for <em>primitives</em>, vs <code>Optional&lt;Double&gt;</code> for the wrapper).</p>
+<pre><span class="kw">var</span> stream = IntStream.rangeClosed(<span class="num">1</span>, <span class="num">10</span>);
+OptionalDouble optional = stream.average();
+optional.ifPresent(System.out::println);                  <span class="cm">// 5.5</span>
+System.out.println(optional.getAsDouble());               <span class="cm">// 5.5</span>
+System.out.println(optional.orElseGet(() -&gt; Double.NaN)); <span class="cm">// 5.5</span></pre>
+  <table>
+    <tr><th></th><th>OptionalDouble</th><th>OptionalInt</th><th>OptionalLong</th></tr>
+    <tr><td>Getting as primitive</td><td><code>getAsDouble()</code></td><td><code>getAsInt()</code></td><td><code>getAsLong()</code></td></tr>
+    <tr><td><code>orElseGet()</code> parameter</td><td><code>DoubleSupplier</code></td><td><code>IntSupplier</code></td><td><code>LongSupplier</code></td></tr>
+    <tr><td>Return of <code>max()</code>/<code>min()</code></td><td><code>OptionalDouble</code></td><td><code>OptionalInt</code></td><td><code>OptionalLong</code></td></tr>
+    <tr><td>Return of <code>sum()</code></td><td><code>double</code></td><td><code>int</code></td><td><code>long</code></td></tr>
+    <tr><td>Return of <code>average()</code></td><td><code>OptionalDouble</code></td><td><code>OptionalDouble</code></td><td><code>OptionalDouble</code></td></tr>
+  </table>
+  <div class="card key-rule"><span class="lbl">✓ Key Rule</span>
+    <code>sum()</code> does <strong>not</strong> return an optional — an empty stream sums to <strong>zero</strong>. <code>average()</code> <strong>always</strong> returns <code>OptionalDouble</code>, whatever the stream type, because averages can be fractional.
+  </div>
+<pre><span class="num">5:</span> LongStream longs = LongStream.of(<span class="num">5</span>, <span class="num">10</span>);
+<span class="num">6:</span> <span class="kw">long</span> sum = longs.sum();
+<span class="num">7:</span> System.out.println(sum);     <span class="cm">// 15</span>
+<span class="num">8:</span> DoubleStream doubles = DoubleStream.generate(() -&gt; Math.PI);
+<span class="num">9:</span> OptionalDouble min = doubles.min(); <span class="cm">// runs infinitely</span></pre>
+
+  <h3>Summary statistics — min AND max from one stream</h3>
+  <p>Since a stream allows only one terminal operation, you can't call <code>min()</code> and <code>max()</code> on the same stream. <code>summaryStatistics()</code> computes them all in a single pass:</p>
+<pre><span class="kw">private static int</span> range(IntStream ints) {
+   IntSummaryStatistics stats = ints.summaryStatistics();
+   <span class="kw">if</span> (stats.getCount() == <span class="num">0</span>) <span class="kw">throw new</span> RuntimeException();
+   <span class="kw">return</span> stats.getMax() - stats.getMin();
+}</pre>
+  <div class="rules-box">
+    <h4>Summary statistics getters (know the empty-stream values!)</h4>
+    <ul>
+      <li><code>getCount()</code> → <code>long</code> count of values.</li>
+      <li><code>getAverage()</code> → <code>double</code>; empty stream → <strong>0.0</strong>.</li>
+      <li><code>getSum()</code> → <code>double</code> for DoubleSummaryStatistics; <code>long</code> for Int/Long.</li>
+      <li><code>getMin()</code> → smallest number (<code>double</code>/<code>int</code>/<code>long</code>); empty stream → the <strong>largest</strong> numeric value of the type.</li>
+      <li><code>getMax()</code> → largest number; empty stream → the <strong>smallest</strong> numeric value of the type.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ SECTION 09 ============ -->
+<div class="section" id="s9">
+  <span class="secnum">SECTION 09</span>
+  <h2>Lazy Data Link &amp; Chaining Optionals</h2>
+  <h3>Streams are linked to the underlying data</h3>
+<pre><span class="num">25:</span> <span class="kw">var</span> cats = <span class="kw">new</span> ArrayList&lt;String&gt;();
+<span class="num">26:</span> cats.add(<span class="str">"Annie"</span>);
+<span class="num">27:</span> cats.add(<span class="str">"Ripley"</span>);
+<span class="num">28:</span> <span class="kw">var</span> stream = cats.stream();
+<span class="num">29:</span> cats.add(<span class="str">"KC"</span>);
+<span class="num">30:</span> System.out.println(stream.count());  <span class="cm">// 3</span></pre>
+  <div class="card exam-trap"><span class="lbl">⚠ Exam Trap</span>
+    The answer is <strong>3</strong>, not 2. Line 28 doesn't materialize the stream — it creates an object that knows <em>where to look</em> when needed. The element added on line 29 is visible when the pipeline actually runs on line 30. Lazy evaluation!
+  </div>
+
+  <h3>Chaining Optionals</h3>
+  <table>
+    <tr><th>Method</th><th>When Optional is empty</th><th>When Optional contains value</th></tr>
+    <tr><td><code>filter(Predicate p)</code></td><td>Returns empty Optional</td><td>Optional with the element if it matches, otherwise empty Optional</td></tr>
+    <tr><td><code>flatMap(Function f)</code></td><td>Returns empty Optional</td><td>Optional with Function applied; Function's return type must inherit Optional</td></tr>
+    <tr><td><code>map(Function f)</code></td><td>Returns empty Optional</td><td>Optional with Function applied</td></tr>
+  </table>
+<pre><span class="kw">private static void</span> threeDigit(Optional&lt;Integer&gt; optional) {
+   optional.map(n -&gt; <span class="str">""</span> + n)           <span class="cm">// part 1</span>
+      .filter(s -&gt; s.length() == <span class="num">3</span>)    <span class="cm">// part 2</span>
+      .ifPresent(System.out::println); <span class="cm">// part 3</span>
+}</pre>
+  <div class="trace"><strong>Trace — three inputs:</strong>
+    <ul>
+      <li><strong>Empty Optional:</strong> <code>map()</code> and <code>filter()</code> pass the empty box through; <code>ifPresent()</code> does nothing.</li>
+      <li><strong>Optional.of(4):</strong> mapped to <code>"4"</code>; filter fails (length 1) → empty Optional; nothing prints.</li>
+      <li><strong>Optional.of(123):</strong> mapped to <code>"123"</code>; filter passes; <code>ifPresent</code> prints <code>123</code>.</li>
+    </ul>
+  </div>
+
+  <div class="card exam-trap"><span class="lbl">⚠ Exam Trap — map vs flatMap on Optional</span>
+<pre style="margin:8px 0 4px"><span class="cm">// helper returns Optional&lt;Integer&gt;</span>
+Optional&lt;Integer&gt; result = optional
+   .map(ChainingOptionals::calculator);     <span class="err">// DOES NOT COMPILE</span>
+Optional&lt;Integer&gt; result = optional
+   .flatMap(ChainingOptionals::calculator); <span class="cm">// OK</span></pre>
+    If the mapped method itself returns an <code>Optional&lt;Integer&gt;</code>, <code>map()</code> wraps it again → <code>Optional&lt;Optional&lt;Integer&gt;&gt;</code>, which doesn't match the declared type. <code>flatMap()</code> flattens the extra layer.
+  </div>
+
+  <div class="card remember"><span class="lbl">★ Remember — checked exceptions &amp; functional interfaces</span>
+    <code>Supplier</code> (like most functional interfaces) declares no checked exceptions. So <code>Supplier&lt;List&lt;String&gt;&gt; s = ExceptionCaseStudy::create;</code> <span class="err">DOES NOT COMPILE</span> when <code>create()</code> throws <code>IOException</code> — even inside a method that declares <code>throws IOException</code>. Fix: catch inside the lambda and rethrow unchecked, or wrap in a safe helper method and reference that.
+  </div>
+</div>
+
+<!-- ============ SECTION 10 ============ -->
+<div class="section" id="s10">
+  <span class="secnum">SECTION 10</span>
+  <h2>Collecting Results — Basic Collectors &amp; toMap</h2>
+  <p>Predefined collectors are <strong>static methods on the <code>Collectors</code> class</strong> (a class of helpers, like <code>Collections</code>) — passed into <code>collect()</code>. A Collector does nothing on its own.</p>
+<pre><span class="kw">var</span> ohMy = Stream.of(<span class="str">"lions"</span>, <span class="str">"tigers"</span>, <span class="str">"bears"</span>);
+String result = ohMy.collect(Collectors.joining(<span class="str">", "</span>));
+System.out.println(result); <span class="cm">// lions, tigers, bears</span>
+
+Double avg = ohMy2.collect(Collectors.averagingInt(String::length));
+System.out.println(avg);    <span class="cm">// 5.333333333333333</span>
+
+TreeSet&lt;String&gt; ts = ohMy3.filter(s -&gt; s.startsWith(<span class="str">"t"</span>))
+   .collect(Collectors.toCollection(TreeSet::<span class="kw">new</span>)); <span class="cm">// [tigers]</span></pre>
+  <div class="card remember"><span class="lbl">★ Remember</span>
+    Collector averaging methods return the <em>wrapper</em> <code>Double</code> (an Object is needed), whereas primitive-stream <code>average()</code> returns <code>OptionalDouble</code>.
+  </div>
+
+  <div class="card exam-trap"><span class="lbl">⚠ Exam Trap — toList() vs Collectors.toList()</span>
+<pre style="margin:8px 0 4px">List&lt;String&gt; mutableList   = stream1.collect(Collectors.toList());
+List&lt;String&gt; immutableList = stream2.toList();
+mutableList.add(<span class="str">"zebras"</span>);   <span class="cm">// No issues</span>
+immutableList.add(<span class="str">"zebras"</span>); <span class="cm">// UnsupportedOperationException</span></pre>
+    <code>Collectors.toList()</code> → <strong>mutable</strong> list. The shortcut <code>stream.toList()</code> → list that does <strong>not allow changes</strong>.
+  </div>
+
+  <h3>Collecting into Maps — toMap()</h3>
+<pre><span class="kw">var</span> ohMy = Stream.of(<span class="str">"lions"</span>, <span class="str">"tigers"</span>, <span class="str">"bears"</span>);
+Map&lt;String, Integer&gt; map = ohMy.collect(
+   Collectors.toMap(s -&gt; s, String::length));
+System.out.println(map); <span class="cm">// {lions=5, bears=5, tigers=6}</span></pre>
+  <p>First function → key; second function → value. <code>s -&gt; s</code> can be written <code>Function.identity()</code>.</p>
+  <div class="card exam-trap"><span class="lbl">⚠ Exam Trap — duplicate keys</span>
+<pre style="margin:8px 0 4px">Map&lt;Integer, String&gt; map = ohMy.collect(Collectors.toMap(
+   String::length, k -&gt; k));  <span class="cm">// BAD</span>
+<span class="cm">// java.lang.IllegalStateException: Duplicate key 5
+//   (attempted merging values lions and bears)</span></pre>
+    <code>"lions"</code> and <code>"bears"</code> both have length 5. With no merge function, the collector throws <code>IllegalStateException</code> at runtime (compiles fine!).
+  </div>
+<pre><span class="cm">// Fix: merge function (3rd arg); force map type with a supplier (4th arg)</span>
+TreeMap&lt;Integer, String&gt; map = ohMy.collect(Collectors.toMap(
+   String::length,
+   k -&gt; k,
+   (s1, s2) -&gt; s1 + <span class="str">","</span> + s2,
+   TreeMap::<span class="kw">new</span>));
+System.out.println(map);            <span class="cm">// {5=lions,bears, 6=tigers}</span>
+System.out.println(map.getClass()); <span class="cm">// class java.util.TreeMap</span></pre>
+  <div class="card key-rule"><span class="lbl">✓ Key Rule</span>
+    Without a supplier, the returned Map <em>happens</em> to be a <code>HashMap</code>, but this is <strong>not guaranteed</strong> — never rely on it.
+  </div>
+</div>
+
+<!-- ============ SECTION 11 ============ -->
+<div class="section" id="s11">
+  <span class="secnum">SECTION 11</span>
+  <h2>Grouping, Partitioning, Mapping &amp; Teeing</h2>
+  <p>The exam creators <em>love</em> <code>groupingBy()</code> and <code>partitioningBy()</code>.</p>
+
+  <h3>groupingBy()</h3>
+<pre><span class="kw">var</span> ohMy = Stream.of(<span class="str">"lions"</span>, <span class="str">"tigers"</span>, <span class="str">"bears"</span>);
+Map&lt;Integer, List&lt;String&gt;&gt; map = ohMy.collect(
+   Collectors.groupingBy(String::length));
+System.out.println(map); <span class="cm">// {5=[lions, bears], 6=[tigers]}</span>
+
+<span class="cm">// Downstream collector: values become a Set</span>
+Map&lt;Integer, Set&lt;String&gt;&gt; map2 = ohMy2.collect(
+   Collectors.groupingBy(String::length, Collectors.toSet()));
+
+<span class="cm">// Map-type supplier + downstream collector</span>
+TreeMap&lt;Integer, Set&lt;String&gt;&gt; map3 = ohMy3.collect(
+   Collectors.groupingBy(String::length, TreeMap::<span class="kw">new</span>, Collectors.toSet()));
+
+<span class="cm">// Count per group</span>
+Map&lt;Integer, Long&gt; map4 = ohMy4.collect(
+   Collectors.groupingBy(String::length, Collectors.counting()));
+System.out.println(map4); <span class="cm">// {5=2, 6=1}</span></pre>
+  <div class="card exam-trap"><span class="lbl">⚠ Exam Trap</span>
+    The function passed to <code>groupingBy()</code> <strong>cannot return <code>null</code></strong> — null keys are not allowed. Also note <code>counting()</code> yields <code>Long</code>, not Integer.
+  </div>
+
+  <h3>partitioningBy()</h3>
+<pre>Map&lt;Boolean, List&lt;String&gt;&gt; map = ohMy.collect(
+   Collectors.partitioningBy(s -&gt; s.length() &lt;= <span class="num">5</span>));
+System.out.println(map); <span class="cm">// {false=[tigers], true=[lions, bears]}</span>
+
+Map&lt;Boolean, List&lt;String&gt;&gt; map2 = ohMy2.collect(
+   Collectors.partitioningBy(s -&gt; s.length() &lt;= <span class="num">7</span>));
+System.out.println(map2); <span class="cm">// {false=[], true=[lions, tigers, bears]}</span></pre>
+  <div class="rules-box">
+    <h4>partitioningBy() — the rules</h4>
+    <ul>
+      <li>A special case of grouping with exactly two groups: <code>true</code> and <code>false</code>.</li>
+      <li>The Map <strong>always has both keys</strong>, even if one value is an empty list.</li>
+      <li>A downstream collector may change the <em>value</em> type (e.g. <code>Collectors.toSet()</code>).</li>
+      <li>Unlike <code>groupingBy()</code>, you <strong>cannot change the Map type</strong> returned.</li>
+      <li>Keys are <code>Boolean</code> (wrapper) — generics can't hold primitive <code>boolean</code>.</li>
+    </ul>
+  </div>
+
+  <div class="vs-grid">
+    <div class="col"><h4>groupingBy(Function)</h4>
+      <ul>
+        <li>Keys determined by your function (any type).</li>
+        <li>Only groups with matches appear in the Map.</li>
+        <li>Optional downstream collector <em>and</em> Map supplier.</li>
+        <li>Function must not return null.</li>
+      </ul>
+    </div>
+    <div class="col"><h4>partitioningBy(Predicate)</h4>
+      <ul>
+        <li>Keys are always <code>true</code> / <code>false</code>.</li>
+        <li>Both keys always present, possibly with empty values.</li>
+        <li>Optional downstream collector, but <em>no</em> Map supplier.</li>
+        <li>Takes a Predicate, not a Function.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>mapping() — a collector inside a collector</h3>
+<pre>Map&lt;Integer, Optional&lt;Character&gt;&gt; map = ohMy.collect(
+   Collectors.groupingBy(
+      String::length,
+      Collectors.mapping(
+         s -&gt; s.charAt(<span class="num">0</span>),
+         Collectors.minBy((a, b) -&gt; a - b))));
+System.out.println(map); <span class="cm">// {5=Optional[b], 6=Optional[t]}</span></pre>
+  <p><code>mapping()</code> takes two parameters: the function for the value and how to group it further. You may see this with <strong>static imports</strong> (<code>groupingBy(…, mapping(…, minBy(…)))</code>) and <code>var</code> — recognize the collector names without the <code>Collectors.</code> prefix.</p>
+
+  <h3>teeing() — return two things from one pass</h3>
+<pre><span class="kw">record</span> Separations(String spaceSeparated, String commaSeparated) {}
+
+<span class="kw">var</span> list = List.of(<span class="str">"x"</span>, <span class="str">"y"</span>, <span class="str">"z"</span>);
+Separations result = list.stream()
+   .collect(Collectors.teeing(
+      Collectors.joining(<span class="str">" "</span>),
+      Collectors.joining(<span class="str">","</span>),
+      (s, c) -&gt; <span class="kw">new</span> Separations(s, c)));
+System.out.println(result);
+<span class="cm">// Separations[spaceSeparated=x y z, commaSeparated=x,y,z]</span></pre>
+  <div class="card key-rule"><span class="lbl">✓ Key Rule</span>
+    <code>teeing(c1, c2, biFunction)</code> feeds the stream to <em>two</em> collectors and merges both results into a single object — one pass, one return value, everybody's happy.
+  </div>
+
+  <h3>Selected collectors reference (Table 10.10 highlights)</h3>
+  <table>
+    <tr><th>Collector</th><th>Description</th><th>Return value</th></tr>
+    <tr><td><code>averagingInt/Long/Double(f)</code></td><td>Average for core primitive types</td><td><code>Double</code></td></tr>
+    <tr><td><code>counting()</code></td><td>Counts elements</td><td><code>Long</code></td></tr>
+    <tr><td><code>filtering(Predicate, Collector)</code></td><td>Applies filter before the downstream collector</td><td><code>R</code></td></tr>
+    <tr><td><code>groupingBy(f)</code> [+ supplier, downstream]</td><td>Map grouped by function</td><td><code>Map&lt;K, List&lt;T&gt;&gt;</code></td></tr>
+    <tr><td><code>joining(cs)</code></td><td>Single String, delimiter between elements</td><td><code>String</code></td></tr>
+    <tr><td><code>maxBy(c)</code> / <code>minBy(c)</code></td><td>Largest / smallest element</td><td><code>Optional&lt;T&gt;</code></td></tr>
+    <tr><td><code>mapping(f, dc)</code></td><td>Adds another level of collectors</td><td><code>Collector</code></td></tr>
+    <tr><td><code>partitioningBy(p)</code> [+ downstream]</td><td>Map with true/false keys</td><td><code>Map&lt;Boolean, List&lt;T&gt;&gt;</code></td></tr>
+    <tr><td><code>summarizingInt/Long/Double(f)</code></td><td>Average, min, max, etc.</td><td><code>…SummaryStatistics</code></td></tr>
+    <tr><td><code>summingInt/Long/Double(f)</code></td><td>Sum for core primitive types</td><td><code>Integer</code>/<code>Long</code>/<code>Double</code></td></tr>
+    <tr><td><code>teeing(c1, c2, f)</code></td><td>Merges results of two collectors</td><td><code>R</code></td></tr>
+    <tr><td><code>toList()</code> / <code>toSet()</code></td><td>Arbitrary List / Set type</td><td><code>List</code> / <code>Set</code></td></tr>
+    <tr><td><code>toCollection(Supplier)</code></td><td>Collection of the specified type</td><td><code>Collection</code></td></tr>
+    <tr><td><code>toMap(k, v [, merge, supplier])</code></td><td>Map from key/value functions</td><td><code>Map</code></td></tr>
+  </table>
+</div>
+
+<!-- ============ SECTION 12 ============ -->
+<div class="section" id="s12">
+  <span class="secnum">SECTION 12</span>
+  <h2>Using a Spliterator</h2>
+  <p>A <code>Spliterator</code> is a bag you can split: <code>trySplit()</code> takes roughly half the data <em>out</em> into a new Spliterator; the rest stays in the original. Implementing one isn't on the exam — using these three methods is:</p>
+  <table>
+    <tr><th>Method</th><th>Description</th></tr>
+    <tr><td><code>Spliterator&lt;T&gt; trySplit()</code></td><td>Returns a Spliterator with ideally half the data, <strong>removed</strong> from the current one. Can be called repeatedly; eventually returns <code>null</code> when no longer splittable.</td></tr>
+    <tr><td><code>void forEachRemaining(Consumer&lt;T&gt; c)</code></td><td>Processes all remaining elements.</td></tr>
+    <tr><td><code>boolean tryAdvance(Consumer&lt;T&gt; c)</code></td><td>Processes a single element if any remain; returns whether an element was processed.</td></tr>
+  </table>
+<pre><span class="num">12:</span> <span class="kw">var</span> stream = List.of(<span class="str">"bird-"</span>, <span class="str">"bunny-"</span>, <span class="str">"cat-"</span>, <span class="str">"dog-"</span>, <span class="str">"fish-"</span>, <span class="str">"lamb-"</span>,
+<span class="num">13:</span>    <span class="str">"mouse-"</span>);
+<span class="num">14:</span> Spliterator&lt;String&gt; originalBagOfFood = stream.spliterator();
+<span class="num">15:</span> Spliterator&lt;String&gt; emmasBag = originalBagOfFood.trySplit();
+<span class="num">16:</span> emmasBag.forEachRemaining(System.out::print);  <span class="cm">// bird-bunny-cat-</span>
+<span class="num">18:</span> Spliterator&lt;String&gt; jillsBag = originalBagOfFood.trySplit();
+<span class="num">19:</span> jillsBag.tryAdvance(System.out::print);        <span class="cm">// dog-</span>
+<span class="num">20:</span> jillsBag.forEachRemaining(System.out::print);  <span class="cm">// fish-</span>
+<span class="num">22:</span> originalBagOfFood.forEachRemaining(System.out::print); <span class="cm">// lamb-mouse-</span></pre>
+  <div class="trace"><strong>Trace:</strong>
+    <ul>
+      <li>Start: 7 elements. <code>trySplit()</code> → Emma gets the front ~half: bird-, bunny-, cat- (3).</li>
+      <li>Original now has 4. Second <code>trySplit()</code> → Jill gets dog-, fish- (2).</li>
+      <li><code>tryAdvance</code> prints one (dog-); <code>forEachRemaining</code> prints the rest of Jill's bag (fish-).</li>
+      <li>Original keeps lamb-, mouse- → printed last.</li>
+    </ul>
+  </div>
+<pre><span class="kw">var</span> originalBag = Stream.iterate(<span class="num">1</span>, n -&gt; ++n).spliterator();
+Spliterator&lt;Integer&gt; newBag = originalBag.trySplit();
+newBag.tryAdvance(System.out::print); <span class="cm">// 1</span>
+newBag.tryAdvance(System.out::print); <span class="cm">// 2</span>
+newBag.tryAdvance(System.out::print); <span class="cm">// 3</span></pre>
+  <div class="card key-rule"><span class="lbl">✓ Key Rule</span>
+    On an <strong>infinite</strong> stream, <code>trySplit()</code> still works — the Spliterator won't try to take "half"; it returns a bag with a large number of elements. But calling <code>forEachRemaining()</code> on an infinite Spliterator is a very bad idea. A Stream-backed Spliterator is evaluated lazily; characteristics like CONCURRENT, ORDERED, SIZED, SORTED exist, but the exam shows only straightforward Spliterators.
+  </div>
+</div>
+
+<!-- ============ RECAP ============ -->
+<div class="recap" id="recap">
+  <h2>★ Short Recap</h2>
+  <h4>Optional</h4>
+  <ul><li>Factories: <code>empty()</code>, <code>of()</code>, <code>ofNullable()</code>; no public constructor. <code>get()</code> on empty → <code>NoSuchElementException</code>.</li>
+  <li><code>orElse</code>(value) / <code>orElseGet</code>(Supplier of value) / <code>orElseThrow</code>(no-arg or Supplier of exception).</li></ul>
+  <h4>Pipeline</h4>
+  <ul><li>Source + zero-or-more intermediate ops + exactly one terminal op; lazy evaluation; stream is single-use.</li></ul>
+  <h4>Terminal operations</h4>
+  <ul><li>Reductions: <code>count</code>, <code>min</code>, <code>max</code>, <code>reduce</code>, <code>collect</code>. Non-reductions: find/match/forEach. Only find (always) and match (sometimes) can finish on infinite streams.</li></ul>
+  <h4>Intermediate operations</h4>
+  <ul><li><code>filter</code>, <code>distinct</code>, <code>limit</code>/<code>skip</code>, <code>map</code>, <code>flatMap</code>, <code>sorted</code>, <code>peek</code>. <code>sorted()</code> needs all elements — put <code>limit()</code> first for infinite streams.</li></ul>
+  <h4>Primitive streams</h4>
+  <ul><li><code>IntStream</code> (int/short/byte/char), <code>LongStream</code>, <code>DoubleStream</code>; <code>range</code> (end exclusive) vs <code>rangeClosed</code> (end inclusive); <code>mapToX</code>/<code>mapToObj</code>/<code>boxed</code>; <code>sum()</code> → primitive (0 if empty), <code>average()</code> → always OptionalDouble.</li></ul>
+  <h4>Collectors</h4>
+  <ul><li><code>toMap</code> duplicate key without merge → IllegalStateException. <code>groupingBy</code>: no null keys, supports Map supplier. <code>partitioningBy</code>: always two Boolean keys, no Map supplier. <code>teeing</code>: two collectors + merger. <code>stream.toList()</code> is unmodifiable; <code>Collectors.toList()</code> is mutable.</li></ul>
+  <h4>Spliterator</h4>
+  <ul><li><code>trySplit()</code> removes ~half; <code>tryAdvance()</code> one element (returns boolean); <code>forEachRemaining()</code> the rest.</li></ul>
+</div>
+
+<!-- ============ CHEAT SHEET ============ -->
+<div class="section" id="cheats">
+  <span class="secnum">⚠ FINAL CHECK</span>
+  <h2>Exam Traps Cheat Sheet</h2>
+  <table>
+    <tr><th>Scenario</th><th>What it tests</th><th>Verdict</th></tr>
+    <tr><td><code>emptyOptional.get()</code></td><td>Unsafe retrieval</td><td class="no">NoSuchElementException</td></tr>
+    <tr><td><code>opt.orElseGet(() -&gt; new RuntimeException())</code></td><td>Supplier must return the Optional's type</td><td class="no">Does not compile</td></tr>
+    <tr><td>3-arg <code>Stream.iterate</code> with semicolons</td><td>Method args use commas, not a for-loop</td><td class="no">Does not compile</td></tr>
+    <tr><td><code>count()</code>/<code>min()</code>/<code>max()</code>/<code>forEach()</code>/<code>reduce()</code>/<code>collect()</code> on infinite stream</td><td>Termination behavior</td><td class="no">Hangs</td></tr>
+    <tr><td><code>findAny()</code>/<code>findFirst()</code> on infinite stream</td><td>Termination behavior</td><td class="yes">Terminates</td></tr>
+    <tr><td><code>allMatch</code> on infinite stream where all match</td><td>Data-dependent termination</td><td class="no">Hangs</td></tr>
+    <tr><td><code>for (T t : stream)</code></td><td>Stream is not Iterable</td><td class="no">Does not compile</td></tr>
+    <tr><td>Two terminal ops on one stream</td><td>Single-use streams</td><td class="no">IllegalStateException</td></tr>
+    <tr><td><code>sorted(Comparator::reverseOrder)</code></td><td>Method reference shape (Supplier ≠ Comparator)</td><td class="no">Does not compile</td></tr>
+    <tr><td><code>sorted()</code> before <code>limit()</code> on infinite stream</td><td>sorted needs all elements</td><td class="no">Hangs</td></tr>
+    <tr><td><code>filter</code> passes nothing, then <code>limit(2)</code>, on infinite stream</td><td>limit never satisfied</td><td class="no">Hangs</td></tr>
+    <tr><td><code>peek(x -&gt; x.remove(0))</code></td><td>Side effects allowed but change results</td><td class="yes">Compiles; alters output</td></tr>
+    <tr><td>Add to List after <code>list.stream()</code>, before terminal op</td><td>Lazy link to underlying data</td><td class="yes">New element counted</td></tr>
+    <tr><td><code>objStream.boxed()</code> on <code>Stream&lt;Integer&gt;</code></td><td>boxed() is primitive-stream-only</td><td class="no">Does not compile</td></tr>
+    <tr><td><code>doubleStream.mapToInt(x -&gt; x)</code></td><td>Lossy narrowing needs a cast</td><td class="no">Does not compile</td></tr>
+    <tr><td><code>IntStream.range(1, 6)</code></td><td>Exclusive end</td><td class="yes">12345</td></tr>
+    <tr><td><code>emptyIntStream.sum()</code></td><td>sum() returns primitive</td><td class="yes">0 (no Optional)</td></tr>
+    <tr><td><code>intStream.average()</code></td><td>Return type</td><td class="yes">Always OptionalDouble</td></tr>
+    <tr><td><code>opt.map(m::returnsOptional)</code></td><td>Nested Optional</td><td class="no">Does not compile — use flatMap</td></tr>
+    <tr><td><code>Supplier&lt;…&gt; s = X::methodThrowingIOException</code></td><td>Checked exceptions vs functional interfaces</td><td class="no">Does not compile</td></tr>
+    <tr><td><code>toMap</code> with duplicate keys, no merge function</td><td>Key collision</td><td class="no">IllegalStateException</td></tr>
+    <tr><td><code>groupingBy</code> classifier returns null</td><td>Null keys forbidden</td><td class="no">Not allowed</td></tr>
+    <tr><td><code>partitioningBy</code> where nothing is false</td><td>Both keys always present</td><td class="yes">{false=[], true=[…]}</td></tr>
+    <tr><td>Map supplier with <code>partitioningBy</code></td><td>Only groupingBy supports Map suppliers</td><td class="no">Not available</td></tr>
+    <tr><td><code>immutableList = stream.toList(); immutableList.add(…)</code></td><td>toList() shortcut is unmodifiable</td><td class="no">UnsupportedOperationException</td></tr>
+    <tr><td><code>trySplit()</code> on infinite Spliterator</td><td>Split behavior</td><td class="yes">Works; returns large bag</td></tr>
+  </table>
+</div>
+
+</div>
+</body>
+</html>
