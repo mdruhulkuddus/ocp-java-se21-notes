@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 — Chapter 11: Exceptions and Localization (Detailed Handnote)</title>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#f4f6f8; font-family:'Source Sans 3',sans-serif; color:#33393f; line-height:1.65; padding:28px 16px 60px; }
+  .wrap { max-width:920px; margin:0 auto; }
+  h1,h2,h3,h4 { font-family:'Merriweather',serif; color:#2b3138; }
+  code, pre, .mono { font-family:'JetBrains Mono',monospace; }
+  p { margin:0 0 12px; }
+  ul,ol { margin:0 0 14px 22px; }
+  li { margin-bottom:6px; }
+
+  .card { background:#ffffff; border-radius:16px; box-shadow:0 2px 10px rgba(50,60,70,.07); padding:28px 30px; margin-bottom:26px; transition:box-shadow .25s ease; }
+  .card:hover { box-shadow:0 6px 20px rgba(50,60,70,.11); }
+
+  /* header */
+  .header { background:linear-gradient(135deg,#ffffff,#fbf7f4); }
+  .badge { display:inline-block; background:linear-gradient(90deg,#c96442,#d4845e); color:#fff; font-family:'JetBrains Mono',monospace; font-size:.72rem; letter-spacing:.09em; text-transform:uppercase; padding:6px 14px; border-radius:999px; margin-bottom:14px; }
+  .header h1 { font-size:1.7rem; margin-bottom:6px; }
+  .header h1 .muted { color:#9aa3ab; font-weight:400; font-size:1.05rem; }
+  .subtitle { font-style:italic; color:#7c858d; margin-bottom:18px; }
+  .objectives { background:linear-gradient(135deg,#f0f9f3,#f7fcf8); border-left:5px solid #5aab7b; border-radius:12px; padding:16px 20px; }
+  .objectives h3 { color:#3b7d57; font-size:.95rem; margin-bottom:8px; }
+  .objectives ul { margin-bottom:0; }
+
+  /* TOC */
+  .toc h2 { font-size:1.1rem; margin-bottom:14px; }
+  .toc-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px 26px; }
+  .toc-grid a { color:#9a5030; text-decoration:none; font-size:.95rem; padding:4px 6px; border-radius:8px; display:block; }
+  .toc-grid a:hover { background:#f3ece4; }
+  .toc-grid a .n { font-family:'JetBrains Mono',monospace; color:#c96442; font-size:.8rem; margin-right:6px; }
+
+  /* sections */
+  .sec-num { font-family:'JetBrains Mono',monospace; color:#c96442; font-size:.8rem; letter-spacing:.14em; }
+  section h2 { font-size:1.35rem; border-bottom:2px solid #ece3da; padding-bottom:8px; margin:4px 0 16px; }
+  section h3 { font-size:1.05rem; margin:20px 0 8px; }
+
+  /* code */
+  pre { background:#fdfaf7; border-radius:12px; box-shadow:inset 0 1px 5px rgba(120,100,80,.10); padding:16px 18px; overflow-x:auto; margin:0 0 14px; font-size:.88rem; line-height:1.6; }
+  .kw{color:#7c5cbf;font-weight:600} .str{color:#3a8a5c} .num{color:#b8860b} .err{color:#c44d3e;font-weight:600} .cm{color:#a89a8a;font-style:italic}
+  code.inline, p code, li code, td code { background:#f3ece4; color:#9a5030; padding:1px 6px; border-radius:6px; font-size:.86em; }
+
+  /* card types */
+  .exam-trap, .key-rule, .remember { border-radius:14px; padding:16px 20px; margin:14px 0 18px; box-shadow:0 2px 8px rgba(60,50,45,.06); transition:transform .2s ease, box-shadow .2s ease; }
+  .exam-trap:hover, .key-rule:hover, .remember:hover { transform:translateY(-2px); box-shadow:0 6px 16px rgba(60,50,45,.11); }
+  .exam-trap { background:linear-gradient(135deg,#fef2f0,#fff8f7); border-left:5px solid #e06b5e; }
+  .exam-trap .label { color:#c0453a; }
+  .key-rule { background:linear-gradient(135deg,#f0f9f3,#f7fcf8); border-left:5px solid #5aab7b; }
+  .key-rule .label { color:#3b7d57; }
+  .remember { background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c; }
+  .remember .label { color:#a9772a; }
+  .label { font-family:'JetBrains Mono',monospace; font-size:.72rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; display:block; margin-bottom:6px; }
+  .exam-trap p:last-child,.key-rule p:last-child,.remember p:last-child,.exam-trap ul:last-child,.key-rule ul:last-child,.remember ul:last-child{margin-bottom:0}
+
+  /* rules box */
+  .rules-box { background:linear-gradient(180deg,#f0f9f3,#f7fcf8); border-top:4px solid #5aab7b; border-radius:14px; padding:18px 22px; margin:14px 0 18px; box-shadow:0 2px 8px rgba(60,90,70,.08); }
+  .rules-box h4 { color:#3b7d57; font-family:'Source Sans 3',sans-serif; font-size:.95rem; margin-bottom:8px; }
+  .rules-box ol,.rules-box ul { margin-bottom:0; }
+
+  /* vs grid */
+  .vs-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:14px 0 18px; }
+  .vs-grid > div { background:#fff; border-radius:14px; box-shadow:0 2px 10px rgba(50,60,70,.08); padding:16px 18px; }
+  .vs-grid h4 { font-family:'Source Sans 3',sans-serif; font-size:.95rem; margin-bottom:8px; }
+  .vs-grid > div:first-child h4 { color:#7c5cbf; }
+  .vs-grid > div:last-child h4 { color:#3b7d57; }
+  .vs-grid ul { margin-bottom:0; }
+
+  /* tables */
+  table { width:100%; border-collapse:separate; border-spacing:0; background:#fff; border-radius:12px; box-shadow:0 2px 10px rgba(50,60,70,.08); overflow:hidden; margin:12px 0 18px; font-size:.92rem; }
+  th { background:#f0e8de; text-align:left; padding:10px 14px; font-weight:700; }
+  td { padding:9px 14px; border-top:1px solid #f2ede7; vertical-align:top; }
+  .yes { color:#3b7d57; font-weight:700; } .no { color:#c44d3e; font-weight:700; }
+
+  .trace { background:#faf7f3; border-radius:12px; padding:12px 18px 12px 34px; margin:0 0 14px; }
+  .trace li { font-size:.92rem; }
+
+  .recap { background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c; }
+  .recap h2 { border:none; }
+  .recap h3 { color:#a9772a; font-size:.98rem; margin:14px 0 6px; }
+  .recap ul { margin-bottom:4px; }
+
+  @media (max-width:640px){
+    .toc-grid,.vs-grid{grid-template-columns:1fr}
+    .card{padding:20px 18px}
+    body{padding:14px 8px 40px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ============ HEADER ============ -->
+<div class="card header">
+  <span class="badge">OCP Java SE 21 Developer — Exam 1Z0-830</span>
+  <h1>Chapter 11 · Exceptions and Localization <span class="muted">(Detailed Handnote)</span></h1>
+  <p class="subtitle">Handle exceptions with try/catch/finally, multi-catch &amp; try-with-resources — and localize numbers, dates, and messages with locales and resource bundles.</p>
+  <div class="objectives">
+    <h3>✓ EXAM OBJECTIVES COVERED</h3>
+    <ul>
+      <li><b>Handling Exceptions</b> — try/catch/finally, try-with-resources, multi-catch blocks, custom exceptions.</li>
+      <li><b>Implementing Localization</b> — locales &amp; resource bundles; parse and format messages, dates, times, and numbers, including currency and percentages.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ TOC ============ -->
+<div class="card toc">
+  <h2>Table of Contents</h2>
+  <div class="toc-grid">
+    <a href="#s1"><span class="n">01</span>Understanding Exceptions</a>
+    <a href="#s2"><span class="n">02</span>Throwing an Exception</a>
+    <a href="#s3"><span class="n">03</span>Recognizing Exception Classes</a>
+    <a href="#s4"><span class="n">04</span>try / catch &amp; Chaining catch Blocks</a>
+    <a href="#s5"><span class="n">05</span>Multi-catch Blocks</a>
+    <a href="#s6"><span class="n">06</span>The finally Block</a>
+    <a href="#s7"><span class="n">07</span>Try-with-Resources</a>
+    <a href="#s8"><span class="n">08</span>Suppressed Exceptions</a>
+    <a href="#s9"><span class="n">09</span>Formatting Numbers — DecimalFormat</a>
+    <a href="#s10"><span class="n">10</span>Formatting Dates &amp; Times</a>
+    <a href="#s11"><span class="n">11</span>Internationalization &amp; Locales</a>
+    <a href="#s12"><span class="n">12</span>Localizing Numbers &amp; CompactNumberFormat</a>
+    <a href="#s13"><span class="n">13</span>Localizing Dates &amp; Locale.Category</a>
+    <a href="#s14"><span class="n">14</span>Resource Bundles</a>
+    <a href="#s15"><span class="n">15</span>MessageFormat &amp; the Properties Class</a>
+    <a href="#recap"><span class="n">16</span>Short Recap + Exam Traps Cheat Sheet</a>
+  </div>
+</div>
+
+<!-- ============ SECTION 01 ============ -->
+<div class="card"><section id="s1">
+  <span class="sec-num">SECTION 01</span>
+  <h2>Understanding Exceptions</h2>
+  <p>An <b>exception</b> is Java's way of saying <i>"I give up — you deal with it."</i> A method can either <b>handle</b> the exception itself, or <b>declare</b> it and make it the caller's problem. All exception events are represented by objects of the <code>Throwable</code> class hierarchy — and not all of them have "Exception" in their name.</p>
+
+  <h3>The Throwable hierarchy</h3>
+  <pre><code>                java.lang.Throwable
+                /                 \
+      java.lang.Exception     java.lang.Error   <span class="cm">// Error = unchecked, don't touch</span>
+             |
+   java.lang.RuntimeException                   <span class="cm">// RuntimeException = unchecked</span>
+
+<span class="cm">// Exception (but NOT RuntimeException) = CHECKED</span></code></pre>
+
+  <table>
+    <tr><th>Type</th><th>How to recognize</th><th>OK for program to catch?</th><th>Required to handle or declare?</th></tr>
+    <tr><td><b>Unchecked exception</b></td><td>Subclass of <code>RuntimeException</code></td><td class="yes">Yes</td><td class="no">No</td></tr>
+    <tr><td><b>Checked exception</b></td><td>Subclass of <code>Exception</code> but <i>not</i> of <code>RuntimeException</code></td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+    <tr><td><b>Error</b></td><td>Subclass of <code>Error</code></td><td class="no">No</td><td class="no">No</td></tr>
+  </table>
+
+  <div class="key-rule"><span class="label">✓ KEY RULE — Handle or Declare</span>
+    <p>Every <b>checked</b> exception that could be thrown inside a method must either be <b>wrapped in a compatible try/catch</b> or <b>declared with <code>throws</code></b> in the method signature. Unchecked exceptions (<code>RuntimeException</code>, <code>Error</code>) never require this — but declaring them redundantly still compiles.</p>
+  </div>
+
+  <pre><code><span class="kw">void</span> fall(<span class="kw">int</span> distance) <span class="kw">throws</span> IOException {   <span class="cm">// declare…</span>
+   <span class="kw">if</span>(distance &gt; <span class="num">10</span>) { <span class="kw">throw new</span> IOException(); }
+}
+
+<span class="kw">void</span> fall(<span class="kw">int</span> distance) {                       <span class="cm">// …or handle</span>
+   <span class="kw">try</span> {
+      <span class="kw">if</span>(distance &gt; <span class="num">10</span>) { <span class="kw">throw new</span> IOException(); }
+   } <span class="kw">catch</span> (Exception e) {          <span class="cm">// superclass catch is fine</span>
+      e.printStackTrace();
+   }
+}</code></pre>
+
+  <div class="remember"><span class="label">★ REMEMBER</span>
+    <p><code>Throwable</code> is the parent of everything, including <code>Error</code>. You <i>can</i> catch <code>Throwable</code>/<code>Error</code>, but you should not. <code>Error</code> means something so bad (out of memory, disk gone) that recovery isn't realistic.</p>
+  </div>
+</section></div>
+
+<!-- ============ SECTION 02 ============ -->
+<div class="card"><section id="s2">
+  <span class="sec-num">SECTION 02</span>
+  <h2>Throwing an Exception</h2>
+
+  <div class="vs-grid">
+    <div><h4>throw</h4><ul><li>A <b>statement</b> inside a code block.</li><li>Actually throws (or rethrows) an exception object.</li><li><code>throw new RuntimeException();</code></li></ul></div>
+    <div><h4>throws</h4><ul><li>Appears only at the <b>end of a method declaration</b>.</li><li>Declares that the method <i>might</i> throw — it also might not.</li><li><code>void fall() throws IOException {}</code></li></ul></div>
+  </div>
+
+  <p>An exception is an <b>object</b> — you can store it in a reference and throw it later:</p>
+  <pre><code><span class="kw">var</span> e = <span class="kw">new</span> RuntimeException();
+<span class="kw">throw</span> e;                          <span class="cm">// legal</span>
+
+<span class="kw">throw</span> RuntimeException();         <span class="err">// DOES NOT COMPILE — missing new!</span></code></pre>
+
+  <div class="exam-trap"><span class="label">⚠ EXAM TRAP — Unreachable code after throw</span>
+    <pre style="margin-bottom:0"><code><span class="kw">try</span> {
+   <span class="kw">throw new</span> RuntimeException();
+   <span class="kw">throw new</span> ArrayIndexOutOfBoundsException();  <span class="err">// DOES NOT COMPILE</span>
+} <span class="kw">catch</span> (Exception e) {}</code></pre>
+    <p style="margin-top:8px">The first <code>throw</code> makes the second statement unreachable → compiler error.</p>
+  </div>
+
+  <h3>Calling methods that throw checked exceptions</h3>
+  <pre><code><span class="kw">class</span> NoMoreCarrotsException <span class="kw">extends</span> Exception {}
+
+<span class="kw">public class</span> Bunny {
+   <span class="kw">private void</span> eatCarrot() <span class="kw">throws</span> NoMoreCarrotsException {}
+   <span class="kw">public void</span> hopAround() {
+      eatCarrot();                <span class="err">// DOES NOT COMPILE</span>
+   }
+}</code></pre>
+  <p>The caller must also handle or declare — even if <code>eatCarrot()</code> never actually throws. Merely <i>declaring</i> the checked exception is enough to force the caller.</p>
+
+  <div class="exam-trap"><span class="label">⚠ EXAM TRAP — Catching a checked exception that can't be thrown</span>
+    <pre style="margin-bottom:0"><code><span class="kw">private void</span> eatCarrot() {}          <span class="cm">// declares nothing</span>
+<span class="kw">public void</span> bad() {
+   <span class="kw">try</span> { eatCarrot(); }
+   <span class="kw">catch</span> (NoMoreCarrotsException e) { <span class="err">// DOES NOT COMPILE</span>
+      System.out.print(<span class="str">"sad rabbit"</span>);
+   }
+}</code></pre>
+    <p style="margin-top:8px">If nothing in the try block can throw the <b>checked</b> exception, the catch is unreachable → compiler error. This rule does <b>not</b> apply to unchecked exceptions (catching <code>RuntimeException</code> is always allowed) or to <code>Exception</code> declared broadly.</p>
+  </div>
+
+  <h3>Overriding methods with exceptions</h3>
+  <div class="rules-box">
+    <h4>OVERRIDING + CHECKED EXCEPTIONS</h4>
+    <ol>
+      <li>An overridden method may <b>NOT declare new or broader checked exceptions</b> than the inherited method.</li>
+      <li>Declaring <b>fewer</b> exceptions, <b>none</b>, or a <b>subclass</b> of the declared exception is perfectly legal.</li>
+      <li>Unchecked exceptions can be declared freely — they're never part of the contract.</li>
+    </ol>
+  </div>
+  <pre><code><span class="kw">class</span> Hopper { <span class="kw">public void</span> hop() {} }
+<span class="kw">public class</span> Bunny <span class="kw">extends</span> Hopper {
+   <span class="kw">public void</span> hop() <span class="kw">throws</span> CanNotHopException {}  <span class="err">// DOES NOT COMPILE</span>
+}
+<span class="cm">// Reverse direction is fine: parent throws, child declares nothing.</span></code></pre>
+
+  <h3>Printing an exception — three ways</h3>
+  <pre><code>} <span class="kw">catch</span> (Exception e) {
+   System.out.println(e);              <span class="cm">// java.lang.RuntimeException: cannot hop</span>
+   System.out.println(e.getMessage()); <span class="cm">// cannot hop</span>
+   e.printStackTrace();                <span class="cm">// full stack trace with method hierarchy</span>
+}</code></pre>
+</section></div>
+
+<!-- ============ SECTION 03 ============ -->
+<div class="card"><section id="s3">
+  <span class="sec-num">SECTION 03</span>
+  <h2>Recognizing Exception Classes</h2>
+  <p>You must recognize three groups — <b>unchecked (RuntimeException)</b>, <b>checked</b>, and <b>Error</b> — plus who throws them (JVM vs. programmer) and the two inheritance pairs.</p>
+
+  <h3>Unchecked (RuntimeException) classes</h3>
+  <table>
+    <tr><th>Exception</th><th>Thrown when…</th><th>Thrown by</th></tr>
+    <tr><td><code>ArithmeticException</code></td><td>Dividing an <code>int</code> by zero: <code>11 / 0</code></td><td>JVM</td></tr>
+    <tr><td><code>ArrayIndexOutOfBoundsException</code></td><td>Illegal array index (e.g. <code>-1</code>, or index == length)</td><td>JVM</td></tr>
+    <tr><td><code>ClassCastException</code></td><td>Cast to a class the object isn't an instance of</td><td>JVM</td></tr>
+    <tr><td><code>NullPointerException</code></td><td>Member access on a <code>null</code> reference</td><td>JVM</td></tr>
+    <tr><td><code>IllegalArgumentException</code></td><td>Method receives an illegal/inappropriate argument</td><td>Programmer</td></tr>
+    <tr><td><code>NumberFormatException</code></td><td>Converting a non-numeric <code>String</code>: <code>Integer.parseInt("abc")</code></td><td>Programmer (via API)</td></tr>
+  </table>
+
+  <div class="key-rule"><span class="label">✓ KEY RULE — Two inheritance pairs the exam loves</span>
+    <ul>
+      <li><code>NumberFormatException</code> <b>extends</b> <code>IllegalArgumentException</code></li>
+      <li><code>FileNotFoundException</code> and <code>NotSerializableException</code> <b>extend</b> <code>IOException</code></li>
+    </ul>
+    <p>These decide catch-block ordering and multi-catch legality (Sections 04–05).</p>
+  </div>
+
+  <h3>ClassCastException — compile time vs runtime</h3>
+  <pre><code>String type = <span class="str">"moose"</span>;
+Integer number = (Integer) type;   <span class="err">// DOES NOT COMPILE (unrelated types)</span>
+
+String type = <span class="str">"moose"</span>;
+Object obj = type;
+Integer number = (Integer) obj;    <span class="cm">// compiles, but ClassCastException at runtime</span></code></pre>
+
+  <h3>Helpful NullPointerException</h3>
+  <pre><code><span class="kw">public class</span> Frog {
+   <span class="kw">static</span> String name;
+   <span class="kw">public void</span> hop() {
+      System.out.print(name.toLowerCase() + <span class="str">" is hopping"</span>);
+   }
+   <span class="kw">public static void</span> main(String[] args) { <span class="kw">new</span> Frog().hop(); }
+}
+<span class="cm">// Cannot invoke "String.toLowerCase()" because "Frog.name" is null</span></code></pre>
+  <ul>
+    <li>For <b>instance/static variables</b>, the JVM prints the variable name (<code>Frog.name</code>).</li>
+    <li>For <b>local variables &amp; parameters</b>, it prints <code>&lt;parameterX&gt;</code> / <code>&lt;localX&gt;</code> — the name is lost at compile time — <i>unless</i> compiled with <code>javac -g:vars</code>, which restores real names.</li>
+  </ul>
+
+  <h3>Checked exceptions &amp; Errors</h3>
+  <div class="vs-grid">
+    <div><h4>Checked (must handle/declare)</h4><ul>
+      <li><code>IOException</code> — problem reading/writing a file</li>
+      <li><code>FileNotFoundException</code> — file doesn't exist (subclass of IOException)</li>
+      <li><code>NotSerializableException</code> — (de)serializing a non-serializable class (subclass of IOException)</li>
+      <li><code>ParseException</code> — problem parsing input (e.g. <code>NumberFormat.parse()</code>)</li>
+    </ul></div>
+    <div><h4>Errors (unchecked, don't catch)</h4><ul>
+      <li><code>ExceptionInInitializerError</code> — static initializer throws and doesn't handle</li>
+      <li><code>StackOverflowError</code> — infinite recursion</li>
+      <li><code>NoClassDefFoundError</code> — class present at compile time, missing at runtime</li>
+    </ul></div>
+  </div>
+
+  <div class="exam-trap"><span class="label">⚠ EXAM TRAP</span>
+    <p>When answer choices include both "does not compile" and "throws an exception": code calling a method on a <b>null reference</b> or using an <b>invalid array/List index</b> compiles fine — the answer is <b>runtime exception</b>, not compiler error.</p>
+  </div>
+</section></div>
+
+<!-- ============ SECTION 04 ============ -->
+<div class="card"><section id="s4">
+  <span class="sec-num">SECTION 04</span>
+  <h2>try / catch &amp; Chaining catch Blocks</h2>
+
+  <div class="rules-box">
+    <h4>TRY STATEMENT SYNTAX RULES</h4>
+    <ol>
+      <li>Braces <code>{}</code> are <b>required</b> for try and catch blocks (unlike if/loops).</li>
+      <li>A traditional try must be followed by <b>catch and/or finally</b> — a "lonely try" does not compile.</li>
+      <li>The words <i>block</i> and <i>clause</i> are used interchangeably on the exam.</li>
+    </ol>
+  </div>
+
+  <pre><code><span class="kw">try</span>                     <span class="err">// DOES NOT COMPILE — missing braces</span>
+   fall();
+<span class="kw">catch</span> (Exception e)
+   System.out.println(<span class="str">"get up"</span>);
+
+<span class="kw">try</span> {                   <span class="err">// DOES NOT COMPILE — lonely try, no catch/finally</span>
+   fall();
+}</code></pre>
+
+  <h3>Chaining catch blocks — order matters</h3>
+  <p>At most <b>one</b> catch block runs: the <b>first</b> one that can handle the exception. If a superclass catch appears <i>before</i> a subclass catch, the subclass catch is unreachable → compiler error.</p>
+  <pre><code><span class="kw">try</span> {
+   seeAnimal();
+} <span class="kw">catch</span> (ExhibitClosed e) {              <span class="cm">// superclass first…</span>
+   System.out.print(<span class="str">"not today"</span>);
+} <span class="kw">catch</span> (ExhibitClosedForLunch e) {      <span class="err">// DOES NOT COMPILE — unreachable</span>
+   System.out.print(<span class="str">"try back later"</span>);
+}</code></pre>
+
+  <div class="exam-trap"><span class="label">⚠ EXAM TRAP — Hidden subclass ordering</span>
+    <pre style="margin-bottom:0"><code><span class="kw">try</span> {
+} <span class="kw">catch</span> (IllegalArgumentException e) {
+} <span class="kw">catch</span> (NumberFormatException e) {   <span class="err">// DOES NOT COMPILE</span>
+}</code></pre>
+    <p style="margin-top:8px"><code>NumberFormatException</code> IS-A <code>IllegalArgumentException</code>, so the second block is unreachable. Same trick works with <code>FileNotFoundException</code> after <code>IOException</code>.</p>
+  </div>
+
+  <div class="exam-trap"><span class="label">⚠ EXAM TRAP — catch variable scope</span>
+    <pre style="margin-bottom:0"><code>} <span class="kw">catch</span> (NumberFormatException e1) {
+   System.out.println(e1);
+} <span class="kw">catch</span> (IllegalArgumentException e2) {
+   System.out.println(e1);            <span class="err">// DOES NOT COMPILE — e1 out of scope</span>
+}</code></pre>
+    <p style="margin-top:8px">The exception variable is in scope <b>only inside its own catch block</b>.</p>
+  </div>
+</section></div>
+
+<!-- ============ SECTION 05 ============ -->
+<div class="card"><section id="s5">
+  <span class="sec-num">SECTION 05</span>
+  <h2>Multi-catch Blocks</h2>
+  <p>A multi-catch block catches multiple exception types with one handler, separated by pipes (<code>|</code>) — with <b>one variable name, written once, at the end</b>.</p>
+  <pre><code><span class="kw">try</span> {
+   System.out.println(Integer.parseInt(args[<span class="num">1</span>]));
+} <span class="kw">catch</span> (ArrayIndexOutOfBoundsException | NumberFormatException e) {
+   System.out.println(<span class="str">"Missing or invalid input"</span>);
+}</code></pre>
+
+  <pre><code><span class="kw">catch</span>(Exception1 e | Exception2 e | Exception3 e)    <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">catch</span>(Exception1 e1 | Exception2 e2 | Exception3 e3) <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">catch</span>(Exception1 | Exception2 | Exception3 e)        <span class="cm">// compiles ✓</span></code></pre>
+
+  <div class="exam-trap"><span class="label">⚠ EXAM TRAP — Related types are redundant</span>
+    <pre style="margin-bottom:0"><code><span class="kw">try</span> {
+   <span class="kw">throw new</span> IOException();
+} <span class="kw">catch</span> (FileNotFoundException | IOException p) {}  <span class="err">// DOES NOT COMPILE</span></code></pre>
+    <p style="margin-top:8px">A subclass and its superclass may not share one multi-catch — the subclass is redundant ("already caught by the alternative IOException"). Fix: just catch <code>IOException</code>.</p>
+  </div>
+
+  <div class="vs-grid">
+    <div><h4>Chained catch blocks</h4><ul><li>Order <b>matters</b>: subclass before superclass.</li><li>Each block has its own variable.</li></ul></div>
+    <div><h4>Multi-catch (single block)</h4><ul><li>Order of types does <b>not</b> matter.</li><li>One shared variable at the end; no subclass/superclass pairs allowed.</li></ul></div>
+  </div>
+</section></div>
+
+<!-- ============ SECTION 06 ============ -->
+<div class="card"><section id="s6">
+  <span class="sec-num">SECTION 06</span>
+  <h2>The finally Block</h2>
+  <div class="rules-box">
+    <h4>FINALLY RULES</h4>
+    <ol>
+      <li>Order is fixed: <code>try</code> → <code>catch</code> → <code>finally</code>. Wrong order does not compile.</li>
+      <li><code>catch</code> is optional when <code>finally</code> is present (try+finally is legal).</li>
+      <li>If a try-with-finally is entered, <b>finally always executes</b> — whether or not an exception is thrown.</li>
+      <li>Exception #1: <code>System.exit()</code> in try/catch — finally does <b>not</b> run.</li>
+      <li>finally always <i>starts</i>, but may not <i>finish</i> (it can itself throw, e.g. NPE).</li>
+    </ol>
+  </div>
+
+  <pre><code><span class="kw">try</span> {                <span class="err">// DOES NOT COMPILE — catch after finally</span>
+   fall();
+} <span class="kw">finally</span> {
+   System.out.println(<span class="str">"all better"</span>);
+} <span class="kw">catch</span> (Exception e) {
+   System.out.println(<span class="str">"get up"</span>);
+}</code></pre>
+
+  <h3>Classic output-tracing question</h3>
+  <pre><code>StringBuilder sb = <span class="kw">new</span> StringBuilder();
+<span class="kw">try</span> {                 sb.append(<span class="str">"t"</span>);
+} <span class="kw">catch</span> (Exception e) { sb.append(<span class="str">"c"</span>);
+} <span class="kw">finally</span> {           sb.append(<span class="str">"f"</span>);
+}
+sb.append(<span class="str">"a"</span>);
+System.out.print(sb.toString());   <span class="cm">// tfa</span></code></pre>
+  <ul class="trace">
+    <li>No exception → try appends <code>t</code>, catch skipped.</li>
+    <li>finally always runs → <code>f</code>.</li>
+    <li>Execution continues after the try statement → <code>a</code>. Output: <b>tfa</b>.</li>
+  </ul>
+
+  <div class="exam-trap"><span class="label">⚠ EXAM TRAP — return inside finally wins</span>
+    <pre style="margin-bottom:0"><code><span class="kw">int</span> goHome() {
+   <span class="kw">try</span> {
+      <span class="cm">// Optionally throw an exception here</span>
+      System.out.print(<span class="str">"1"</span>);  <span class="kw">return</span> -<span class="num">1</span>;
+   } <span class="kw">catch</span> (Exception e) {
+      System.out.print(<span class="str">"2"</span>);  <span class="kw">return</span> -<span class="num">2</span>;
+   } <span class="kw">finally</span> {
+      System.out.print(<span class="str">"3"</span>);  <span class="kw">return</span> -<span class="num">3</span>;
+   } }</code></pre>
+    <p style="margin-top:8px">Prints <code>13</code> (no exception) or <code>23</code> (exception) — but the return value is <b>always -3</b>. The finally block runs just before the method completes and interrupts any earlier <code>return</code>.</p>
+  </div>
+</section></div>
+
+<!-- ============ SECTION 07 ============ -->
+<div class="card"><section id="s7">
+  <span class="sec-num">SECTION 07</span>
+  <h2>Try-with-Resources</h2>
+  <p>Try-with-resources (a.k.a. <b>automatic resource management</b>) automatically closes all resources opened in the try clause. The compiler rewrites it into a try + <b>implicit finally</b> that calls <code>close()</code>.</p>
+
+  <div class="rules-box">
+    <h4>TRY-WITH-RESOURCES RULES</h4>
+    <ol>
+      <li>Only types implementing <code>AutoCloseable</code> may be used (<code>Closeable extends AutoCloseable</code>, both work).</li>
+      <li>Resources are separated by <b>semicolons</b> (<code>;</code>); each declaration needs its own <b>data type</b> (<code>var</code> is fine).</li>
+      <li>catch and finally are both <b>optional</b> (unlike a traditional try).</li>
+      <li>Resources are closed at the end of the try block, in the <b>REVERSE</b> of declaration order.</li>
+      <li>The <b>implicit finally</b> (close calls) runs <b>before</b> any programmer-defined catch/finally.</li>
+      <li>Resource variables are in scope <b>only inside the try block</b>.</li>
+    </ol>
+  </div>
+
+  <pre><code><span class="kw">interface</span> AutoCloseable {
+   <span class="kw">public void</span> close() <span class="kw">throws</span> Exception;   <span class="cm">// impl may throw subclass or nothing</span>
+}
+
+<span class="kw">try</span> (String reptile = <span class="str">"lizard"</span>) {}          <span class="err">// DOES NOT COMPILE — String isn't AutoCloseable</span>
+
+<span class="kw">try</span> (MyFileClass is = <span class="kw">new</span> MyFileClass(<span class="num">1</span>),   <span class="err">// DOES NOT COMPILE — comma + missing type</span>
+   os = <span class="kw">new</span> MyFileClass(<span class="num">2</span>)) {}
+<span class="kw">try</span> (MyFileClass ab = <span class="kw">new</span> MyFileClass(<span class="num">1</span>),   <span class="err">// DOES NOT COMPILE — comma instead of ;</span>
+   MyFileClass cd = <span class="kw">new</span> MyFileClass(<span class="num">2</span>)) {}</code></pre>
+
+  <h3>Order of operations — memorize this output</h3>
+  <pre><code><span class="kw">public class</span> MyFileClass <span class="kw">implements</span> AutoCloseable {
+   <span class="kw">private final int</span> num;
+   <span class="kw">public</span> MyFileClass(<span class="kw">int</span> num) { <span class="kw">this</span>.num = num; }
+   <span class="kw">@Override public void</span> close() { System.out.println(<span class="str">"Closing: "</span> + num); }
+}
+
+<span class="kw">try</span> (MyFileClass bookReader = <span class="kw">new</span> MyFileClass(<span class="num">1</span>);
+      MyFileClass movieReader = <span class="kw">new</span> MyFileClass(<span class="num">2</span>)) {
+   System.out.println(<span class="str">"Try Block"</span>);
+   <span class="kw">throw new</span> RuntimeException();
+} <span class="kw">catch</span> (Exception e) {
+   System.out.println(<span class="str">"Catch Block"</span>);
+} <span class="kw">finally</span> {
+   System.out.println(<span class="str">"Finally Block"</span>);
+}</code></pre>
+  <ul class="trace">
+    <li><code>Try Block</code> — try body runs, then throws.</li>
+    <li><code>Closing: 2</code> then <code>Closing: 1</code> — implicit finally closes in <b>reverse</b> order, <b>before</b> catch.</li>
+    <li><code>Catch Block</code> — then <code>Finally Block</code>.</li>
+  </ul>
+
+  <h3>Effectively final resources</h3>
+  <p>A pre-declared variable can be used as a resource (just the name, separated by <code>;</code>) if it is <b>final or effectively final</b>:</p>
+  <pre><code><span class="kw">final var</span> bookReader = <span class="kw">new</span> MyFileClass(<span class="num">4</span>);
+MyFileClass movieReader = <span class="kw">new</span> MyFileClass(<span class="num">5</span>);       <span class="cm">// effectively final</span>
+<span class="kw">try</span> (bookReader; <span class="kw">var</span> tvReader = <span class="kw">new</span> MyFileClass(<span class="num">6</span>); movieReader) {
+   System.out.println(<span class="str">"Try Block"</span>);
+} <span class="kw">finally</span> { System.out.println(<span class="str">"Finally Block"</span>); }
+<span class="cm">// Try Block → Closing: 5 → Closing: 6 → Closing: 4 → Finally Block</span></code></pre>
+
+  <div class="exam-trap"><span class="label">⚠ EXAM TRAP — Not effectively final / use after close</span>
+    <pre style="margin-bottom:0"><code><span class="kw">var</span> writer = Files.newBufferedWriter(path);
+<span class="kw">try</span> (writer) {          <span class="err">// DOES NOT COMPILE — writer reassigned below</span>
+   writer.append(<span class="str">"Welcome to the zoo!"</span>);
+}
+writer = <span class="kw">null</span>;
+
+<span class="cm">// Separately: writing to a resource AFTER its try block compiles</span>
+<span class="cm">// but throws IOException ("Stream closed") at runtime.</span></code></pre>
+  </div>
+
+  <div class="exam-trap"><span class="label">⚠ EXAM TRAP — Scope ends with try block</span>
+    <pre style="margin-bottom:0"><code><span class="kw">try</span> (Scanner s = <span class="kw">new</span> Scanner(System.in)) {
+   s.nextLine();
+} <span class="kw">catch</span>(Exception e) {
+   s.nextInt();          <span class="err">// DOES NOT COMPILE</span>
+} <span class="kw">finally</span> {
+   s.nextInt();          <span class="err">// DOES NOT COMPILE</span>
+}</code></pre>
+    <p style="margin-top:8px">The resource is already closed and out of scope when catch/finally run.</p>
+  </div>
+</section></div>
+
+<!-- ============ SECTION 08 ============ -->
+<div class="card"><section id="s8">
+  <span class="sec-num">SECTION 08</span>
+  <h2>Suppressed Exceptions</h2>
+  <p>When more than one exception is thrown, the <b>first</b> is the <b>primary</b> exception; the rest become <b>suppressed</b> exceptions attached to it (retrieved via <code>getSuppressed()</code>). Typical case: the try block throws, then <code>close()</code> also throws.</p>
+
+  <pre><code><span class="num">1:</span> <span class="kw">public class</span> JammedTurkeyCage <span class="kw">implements</span> AutoCloseable {
+<span class="num">2:</span>    <span class="kw">public void</span> close() <span class="kw">throws</span> IllegalStateException {
+<span class="num">3:</span>       <span class="kw">throw new</span> IllegalStateException(<span class="str">"Cage door does not close"</span>);
+<span class="num">4:</span>    }
+<span class="num">5:</span>    <span class="kw">public static void</span> main(String[] args) {
+<span class="num">6:</span>       <span class="kw">try</span> (JammedTurkeyCage t = <span class="kw">new</span> JammedTurkeyCage()) {
+<span class="num">7:</span>          <span class="kw">throw new</span> IllegalStateException(<span class="str">"Turkeys ran off"</span>);
+<span class="num">8:</span>       } <span class="kw">catch</span> (IllegalStateException e) {
+<span class="num">9:</span>          System.out.println(<span class="str">"Caught: "</span> + e.getMessage());
+<span class="num">10:</span>         <span class="kw">for</span> (Throwable t: e.getSuppressed())
+<span class="num">11:</span>            System.out.println(<span class="str">"Suppressed: "</span> + t.getMessage());
+<span class="num">12:</span>      } }</code></pre>
+  <ul class="trace">
+    <li>Line 7 throws the <b>primary</b> exception ("Turkeys ran off").</li>
+    <li>Java auto-calls <code>close()</code> → its exception becomes <b>suppressed</b>.</li>
+    <li>Output: <code>Caught: Turkeys ran off</code> then <code>Suppressed: Cage door does not close</code>.</li>
+  </ul>
+
+  <div class="key-rule"><span class="label">✓ KEY RULE — catch matches the PRIMARY exception</span>
+    <p>If the try block throws <code>RuntimeException</code> and <code>close()</code> throws <code>IllegalStateException</code>, a <code>catch (IllegalStateException e)</code> does <b>not</b> match — the primary <code>RuntimeException</code> propagates to the caller (with the suppressed one attached).</p>
+  </div>
+
+  <div class="key-rule"><span class="label">✓ KEY RULE — Multiple resources failing</span>
+    <p>Resources close in reverse order, so if several <code>close()</code> calls throw, the <b>last-declared resource's exception is thrown first → it becomes the primary</b>, and the rest are suppressed.</p>
+  </div>
+
+  <div class="exam-trap"><span class="label">⚠ EXAM TRAP — finally can LOSE exceptions (not suppress)</span>
+    <pre style="margin-bottom:0"><code><span class="kw">try</span> (JammedTurkeyCage t = <span class="kw">new</span> JammedTurkeyCage()) {
+   <span class="kw">throw new</span> IllegalStateException(<span class="str">"Turkeys ran off"</span>);
+} <span class="kw">finally</span> {
+   <span class="kw">throw new</span> RuntimeException(<span class="str">"and we couldn't find them"</span>);
+}
+<span class="cm">// Only "and we couldn't find them" propagates — the try-block</span>
+<span class="cm">// exception (and its suppressed exception) are LOST.</span></code></pre>
+    <p style="margin-top:8px">Suppression applies only to exceptions thrown <b>in the try clause</b> (plus close). An exception thrown in a programmer-defined <code>finally</code> simply replaces everything — bad practice, but legal.</p>
+  </div>
+</section></div>
+
+<!-- ============ SECTION 09 ============ -->
+<div class="card"><section id="s9">
+  <span class="sec-num">SECTION 09</span>
+  <h2>Formatting Numbers — DecimalFormat</h2>
+  <p><code>NumberFormat</code> is an abstract class with <code>format(double)</code> / <code>format(long)</code>. The concrete <code>DecimalFormat</code> takes a pattern String. Only two symbols matter for the exam:</p>
+  <table>
+    <tr><th>Symbol</th><th>Meaning</th><th>Example</th></tr>
+    <tr><td><code>#</code></td><td><b>Omit</b> the position if no digit exists for it</td><td><code>$2.2</code></td></tr>
+    <tr><td><code>0</code></td><td>Put <b>0</b> in the position if no digit exists for it</td><td><code>$002.20</code></td></tr>
+  </table>
+
+  <pre><code><span class="kw">double</span> d = <span class="num">1234.567</span>;
+NumberFormat f1 = <span class="kw">new</span> DecimalFormat(<span class="str">"###,###,###.0"</span>);
+System.out.println(f1.format(d));  <span class="cm">// 1,234.6</span>
+
+NumberFormat f2 = <span class="kw">new</span> DecimalFormat(<span class="str">"000,000,000.00000"</span>);
+System.out.println(f2.format(d));  <span class="cm">// 000,001,234.56700</span>
+
+NumberFormat f3 = <span class="kw">new</span> DecimalFormat(<span class="str">"Your Balance $#,###,###.##"</span>);
+System.out.println(f3.format(d));  <span class="cm">// Your Balance $1,234.57</span></code></pre>
+  <ul class="trace">
+    <li><code>#</code> positions to the left disappear; the fraction is <b>rounded</b> to fit (.567 → .6, .57).</li>
+    <li><code>0</code> forces leading/trailing zeros to the full pattern width.</li>
+    <li>Commas between unused <code>#</code> positions are removed automatically.</li>
+  </ul>
+</section></div>
+
+<!-- ============ SECTION 10 ============ -->
+<div class="card"><section id="s10">
+  <span class="sec-num">SECTION 10</span>
+  <h2>Formatting Dates &amp; Times</h2>
+  <pre><code>LocalDate date = LocalDate.of(<span class="num">2025</span>, Month.OCTOBER, <span class="num">20</span>);
+LocalTime time = LocalTime.of(<span class="num">11</span>, <span class="num">12</span>, <span class="num">34</span>);
+LocalDateTime dt = LocalDateTime.of(date, time);
+
+date.format(DateTimeFormatter.ISO_LOCAL_DATE);       <span class="cm">// 2025-10-20</span>
+time.format(DateTimeFormatter.ISO_LOCAL_TIME);       <span class="cm">// 11:12:34</span>
+dt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);    <span class="cm">// 2025-10-20T11:12:34</span>
+
+date.format(DateTimeFormatter.ISO_LOCAL_TIME);  <span class="err">// RuntimeException — date has no time</span>
+time.format(DateTimeFormatter.ISO_LOCAL_DATE);  <span class="err">// RuntimeException — time has no date</span></code></pre>
+
+  <h3>Symbols — case matters!</h3>
+  <table>
+    <tr><th>Symbol</th><th>Meaning</th><th>Examples</th><th>LocalDate</th><th>LocalTime</th><th>LocalDateTime</th><th>ZonedDateTime</th></tr>
+    <tr><td><code>y</code></td><td>Year</td><td>25, 2025</td><td class="yes">√</td><td class="no">–</td><td class="yes">√</td><td class="yes">√</td></tr>
+    <tr><td><code>M</code></td><td>Month</td><td>1, 01, Jan, January</td><td class="yes">√</td><td class="no">–</td><td class="yes">√</td><td class="yes">√</td></tr>
+    <tr><td><code>d</code></td><td>Day</td><td>5, 05</td><td class="yes">√</td><td class="no">–</td><td class="yes">√</td><td class="yes">√</td></tr>
+    <tr><td><code>H</code> / <code>h</code></td><td>24-hour / 12-hour</td><td>15 / 9</td><td class="no">–</td><td class="yes">√</td><td class="yes">√</td><td class="yes">√</td></tr>
+    <tr><td><code>m</code></td><td>Minute</td><td>45</td><td class="no">–</td><td class="yes">√</td><td class="yes">√</td><td class="yes">√</td></tr>
+    <tr><td><code>s</code></td><td>Second</td><td>52</td><td class="no">–</td><td class="yes">√</td><td class="yes">√</td><td class="yes">√</td></tr>
+    <tr><td><code>a</code></td><td>a.m./p.m.</td><td>AM, PM</td><td class="no">–</td><td class="yes">√</td><td class="yes">√</td><td class="yes">√</td></tr>
+    <tr><td><code>z</code> / <code>Z</code></td><td>Zone name / offset</td><td>EST / -0400</td><td class="no">–</td><td class="no">–</td><td class="no">–</td><td class="yes">√</td></tr>
+  </table>
+
+  <div class="remember"><span class="label">★ REMEMBER</span>
+    <p><b>Uppercase is bigger:</b> <code>H</code> = 24-hour vs <code>h</code> = 12-hour; <code>M</code> = Month vs <code>m</code> = minute. More letters = longer form: <code>M</code>→1, <code>MM</code>→01, <code>MMM</code>→Oct, <code>MMMM</code>→October.</p>
+  </div>
+
+  <div class="exam-trap"><span class="label">⚠ EXAM TRAP — Unsupported symbol for the type</span>
+    <pre style="margin-bottom:0"><code><span class="kw">var</span> dt = LocalDateTime.of(<span class="num">2025</span>, Month.OCTOBER, <span class="num">20</span>, <span class="num">6</span>, <span class="num">15</span>, <span class="num">30</span>);
+<span class="kw">var</span> f3 = DateTimeFormatter.ofPattern(<span class="str">"hh:mm:z"</span>);
+System.out.println(dt.format(f3));   <span class="err">// DateTimeException — LocalDateTime has no zone</span></code></pre>
+    <p style="margin-top:8px">Month for a <code>LocalTime</code>, hour for a <code>LocalDate</code>, or zone for anything but <code>ZonedDateTime</code> → <b>runtime</b> exception.</p>
+  </div>
+
+  <h3>format() works both ways</h3>
+  <pre><code>dateTime.format(formatter);   <span class="cm">// 10/20/2025 06:15:30</span>
+formatter.format(dateTime);   <span class="cm">// 10/20/2025 06:15:30 — identical</span></code></pre>
+
+  <h3>Escaping custom text with single quotes</h3>
+  <pre><code><span class="kw">var</span> f = DateTimeFormatter.ofPattern(<span class="str">"MMMM dd, yyyy 'at' hh:mm"</span>);
+dt.format(f);   <span class="cm">// October 20, 2025 at 06:15</span>
+
+<span class="cm">// '' (two single quotes) = literal single quote</span>
+<span class="str">"MMMM dd', Party''s at' hh:mm"</span>   <span class="cm">// October 20, Party's at 06:15</span>
+<span class="str">"'System format, hh:mm: 'hh:mm"</span> <span class="cm">// System format, hh:mm: 06:15</span>
+<span class="str">"'NEW! 'yyyy', yay!'"</span>            <span class="cm">// NEW! 2025, yay!</span>
+
+DateTimeFormatter.ofPattern(<span class="str">"The time is hh:mm"</span>); <span class="err">// IllegalArgumentException — 'T' unknown</span>
+DateTimeFormatter.ofPattern(<span class="str">"'Time is: hh:mm: "</span>);  <span class="err">// IllegalArgumentException — unterminated '</span></code></pre>
+</section></div>
+
+<!-- ============ SECTION 11 ============ -->
+<div class="card"><section id="s11">
+  <span class="sec-num">SECTION 11</span>
+  <h2>Internationalization &amp; Locales</h2>
+  <div class="vs-grid">
+    <div><h4>Internationalization (i18n)</h4><ul><li>Designing the program so it <b>can be adapted</b>: externalize strings to properties files, use proper formatters.</li></ul></div>
+    <div><h4>Localization (l10n)</h4><ul><li>Actually <b>supporting</b> multiple locales: translating strings, locale-correct dates &amp; numbers.</li></ul></div>
+  </div>
+
+  <div class="rules-box">
+    <h4>LOCALE FORMAT RULES</h4>
+    <ol>
+      <li><b>Language code</b>: lowercase, <b>always required</b> — e.g. <code>en</code>.</li>
+      <li><b>Country code</b>: UPPERCASE, <b>optional</b>, joined by underscore — e.g. <code>en_US</code>.</li>
+      <li>Valid forms: <code>en</code> and <code>en_US</code>. Nothing else.</li>
+    </ol>
+  </div>
+
+  <pre><code>US      <span class="err">// invalid — country without language</span>
+enUS    <span class="err">// invalid — missing underscore</span>
+US_en   <span class="err">// invalid — reversed</span>
+EN      <span class="err">// invalid — language must be lowercase</span></code></pre>
+
+  <h3>Three (non-deprecated) ways to get a Locale</h3>
+  <pre><code><span class="cm">// 1. Built-in constants</span>
+System.out.println(Locale.GERMAN);   <span class="cm">// de       (language only)</span>
+System.out.println(Locale.GERMANY);  <span class="cm">// de_DE    (language + country)</span>
+
+<span class="cm">// 2. Factory method</span>
+Locale.of(<span class="str">"fr"</span>);           <span class="cm">// fr</span>
+Locale.of(<span class="str">"hi"</span>, <span class="str">"IN"</span>);     <span class="cm">// hi_IN</span>
+
+<span class="cm">// 3. Builder — properties in any order</span>
+Locale l1 = <span class="kw">new</span> Locale.Builder().setLanguage(<span class="str">"en"</span>).setRegion(<span class="str">"US"</span>).build();
+Locale l2 = <span class="kw">new</span> Locale.Builder().setRegion(<span class="str">"US"</span>).setLanguage(<span class="str">"en"</span>).build();</code></pre>
+
+  <div class="remember"><span class="label">★ REMEMBER</span>
+    <ul>
+      <li>The <code>new Locale("en","US")</code> <b>constructors are deprecated</b> — use constants, <code>Locale.of()</code>, or the Builder.</li>
+      <li>Java happily creates invalid locales like <code>xx_XX</code> — no exception, it just won't match anything.</li>
+      <li><code>Locale.setDefault(locale)</code> affects only that one program run.</li>
+    </ul>
+  </div>
+</section></div>
+
+<!-- ============ SECTION 12 ============ -->
+<div class="card"><section id="s12">
+  <span class="sec-num">SECTION 12</span>
+  <h2>Localizing Numbers &amp; CompactNumberFormat</h2>
+  <h3>NumberFormat factory methods (java.text)</h3>
+  <table>
+    <tr><th>Purpose</th><th>Factory method (default or with Locale)</th></tr>
+    <tr><td>General purpose</td><td><code>getInstance()</code> / <code>getNumberInstance()</code></td></tr>
+    <tr><td>Currency</td><td><code>getCurrencyInstance()</code></td></tr>
+    <tr><td>Percentage</td><td><code>getPercentInstance()</code></td></tr>
+    <tr><td>Rounds decimals before display</td><td><code>getIntegerInstance()</code></td></tr>
+    <tr><td>Compact numbers</td><td><code>getCompactNumberInstance(locale, Style)</code></td></tr>
+  </table>
+
+  <pre><code><span class="kw">int</span> attendeesPerMonth = <span class="num">3_200_000</span> / <span class="num">12</span>;
+NumberFormat.getInstance(Locale.US).format(attendeesPerMonth);            <span class="cm">// 266,666</span>
+NumberFormat.getInstance(Locale.GERMANY).format(attendeesPerMonth);       <span class="cm">// 266.666</span>
+NumberFormat.getInstance(Locale.CANADA_FRENCH).format(attendeesPerMonth); <span class="cm">// 266 666</span>
+
+<span class="cm">// Currency: $48.00 in en_US, £48.00 in en_GB</span>
+<span class="cm">// Percent: 0.802 → "80%" (US), "80 %" (Germany)</span></code></pre>
+
+  <div class="key-rule"><span class="label">✓ KEY RULE — parse() is locale-sensitive and CHECKED</span>
+    <pre style="margin-bottom:0"><code>String s = <span class="str">"40.45"</span>;
+NumberFormat.getInstance(Locale.US).parse(s);     <span class="cm">// 40.45</span>
+NumberFormat.getInstance(Locale.FRANCE).parse(s); <span class="cm">// 40 — '.' isn't a French decimal; parsing stops</span>
+
+String income = <span class="str">"$92,807.99"</span>;
+<span class="kw">double</span> value = (Double) NumberFormat.getCurrencyInstance().parse(income);
+System.out.println(value);   <span class="cm">// 92807.99 — parse returns Number, cast then unbox</span></code></pre>
+    <p style="margin-top:8px"><code>parse()</code> throws a <b>checked <code>ParseException</code></b> — it must be handled or declared. It returns <code>Number</code>, castable to the wrapper type.</p>
+  </div>
+
+  <h3>CompactNumberFormat</h3>
+  <div class="rules-box">
+    <h4>COMPACT NUMBER RULES</h4>
+    <ol>
+      <li>Determine the highest range: thousand (K), million (M), billion (B), trillion (T).</li>
+      <li>Return <b>up to the first three digits</b> of that range, <b>rounding</b> the last as needed.</li>
+      <li>Append an identifier: <code>SHORT</code> → symbol (7M); <code>LONG</code> → space + word (7 million).</li>
+      <li>No style specified → <b>SHORT is the default</b>.</li>
+    </ol>
+  </div>
+  <pre><code><span class="cm">// format(7_123_456) in en_US:</span>
+getCompactNumberInstance()                              <span class="cm">// 7M</span>
+getCompactNumberInstance(Locale.getDefault(), Style.SHORT) <span class="cm">// 7M</span>
+getCompactNumberInstance(Locale.getDefault(), Style.LONG)  <span class="cm">// 7 million</span>
+getCompactNumberInstance(Locale.GERMAN, Style.SHORT)    <span class="cm">// 7 Mio.</span>
+getCompactNumberInstance(Locale.GERMAN, Style.LONG)     <span class="cm">// 7 Millionen</span>
+getNumberInstance()                                     <span class="cm">// 7,123,456</span>
+
+<span class="cm">// format(314_900_000) → 315M / 315 million / … (third digit rounds up!)</span></code></pre>
+
+  <div class="exam-trap"><span class="label">⚠ EXAM TRAP — Compact parsing quirks</span>
+    <pre style="margin-bottom:0"><code><span class="kw">var</span> compact = NumberFormat.getCompactNumberInstance(Locale.of(<span class="str">"en"</span>,<span class="str">"US"</span>), Style.SHORT);
+compact.format(<span class="num">1_000_000</span>);      <span class="cm">// 1M</span>
+compact.parse(<span class="str">"1M"</span>);            <span class="cm">// 1000000</span>
+compact.parse(<span class="str">"1000000"</span>);       <span class="cm">// 1000000</span>
+compact.parse(<span class="str">"1,000,000"</span>);     <span class="cm">// 1 — stops at the comma!</span>
+compact.parse(<span class="str">"$1000000"</span>);      <span class="err">// ParseException — can't handle $</span></code></pre>
+  </div>
+</section></div>
+
+<!-- ============ SECTION 13 ============ -->
+<div class="card"><section id="s13">
+  <span class="sec-num">SECTION 13</span>
+  <h2>Localizing Dates &amp; Locale.Category</h2>
+  <table>
+    <tr><th>For formatting</th><th>Factory method</th></tr>
+    <tr><td>Dates</td><td><code>DateTimeFormatter.ofLocalizedDate(dateStyle)</code></td></tr>
+    <tr><td>Times</td><td><code>DateTimeFormatter.ofLocalizedTime(timeStyle)</code></td></tr>
+    <tr><td>Dates &amp; times</td><td><code>ofLocalizedDateTime(dateStyle, timeStyle)</code> / <code>ofLocalizedDateTime(dateTimeStyle)</code></td></tr>
+  </table>
+  <p>Each takes <code>FormatStyle</code> values <code>SHORT</code>, <code>MEDIUM</code>, <code>LONG</code>, <code>FULL</code> (formats themselves need not be memorized). For a specific locale, append <code>.withLocale(locale)</code>.</p>
+  <pre><code>Locale.setDefault(Locale.of(<span class="str">"en"</span>, <span class="str">"US"</span>));
+<span class="kw">var</span> italy = Locale.of(<span class="str">"it"</span>, <span class="str">"IT"</span>);
+<span class="kw">var</span> dt = LocalDateTime.of(<span class="num">2025</span>, Month.OCTOBER, <span class="num">20</span>, <span class="num">15</span>, <span class="num">12</span>, <span class="num">34</span>);
+
+ofLocalizedDate(SHORT):      <span class="cm">// 10/20/25 --- 20/10/25 (with italy)</span>
+ofLocalizedTime(SHORT):      <span class="cm">// 3:12 PM  --- 15:12</span>
+ofLocalizedDateTime(SHORT,SHORT): <span class="cm">// 10/20/25, 3:12 PM --- 20/10/25, 15:12</span></code></pre>
+
+  <h3>Locale.Category — DISPLAY vs FORMAT</h3>
+  <pre><code><span class="kw">var</span> spain = Locale.of(<span class="str">"es"</span>, <span class="str">"ES"</span>);  <span class="kw">var</span> money = <span class="num">1.23</span>;
+
+Locale.setDefault(Locale.of(<span class="str">"en"</span>, <span class="str">"US"</span>));
+printCurrency(spain, money);              <span class="cm">// $1.23, Spanish</span>
+
+Locale.setDefault(Category.DISPLAY, spain);
+printCurrency(spain, money);              <span class="cm">// $1.23, español</span>
+
+Locale.setDefault(Category.FORMAT, spain);
+printCurrency(spain, money);              <span class="cm">// 1,23 €, español</span></code></pre>
+  <ul class="trace">
+    <li><code>DISPLAY</code> — how data <i>about</i> the locale is displayed (e.g. <code>getDisplayLanguage()</code>).</li>
+    <li><code>FORMAT</code> — how dates/numbers/currencies are formatted.</li>
+    <li><code>Locale.setDefault(locale)</code> sets <b>both</b> categories together.</li>
+  </ul>
+</section></div>
+
+<!-- ============ SECTION 14 ============ -->
+<div class="card"><section id="s14">
+  <span class="sec-num">SECTION 14</span>
+  <h2>Resource Bundles</h2>
+  <p>A <b>resource bundle</b> holds locale-specific key/value pairs, commonly in <code>.properties</code> files (keys and values separated by <code>=</code> or <code>:</code>). Filename = bundle name + <code>_locale</code> + <code>.properties</code>.</p>
+  <pre><code><span class="cm"># Zoo_en.properties</span>
+hello=Hello
+open=The zoo is open
+
+<span class="cm"># Zoo_fr.properties</span>
+hello=Bonjour
+open=Le zoo est ouvert</code></pre>
+  <pre><code><span class="kw">var</span> rb = ResourceBundle.getBundle(<span class="str">"Zoo"</span>, locale);  <span class="cm">// or getBundle("Zoo") = default locale</span>
+rb.getString(<span class="str">"hello"</span>);
+rb.keySet();   <span class="cm">// all keys</span></code></pre>
+
+  <h3>Search order — picking the bundle (requested fr_FR, default en_US)</h3>
+  <table>
+    <tr><th>Step</th><th>Looks for file</th><th>Reason</th></tr>
+    <tr><td>1</td><td><code>Zoo_fr_FR.properties</code></td><td>Requested locale</td></tr>
+    <tr><td>2</td><td><code>Zoo_fr.properties</code></td><td>Requested language, no country</td></tr>
+    <tr><td>3</td><td><code>Zoo_en_US.properties</code></td><td>Default locale</td></tr>
+    <tr><td>4</td><td><code>Zoo_en.properties</code></td><td>Default locale's language, no country</td></tr>
+    <tr><td>5</td><td><code>Zoo.properties</code></td><td>Default bundle (no locale)</td></tr>
+    <tr><td>6</td><td class="no">MissingResourceException</td><td>Nothing found</td></tr>
+  </table>
+
+  <div class="remember"><span class="label">★ REMEMBER — Count-the-files question</span>
+    <pre style="margin-bottom:0"><code>Locale.setDefault(Locale.of(<span class="str">"hi"</span>));
+ResourceBundle rb = ResourceBundle.getBundle(<span class="str">"Zoo"</span>, Locale.of(<span class="str">"en"</span>));
+<span class="cm">// Max files considered = 3: Zoo_en, Zoo_hi, Zoo (no countries anywhere)</span></code></pre>
+  </div>
+
+  <div class="key-rule"><span class="label">✓ KEY RULE — Selecting VALUES uses only the matched hierarchy</span>
+    <p>Once a bundle is matched, keys may come only from it and its <b>parents</b> (drop name components until the top): <code>Zoo_fr_FR → Zoo_fr → Zoo</code>. The <b>default locale's bundle is no longer considered</b> for individual keys.</p>
+  </div>
+
+  <h3>The classic four-file trace</h3>
+  <pre><code><span class="cm"># Zoo.properties        → name=Vancouver Zoo</span>
+<span class="cm"># Zoo_en.properties     → hello=Hello, open=is open</span>
+<span class="cm"># Zoo_en_US.properties  → name=The Zoo</span>
+<span class="cm"># Zoo_en_CA.properties  → visitors=Canada visitors</span>
+
+Locale.setDefault(Locale.of(<span class="str">"en"</span>, <span class="str">"US"</span>));
+<span class="kw">var</span> rb = ResourceBundle.getBundle(<span class="str">"Zoo"</span>, Locale.of(<span class="str">"en"</span>, <span class="str">"CA"</span>));
+rb.getString(<span class="str">"hello"</span>);    <span class="cm">// Zoo_en   → Hello</span>
+rb.getString(<span class="str">"name"</span>);     <span class="cm">// Zoo      → Vancouver Zoo (NOT "The Zoo"!)</span>
+rb.getString(<span class="str">"open"</span>);     <span class="cm">// Zoo_en   → is open</span>
+rb.getString(<span class="str">"visitors"</span>); <span class="cm">// Zoo_en_CA → Canada visitors</span>
+<span class="cm">// Output: Hello. Vancouver Zoo is open Canada visitors</span>
+
+rb.getString(<span class="str">"close"</span>);    <span class="err">// MissingResourceException — key not in hierarchy</span></code></pre>
+  <ul class="trace">
+    <li>Match found immediately: <code>Zoo_en_CA</code> → default locale <code>en_US</code> becomes irrelevant.</li>
+    <li>Hierarchy searched per key: <code>Zoo_en_CA → Zoo_en → Zoo</code>. <code>Zoo_en_US</code> is never used.</li>
+  </ul>
+</section></div>
+
+<!-- ============ SECTION 15 ============ -->
+<div class="card"><section id="s15">
+  <span class="sec-num">SECTION 15</span>
+  <h2>MessageFormat &amp; the Properties Class</h2>
+  <h3>MessageFormat — parameter substitution</h3>
+  <pre><code><span class="cm"># property: helloGreeting=Hello, {0} and {1}</span>
+String greeting = rb.getString(<span class="str">"helloGreeting"</span>);
+MessageFormat.format(greeting, <span class="str">"Tammy"</span>, <span class="str">"Henry"</span>);  <span class="cm">// Hello, Tammy and Henry</span></code></pre>
+  <p>The second parameter of <code>format()</code> is a <b>vararg</b>; <code>{0}, {1}…</code> mark substitution order.</p>
+
+  <h3>Properties — a String→String map with defaults</h3>
+  <pre><code><span class="kw">var</span> props = <span class="kw">new</span> Properties();
+props.setProperty(<span class="str">"name"</span>, <span class="str">"Our zoo"</span>);
+props.setProperty(<span class="str">"open"</span>, <span class="str">"10am"</span>);
+
+props.getProperty(<span class="str">"camel"</span>);           <span class="cm">// null</span>
+props.getProperty(<span class="str">"camel"</span>, <span class="str">"Bob"</span>);    <span class="cm">// Bob — default for missing key</span>
+
+props.get(<span class="str">"open"</span>);                    <span class="cm">// 10am</span>
+props.get(<span class="str">"open"</span>, <span class="str">"soon"</span>);            <span class="err">// DOES NOT COMPILE — get() takes ONE arg</span></code></pre>
+  <div class="key-rule"><span class="label">✓ KEY RULE</span>
+    <p>Only <code>getProperty()</code> supports a default value. <code>get()</code> (inherited map behavior) takes a single parameter — a two-argument <code>get()</code> is a compiler error.</p>
+  </div>
+</section></div>
+
+<!-- ============ RECAP ============ -->
+<div class="card recap" id="recap">
+  <h2>Short Recap</h2>
+  <h3>Exception types</h3>
+  <ul><li>Checked = <code>Exception</code> minus <code>RuntimeException</code> → handle or declare. Unchecked = <code>RuntimeException</code> + <code>Error</code>. Never catch <code>Error</code>/<code>Throwable</code>.</li></ul>
+  <h3>throw / throws &amp; overriding</h3>
+  <ul><li><code>throw</code> = statement, <code>throws</code> = declaration; <code>throw RuntimeException()</code> without <code>new</code> doesn't compile. Overrides may declare fewer/narrower checked exceptions, never new/broader ones.</li></ul>
+  <h3>Exception classes</h3>
+  <ul><li>NFE extends IAE; FNFE &amp; NotSerializableException extend IOException. JVM throws ArithmeticException/AIOOBE/CCE/NPE; programmers throw IAE/NFE.</li></ul>
+  <h3>try/catch/finally</h3>
+  <ul><li>Subclass catch must come before superclass; catch variable scoped to its block; finally always runs (except <code>System.exit()</code>) and a <code>return</code> there overrides earlier returns.</li></ul>
+  <h3>Multi-catch</h3>
+  <ul><li>One variable at the end; no subclass–superclass pairs; type order irrelevant.</li></ul>
+  <h3>Try-with-resources</h3>
+  <ul><li>AutoCloseable only; semicolon-separated; closes in reverse order via implicit finally that runs before catch/finally; resources scoped to try; pre-declared resources must be (effectively) final.</li></ul>
+  <h3>Suppressed exceptions</h3>
+  <ul><li>First thrown = primary, close() failures get suppressed onto it; an exception in a programmer-defined finally <i>replaces</i> (loses) everything.</li></ul>
+  <h3>Formatting</h3>
+  <ul><li>DecimalFormat: <code>#</code> omits, <code>0</code> pads, fraction rounds. Date symbols: M/m, H/h case-sensitive; wrong symbol for type → runtime exception; escape literals with <code>'…'</code>, <code>''</code> = literal quote.</li></ul>
+  <h3>Locales &amp; localization</h3>
+  <ul><li>Format: <code>en</code> or <code>en_US</code> (lowercase lang required, UPPERCASE country optional). Constructors deprecated → constants / <code>Locale.of()</code> / Builder. <code>parse()</code> throws checked ParseException and is locale-sensitive. Compact: 3 digits + K/M/B/T, SHORT default.</li></ul>
+  <h3>Resource bundles</h3>
+  <ul><li>Pick bundle: requested (full→lang) → default (full→lang) → base bundle → MissingResourceException. Values come only from the matched hierarchy + parents.</li></ul>
+</div>
+
+<!-- ============ CHEAT SHEET ============ -->
+<div class="card">
+  <h2 style="border-bottom:2px solid #ece3da;padding-bottom:8px;margin-bottom:16px">Exam Traps Cheat Sheet</h2>
+  <table>
+    <tr><th>Scenario</th><th>What it tests</th><th>Verdict</th></tr>
+    <tr><td><code>throw RuntimeException();</code></td><td>Missing <code>new</code></td><td class="no">DOES NOT COMPILE</td></tr>
+    <tr><td>Statement after <code>throw</code> in same block</td><td>Unreachable code</td><td class="no">DOES NOT COMPILE</td></tr>
+    <tr><td>Calling method that declares checked exception without handle/declare</td><td>Handle-or-declare rule</td><td class="no">DOES NOT COMPILE</td></tr>
+    <tr><td>Catching a checked exception the try block can't throw</td><td>Unreachable catch</td><td class="no">DOES NOT COMPILE</td></tr>
+    <tr><td>Catching <code>RuntimeException</code> never thrown in try</td><td>Rule only applies to checked</td><td class="yes">Compiles</td></tr>
+    <tr><td>Override adds new/broader checked exception</td><td>Overriding rules</td><td class="no">DOES NOT COMPILE</td></tr>
+    <tr><td>Override declares fewer/narrower/none</td><td>Overriding rules</td><td class="yes">Compiles</td></tr>
+    <tr><td><code>catch (IOException)</code> before <code>catch (FileNotFoundException)</code></td><td>Superclass first = unreachable</td><td class="no">DOES NOT COMPILE</td></tr>
+    <tr><td><code>catch (A e1 | B e2)</code> or repeated variable names</td><td>Multi-catch: one name at end</td><td class="no">DOES NOT COMPILE</td></tr>
+    <tr><td><code>catch (FileNotFoundException | IOException e)</code></td><td>Related types in multi-catch</td><td class="no">DOES NOT COMPILE</td></tr>
+    <tr><td>try with no catch and no finally (traditional)</td><td>Lonely try</td><td class="no">DOES NOT COMPILE</td></tr>
+    <tr><td>try-with-resources with no catch/finally</td><td>Implicit finally suffices</td><td class="yes">Compiles</td></tr>
+    <tr><td>finally before catch</td><td>Clause order</td><td class="no">DOES NOT COMPILE</td></tr>
+    <tr><td><code>return</code> in finally</td><td>Overrides try/catch returns</td><td class="yes">Compiles; finally's value wins</td></tr>
+    <tr><td><code>System.exit()</code> in try</td><td>Only case finally is skipped</td><td class="yes">finally NOT executed</td></tr>
+    <tr><td>Resources separated by comma</td><td>Must use <code>;</code> + type each</td><td class="no">DOES NOT COMPILE</td></tr>
+    <tr><td><code>try (String s = "x")</code></td><td>Not AutoCloseable</td><td class="no">DOES NOT COMPILE</td></tr>
+    <tr><td>Resource variable used in catch/finally</td><td>Scope ends with try block</td><td class="no">DOES NOT COMPILE</td></tr>
+    <tr><td>try (var) where var is later reassigned</td><td>Not effectively final</td><td class="no">DOES NOT COMPILE</td></tr>
+    <tr><td>Writing to resource after its try block</td><td>Stream closed</td><td class="no">IOException at runtime</td></tr>
+    <tr><td>try block + close() both throw</td><td>Suppressed exceptions</td><td class="yes">Primary = try's; close's suppressed</td></tr>
+    <tr><td>Exception thrown in programmer-defined finally</td><td>Replaces earlier exceptions</td><td class="no">Previous exceptions LOST</td></tr>
+    <tr><td><code>date.format(ISO_LOCAL_TIME)</code></td><td>Incompatible formatter</td><td class="no">Runtime exception</td></tr>
+    <tr><td>Pattern <code>"hh:mm:z"</code> on LocalDateTime</td><td>Zone symbol needs ZonedDateTime</td><td class="no">DateTimeException</td></tr>
+    <tr><td>Unescaped text / unterminated quote in pattern</td><td>Custom text escaping</td><td class="no">IllegalArgumentException</td></tr>
+    <tr><td>Locale <code>"US"</code>, <code>"enUS"</code>, <code>"US_en"</code>, <code>"EN"</code></td><td>Locale format</td><td class="no">Invalid</td></tr>
+    <tr><td><code>new Locale("en","US")</code></td><td>Deprecated constructor</td><td class="yes">Compiles (deprecated) — avoid</td></tr>
+    <tr><td>French locale parsing <code>"40.45"</code></td><td>Locale-sensitive parse</td><td class="yes">Returns 40 (stops at dot)</td></tr>
+    <tr><td>Compact parse of <code>"1,000,000"</code> / <code>"$1000000"</code></td><td>Compact parsing quirks</td><td class="no">1 / ParseException</td></tr>
+    <tr><td><code>NumberFormat.parse()</code> without handle/declare</td><td>Checked ParseException</td><td class="no">DOES NOT COMPILE</td></tr>
+    <tr><td>Key missing from bundle hierarchy</td><td>Value lookup</td><td class="no">MissingResourceException</td></tr>
+    <tr><td><code>props.get("k", "default")</code></td><td>Only getProperty takes default</td><td class="no">DOES NOT COMPILE</td></tr>
+  </table>
+</div>
+
+</div>
+</body>
+</html>
