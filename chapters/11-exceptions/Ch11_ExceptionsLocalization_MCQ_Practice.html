@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 — Chapter 11: Exceptions and Localization — MCQ Practice</title>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#f4f6f8; font-family:'Source Sans 3',sans-serif; color:#33393f; line-height:1.65; padding:28px 16px 60px; }
+  .wrap { max-width:860px; margin:0 auto; }
+  h1,h2 { font-family:'Merriweather',serif; color:#2b3138; }
+  code, pre { font-family:'JetBrains Mono',monospace; }
+  p { margin:0 0 10px; }
+
+  /* header */
+  .header { background:linear-gradient(135deg,#ffffff,#fdf8f3); border-radius:18px; box-shadow:0 2px 12px rgba(50,60,70,.08); padding:30px 32px; margin-bottom:28px; position:relative; overflow:hidden; }
+  .header::after { content:""; position:absolute; top:-70px; right:-70px; width:230px; height:230px; background:radial-gradient(circle,#f5e0d3 0%,transparent 70%); pointer-events:none; }
+  .badge { display:inline-block; background:linear-gradient(90deg,#c96442,#d4845e); color:#fff; font-family:'JetBrains Mono',monospace; font-size:.72rem; letter-spacing:.09em; text-transform:uppercase; padding:6px 14px; border-radius:999px; margin-bottom:14px; }
+  .header h1 { font-size:1.55rem; margin-bottom:6px; position:relative; z-index:1; }
+  .subtitle { font-style:italic; color:#7c858d; margin-bottom:16px; position:relative; z-index:1; }
+  .pills { display:flex; flex-wrap:wrap; gap:8px; position:relative; z-index:1; }
+  .pill { background:#f3ece4; color:#9a5030; font-family:'JetBrains Mono',monospace; font-size:.72rem; padding:5px 12px; border-radius:999px; }
+
+  /* question cards */
+  .q-card { background:linear-gradient(135deg,#f4f0fa,#f9f6fd); border-top:4px solid #9b7fd4; border-radius:14px; box-shadow:0 2px 10px rgba(80,70,120,.09); padding:22px 24px; margin-bottom:24px; transition:transform .2s ease, box-shadow .2s ease; }
+  .q-card:hover { transform:translateY(-3px); box-shadow:0 8px 20px rgba(80,70,120,.14); }
+  .q-head { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+  .q-num { font-family:'JetBrains Mono',monospace; font-weight:700; color:#7a5cb8; font-size:1rem; }
+  .topic { background:#b29ad9; color:#fff; font-family:'JetBrains Mono',monospace; font-size:.64rem; letter-spacing:.08em; text-transform:uppercase; padding:4px 10px; border-radius:999px; }
+  .prompt { font-weight:600; margin-bottom:12px; }
+  .prompt .all { color:#7a5cb8; font-weight:700; }
+  pre { background:#fbf9fe; border-radius:12px; box-shadow:inset 0 1px 5px rgba(110,90,160,.10); padding:14px 16px; overflow-x:auto; margin:0 0 14px; font-size:.86rem; line-height:1.6; }
+  .kw{color:#7c5cbf;font-weight:600} .str{color:#3a8a5c} .num{color:#b8860b} .err{color:#c44d3e;font-weight:600} .cm{color:#a89a8a;font-style:italic}
+  .opts { list-style:none; margin:0 0 6px; }
+  .opts li { margin-bottom:7px; padding-left:34px; position:relative; }
+  .opts .L { position:absolute; left:0; top:0; font-family:'JetBrains Mono',monospace; font-weight:700; color:#7a5cb8; }
+  .opts code { background:#f3ece4; color:#9a5030; padding:1px 6px; border-radius:6px; font-size:.86em; }
+  .prompt code, p code { background:#f3ece4; color:#9a5030; padding:1px 6px; border-radius:6px; font-size:.86em; }
+
+  details { border-top:1px dashed #cbbfe4; margin-top:14px; padding-top:10px; }
+  summary { cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:.8rem; font-weight:600; color:#7a5cb8; letter-spacing:.04em; user-select:none; }
+  summary:hover { color:#5d40a0; }
+  .ans-key { display:inline-block; background:#eef8f1; color:#3d8a5e; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:.85rem; padding:5px 14px; border-radius:8px; margin:10px 0 8px; }
+  .expl { font-size:.95rem; }
+
+  /* revision box */
+  .revision { background:linear-gradient(135deg,#fdf6eb,#fffbf4); border-left:5px solid #d4a24c; border-radius:14px; box-shadow:0 2px 10px rgba(150,120,60,.10); padding:24px 26px; margin-top:34px; }
+  .revision h2 { font-size:1.15rem; color:#a9772a; margin-bottom:12px; }
+  .revision ul { margin:0 0 0 20px; }
+  .revision li { margin-bottom:7px; font-size:.95rem; }
+
+  @media (max-width:640px){ .q-card{padding:18px 16px} body{padding:14px 8px 40px} .header{padding:22px 20px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ============ HEADER ============ -->
+<div class="header">
+  <span class="badge">OCP Java SE 21 · 1Z0-830</span>
+  <h1>Chapter 11 — Exceptions and Localization · MCQ Practice</h1>
+  <p class="subtitle">30 exam-style questions with inline reveal answers. Trace every line before you peek!</p>
+  <div class="pills">
+    <span class="pill">exception types</span><span class="pill">throw / throws</span><span class="pill">try / catch</span>
+    <span class="pill">multi-catch</span><span class="pill">finally</span><span class="pill">try-with-resources</span>
+    <span class="pill">suppressed</span><span class="pill">DecimalFormat</span><span class="pill">date patterns</span>
+    <span class="pill">locales</span><span class="pill">NumberFormat</span><span class="pill">resource bundles</span>
+  </div>
+</div>
+
+<!-- Q1 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q1</span><span class="topic">Exception Types</span></div>
+  <p class="prompt">Which of the following exceptions must be handled or declared in the method where they are thrown? <span class="all">(Choose all that apply.)</span></p>
+  <pre><code><span class="kw">class</span> Apple  <span class="kw">extends</span> RuntimeException {}
+<span class="kw">class</span> Orange <span class="kw">extends</span> Exception {}
+<span class="kw">class</span> Banana <span class="kw">extends</span> Error {}
+<span class="kw">class</span> Pear   <span class="kw">extends</span> Apple {}
+<span class="kw">class</span> Tomato <span class="kw">extends</span> Orange {}</code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> Apple</li>
+    <li><span class="L">B.</span> Orange</li>
+    <li><span class="L">C.</span> Banana</li>
+    <li><span class="L">D.</span> Pear</li>
+    <li><span class="L">E.</span> Tomato</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">B, E</span>
+    <p class="expl">Checked exceptions inherit <code>Exception</code> but not <code>RuntimeException</code> — that's Orange and Tomato (Tomato extends Orange). Apple and Pear are unchecked (RuntimeException subclasses), and Banana is an <code>Error</code>, which is unchecked and should not be handled or declared.</p>
+  </details>
+</div>
+
+<!-- Q2 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q2</span><span class="topic">throw / throws</span></div>
+  <p class="prompt">What is the result of the following statement inside a method body?</p>
+  <pre><code><span class="kw">throw</span> RuntimeException();</code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> A RuntimeException is thrown at runtime.</li>
+    <li><span class="L">B.</span> The code compiles but nothing is thrown.</li>
+    <li><span class="L">C.</span> The code does not compile.</li>
+    <li><span class="L">D.</span> An Error is thrown at runtime.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">C · Does not compile</span>
+    <p class="expl">The <code>new</code> keyword is missing — exceptions must be instantiated (<code>throw new RuntimeException();</code>). Without <code>new</code>, Java treats this as a call to a method named <code>RuntimeException()</code>, which doesn't exist.</p>
+  </details>
+</div>
+
+<!-- Q3 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q3</span><span class="topic">try / catch</span></div>
+  <p class="prompt">Which statements about this snippet are true? <span class="all">(Choose all that apply.)</span></p>
+  <pre><code><span class="num">3:</span> <span class="kw">try</span> {
+<span class="num">4:</span>    <span class="kw">throw new</span> RuntimeException();
+<span class="num">5:</span>    <span class="kw">throw new</span> ArrayIndexOutOfBoundsException();
+<span class="num">6:</span> } <span class="kw">catch</span> (Exception e) {}</code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> The code compiles and line 4's exception is caught.</li>
+    <li><span class="L">B.</span> Line 5 does not compile because it is unreachable code.</li>
+    <li><span class="L">C.</span> Line 6 does not compile because Exception is too broad.</li>
+    <li><span class="L">D.</span> Removing line 5 makes the code compile.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">B, D</span>
+    <p class="expl">Line 4 always throws, so line 5 can never execute — the compiler reports unreachable code (B). Removing line 5 leaves a legal try/catch (D). A is wrong because the code doesn't compile at all; C is wrong — catching a superclass like <code>Exception</code> is always allowed.</p>
+  </details>
+</div>
+
+<!-- Q4 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q4</span><span class="topic">Checked Exceptions</span></div>
+  <p class="prompt">Why does the following code not compile?</p>
+  <pre><code><span class="kw">class</span> NoMoreCarrotsException <span class="kw">extends</span> Exception {}
+
+<span class="kw">public class</span> Bunny {
+   <span class="kw">private void</span> eatCarrot() <span class="kw">throws</span> NoMoreCarrotsException {}
+   <span class="kw">public void</span> hopAround() {
+      eatCarrot();
+   }
+}</code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> <code>eatCarrot()</code> never actually throws the exception, so declaring it is an error.</li>
+    <li><span class="L">B.</span> <code>hopAround()</code> must handle or declare the checked exception.</li>
+    <li><span class="L">C.</span> A private method cannot declare a checked exception.</li>
+    <li><span class="L">D.</span> The code compiles as written.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">B</span>
+    <p class="expl"><code>NoMoreCarrotsException</code> is checked, and merely <i>declaring</i> it on <code>eatCarrot()</code> forces every caller to handle or declare it. A is false — declaring an unused checked exception is legal; C is false — visibility is irrelevant.</p>
+  </details>
+</div>
+
+<!-- Q5 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q5</span><span class="topic">Unreachable Catch</span></div>
+  <p class="prompt">What is the result of compiling this method?</p>
+  <pre><code><span class="kw">private void</span> eatCarrot() {}   <span class="cm">// declares no exceptions</span>
+<span class="kw">public void</span> bad() {
+   <span class="kw">try</span> {
+      eatCarrot();
+   } <span class="kw">catch</span> (NoMoreCarrotsException e) {   <span class="cm">// checked exception</span>
+      System.out.print(<span class="str">"sad rabbit"</span>);
+   }
+}</code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> Compiles; catch block simply never runs.</li>
+    <li><span class="L">B.</span> Does not compile — the catch block is unreachable.</li>
+    <li><span class="L">C.</span> Compiles; throws an exception at runtime.</li>
+    <li><span class="L">D.</span> Does not compile — <code>eatCarrot()</code> must declare the exception.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">B</span>
+    <p class="expl">Nothing in the try block can throw the <b>checked</b> <code>NoMoreCarrotsException</code>, so the catch is unreachable → compiler error. Note the rule applies only to checked exceptions — catching <code>RuntimeException</code> here would compile fine.</p>
+  </details>
+</div>
+
+<!-- Q6 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q6</span><span class="topic">Overriding</span></div>
+  <p class="prompt">Given <code>class Hopper { public void hop() {} }</code>, which overrides of <code>hop()</code> in a subclass compile? <span class="all">(Choose all that apply.)</span></p>
+  <ul class="opts">
+    <li><span class="L">A.</span> <code>public void hop() throws CanNotHopException {}</code> (checked)</li>
+    <li><span class="L">B.</span> <code>public void hop() {}</code></li>
+    <li><span class="L">C.</span> <code>public void hop() throws RuntimeException {}</code></li>
+    <li><span class="L">D.</span> <code>public void hop() throws Exception {}</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">B, C</span>
+    <p class="expl">An override may not add new or broader <b>checked</b> exceptions than the parent (which declares none) — so A and D fail. Declaring an <b>unchecked</b> exception (C) is always allowed, and declaring nothing (B) is trivially fine.</p>
+  </details>
+</div>
+
+<!-- Q7 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q7</span><span class="topic">NPE Output</span></div>
+  <p class="prompt">What is the output of this program?</p>
+  <pre><code><span class="kw">public class</span> Frog {
+   <span class="kw">static</span> String name;
+   <span class="kw">public void</span> hop() {
+      System.out.print(name.toLowerCase() + <span class="str">" is hopping"</span>);
+   }
+   <span class="kw">public static void</span> main(String[] args) {
+      <span class="kw">new</span> Frog().hop();
+   }
+}</code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> <code>null is hopping</code></li>
+    <li><span class="L">B.</span> The code does not compile.</li>
+    <li><span class="L">C.</span> A NullPointerException naming <code>Frog.name</code> is thrown.</li>
+    <li><span class="L">D.</span> A NullPointerException naming <code>&lt;local1&gt;</code> is thrown.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">C</span>
+    <p class="expl">Static variables default to <code>null</code>, so <code>name.toLowerCase()</code> throws an NPE. Helpful NullPointerExceptions print the variable name for instance/static variables (<code>"Frog.name" is null</code>); the <code>&lt;localX&gt;</code>/<code>&lt;parameterX&gt;</code> form appears only for local variables and parameters compiled without <code>-g:vars</code>.</p>
+  </details>
+</div>
+
+<!-- Q8 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q8</span><span class="topic">Exception Classes</span></div>
+  <p class="prompt">Which statements are true? <span class="all">(Choose all that apply.)</span></p>
+  <ul class="opts">
+    <li><span class="L">A.</span> <code>NumberFormatException</code> is a subclass of <code>IllegalArgumentException</code>.</li>
+    <li><span class="L">B.</span> <code>FileNotFoundException</code> is a subclass of <code>IOException</code>.</li>
+    <li><span class="L">C.</span> <code>ParseException</code> is an unchecked exception.</li>
+    <li><span class="L">D.</span> <code>StackOverflowError</code> must be handled or declared.</li>
+    <li><span class="L">E.</span> <code>ClassCastException</code> is thrown by the JVM.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">A, B, E</span>
+    <p class="expl">A and B are the two inheritance pairs to memorize; E is a JVM-thrown runtime exception. C is false — <code>ParseException</code> is checked. D is false — errors are unchecked and should not be handled or declared.</p>
+  </details>
+</div>
+
+<!-- Q9 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q9</span><span class="topic">Catch Order</span></div>
+  <p class="prompt">What is the result of the following?</p>
+  <pre><code><span class="kw">public void</span> visitSnakes() {
+   <span class="kw">try</span> {
+   } <span class="kw">catch</span> (IllegalArgumentException e) {
+   } <span class="kw">catch</span> (NumberFormatException e) {
+   }
+}</code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> Compiles; neither catch block ever runs.</li>
+    <li><span class="L">B.</span> Does not compile — the second catch block is unreachable.</li>
+    <li><span class="L">C.</span> Does not compile — an empty try block is illegal.</li>
+    <li><span class="L">D.</span> Does not compile — unchecked exceptions cannot be caught.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">B</span>
+    <p class="expl"><code>NumberFormatException</code> is a subclass of <code>IllegalArgumentException</code>, so anything it would catch is already caught by the first block → unreachable code. An empty try block (C) is legal, and unchecked exceptions can always be caught (D).</p>
+  </details>
+</div>
+
+<!-- Q10 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q10</span><span class="topic">Catch Scope</span></div>
+  <p class="prompt">Why does this code not compile?</p>
+  <pre><code>} <span class="kw">catch</span> (NumberFormatException e1) {
+   System.out.println(e1);
+} <span class="kw">catch</span> (IllegalArgumentException e2) {
+   System.out.println(e1);
+}</code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> Two catch blocks cannot both print.</li>
+    <li><span class="L">B.</span> <code>e1</code> is out of scope in the second catch block.</li>
+    <li><span class="L">C.</span> The catch order is wrong.</li>
+    <li><span class="L">D.</span> It compiles as written.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">B</span>
+    <p class="expl">A catch variable is in scope only within its own catch block, so <code>e1</code> cannot be referenced from the second block. The order (subclass NumberFormatException first) is actually correct, so C is wrong.</p>
+  </details>
+</div>
+
+<!-- Q11 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q11</span><span class="topic">Multi-catch</span></div>
+  <p class="prompt">Which of the following catch clauses compile? <span class="all">(Choose all that apply.)</span></p>
+  <ul class="opts">
+    <li><span class="L">A.</span> <code>catch(Exception1 e | Exception2 e | Exception3 e)</code></li>
+    <li><span class="L">B.</span> <code>catch(Exception1 e1 | Exception2 e2 | Exception3 e3)</code></li>
+    <li><span class="L">C.</span> <code>catch(Exception1 | Exception2 | Exception3 e)</code></li>
+    <li><span class="L">D.</span> <code>catch(FileNotFoundException | IOException e)</code></li>
+    <li><span class="L">E.</span> <code>catch(ArrayIndexOutOfBoundsException | NumberFormatException e)</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">C, E</span>
+    <p class="expl">Multi-catch takes exactly one variable name, written once at the end (kills A and B). Related types are forbidden — <code>FileNotFoundException</code> is a subclass of <code>IOException</code>, making D redundant and a compiler error. E's two types are unrelated, so it's fine.</p>
+  </details>
+</div>
+
+<!-- Q12 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q12</span><span class="topic">finally</span></div>
+  <p class="prompt">What does this print, assuming <code>a</code> and <code>b</code> are both <code>0</code>?</p>
+  <pre><code><span class="kw">try</span> {
+   System.out.print(a / b);
+} <span class="kw">catch</span> (ArithmeticException e) {
+   System.out.print(<span class="str">"0"</span>);
+} <span class="kw">finally</span> {
+   System.out.print(<span class="str">"done"</span>);
+}</code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> <code>0</code></li>
+    <li><span class="L">B.</span> <code>0done</code></li>
+    <li><span class="L">C.</span> <code>done0</code></li>
+    <li><span class="L">D.</span> An uncaught exception is thrown.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">B · 0done</span>
+    <p class="expl"><code>0 / 0</code> throws <code>ArithmeticException</code>, the catch block prints <code>0</code>, then finally always runs and prints <code>done</code>. finally executes <i>after</i> the catch block, so C is reversed.</p>
+  </details>
+</div>
+
+<!-- Q13 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q13</span><span class="topic">finally</span></div>
+  <p class="prompt">What does <code>main</code> print, and what does <code>goHome()</code> return, if <b>no</b> exception is thrown on the marked line?</p>
+  <pre><code><span class="kw">int</span> goHome() {
+   <span class="kw">try</span> {
+      <span class="cm">// Optionally throw an exception here</span>
+      System.out.print(<span class="str">"1"</span>);
+      <span class="kw">return</span> -<span class="num">1</span>;
+   } <span class="kw">catch</span> (Exception e) {
+      System.out.print(<span class="str">"2"</span>);
+      <span class="kw">return</span> -<span class="num">2</span>;
+   } <span class="kw">finally</span> {
+      System.out.print(<span class="str">"3"</span>);
+      <span class="kw">return</span> -<span class="num">3</span>;
+   } }</code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> Prints <code>1</code>, returns -1</li>
+    <li><span class="L">B.</span> Prints <code>13</code>, returns -1</li>
+    <li><span class="L">C.</span> Prints <code>13</code>, returns -3</li>
+    <li><span class="L">D.</span> Prints <code>123</code>, returns -3</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">C · "13", returns -3</span>
+    <p class="expl">The try prints <code>1</code> and reaches <code>return -1</code>, but the finally block runs before the method completes: it prints <code>3</code> and its own <code>return -3</code> interrupts and replaces the earlier return. The catch never runs, so <code>2</code> is never printed.</p>
+  </details>
+</div>
+
+<!-- Q14 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q14</span><span class="topic">finally</span></div>
+  <p class="prompt">Which statements about <code>finally</code> are true? <span class="all">(Choose all that apply.)</span></p>
+  <ul class="opts">
+    <li><span class="L">A.</span> A traditional try statement without a catch block requires a finally block.</li>
+    <li><span class="L">B.</span> A try-with-resources statement without a catch block requires a finally block.</li>
+    <li><span class="L">C.</span> If <code>System.exit()</code> is called in the try block, the finally block does not run.</li>
+    <li><span class="L">D.</span> A finally block that starts executing is guaranteed to finish executing.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">A, C</span>
+    <p class="expl">A traditional try needs catch and/or finally (A). Try-with-resources has an implicit finally, so both are optional (B is false). <code>System.exit()</code> is the one exception to "finally always runs" (C). A finally block always <i>starts</i> but may not <i>finish</i> — it can itself throw, e.g. an NPE (D is false).</p>
+  </details>
+</div>
+
+<!-- Q15 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q15</span><span class="topic">Try-with-Resources</span></div>
+  <p class="prompt">Which of the following try-with-resources headers compile, given <code>MyFileClass implements AutoCloseable</code>? <span class="all">(Choose all that apply.)</span></p>
+  <ul class="opts">
+    <li><span class="L">A.</span> <code>try (MyFileClass a = new MyFileClass(1), MyFileClass b = new MyFileClass(2))</code></li>
+    <li><span class="L">B.</span> <code>try (MyFileClass a = new MyFileClass(1); MyFileClass b = new MyFileClass(2))</code></li>
+    <li><span class="L">C.</span> <code>try (var a = new MyFileClass(1))</code></li>
+    <li><span class="L">D.</span> <code>try (String reptile = "lizard")</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">B, C</span>
+    <p class="expl">Resources are separated by semicolons, not commas (A fails). <code>var</code> is allowed since resources are local variables (C). <code>String</code> does not implement <code>AutoCloseable</code>, so D fails.</p>
+  </details>
+</div>
+
+<!-- Q16 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q16</span><span class="topic">Try-with-Resources</span></div>
+  <p class="prompt">What does this program print?</p>
+  <pre><code><span class="kw">public class</span> MyFileClass <span class="kw">implements</span> AutoCloseable {
+   <span class="kw">private final int</span> num;
+   <span class="kw">public</span> MyFileClass(<span class="kw">int</span> num) { <span class="kw">this</span>.num = num; }
+   <span class="kw">@Override public void</span> close() { System.out.println(<span class="str">"Closing: "</span> + num); }
+
+   <span class="kw">public static void</span> main(String... xyz) {
+      <span class="kw">try</span> (MyFileClass bookReader = <span class="kw">new</span> MyFileClass(<span class="num">1</span>);
+            MyFileClass movieReader = <span class="kw">new</span> MyFileClass(<span class="num">2</span>)) {
+         System.out.println(<span class="str">"Try Block"</span>);
+         <span class="kw">throw new</span> RuntimeException();
+      } <span class="kw">catch</span> (Exception e) {
+         System.out.println(<span class="str">"Catch Block"</span>);
+      } <span class="kw">finally</span> {
+         System.out.println(<span class="str">"Finally Block"</span>);
+      } } }</code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> Try Block → Catch Block → Closing: 2 → Closing: 1 → Finally Block</li>
+    <li><span class="L">B.</span> Try Block → Closing: 1 → Closing: 2 → Catch Block → Finally Block</li>
+    <li><span class="L">C.</span> Try Block → Closing: 2 → Closing: 1 → Catch Block → Finally Block</li>
+    <li><span class="L">D.</span> Try Block → Catch Block → Finally Block → Closing: 2 → Closing: 1</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">C</span>
+    <p class="expl">Resources close at the end of the try block, in <b>reverse</b> declaration order (2 then 1), via the implicit finally — which runs <b>before</b> the programmer's catch and finally blocks.</p>
+  </details>
+</div>
+
+<!-- Q17 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q17</span><span class="topic">Effectively Final</span></div>
+  <p class="prompt">Why does line 32 not compile?</p>
+  <pre><code><span class="num">31:</span> <span class="kw">var</span> writer = Files.newBufferedWriter(path);
+<span class="num">32:</span> <span class="kw">try</span> (writer) {
+<span class="num">33:</span>    writer.append(<span class="str">"Welcome to the zoo!"</span>);
+<span class="num">34:</span> }
+<span class="num">35:</span> writer = <span class="kw">null</span>;</code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> A resource must always be declared inside the try clause.</li>
+    <li><span class="L">B.</span> <code>writer</code> is not effectively final because it is reassigned on line 35.</li>
+    <li><span class="L">C.</span> <code>var</code> cannot be used with resources.</li>
+    <li><span class="L">D.</span> It compiles; line 33 throws an exception instead.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">B</span>
+    <p class="expl">A pre-declared variable may be used as a resource only if it is final or effectively final. The assignment on line 35 disqualifies <code>writer</code>, so line 32 is a compiler error. A and C are both false statements about try-with-resources.</p>
+  </details>
+</div>
+
+<!-- Q18 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q18</span><span class="topic">Resource Scope</span></div>
+  <p class="prompt">How many lines of this snippet do not compile?</p>
+  <pre><code><span class="num">3:</span> <span class="kw">try</span> (Scanner s = <span class="kw">new</span> Scanner(System.in)) {
+<span class="num">4:</span>    s.nextLine();
+<span class="num">5:</span> } <span class="kw">catch</span>(Exception e) {
+<span class="num">6:</span>    s.nextInt();
+<span class="num">7:</span> } <span class="kw">finally</span> {
+<span class="num">8:</span>    s.nextInt();
+<span class="num">9:</span> }</code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> Zero — it compiles.</li>
+    <li><span class="L">B.</span> One (line 6 only).</li>
+    <li><span class="L">C.</span> Two (lines 6 and 8).</li>
+    <li><span class="L">D.</span> Three (lines 4, 6, and 8).</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">C · Lines 6 and 8</span>
+    <p class="expl">The resource <code>s</code> is in scope only inside the try block. By the time catch/finally run, the implicit finally has already closed it and it is out of scope — so both references fail to compile. Line 4 is inside the try block and is fine.</p>
+  </details>
+</div>
+
+<!-- Q19 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q19</span><span class="topic">Suppressed</span></div>
+  <p class="prompt">What does this program print?</p>
+  <pre><code><span class="num">1:</span> <span class="kw">public class</span> JammedTurkeyCage <span class="kw">implements</span> AutoCloseable {
+<span class="num">2:</span>    <span class="kw">public void</span> close() {
+<span class="num">3:</span>       <span class="kw">throw new</span> IllegalStateException(<span class="str">"Cage door does not close"</span>);
+<span class="num">4:</span>    }
+<span class="num">5:</span>    <span class="kw">public static void</span> main(String[] args) {
+<span class="num">6:</span>       <span class="kw">try</span> (JammedTurkeyCage t = <span class="kw">new</span> JammedTurkeyCage()) {
+<span class="num">7:</span>          <span class="kw">throw new</span> IllegalStateException(<span class="str">"Turkeys ran off"</span>);
+<span class="num">8:</span>       } <span class="kw">catch</span> (IllegalStateException e) {
+<span class="num">9:</span>          System.out.println(<span class="str">"Caught: "</span> + e.getMessage());
+<span class="num">10:</span>         <span class="kw">for</span> (Throwable t: e.getSuppressed())
+<span class="num">11:</span>            System.out.println(<span class="str">"Suppressed: "</span> + t.getMessage());
+<span class="num">12:</span>      } } }</code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> Caught: Cage door does not close / Suppressed: Turkeys ran off</li>
+    <li><span class="L">B.</span> Caught: Turkeys ran off / Suppressed: Cage door does not close</li>
+    <li><span class="L">C.</span> Caught: Turkeys ran off (nothing suppressed)</li>
+    <li><span class="L">D.</span> An uncaught exception is printed.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">B</span>
+    <p class="expl">The try block's exception is thrown <b>first</b>, so it is the primary. The exception from the automatic <code>close()</code> call is tacked on as suppressed. The catch matches the primary and prints both.</p>
+  </details>
+</div>
+
+<!-- Q20 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q20</span><span class="topic">Suppressed</span></div>
+  <p class="prompt">Using the same <code>JammedTurkeyCage</code> (whose <code>close()</code> throws <code>IllegalStateException</code>), what happens here?</p>
+  <pre><code><span class="kw">try</span> (JammedTurkeyCage t = <span class="kw">new</span> JammedTurkeyCage()) {
+   <span class="kw">throw new</span> RuntimeException(<span class="str">"Turkeys ran off"</span>);
+} <span class="kw">catch</span> (IllegalStateException e) {
+   System.out.println(<span class="str">"caught: "</span> + e.getMessage());
+}</code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> Prints <code>caught: Turkeys ran off</code>.</li>
+    <li><span class="L">B.</span> Prints <code>caught: Cage door does not close</code>.</li>
+    <li><span class="L">C.</span> The RuntimeException propagates to the caller uncaught.</li>
+    <li><span class="L">D.</span> The code does not compile.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">C</span>
+    <p class="expl">The catch clause is matched against the <b>primary</b> exception, which is the <code>RuntimeException</code> from the try block — not the suppressed <code>IllegalStateException</code> from <code>close()</code>. Since <code>RuntimeException</code> is not an <code>IllegalStateException</code>, nothing matches and it propagates (with the suppressed exception attached).</p>
+  </details>
+</div>
+
+<!-- Q21 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q21</span><span class="topic">Suppressed</span></div>
+  <p class="prompt">What is printed by this snippet (same <code>JammedTurkeyCage</code>)?</p>
+  <pre><code><span class="kw">try</span> (JammedTurkeyCage t = <span class="kw">new</span> JammedTurkeyCage()) {
+   <span class="kw">throw new</span> IllegalStateException(<span class="str">"Turkeys ran off"</span>);
+} <span class="kw">finally</span> {
+   <span class="kw">throw new</span> RuntimeException(<span class="str">"and we couldn't find them"</span>);
+}</code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> "Turkeys ran off" propagates with "and we couldn't find them" suppressed.</li>
+    <li><span class="L">B.</span> Only "and we couldn't find them" propagates; the others are lost.</li>
+    <li><span class="L">C.</span> "Cage door does not close" propagates as the primary.</li>
+    <li><span class="L">D.</span> The code does not compile.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">B</span>
+    <p class="expl">Suppression only applies to exceptions from the try clause (and the automatic close). An exception thrown in a <b>programmer-defined finally</b> simply replaces whatever came before — the try-block exception and its suppressed close() exception are both lost.</p>
+  </details>
+</div>
+
+<!-- Q22 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q22</span><span class="topic">DecimalFormat</span></div>
+  <p class="prompt">What is the output?</p>
+  <pre><code><span class="kw">double</span> d = <span class="num">1234.567</span>;
+NumberFormat f2 = <span class="kw">new</span> DecimalFormat(<span class="str">"000,000,000.00000"</span>);
+System.out.println(f2.format(d));</code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> <code>1,234.567</code></li>
+    <li><span class="L">B.</span> <code>000,001,234.56700</code></li>
+    <li><span class="L">C.</span> <code>001,234.56700</code></li>
+    <li><span class="L">D.</span> <code>000001234.56700</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">B</span>
+    <p class="expl">The <code>0</code> symbol forces a digit (zero if absent) at every position, so the value is padded to nine integer digits with grouping commas and five decimal digits: <code>000,001,234.56700</code>. With <code>#</code> instead, unused positions would simply be omitted.</p>
+  </details>
+</div>
+
+<!-- Q23 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q23</span><span class="topic">DecimalFormat</span></div>
+  <p class="prompt">What does this print?</p>
+  <pre><code><span class="kw">double</span> d = <span class="num">1234.567</span>;
+NumberFormat f3 = <span class="kw">new</span> DecimalFormat(<span class="str">"Your Balance $#,###,###.##"</span>);
+System.out.println(f3.format(d));</code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> <code>Your Balance $1,234.56</code></li>
+    <li><span class="L">B.</span> <code>Your Balance $0,001,234.57</code></li>
+    <li><span class="L">C.</span> <code>Your Balance $1,234.57</code></li>
+    <li><span class="L">D.</span> An IllegalArgumentException is thrown at runtime.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">C</span>
+    <p class="expl">Unused <code>#</code> positions (and the commas between them) disappear, and the fraction is <b>rounded</b> to two places: .567 → .57 (not truncated, so A is wrong). Literal prefix text like "Your Balance $" is printed as-is.</p>
+  </details>
+</div>
+
+<!-- Q24 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q24</span><span class="topic">Date Patterns</span></div>
+  <p class="prompt">What is the result of the following?</p>
+  <pre><code><span class="kw">var</span> dt = LocalDateTime.of(<span class="num">2025</span>, Month.OCTOBER, <span class="num">20</span>, <span class="num">6</span>, <span class="num">15</span>, <span class="num">30</span>);
+<span class="kw">var</span> f = DateTimeFormatter.ofPattern(<span class="str">"hh:mm:z"</span>);
+System.out.println(dt.format(f));</code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> <code>06:15:EDT</code></li>
+    <li><span class="L">B.</span> The code does not compile.</li>
+    <li><span class="L">C.</span> An exception is thrown at runtime.</li>
+    <li><span class="L">D.</span> <code>06:15:</code> (zone omitted).</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">C · DateTimeException</span>
+    <p class="expl">The pattern compiles fine, but <code>z</code> (time-zone name) requires zone information that a <code>LocalDateTime</code> doesn't have — so a <code>DateTimeException</code> is thrown at runtime. A <code>ZonedDateTime</code> would print something like <code>06:15 EDT</code>.</p>
+  </details>
+</div>
+
+<!-- Q25 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q25</span><span class="topic">Date Patterns</span></div>
+  <p class="prompt">Given <code>dt = LocalDateTime.of(2025, Month.OCTOBER, 20, 6, 15, 30)</code>, what does this print?</p>
+  <pre><code><span class="kw">var</span> g1 = DateTimeFormatter.ofPattern(<span class="str">"MMMM dd', Party''s at' hh:mm"</span>);
+System.out.println(dt.format(g1));</code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> <code>October 20, Party's at 06:15</code></li>
+    <li><span class="L">B.</span> <code>October 20, Party''s at 06:15</code></li>
+    <li><span class="L">C.</span> An IllegalArgumentException is thrown.</li>
+    <li><span class="L">D.</span> <code>10 20, Party's at 06:15</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">A</span>
+    <p class="expl">Text inside single quotes is escaped literally, and <code>''</code> (two single quotes) produces one literal quote. <code>MMMM</code> gives the full month name, <code>dd</code> the two-digit day, <code>hh</code> the 12-hour clock: <code>October 20, Party's at 06:15</code>.</p>
+  </details>
+</div>
+
+<!-- Q26 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q26</span><span class="topic">Locales</span></div>
+  <p class="prompt">Which of the following are valid printed representations of a <code>Locale</code>? <span class="all">(Choose all that apply.)</span></p>
+  <ul class="opts">
+    <li><span class="L">A.</span> <code>US</code></li>
+    <li><span class="L">B.</span> <code>enUS</code></li>
+    <li><span class="L">C.</span> <code>en_US</code></li>
+    <li><span class="L">D.</span> <code>EN</code></li>
+    <li><span class="L">E.</span> <code>en</code></li>
+    <li><span class="L">F.</span> <code>US_en</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">C, E</span>
+    <p class="expl">The lowercase language code is mandatory; the UPPERCASE country code is optional and joined by an underscore. <code>US</code> lacks a language, <code>enUS</code> lacks the underscore, <code>EN</code> is uppercase, and <code>US_en</code> is reversed.</p>
+  </details>
+</div>
+
+<!-- Q27 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q27</span><span class="topic">NumberFormat</span></div>
+  <p class="prompt">What is the result of the following?</p>
+  <pre><code>String s = <span class="str">"40.45"</span>;
+<span class="kw">var</span> fr = NumberFormat.getInstance(Locale.FRANCE);
+System.out.println(fr.parse(s));   <span class="cm">// assume ParseException is declared</span></code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> <code>40.45</code></li>
+    <li><span class="L">B.</span> <code>40,45</code></li>
+    <li><span class="L">C.</span> <code>40</code></li>
+    <li><span class="L">D.</span> A ParseException is thrown at runtime.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">C · 40</span>
+    <p class="expl">France doesn't use a dot as a decimal separator. Java treats the <code>.</code> as a formatting character and stops parsing there, returning <code>40</code>. Also remember: <code>parse()</code> throws a <b>checked</b> <code>ParseException</code>, so it must be handled or declared.</p>
+  </details>
+</div>
+
+<!-- Q28 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q28</span><span class="topic">Compact Numbers</span></div>
+  <p class="prompt">What is printed? <span class="all">(Choose all that apply — one option per line of output.)</span></p>
+  <pre><code><span class="kw">var</span> compact = NumberFormat.getCompactNumberInstance(
+   Locale.of(<span class="str">"en"</span>, <span class="str">"US"</span>), Style.SHORT);
+System.out.println(compact.format(<span class="num">314_900_000</span>));
+System.out.println(compact.parse(<span class="str">"1,000,000"</span>));   <span class="cm">// ParseException declared</span></code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> <code>314M</code></li>
+    <li><span class="L">B.</span> <code>315M</code></li>
+    <li><span class="L">C.</span> <code>1000000</code></li>
+    <li><span class="L">D.</span> <code>1</code></li>
+    <li><span class="L">E.</span> A ParseException is thrown by the parse call.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">B, D</span>
+    <p class="expl">CompactNumberFormat keeps up to the first three digits of the range and <b>rounds</b> the last: 314.9 million → <code>315M</code>. Parsing <code>"1,000,000"</code> stops at the comma and returns <code>1</code> — surprising but true. (A <code>$</code> prefix, by contrast, would throw ParseException.)</p>
+  </details>
+</div>
+
+<!-- Q29 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q29</span><span class="topic">Resource Bundles</span></div>
+  <p class="prompt">The default locale is <code>en_US</code> and the requested locale is <code>fr_FR</code>. In what order does Java search for the <code>Zoo</code> resource bundle?</p>
+  <ul class="opts">
+    <li><span class="L">A.</span> Zoo_fr_FR → Zoo_fr → Zoo → Zoo_en_US → Zoo_en</li>
+    <li><span class="L">B.</span> Zoo_en_US → Zoo_en → Zoo_fr_FR → Zoo_fr → Zoo</li>
+    <li><span class="L">C.</span> Zoo_fr_FR → Zoo_fr → Zoo_en_US → Zoo_en → Zoo</li>
+    <li><span class="L">D.</span> Zoo → Zoo_fr → Zoo_fr_FR → Zoo_en → Zoo_en_US</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">C</span>
+    <p class="expl">Requested locale first (language/country, then language), then the default locale the same way, and the no-locale default bundle <code>Zoo.properties</code> last. If nothing is found, a <code>MissingResourceException</code> is thrown.</p>
+  </details>
+</div>
+
+<!-- Q30 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q30</span><span class="topic">Resource Bundles</span></div>
+  <p class="prompt">Given these properties files, what does <code>rb.getString("name")</code> print?</p>
+  <pre><code><span class="cm"># Zoo.properties        → name=Vancouver Zoo</span>
+<span class="cm"># Zoo_en.properties     → hello=Hello, open=is open</span>
+<span class="cm"># Zoo_en_US.properties  → name=The Zoo</span>
+<span class="cm"># Zoo_en_CA.properties  → visitors=Canada visitors</span>
+
+Locale.setDefault(Locale.of(<span class="str">"en"</span>, <span class="str">"US"</span>));
+<span class="kw">var</span> rb = ResourceBundle.getBundle(<span class="str">"Zoo"</span>, Locale.of(<span class="str">"en"</span>, <span class="str">"CA"</span>));
+System.out.print(rb.getString(<span class="str">"name"</span>));</code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> <code>The Zoo</code></li>
+    <li><span class="L">B.</span> <code>Vancouver Zoo</code></li>
+    <li><span class="L">C.</span> A MissingResourceException is thrown.</li>
+    <li><span class="L">D.</span> <code>null</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">B · Vancouver Zoo</span>
+    <p class="expl">The matched bundle is <code>Zoo_en_CA</code>, so keys may come only from its hierarchy: <code>Zoo_en_CA → Zoo_en → Zoo</code>. Neither of the first two defines <code>name</code>, so the base <code>Zoo.properties</code> supplies "Vancouver Zoo". <code>Zoo_en_US</code> (the default locale's file) is never consulted once a match is found.</p>
+  </details>
+</div>
+
+<!-- Q31 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q31</span><span class="topic">Properties</span></div>
+  <p class="prompt">Which lines do not compile? <span class="all">(Choose all that apply.)</span></p>
+  <pre><code><span class="kw">var</span> props = <span class="kw">new</span> Properties();
+props.setProperty(<span class="str">"open"</span>, <span class="str">"10am"</span>);
+<span class="num">1:</span> System.out.println(props.getProperty(<span class="str">"camel"</span>));
+<span class="num">2:</span> System.out.println(props.getProperty(<span class="str">"camel"</span>, <span class="str">"Bob"</span>));
+<span class="num">3:</span> System.out.println(props.get(<span class="str">"open"</span>));
+<span class="num">4:</span> System.out.println(props.get(<span class="str">"open"</span>, <span class="str">"The zoo will be open soon"</span>));</code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> Line 1</li>
+    <li><span class="L">B.</span> Line 2</li>
+    <li><span class="L">C.</span> Line 3</li>
+    <li><span class="L">D.</span> Line 4</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">D · Line 4</span>
+    <p class="expl">Only <code>getProperty()</code> has an overload with a default value. <code>get()</code> takes a single parameter, so line 4 does not compile. Line 1 compiles and prints <code>null</code>; line 2 prints <code>Bob</code>; line 3 prints <code>10am</code>.</p>
+  </details>
+</div>
+
+<!-- Q32 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q32</span><span class="topic">Locale.Category</span></div>
+  <p class="prompt">After the following, how is <code>NumberFormat.getCurrencyInstance().format(1.23)</code> displayed, and what does <code>spain.getDisplayLanguage()</code> show?</p>
+  <pre><code><span class="kw">var</span> spain = Locale.of(<span class="str">"es"</span>, <span class="str">"ES"</span>);
+Locale.setDefault(Locale.of(<span class="str">"en"</span>, <span class="str">"US"</span>));
+Locale.setDefault(Category.DISPLAY, spain);
+<span class="cm">// FORMAT category still en_US</span></code></pre>
+  <ul class="opts">
+    <li><span class="L">A.</span> <code>1,23 €</code> and <code>español</code></li>
+    <li><span class="L">B.</span> <code>$1.23</code> and <code>español</code></li>
+    <li><span class="L">C.</span> <code>$1.23</code> and <code>Spanish</code></li>
+    <li><span class="L">D.</span> <code>1,23 €</code> and <code>Spanish</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <span class="ans-key">B</span>
+    <p class="expl">Only the DISPLAY category was switched to Spanish, so language names display as <code>español</code> — but currency formatting follows the FORMAT category, which is still <code>en_US</code>: <code>$1.23</code>. Setting <code>Category.FORMAT</code> too would give <code>1,23 €</code>.</p>
+  </details>
+</div>
+
+<!-- ============ QUICK REVISION ============ -->
+<div class="revision">
+  <h2>★ Quick Revision — Chapter 11 Core Traps</h2>
+  <ul>
+    <li><b>Checked</b> = Exception minus RuntimeException → handle or declare; declaring an unused checked exception is legal, but catching an impossible one is not.</li>
+    <li><code>throw new …</code> — no <code>new</code>, no compile. Code after a <code>throw</code> in the same block = unreachable.</li>
+    <li>Catch order: subclass before superclass (NFE ⊂ IAE, FNFE ⊂ IOException). Multi-catch: one variable at the end, no related types, order irrelevant.</li>
+    <li><b>finally always runs</b> (except <code>System.exit()</code>) — and a <code>return</code> there overrides try/catch returns.</li>
+    <li>Try-with-resources: AutoCloseable only, <code>;</code>-separated with types, closes in <b>reverse</b> order via an implicit finally that runs <b>before</b> catch/finally; resource scope = try block; pre-declared resources must be (effectively) final.</li>
+    <li>Suppressed: first thrown = primary (catch matches this one); close() failures are suppressed; a throw in a programmer's finally <b>replaces</b> everything.</li>
+    <li>DecimalFormat: <code>#</code> omits, <code>0</code> pads, fractions <b>round</b>. Date symbols are case-sensitive (M/m, H/h); wrong symbol for the type → runtime exception; escape literals with <code>'…'</code>, <code>''</code> = literal quote.</li>
+    <li>Locale = lowercase language (required) + optional _UPPERCASE country; constructors deprecated. <code>parse()</code> throws checked ParseException and is locale-sensitive (fr "40.45" → 40). Compact = 3 digits + K/M/B/T, SHORT by default, rounds the third digit.</li>
+    <li>Bundle search: requested (full → lang) → default (full → lang) → base → MissingResourceException; values then come only from the matched hierarchy + parents.</li>
+    <li>Properties: only <code>getProperty()</code> takes a default; two-arg <code>get()</code> does not compile.</li>
+  </ul>
+</div>
+
+</div>
+</body>
+</html>
