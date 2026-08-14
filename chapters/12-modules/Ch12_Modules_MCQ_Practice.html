@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 — Chapter 12: Modules · MCQ Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6f8;   --card:#ffffff;  --ink:#2f3437;   --muted:#7b8a93;
+  --kw:#7c5cbf;   --str:#3a8a5c;   --num:#b8860b;   --err:#c44d3e;  --cm:#a89a8a;
+  --icode-bg:#f3ece4; --icode-fg:#9a5030;
+  --accent:#c96442; --accent2:#d4845e;
+  --purple:#7a5cb8; --purple-top:#9b7fd4; --purple-pill:#b29ad9;
+  --yes:#3b7d57; --no:#c44d3e;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;padding:28px 16px 70px;background:var(--bg);color:var(--ink);
+  font-family:'Source Sans 3',system-ui,sans-serif;font-size:16.5px;line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:860px;margin:0 auto;}
+h1,h2,h3{font-family:'Merriweather',Georgia,serif;line-height:1.34;}
+p{margin:0 0 13px;}
+code,pre,.mono{font-family:'JetBrains Mono',ui-monospace,monospace;}
+code{background:var(--icode-bg);color:var(--icode-fg);padding:1.5px 6px;border-radius:5px;font-size:.85em;}
+pre{background:#fbf9fe;border-radius:12px;padding:15px 17px;margin:12px 0 14px;overflow-x:auto;
+  box-shadow:inset 0 2px 8px rgba(120,100,150,.10);font-size:13.4px;line-height:1.6;}
+pre code{background:none;color:#3b3f42;padding:0;font-size:inherit;}
+.kw{color:var(--kw);font-weight:600;} .str{color:var(--str);} .num{color:var(--num);}
+.err{color:var(--err);font-weight:700;} .cm{color:var(--cm);font-style:italic;}
+
+/* ---------- header ---------- */
+.header{
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#ffffff 0%,#fdf8f3 100%);
+  border-radius:18px;padding:34px 32px;margin-bottom:30px;
+  box-shadow:0 6px 26px rgba(120,110,100,.10);
+}
+.header::after{
+  content:'';position:absolute;top:-90px;right:-70px;width:280px;height:280px;
+  background:radial-gradient(circle,rgba(201,100,66,.16) 0%,rgba(201,100,66,0) 68%);
+  pointer-events:none;
+}
+.badge{
+  display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;padding:7px 15px;border-radius:999px;
+  box-shadow:0 3px 10px rgba(201,100,66,.28);
+}
+.header h1{font-size:1.95rem;margin:18px 0 6px;font-weight:900;letter-spacing:-.3px;}
+.header .sub{font-style:italic;color:var(--muted);margin-bottom:18px;}
+.pills{display:flex;flex-wrap:wrap;gap:8px;position:relative;}
+.pill{
+  background:var(--icode-bg);color:var(--icode-fg);font-family:'JetBrains Mono',monospace;
+  font-size:11.5px;padding:5px 11px;border-radius:999px;letter-spacing:.3px;
+}
+
+/* ---------- question cards ---------- */
+.q-card{
+  background:linear-gradient(135deg,#f4f0fa,#f9f6fd);
+  border-top:4px solid var(--purple-top);border-radius:14px;
+  padding:20px 24px;margin-bottom:20px;
+  box-shadow:0 3px 14px rgba(120,110,140,.10);
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.q-card:hover{transform:translateY(-2px);box-shadow:0 9px 24px rgba(120,110,140,.16);}
+.q-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+.q-num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:1rem;color:var(--purple);}
+.q-tag{
+  background:var(--purple-pill);color:#fff;font-family:'Source Sans 3',sans-serif;
+  font-size:10.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;
+  padding:3px 10px;border-radius:999px;
+}
+.prompt{font-weight:600;margin:0 0 6px;}
+.multi{font-weight:700;color:#8a5b47;font-size:.9rem;margin:0 0 8px;}
+.opts{list-style:none;padding:0;margin:12px 0 0;}
+.opts li{margin-bottom:7px;padding-left:30px;position:relative;}
+.opts li .lbl{
+  position:absolute;left:0;top:0;font-family:'JetBrains Mono',monospace;
+  font-weight:700;color:var(--purple);
+}
+details{margin-top:16px;border-top:1px dashed #cdbfe6;padding-top:12px;}
+summary{
+  cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12.5px;
+  font-weight:700;letter-spacing:.6px;color:var(--purple);text-transform:uppercase;
+  list-style:none;
+}
+summary::-webkit-details-marker{display:none;}
+summary::before{content:'▸ ';}
+details[open] summary::before{content:'▾ ';}
+summary:hover{color:#5f45a0;}
+.ans-key{
+  display:inline-block;background:#eef8f1;color:#3d8a5e;
+  font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;
+  padding:5px 13px;border-radius:8px;margin:12px 0 8px;
+}
+details p{margin:0 0 8px;font-size:.96rem;}
+details p:last-child{margin-bottom:0;}
+
+/* ---------- closing box ---------- */
+.revision{
+  background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:4px solid #d4a24c;
+  border-radius:14px;padding:26px 30px;margin-top:34px;
+  box-shadow:0 4px 18px rgba(120,110,100,.10);
+}
+.revision h2{font-size:1.3rem;margin:0 0 14px;color:#a9772a;}
+.revision ul{margin:0;padding-left:20px;}
+.revision li{margin-bottom:9px;}
+
+footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:30px;}
+@media(max-width:520px){.q-card{padding:18px 16px;} .header{padding:26px 20px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="header">
+  <span class="badge">OCP Java SE 21 · 1Z0-830</span>
+  <h1>Chapter 12 · Modules — MCQ Practice</h1>
+  <p class="sub">31 exam-style questions covering every section of the chapter. Answer first, then reveal.</p>
+  <div class="pills">
+    <span class="pill">module-info.java</span>
+    <span class="pill">exports / requires</span>
+    <span class="pill">requires transitive</span>
+    <span class="pill">opens / open module</span>
+    <span class="pill">services</span>
+    <span class="pill">ServiceLoader</span>
+    <span class="pill">command line</span>
+    <span class="pill">module types</span>
+    <span class="pill">automatic names</span>
+    <span class="pill">migration</span>
+    <span class="pill">cyclic deps</span>
+  </div>
+</div>
+
+<!-- Q1 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q1</span><span class="q-tag">Module structure</span></div>
+  <p class="prompt">Which statement is true of the following directory structure?</p>
+<pre><code>|--- aquarium
+   |-- fish
+      |-- Feeder.java</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> The directory structure shown is already a valid module.</li>
+    <li><span class="lbl">B.</span> It would be a valid module if <code>module-info.java</code> were added directly underneath <code>aquarium</code>.</li>
+    <li><span class="lbl">C.</span> It would be a valid module if <code>module-info.java</code> were added directly underneath <code>aquarium/fish</code>.</li>
+    <li><span class="lbl">D.</span> It would be a valid module if <code>module.java</code> were added directly underneath <code>aquarium</code>.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B</div>
+    <p>Every module requires a <code>module-info.java</code> file at the <strong>root directory</strong> of the module. Here <code>aquarium</code> is the module directory and <code>fish</code> is the package, so the file goes directly under <code>aquarium</code>. C puts it inside a package, and D uses the wrong filename — it is always <code>module-info.java</code>.</p>
+  </details>
+</div>
+
+<!-- Q2 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q2</span><span class="q-tag">Directives</span></div>
+  <p class="prompt">Module <code>puppy</code> depends on module <code>dog</code>, and <code>dog</code> depends on module <code>animal</code>. Fill in the blank so that code in module <code>dog</code> can access the <code>animal.behavior</code> package.</p>
+<pre><code><span class="kw">module</span> animal {
+   _________ animal.behavior;
+}</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>export</code></li>
+    <li><span class="lbl">B.</span> <code>exports</code></li>
+    <li><span class="lbl">C.</span> <code>requires</code></li>
+    <li><span class="lbl">D.</span> <code>requires transitive</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B</div>
+    <p><code>exports</code> is the directive that allows a package to be called by code outside the module. A is not a directive — the keyword is always plural. C and D are the wrong keyword entirely: <code>requires</code> names a <em>module</em> you depend on, never a package you publish.</p>
+  </details>
+</div>
+
+<!-- Q3 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q3</span><span class="q-tag">Command line</span></div>
+  <p class="prompt">Which command correctly runs class <code>Peacocks</code> in package <code>zoo.animal.talks</code>, inside module <code>zoo.animal.talks</code>, with the modules in the <code>mods</code> folder?</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>java -d mods -m zoo.animal.talks/zoo.animal.talks.Peacocks</code></li>
+    <li><span class="lbl">B.</span> <code>java -p mods -m zoo.animal.talks/zoo/animal/talks/Peacocks</code></li>
+    <li><span class="lbl">C.</span> <code>java -p mods -m zoo.animal.talks/zoo.animal.talks.Peacocks</code></li>
+    <li><span class="lbl">D.</span> <code>java -m mods -p zoo.animal.talks/zoo.animal.talks.Peacocks</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C</div>
+    <p><code>-p</code> (or <code>--module-path</code>) gives the module location and <code>-m</code> (or <code>--module</code>) gives <code>moduleName/fully.qualified.ClassName</code>. B uses slashes inside the class name — package parts must use periods. A uses <code>-d</code>, which on <code>java</code> means <code>--describe-module</code>. D swaps the two options.</p>
+  </details>
+</div>
+
+<!-- Q4 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q4</span><span class="q-tag">Services</span></div>
+  <p class="prompt">Which of the following pairs make up a service?</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> Consumer and service locator</li>
+    <li><span class="lbl">B.</span> Consumer and service provider interface</li>
+    <li><span class="lbl">C.</span> Service locator and service provider</li>
+    <li><span class="lbl">D.</span> Service locator and service provider interface</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">D</div>
+    <p>A service consists of the service provider interface (plus any classes it references) and the lookup logic in the service locator. The service <em>provider</em> is the implementation and is explicitly <strong>not</strong> part of the service, which rules out C. The consumer merely calls the service, ruling out A and B.</p>
+  </details>
+</div>
+
+<!-- Q5 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q5</span><span class="q-tag">Module types</span></div>
+  <p class="prompt">A(n) __________ module is on the classpath while a(n) __________ module is on the module path.</p>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> automatic, named</li>
+    <li><span class="lbl">B.</span> named, unnamed</li>
+    <li><span class="lbl">C.</span> unnamed, automatic</li>
+    <li><span class="lbl">D.</span> unnamed, named</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C · D</div>
+    <p>Unnamed modules live on the classpath. Both automatic and named modules live on the module path — automatic without a <code>module-info.java</code>, named with one. A and B are wrong because they place a module-path type on the classpath.</p>
+  </details>
+</div>
+
+<!-- Q6 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q6</span><span class="q-tag">Directives</span></div>
+  <p class="prompt">Which of the following statements are true in a <code>module-info.java</code> file?</p>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> The <code>opens</code> directive allows the use of reflection.</li>
+    <li><span class="lbl">B.</span> The <code>opens</code> directive declares that an API is called.</li>
+    <li><span class="lbl">C.</span> The <code>uses</code> directive allows the use of reflection.</li>
+    <li><span class="lbl">D.</span> The <code>uses</code> directive declares that an API is called.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · D</div>
+    <p><code>opens</code> is for reflection; <code>uses</code> declares that the module consumes a service, referencing the service provider interface so the locator can find it. B and C simply swap the two meanings.</p>
+  </details>
+</div>
+
+<!-- Q7 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q7</span><span class="q-tag">Automatic names</span></div>
+  <p class="prompt">An automatic module name is generated when the manifest does not supply one. Which JAR filename / generated name pairs are correct?</p>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>emily-1.0.0.jar</code> and <code>emily</code></li>
+    <li><span class="lbl">B.</span> <code>emily-1.0.0-SNAPSHOT.jar</code> and <code>emily</code></li>
+    <li><span class="lbl">C.</span> <code>emily_the_cat-1.0.0.jar</code> and <code>emily_the_cat</code></li>
+    <li><span class="lbl">D.</span> <code>emily.$.jar</code> and <code>emily</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · B · D</div>
+    <p>Version information at the end of the filename is removed, including a trailing tag like <code>-SNAPSHOT</code>, so A and B are right. C is wrong because underscores are special characters and become dots — the name is <code>emily.the.cat</code>. In D the <code>$</code> becomes a dot giving <code>emily..</code>, adjacent dots merge to <code>emily.</code>, and the trailing dot is removed.</p>
+  </details>
+</div>
+
+<!-- Q8 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q8</span><span class="q-tag">Cyclic deps</span></div>
+  <p class="prompt">Which of the following statements are true?</p>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> Modules with cyclic dependencies will not compile.</li>
+    <li><span class="lbl">B.</span> Packages with a cyclic dependency will not compile.</li>
+    <li><span class="lbl">C.</span> A cyclic dependency always involves exactly two modules.</li>
+    <li><span class="lbl">D.</span> A cyclic dependency always involves at least two <code>requires</code> statements.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · D</div>
+    <p>The JPMS forbids cycles between modules, so A is correct, and forming a cycle needs at least two <code>requires</code> statements, so D is correct. No such restriction applies to packages inside a module, making B wrong, and a cycle can span three or more modules, making C wrong.</p>
+  </details>
+</div>
+
+<!-- Q9 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q9</span><span class="q-tag">Services</span></div>
+  <p class="prompt">You are creating a service provider containing this class. Which line belongs in your <code>module-info.java</code>?</p>
+<pre><code><span class="kw">package</span> dragon;
+<span class="kw">import</span> magic.*;
+<span class="kw">public class</span> Dragon <span class="kw">implements</span> Magic {
+   <span class="kw">public</span> String getPower() {
+      <span class="kw">return</span> <span class="str">"breathe fire"</span>;
+   }
+}</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>provides dragon.Dragon with magic.Magic;</code></li>
+    <li><span class="lbl">B.</span> <code>provides magic.Magic with dragon.Dragon;</code></li>
+    <li><span class="lbl">C.</span> <code>provides magic.Magic using dragon.Dragon;</code></li>
+    <li><span class="lbl">D.</span> <code>uses magic.Magic with dragon.Dragon;</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B</div>
+    <p>The <code>provides</code> directive takes the <strong>interface first</strong> and the implementing class second, joined by <code>with</code>. A reverses the two, C invents a <code>using</code> keyword, and D misuses <code>uses</code>, which takes a single interface name and no second operand.</p>
+  </details>
+</div>
+
+<!-- Q10 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q10</span><span class="q-tag">exports</span></div>
+  <p class="prompt">What is true of a module containing a <code>module-info.java</code> file with the following contents?</p>
+<pre><code><span class="kw">module</span> com.food.supplier {}</code></pre>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> No packages inside the module are automatically exported.</li>
+    <li><span class="lbl">B.</span> All packages inside the module are automatically exported.</li>
+    <li><span class="lbl">C.</span> A <code>main()</code> method inside the module can be run.</li>
+    <li><span class="lbl">D.</span> The <code>module-info.java</code> file contains a compiler error.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · C</div>
+    <p>Packages are never exported by default, so A is correct and B is wrong. Exporting is only needed for <em>other code</em> to use the packages — it is not needed to launch a <code>main()</code> method from the command line, so C is correct. The declaration is syntactically valid, so D is wrong.</p>
+  </details>
+</div>
+
+<!-- Q11 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q11</span><span class="q-tag">requires transitive</span></div>
+  <p class="prompt">Which of these individually appear in a correct solution that lets module <code>puppy</code> access the <code>animal.behavior</code> package?</p>
+<pre><code><span class="kw">module</span> animal {
+   <span class="kw">exports</span> animal.behavior;
+}
+<span class="kw">module</span> dog {
+   _____________ animal;   <span class="cm">// line S</span>
+}
+<span class="kw">module</span> puppy {
+   _____________ dog;      <span class="cm">// line T</span>
+}</code></pre>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>requires</code> on line S</li>
+    <li><span class="lbl">B.</span> <code>requires</code> on line T</li>
+    <li><span class="lbl">C.</span> <code>requires transitive</code> on line S</li>
+    <li><span class="lbl">D.</span> <code>requires transitive</code> on line T</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · C · D</div>
+    <p>Line S must be <code>requires transitive</code> so that the dependency on <code>animal</code> is passed along to anything requiring <code>dog</code> — hence C. On line T a plain <code>requires dog</code> is enough to inherit that transitive dependency (B), and <code>requires transitive</code> also works there since it does everything <code>requires</code> does and more (D). A plain <code>requires</code> on line S (option A) would keep the dependency private to <code>dog</code>.</p>
+  </details>
+</div>
+
+<!-- Q12 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q12</span><span class="q-tag">Built-in modules</span></div>
+  <p class="prompt">Which of the following are modules provided by the JDK?</p>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>java.base</code></li>
+    <li><span class="lbl">B.</span> <code>java.util</code></li>
+    <li><span class="lbl">C.</span> <code>jdk.compiler</code></li>
+    <li><span class="lbl">D.</span> <code>jdk.base</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · C</div>
+    <p><code>java.base</code> and <code>jdk.compiler</code> are both real JDK modules. B is a trap: <code>java.util</code> is a <em>package</em> that lives inside <code>java.base</code>, not a module. D is invented — the base module is <code>java.base</code>, never <code>jdk.base</code>.</p>
+  </details>
+</div>
+
+<!-- Q13 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q13</span><span class="q-tag">ServiceLoader</span></div>
+  <p class="prompt">Which compiles and is equivalent to this loop?</p>
+<pre><code>List&lt;Unicorn&gt; all = <span class="kw">new</span> ArrayList&lt;&gt;();
+<span class="kw">for</span> (Unicorn current : ServiceLoader.load(Unicorn.class))
+   all.add(current);</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>ServiceLoader.load(Unicorn.class).getStream().toList();</code></li>
+    <li><span class="lbl">B.</span> <code>ServiceLoader.load(Unicorn.class).stream().toList();</code></li>
+    <li><span class="lbl">C.</span> <code>ServiceLoader.load(Unicorn.class).stream().map(Provider::get).toList();</code></li>
+    <li><span class="lbl">D.</span> <code>ServiceLoader.load(Unicorn.class).getStream().map(Provider::get).toList();</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C</div>
+    <p>There is no <code>getStream()</code> method on <code>ServiceLoader</code>, which eliminates A and D. <code>stream()</code> returns a <code>Stream&lt;Provider&lt;S&gt;&gt;</code>, so B produces a list of <code>Provider</code> objects rather than <code>List&lt;Unicorn&gt;</code> and does not compile. C converts each <code>Provider</code> with <code>get()</code> first.</p>
+  </details>
+</div>
+
+<!-- Q14 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q14</span><span class="q-tag">Command line</span></div>
+  <p class="prompt">Which is a legal command to run a modular program, where <code>n</code> is the module name and <code>c</code> is the fully qualified class name?</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>java --module-path x -m n.c</code></li>
+    <li><span class="lbl">B.</span> <code>java --module-path x -p n/c</code></li>
+    <li><span class="lbl">C.</span> <code>java --module-path x-x -m n/c</code></li>
+    <li><span class="lbl">D.</span> <code>java --module-path x -m n-c</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C</div>
+    <p>The module name and class name must be separated with a slash, so C is correct — and <code>x-x</code> is fine because the module path is a folder name, where dashes are allowed. A uses a period instead of the slash, B repeats the module-path option (<code>-p</code> is the short form of <code>--module-path</code>), and D uses a dash as the separator.</p>
+  </details>
+</div>
+
+<!-- Q15 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q15</span><span class="q-tag">Migration</span></div>
+  <p class="prompt">For a top-down migration, all modules other than named modules are __________ modules and are on the __________.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> automatic, classpath</li>
+    <li><span class="lbl">B.</span> automatic, module path</li>
+    <li><span class="lbl">C.</span> unnamed, classpath</li>
+    <li><span class="lbl">D.</span> unnamed, module path</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B</div>
+    <p>A top-down migration begins by placing <strong>all</strong> JARs on the module path, then converts the top-level project to a named module. Anything not yet migrated sits on the module path without a <code>module-info.java</code>, which is the definition of an automatic module. Unnamed modules belong to bottom-up migration, which leaves unmigrated JARs on the classpath.</p>
+  </details>
+</div>
+
+<!-- Q16 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q16</span><span class="q-tag">Services</span></div>
+  <p class="prompt">You have separate modules for a service provider interface, service provider, service locator, and consumer. If you add a <em>second</em> service provider module, how many of the existing modules do you need to recompile?</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> Zero</li>
+    <li><span class="lbl">B.</span> One</li>
+    <li><span class="lbl">C.</span> Two</li>
+    <li><span class="lbl">D.</span> Four</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A</div>
+    <p>You compile the new module itself, but none of the existing modules change. The service locator discovers the new provider at runtime simply because it is present on the module path — that is the whole point of the loose coupling a service gives you.</p>
+  </details>
+</div>
+
+<!-- Q17 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q17</span><span class="q-tag">Module types</span></div>
+  <p class="prompt">Suppose you have a JAR named <code>cat-1.2.3-RC1.jar</code>, and <code>Automatic-Module-Name</code> in its <code>MANIFEST.MF</code> is set to <code>dog</code>. What should an <strong>unnamed</strong> module referencing this automatic module include in its <code>module-info.java</code>?</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>requires cat;</code></li>
+    <li><span class="lbl">B.</span> <code>requires cat.RC;</code></li>
+    <li><span class="lbl">C.</span> <code>requires dog;</code></li>
+    <li><span class="lbl">D.</span> None of the above</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">D</div>
+    <p>Trick question. An unnamed module has no <code>module-info.java</code> at all — that is what makes it unnamed. It can still access the automatic module, but it treats it as a plain JAR without any module declaration. Had the question been about a <em>named</em> module, the manifest name <code>dog</code> would win over the filename.</p>
+  </details>
+</div>
+
+<!-- Q18 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q18</span><span class="q-tag">Tooling</span></div>
+  <p class="prompt">Two commands create artifacts that include smaller versions of the JDK. Which are used to create an <code>.exe</code> file and a directory, respectively?</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>jimage</code> and <code>jlink</code></li>
+    <li><span class="lbl">B.</span> <code>jlink</code> and <code>jpackage</code></li>
+    <li><span class="lbl">C.</span> <code>jpackage</code> and <code>jlink</code></li>
+    <li><span class="lbl">D.</span> <code>jpackage</code> and <code>jimage</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C</div>
+    <p><code>jpackage</code> creates a self-contained application image such as an <code>.exe</code> or <code>.dmg</code>; <code>jlink</code> creates a directory holding a smaller Java runtime containing just what is needed. <code>jimage</code> only <em>inspects</em> a Java image file, so A and D are wrong, and B reverses the correct pair.</p>
+  </details>
+</div>
+
+<!-- Q19 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q19</span><span class="q-tag">Compile error</span></div>
+  <p class="prompt">Which is a true statement about the following module?</p>
+<pre><code><span class="err">class</span> dragon {
+   exports com.dragon.fire;
+   exports com.dragon.scales <span class="kw">to</span> castle;
+}</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> All modules can reference the <code>com.dragon.fire</code> package.</li>
+    <li><span class="lbl">B.</span> Only the <code>castle</code> module can reference the <code>com.dragon.scales</code> package.</li>
+    <li><span class="lbl">C.</span> Both A and B are true.</li>
+    <li><span class="lbl">D.</span> None of the above.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">D</div>
+    <p>A module definition must use the keyword <code>module</code>, not <code>class</code>, so this code does not compile and no statement about its exports can be true. If the keyword were fixed, C would then be the correct description.</p>
+  </details>
+</div>
+
+<!-- Q20 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q20</span><span class="q-tag">Describe module</span></div>
+  <p class="prompt">Which line would you expect to see when describing <em>any</em> module?</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>requires java.base mandated</code></li>
+    <li><span class="lbl">B.</span> <code>requires mandated java.base</code></li>
+    <li><span class="lbl">C.</span> <code>requires java.lang mandated</code></li>
+    <li><span class="lbl">D.</span> <code>requires java.core mandated</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A</div>
+    <p>Describing a module lists its required modules, and <code>java.base</code> always appears because it is added automatically — with <code>mandated</code> at the <strong>end</strong> of the line, which rules out B. C is a trap: <code>java.lang</code> is a package imported by default in a class, not a module. There is no <code>java.core</code> module.</p>
+  </details>
+</div>
+
+<!-- Q21 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q21</span><span class="q-tag">Services</span></div>
+  <p class="prompt">You have separate modules for a service provider interface, service provider, service locator, and consumer. Which module(s) need to specify a <code>requires</code> directive on the <strong>service provider</strong>?</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> Service locator</li>
+    <li><span class="lbl">B.</span> Consumer</li>
+    <li><span class="lbl">C.</span> Consumer and service locator</li>
+    <li><span class="lbl">D.</span> None of the above</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">D</div>
+    <p>No module requires the service provider — it is the implementation, and it is discovered at runtime by <code>ServiceLoader</code>. The service locator does have a <code>uses</code> directive, but it names the service provider <em>interface</em>, not the provider. Both the locator and the consumer <code>requires</code> the interface module.</p>
+  </details>
+</div>
+
+<!-- Q22 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q22</span><span class="q-tag">Module types</span></div>
+  <p class="prompt">Which are true statements?</p>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> An automatic module exports all packages to named modules.</li>
+    <li><span class="lbl">B.</span> An automatic module exports only the specified packages to named modules.</li>
+    <li><span class="lbl">C.</span> An unnamed module exports all packages to named modules.</li>
+    <li><span class="lbl">D.</span> An unnamed module exports no packages to named modules.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · D</div>
+    <p>An automatic module exports everything, since there is no <code>module-info.java</code> to restrict it, making A correct and B wrong. An unnamed module is on the classpath and is not available to anything on the module path, so it exports no packages to named modules — D is correct and C is wrong.</p>
+  </details>
+</div>
+
+<!-- Q23 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q23</span><span class="q-tag">Compile error</span></div>
+  <p class="prompt">Which is the first line to contain a compiler error?</p>
+<pre><code><span class="num">1:</span> <span class="kw">module</span> snake {
+<span class="num">2:</span>    <span class="kw">exports</span> com.snake.tail;
+<span class="num">3:</span>    <span class="kw">exports</span> com.snake.fangs <span class="kw">to</span> bird;
+<span class="num">4:</span>    <span class="kw">requires</span> skin;
+<span class="num">5:</span>    <span class="kw">requires transitive</span> skin;
+<span class="num">6:</span> }</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> Line 3</li>
+    <li><span class="lbl">B.</span> Line 4</li>
+    <li><span class="lbl">C.</span> Line 5</li>
+    <li><span class="lbl">D.</span> The code does not contain any compiler errors.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C</div>
+    <p>The module name and both <code>exports</code> statements are valid, and a qualified export on line 3 is fine. Lines 4 and 5 are each legal on their own, but the same module name may not appear in two <code>requires</code> statements — so the <em>second</em> one, line 5, is what fails to compile.</p>
+  </details>
+</div>
+
+<!-- Q24 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q24</span><span class="q-tag">Module types</span></div>
+  <p class="prompt">Which is a true statement about a package in a JAR on the <strong>classpath</strong> that contains a <code>module-info.java</code> file?</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> It is possible to make the package available to all other modules on the classpath.</li>
+    <li><span class="lbl">B.</span> It is possible to make the package available to all other modules on the module path.</li>
+    <li><span class="lbl">C.</span> It is possible to make the package available to exactly one other specific module on the classpath.</li>
+    <li><span class="lbl">D.</span> It is possible to make sure the package is not available to any other modules on the classpath.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A</div>
+    <p>Because the JAR is on the classpath it is an unnamed module and the <code>module-info.java</code> inside is ignored — so everything on the classpath sees everything, making A correct. B is wrong since modules on the module path cannot refer to the classpath. The classpath has no facility to restrict packages at all, which rules out C and D.</p>
+  </details>
+</div>
+
+<!-- Q25 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q25</span><span class="q-tag">Services</span></div>
+  <p class="prompt">You have separate modules for a service provider interface, service provider, service locator, and consumer. Which statements are true about the directives you need to specify?</p>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> The consumer must use the <code>requires</code> directive.</li>
+    <li><span class="lbl">B.</span> The consumer must use the <code>uses</code> directive.</li>
+    <li><span class="lbl">C.</span> The service locator must use the <code>requires</code> directive.</li>
+    <li><span class="lbl">D.</span> The service locator must use the <code>uses</code> directive.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · C · D</div>
+    <p>Both the consumer and the service locator depend on the service provider interface module, so both need <code>requires</code> — A and C. The locator is the one performing the lookup, so it also needs <code>uses</code> — D. The consumer never declares <code>uses</code>; the locator handles discovery on its behalf, so B is wrong.</p>
+  </details>
+</div>
+
+<!-- Q26 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q26</span><span class="q-tag">Output</span></div>
+  <p class="prompt">The <code>zoo.tours.api</code>, <code>zoo.tours.reservations</code>, and <code>zoo.visitor</code> modules are all on the module path, but <strong>no</strong> service provider module has been created yet. What is the result of running <code>Tourist</code>?</p>
+<pre><code><span class="kw">public static void</span> main(String[] args) {
+   Tour tour = TourFinder.findSingleTour();
+   System.out.println(<span class="str">"Single tour: "</span> + tour);
+
+   List&lt;Tour&gt; tours = TourFinder.findAllTours();
+   System.out.println(<span class="str">"# tours: "</span> + tours.size());
+}</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> It prints <code>Single tour: null</code> then <code># tours: 0</code></li>
+    <li><span class="lbl">B.</span> It throws a <code>NullPointerException</code> on the first <code>println</code></li>
+    <li><span class="lbl">C.</span> It prints <code>Single tour: null</code> then throws a <code>NullPointerException</code></li>
+    <li><span class="lbl">D.</span> The code does not compile without a <code>provides</code> directive</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A</div>
+    <p><code>findSingleTour()</code> finds no providers, so the enhanced for loop body never executes and <code>null</code> is returned; concatenating a <code>null</code> reference into a String prints the text <code>null</code> rather than throwing. <code>findAllTours()</code> returns an empty <code>ArrayList</code>, not <code>null</code>, so <code>size()</code> is <code>0</code>.</p>
+  </details>
+</div>
+
+<!-- Q27 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q27</span><span class="q-tag">opens</span></div>
+  <p class="prompt">What is the result of the following module declaration?</p>
+<pre><code><span class="kw">open module</span> zoo.animal.talks {
+   <span class="kw">opens</span> zoo.animal.talks.schedule;
+}</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> It compiles, and every package in the module is open for reflection.</li>
+    <li><span class="lbl">B.</span> It compiles, and only <code>zoo.animal.talks.schedule</code> is open for reflection.</li>
+    <li><span class="lbl">C.</span> It does not compile.</li>
+    <li><span class="lbl">D.</span> It compiles, but the <code>opens</code> directive is ignored at runtime.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C</div>
+    <p>A module declared with the <code>open</code> modifier is not permitted to also use the <code>opens</code> directive — all of its packages are open already, so the directive is redundant and rejected. Remove either the <code>open</code> modifier or the <code>opens</code> line and it compiles.</p>
+  </details>
+</div>
+
+<!-- Q28 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q28</span><span class="q-tag">Command line</span></div>
+  <p class="prompt">Which commands describe the module in <code>mods/zoo.animal.feeding.jar</code>?</p>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>java -p mods -d zoo.animal.feeding</code></li>
+    <li><span class="lbl">B.</span> <code>java -p mods --describe-module zoo.animal.feeding</code></li>
+    <li><span class="lbl">C.</span> <code>jar -f mods/zoo.animal.feeding.jar -d</code></li>
+    <li><span class="lbl">D.</span> <code>javac -p mods -d zoo.animal.feeding</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · B · C</div>
+    <p>On both <code>java</code> and <code>jar</code>, <code>-d</code> is the short form of <code>--describe-module</code>, so A, B, and C all work — the <code>jar</code> output differs only by including <code>module-info.class</code> in the filename. D is the trap: on <code>javac</code>, <code>-d</code> specifies the output directory for class files.</p>
+  </details>
+</div>
+
+<!-- Q29 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q29</span><span class="q-tag">Command line</span></div>
+  <p class="prompt">Which statements about these two <code>java</code> options are true?</p>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>--list-modules</code> prints the observable modules and exits without running the program.</li>
+    <li><span class="lbl">B.</span> <code>--show-module-resolution</code> prints resolution details and then runs the program.</li>
+    <li><span class="lbl">C.</span> <code>--list-modules</code> only works when <code>-p</code> is also supplied.</li>
+    <li><span class="lbl">D.</span> Both options belong to the <code>java</code> command.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · B · D</div>
+    <p><code>--list-modules</code> exits as soon as it prints, while <code>--show-module-resolution</code> outputs the resolution trace and then executes, ending with the program's own output. Both are <code>java</code> options. C is wrong: <code>java --list-modules</code> on its own lists the JDK modules, and adding <code>-p</code> merely appends your custom ones.</p>
+  </details>
+</div>
+
+<!-- Q30 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q30</span><span class="q-tag">jdeps</span></div>
+  <p class="prompt">Which are valid <code>jdeps</code> invocations against <code>zoo.dino.jar</code>?</p>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>jdeps -s zoo.dino.jar</code></li>
+    <li><span class="lbl">B.</span> <code>jdeps -summary zoo.dino.jar</code></li>
+    <li><span class="lbl">C.</span> <code>jdeps -jdkinternals zoo.dino.jar</code></li>
+    <li><span class="lbl">D.</span> <code>jdeps -p mods zoo.dino.jar</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · B · C</div>
+    <p><code>-s</code> and <code>-summary</code> are equivalent summary flags, and <code>-jdkinternals</code> is equivalent to <code>--jdk-internals</code>, which lists uses of internal APIs such as <code>sun.misc.Unsafe</code>. D is the trap: unlike other commands, <code>jdeps</code> has <strong>no short form</strong> for <code>--module-path</code>.</p>
+  </details>
+</div>
+
+<!-- Q31 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q31</span><span class="q-tag">Access control</span></div>
+  <p class="prompt">Given this declaration, can a <code>public</code> class in <code>zoo.animal.care.details</code> be referenced from module <code>zoo.staff</code>, which declares <code>requires zoo.animal.care;</code>?</p>
+<pre><code><span class="kw">module</span> zoo.animal.care {
+   <span class="kw">exports</span> zoo.animal.care.medical;
+   <span class="kw">requires</span> zoo.animal.feeding;
+}</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> Yes, because the class is declared <code>public</code>.</li>
+    <li><span class="lbl">B.</span> Yes, because <code>zoo.staff</code> requires <code>zoo.animal.care</code>.</li>
+    <li><span class="lbl">C.</span> No, because the package is not exported.</li>
+    <li><span class="lbl">D.</span> No, because a module may export only one package.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C</div>
+    <p>A <code>public</code> type is accessible outside its module only if its package is exported, and only <code>zoo.animal.care.medical</code> is. <code>requires</code> grants access to what the other module <em>exports</em>, so B does not help. D is false — a module can export as many packages as it likes, one <code>exports</code> statement each.</p>
+  </details>
+</div>
+
+<div class="revision">
+  <h2>Quick Revision — the chapter's core traps</h2>
+  <ul>
+    <li><strong>Declaration basics:</strong> keyword <code>module</code> (never <code>class</code>), file named <code>module-info.java</code>, placed in the module's <strong>root</strong>, module names allow dots but never dashes.</li>
+    <li><strong>Directive spelling:</strong> <code>exports</code>, <code>requires</code>, <code>opens</code>, <code>provides … with …</code>, <code>uses</code> — all plural, any order. <code>export</code>, <code>require</code>, and <code>use</code> do not exist.</li>
+    <li><strong>Does not compile:</strong> the same module in two <code>requires</code> clauses (error on the second), and <code>open module</code> combined with an <code>opens</code> directive.</li>
+    <li><strong>Access:</strong> <code>public</code> reaches outside the module only if the package is exported. An unexported package still lets you run its <code>main()</code> from the command line.</li>
+    <li><strong>Services:</strong> the service = SPI + locator. Provider and consumer are outside it. Nobody <code>requires</code> the provider; adding one costs zero recompiles.</li>
+    <li><strong>ServiceLoader:</strong> iterable directly; <code>stream()</code> gives <code>Stream&lt;Provider&lt;S&gt;&gt;</code>, so <code>.map(Provider::get)</code> is mandatory. There is no <code>getStream()</code>.</li>
+    <li><strong>Command line:</strong> <code>-p</code>/<code>--module-path</code>, <code>-m</code>/<code>--module</code> with <code>module/fully.qualified.Class</code> — one slash, dots everywhere else. <code>-d</code> means output directory on <code>javac</code> but <code>--describe-module</code> on <code>java</code> and <code>jar</code>.</li>
+    <li><strong>Tooling:</strong> <code>jdeps</code> (<code>-s</code>, <code>-jdkinternals</code>, no short <code>--module-path</code>), <code>jmod</code> for JMOD files, <code>jlink</code> → directory, <code>jpackage</code> → executable, <code>jimage</code> only inspects.</li>
+    <li><strong>Module types:</strong> named (module-info + module path), automatic (no module-info + module path, exports all), unnamed (classpath, exports nothing to named modules, ignores any module-info inside).</li>
+    <li><strong>Automatic names:</strong> manifest wins; otherwise drop extension and version, turn special characters into dots, collapse repeats, trim leading/trailing dots.</li>
+    <li><strong>Migration:</strong> bottom-up leaves unmigrated JARs unnamed on the classpath; top-down puts everything on the module path so unmigrated JARs are automatic.</li>
+    <li><strong>Cycles:</strong> never allowed between modules (won't compile), always allowed between packages inside one module.</li>
+  </ul>
+</div>
+
+<footer>OCP Java SE 21 Developer Study Guide · Boyarsky &amp; Selikoff · Chapter 12 — Modules · MCQ Practice</footer>
+</div>
+</body>
+</html>

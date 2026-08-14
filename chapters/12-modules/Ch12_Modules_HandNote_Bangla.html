@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 — অধ্যায় ১২ · Modules (বিস্তারিত হ্যান্ডনোট)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6f8;   --card:#ffffff;  --ink:#2f3437;   --muted:#7b8a93;
+  --kw:#7c5cbf;   --str:#3a8a5c;   --num:#b8860b;   --err:#c44d3e;  --cm:#a89a8a;
+  --icode-bg:#f3ece4; --icode-fg:#9a5030;
+  --accent:#c96442; --accent2:#d4845e;
+  --line:#ece3da;
+  --yes:#3b7d57;  --no:#c44d3e;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; padding:28px 16px 70px;
+  background:var(--bg); color:var(--ink);
+  font-family:'Noto Sans Bengali','Source Sans 3',system-ui,sans-serif;
+  font-size:17px; line-height:1.95;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:980px;margin:0 auto;}
+h1,h2,h3,h4{font-family:'Noto Sans Bengali',system-ui,sans-serif;line-height:1.55;}
+p{margin:0 0 14px;}
+ul,ol{margin:0 0 15px;padding-left:22px;}
+li{margin-bottom:8px;}
+code,pre,.mono{font-family:'JetBrains Mono',ui-monospace,monospace;}
+code{background:var(--icode-bg);color:var(--icode-fg);padding:1.5px 6px;border-radius:5px;font-size:.82em;}
+pre{
+  background:#fdfaf7;border-radius:12px;padding:16px 18px;margin:0 0 16px;
+  overflow-x:auto;box-shadow:inset 0 2px 8px rgba(140,110,90,.10);
+  font-size:13.6px;line-height:1.62;
+}
+pre code{background:none;color:#3b3f42;padding:0;font-size:inherit;}
+.kw{color:var(--kw);font-weight:600;} .str{color:var(--str);} .num{color:var(--num);}
+.err{color:var(--err);font-weight:700;} .cm{color:var(--cm);font-style:italic;}
+
+/* ---------- header ---------- */
+.header{
+  background:linear-gradient(135deg,#ffffff 0%,#fbf7f4 100%);
+  border-radius:18px;padding:34px 32px;margin-bottom:26px;
+  box-shadow:0 6px 26px rgba(120,110,100,.10);
+}
+.badge{
+  display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:700;
+  letter-spacing:.9px;text-transform:uppercase;padding:7px 15px;border-radius:999px;
+  box-shadow:0 3px 10px rgba(201,100,66,.28);
+}
+.header h1{font-size:1.95rem;margin:18px 0 6px;font-weight:800;}
+.header h1 .dim{color:var(--muted);font-weight:400;font-size:1.1rem;}
+.header .sub{font-style:italic;color:var(--muted);margin-bottom:20px;}
+.objectives{
+  background:linear-gradient(135deg,#f0f9f3,#f7fcf8);
+  border-left:4px solid #5aab7b;border-radius:12px;padding:16px 20px;
+}
+.objectives h4{margin:0 0 8px;color:#3b7d57;font-size:.95rem;}
+.objectives ul{margin:0;padding-left:20px;}
+.objectives li{margin-bottom:5px;font-size:.95rem;}
+
+/* ---------- toc ---------- */
+.toc{
+  background:var(--card);border-radius:14px;padding:24px 28px;margin-bottom:30px;
+  box-shadow:0 4px 18px rgba(120,110,100,.08);
+}
+.toc h3{margin:0 0 14px;font-size:1.05rem;color:var(--accent);}
+.toc ol{columns:2;column-gap:34px;margin:0;padding-left:22px;}
+.toc li{margin-bottom:8px;break-inside:avoid;}
+.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted #cfc4b8;}
+.toc a:hover{color:var(--accent);}
+@media(max-width:660px){.toc ol{columns:1;}}
+
+/* ---------- sections ---------- */
+.section{
+  background:var(--card);border-radius:14px;padding:28px 30px;margin-bottom:26px;
+  box-shadow:0 4px 18px rgba(120,110,100,.08);
+}
+.sec-num{
+  font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;
+  letter-spacing:1.6px;color:var(--accent);text-transform:uppercase;
+}
+.section h2{
+  font-size:1.42rem;margin:6px 0 20px;padding-bottom:12px;border-bottom:2px solid var(--line);
+}
+.section h3{font-size:1.12rem;margin:26px 0 10px;color:#43484c;}
+.section h4{font-size:1rem;margin:20px 0 8px;color:#5a6166;}
+
+/* ---------- cards ---------- */
+.card{
+  border-radius:14px;padding:15px 20px;margin:18px 0;
+  box-shadow:0 3px 12px rgba(120,110,100,.09);
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(120,110,100,.15);}
+.card p:last-child,.card ul:last-child{margin-bottom:0;}
+.card-label{
+  font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+  letter-spacing:1.1px;text-transform:uppercase;margin-bottom:7px;display:block;
+}
+.exam-trap{background:linear-gradient(135deg,#fef2f0,#fff8f7);border-left:4px solid #e06b5e;}
+.exam-trap .card-label{color:#c0453a;}
+.key-rule{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:4px solid #5aab7b;}
+.key-rule .card-label{color:#3b7d57;}
+.remember{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:4px solid #d4a24c;}
+.remember .card-label{color:#a9772a;}
+
+.rules-box{
+  background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-top:4px solid #5aab7b;
+  border-radius:12px;padding:18px 22px;margin:18px 0;
+  box-shadow:0 3px 12px rgba(120,110,100,.08);
+}
+.rules-box h4{margin:0 0 10px;color:#3b7d57;font-size:.95rem;font-weight:700;}
+.rules-box ul,.rules-box ol{margin:0;}
+
+/* ---------- vs grid ---------- */
+.vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0;}
+.vs-grid > div{
+  background:var(--card);border-radius:12px;padding:16px 18px;
+  box-shadow:0 3px 12px rgba(120,110,100,.10);
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.vs-grid > div:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(120,110,100,.15);}
+.vs-grid h4{margin:0 0 8px;font-size:1rem;}
+.vs-grid .left h4{color:#7c5cbf;}
+.vs-grid .right h4{color:#3b7d57;}
+.vs-grid ul,.vs-grid ol{padding-left:19px;margin:0;font-size:.95rem;}
+@media(max-width:660px){.vs-grid{grid-template-columns:1fr;}}
+
+/* ---------- tables ---------- */
+.tbl-wrap{overflow-x:auto;margin:18px 0;border-radius:12px;box-shadow:0 3px 14px rgba(120,110,100,.10);}
+table{width:100%;border-collapse:collapse;background:var(--card);border-radius:12px;overflow:hidden;font-size:.93rem;}
+th{background:#f0e8de;text-align:left;padding:11px 14px;font-weight:700;color:#4a4038;font-size:.88rem;}
+td{padding:10px 14px;border-top:1px solid #f1eae2;vertical-align:top;}
+tr:hover td{background:#fdfbf9;}
+td code,th code{font-size:.85em;}
+.yes{color:var(--yes);font-weight:700;}
+.no{color:var(--no);font-weight:700;}
+
+/* ---------- trace ---------- */
+.trace{background:#fdfaf7;border-radius:12px;padding:14px 18px 14px 36px;margin:0 0 16px;
+  box-shadow:inset 0 2px 8px rgba(140,110,90,.08);font-size:.96rem;}
+.trace li{margin-bottom:6px;}
+
+/* ---------- recap ---------- */
+.recap{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-radius:14px;padding:28px 30px;
+  margin-bottom:26px;box-shadow:0 4px 18px rgba(120,110,100,.10);}
+.recap h2{font-size:1.4rem;margin:0 0 18px;padding-bottom:12px;border-bottom:2px solid #f0e2c8;}
+.recap h4{color:#a9772a;margin:18px 0 6px;font-size:1rem;}
+.recap ul{margin:0;padding-left:20px;}
+
+footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:34px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ============ HEADER ============ -->
+<div class="header">
+  <span class="badge">OCP Java SE 21 Developer — Exam 1Z0-830</span>
+  <h1>অধ্যায় ১২ · Modules <span class="dim">(বিস্তারিত হ্যান্ডনোট)</span></h1>
+  <p class="sub">Java Platform Module System — module declaration, directives, services, command-line tooling, module types এবং migration strategy।</p>
+  <div class="objectives">
+    <h4>এই অধ্যায়ে কভার হওয়া exam objectives</h4>
+    <ul>
+      <li>Module সংজ্ঞায়িত করা, module-এর content expose করা (reflection সহ), এবং module dependency ঘোষণা করা।</li>
+      <li>Service, provider এবং consumer সংজ্ঞায়িত করা।</li>
+      <li>Java code compile করা, modular ও non-modular JAR এবং runtime image তৈরি করা।</li>
+      <li>Unnamed ও automatic module ব্যবহার করে module-এ migration বাস্তবায়ন করা।</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ TOC ============ -->
+<div class="toc">
+  <h3>সূচিপত্র</h3>
+  <ol>
+    <li><a href="#s1">Modules-এর পরিচয়</a></li>
+    <li><a href="#s2">Modular প্রোগ্রাম তৈরি ও চালানো</a></li>
+    <li><a href="#s3">একাধিক Module-এর জন্য উদাহরণ আপডেট</a></li>
+    <li><a href="#s4">Module Declaration-এর গভীরে</a></li>
+    <li><a href="#s5">Service তৈরি করা</a></li>
+    <li><a href="#s6">Module আবিষ্কার করা (Discovering)</a></li>
+    <li><a href="#s7">Module-এর প্রকারভেদ তুলনা</a></li>
+    <li><a href="#s8">Application Migration</a></li>
+    <li><a href="#recap">সংক্ষিপ্ত রিভিউ</a></li>
+    <li><a href="#cheat">Exam Traps চিট-শিট</a></li>
+  </ol>
+</div>
+
+<!-- ============ SECTION 1 ============ -->
+<section class="section" id="s1">
+  <div class="sec-num">Section 01</div>
+  <h2>Modules-এর পরিচয়</h2>
+
+  <p>বাস্তব প্রজেক্টে শত শত বা হাজার হাজার class থাকে, যেগুলো package-এ ভাগ করা হয়, আর সেই package-গুলো <strong>JAR</strong> ফাইলে গোছানো হয়। JAR আসলে একটা zip ফাইল যাতে কিছু বাড়তি তথ্য থাকে, extension হলো <code>.jar</code>। যখন এক open-source library আরেক library-র উপর নির্ভর করে, তখন runtime-এ সব JAR-এর compatible version রাখা কঠিন হয়ে যায় — community এই সমস্যাকে বলে <strong>JAR hell</strong>। ভুল version-এর class লোড হওয়া, কিংবা runtime-এ <code>ClassNotFoundException</code> — এগুলোই এর লক্ষণ।</p>
+
+  <p><strong>Java Platform Module System (JPMS)</strong> package-এর চেয়েও উপরের স্তরে code সংগঠিত করে। একটি module-এর মূল উদ্দেশ্য হলো সম্পর্কিত package-এর একটি গ্রুপ দেওয়া যা নির্দিষ্ট কিছু functionality প্রদান করে। এটা অনেকটা JAR ফাইলের মতোই, তবে পার্থক্য হলো — developer নিজে ঠিক করে দেয় কোন package গুলো module-এর বাইরে থেকে accessible হবে।</p>
+
+  <div class="rules-box">
+    <h4>Java Platform Module System-এ যা যা আছে</h4>
+    <ul>
+      <li>Module JAR ফাইলের একটি format</li>
+      <li>JDK-কে module-এ ভাগ করা (partitioning)</li>
+      <li>Java tool-গুলোর জন্য অতিরিক্ত command-line option</li>
+    </ul>
+  </div>
+
+  <h3>Module আসলে কী</h3>
+  <p>একটি module মানে <strong>এক বা একাধিক package</strong> + <code>module-info.java</code> নামের একটি বিশেষ ফাইল। এই ফাইলের ভেতরের বিষয়বস্তুকেই বলে <em>module declaration</em>। Design ডায়াগ্রামে module-গুলোর মাঝে যে তীরচিহ্ন থাকে সেগুলো হলো <strong>dependency</strong> — অর্থাৎ একটি module আরেকটির code-এর উপর নির্ভরশীল।</p>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ KEY RULE</span>
+    <p><code>module-info.java</code> <strong>প্রতিটি module-এ থাকা বাধ্যতামূলক</strong>, এবং এটি থাকতে হবে module-এর <strong>root directory</strong>-তে — কোনো package folder-এর ভেতরে নয়।</p>
+  </div>
+
+  <h3>Module-এর সুবিধাগুলো</h3>
+  <ul>
+    <li><strong>Better access control:</strong> <code>private</code>/package/<code>protected</code>/<code>public</code>-এর বাইরেও এমন package রাখা যায় যা শুধু একই module-এর অন্য package থেকে accessible।</li>
+    <li><strong>Clearer dependency management:</strong> module যেহেতু নিজের নির্ভরতা ঘোষণা করে, তাই Java missing JAR-এর অভিযোগ program <em>startup</em>-এই করতে পারে, runtime-এ প্রথম access-এর সময় নয়।</li>
+    <li><strong>Custom Java builds:</strong> ১৫০ MB+ পুরো JDK-র বদলে শুধু প্রয়োজনীয় অংশ নিয়ে Java runtime বানানো যায়।</li>
+    <li><strong>Improved security:</strong> JDK-র যে অংশ বাদ দিয়েছেন, সেই অংশের vulnerability নিয়ে আর চিন্তা করতে হয় না।</li>
+    <li><strong>Improved performance:</strong> ছোট package মানে দ্রুত startup time এবং কম memory প্রয়োজন।</li>
+    <li><strong>Unique package enforcement:</strong> Java নিশ্চিত করতে পারে প্রতিটি package শুধু একটি module থেকেই আসছে।</li>
+  </ul>
+
+  <div class="card remember">
+    <span class="card-label">★ REMEMBER</span>
+    <p>Module ব্যবহার করা <strong>optional</strong>। Java 21-এর বাকি সব feature module-এ convert না করেও ব্যবহার করা যায়। কিন্তু exam-এ এর syntax খুব ভালোভাবেই পরীক্ষা করা হয়।</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 2 ============ -->
+<section class="section" id="s2">
+  <div class="sec-num">Section 02</div>
+  <h2>Modular প্রোগ্রাম তৈরি ও চালানো</h2>
+
+  <p>বইয়ের চলমান উদাহরণ হলো একটি zoo। প্রথম module হলো <code>zoo.animal.feeding</code> — একে দিয়ে শুরু করা হয়েছে কারণ বাকি সব module এর উপর নির্ভর করে। এতে একটি package, একটি class এবং module declaration আছে।</p>
+
+  <h3>ফাইল তৈরি</h3>
+<pre><code><span class="kw">package</span> zoo.animal.feeding;
+
+<span class="kw">public class</span> Task {
+   <span class="kw">public static void</span> main(String... args) {
+      System.out.println(<span class="str">"All fed!"</span>);
+   }
+}</code></pre>
+
+  <p>আর সবচেয়ে সরল module declaration:</p>
+<pre><code><span class="kw">module</span> zoo.animal.feeding {
+}</code></pre>
+
+  <div class="rules-box">
+    <h4>Module declaration ও সাধারণ class declaration-এর ৩টি পার্থক্য</h4>
+    <ol>
+      <li><code>module-info.java</code> থাকতে হবে module-এর <strong>root directory</strong>-তে। সাধারণ class থাকে package-এর ভেতরে।</li>
+      <li>Declaration-এ <code>module</code> keyword ব্যবহার করতে হবে — <code>class</code>, <code>interface</code> বা <code>enum</code> নয়।</li>
+      <li>Module name <strong>package name-এর naming rule</strong> মেনে চলে। এতে সাধারণত period (.) থাকে। Dash (<code>-</code>) <strong>allowed নয়</strong> — ঠিক যেমন class ও package name-এ allowed নয়।</li>
+    </ol>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+<pre style="margin:8px 0 6px"><code><span class="err">class</span> dragon {              <span class="cm">// DOES NOT COMPILE</span>
+   exports com.dragon.fire;
+}</code></pre>
+    <p><code>class</code> (বা <code>interface</code>) দিয়ে শুরু হওয়া module declaration কখনোই compile হয় না — ভেতরের directive যতই সঠিক দেখাক। Exam প্রায়ই এই ভুলটা line 1-এ লুকিয়ে রাখে, আর আপনি line 2–5-এ "আসল" ভুল খুঁজতে থাকেন।</p>
+  </div>
+
+  <h3>Directory structure</h3>
+  <p><code>feeding</code> হলো module directory, আর <code>module-info.java</code> সরাসরি তার নিচে। সাধারণ JAR-এর মতোই <code>zoo.animal.feeding</code> package-এর নামের প্রতিটি অংশের জন্য একটি করে subfolder থাকে, এবং <code>Task</code> class থাকে সবচেয়ে ভেতরের folder-এ। Module artifact রাখার জন্য module-এর পাশেই একটি <code>mods</code> directory বানানো হয়। এই directory-র নাম যেকোনো কিছু হতে পারে; <code>mods</code> শুধু প্রচলিত নাম।</p>
+
+<pre><code>feeding
+ ├── module-info.java
+ └── zoo
+      └── animal
+           └── feeding
+                └── Task.java
+mods            <span class="cm">// feeding-এর সমপর্যায়ে, JAR রাখার জন্য</span></code></pre>
+
+  <h3>Compile করা</h3>
+<pre><code>javac --module-path mods
+   -d feeding
+   feeding/zoo/animal/feeding/*.java feeding/module-info.java</code></pre>
+  <ul class="trace">
+    <li><code>-d feeding</code> — generated class ফাইল কোন directory-তে যাবে।</li>
+    <li>Command-এর শেষে compile করার <code>.java</code> ফাইলের তালিকা; আলাদা আলাদা লিখুন বা wildcard দিন।</li>
+    <li><code>--module-path mods</code> — <strong>custom</strong> module ফাইলের অবস্থান। এখানে dependency নেই বলে এটা বাদ দিলেও চলত। Modular program-এ module-path কে classpath-এর বিকল্প ভাবতে পারেন।</li>
+  </ul>
+
+  <p>নিচের চারটিই বৈধ বিকল্প, short form <code>-p</code> ব্যবহার করে:</p>
+<pre><code>javac -p mods -d feeding feeding/zoo/animal/feeding/*.java feeding/*.java
+javac -p mods -d feeding feeding/zoo/animal/feeding/*.java feeding/module-info.java
+javac -p mods -d feeding feeding/zoo/animal/feeding/Task.java feeding/module-info.java
+javac -p mods -d feeding feeding/zoo/animal/feeding/Task.java feeding/*.java</code></pre>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>কীসের জন্য</th><th>Abbreviation</th><th>Long form</th></tr>
+      <tr><td>Class ফাইলের directory</td><td><code>-d &lt;dir&gt;</code></td><td>n/a</td></tr>
+      <tr><td>Module path</td><td><code>-p &lt;path&gt;</code></td><td><code>--module-path &lt;path&gt;</code></td></tr>
+    </table>
+  </div>
+
+  <div class="card remember">
+    <span class="card-label">★ REMEMBER</span>
+    <p>classpath option এখনো তিন রূপে আছে: <code>-cp</code>, <code>--class-path</code> এবং <code>-classpath</code>। Nonmodular program লেখার সময় এগুলো এখনো খুব সাধারণ।</p>
+  </div>
+
+  <h3>Run করা</h3>
+  <p>Syntax হলো — <strong>module name, তারপর একটি slash, তারপর fully qualified class name</strong>।</p>
+<pre><code>java --module-path feeding
+   --module zoo.animal.feeding/zoo.animal.feeding.Task
+
+java -p feeding
+   -m zoo.animal.feeding/zoo.animal.feeding.Task</code></pre>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p>Slash থাকে <strong>মাত্র একটি</strong>, আর সেটা module ও class-কে আলাদা করে। Class name-এর <em>ভেতরের</em> সব অংশে period ব্যবহার হয়:</p>
+    <ul>
+      <li><code>-m zoo.animal.talks/zoo/animal/talks/Peacocks</code> — <span class="no">ভুল</span>, package অংশে dot লাগবে।</li>
+      <li><code>-m n.c</code> — <span class="no">ভুল</span>, slash নেই।</li>
+      <li><code>-m n-c</code> — <span class="no">ভুল</span>, dash কোনো separator নয়।</li>
+      <li><code>--module-path x-x -m n/c</code> — <span class="yes">সঠিক</span>। <code>x-x</code> বৈধ কারণ module <em>path</em> একটি folder name, আর folder name-এ dash allowed।</li>
+    </ul>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>কীসের জন্য</th><th>Abbreviation</th><th>Long form</th></tr>
+      <tr><td>Module name</td><td><code>-m &lt;name&gt;</code></td><td><code>--module &lt;name&gt;</code></td></tr>
+      <tr><td>Module path</td><td><code>-p &lt;path&gt;</code></td><td><code>--module-path &lt;path&gt;</code></td></tr>
+    </table>
+  </div>
+
+  <h3>Package করা (JAR বানানো)</h3>
+<pre><code>jar -cvf mods/zoo.animal.feeding.jar -C feeding/ .</code></pre>
+  <p>এখানে module-specific কিছুই নেই — <code>feeding</code>-এর সবকিছু নিয়ে <code>mods</code> folder-এ <code>zoo.animal.feeding.jar</code> তৈরি হচ্ছে। এবার একই run command module path দিয়ে চালানো যায়:</p>
+<pre><code>java -p mods -m zoo.animal.feeding/zoo.animal.feeding.Task</code></pre>
+  <p>আগের command-এর সাথে এর একমাত্র পার্থক্য হলো directory। Module path এখন <code>mods</code>-এ, তাই এবার একটি <strong>module JAR</strong> রান হচ্ছে।</p>
+</section>
+
+<!-- ============ SECTION 3 ============ -->
+<section class="section" id="s3">
+  <div class="sec-num">Section 03</div>
+  <h2>একাধিক Module-এর জন্য উদাহরণ আপডেট</h2>
+
+  <h3>exports — feeding module আপডেট</h3>
+  <p><code>exports</code> directive দিয়ে বোঝানো হয় যে module চায় ওই package-গুলো তার <strong>বাইরের</strong> Java code ব্যবহার করুক। <code>exports</code> না থাকলে module শুধু command line থেকে একা রান করার জন্যই available থাকে।</p>
+<pre><code><span class="kw">module</span> zoo.animal.feeding {
+   <span class="kw">exports</span> zoo.animal.feeding;
+}</code></pre>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p><code>module com.food.supplier {}</code> — এই খালি module কোনো package <strong>export করে না</strong>, কিন্তু এর ভেতরের <code>main()</code> method <strong>command line থেকে রান করা যাবে</strong>। "Export করা হয়নি" মানে অন্য <em>module</em>-এর জন্য বন্ধ, launcher-এর জন্য নয়।</p>
+  </div>
+
+  <h3>requires — care module</h3>
+  <p><code>zoo.animal.care</code>-এ দুটি package। <code>zoo.animal.care.medical</code> অন্য module-এর জন্য, আর <code>zoo.animal.care.details</code> শুধু ভেতরের ব্যবহারের জন্য — কখনো export হয় না।</p>
+<pre><code><span class="cm">// HippoBirthday.java</span>
+<span class="kw">package</span> zoo.animal.care.details;
+<span class="kw">import</span> zoo.animal.feeding.*;
+<span class="kw">public class</span> HippoBirthday {
+   <span class="kw">private</span> Task task;
+}
+
+<span class="cm">// Diet.java</span>
+<span class="kw">package</span> zoo.animal.care.medical;
+<span class="kw">public class</span> Diet { }</code></pre>
+
+<pre><code><span class="num">1:</span> <span class="kw">module</span> zoo.animal.care {
+<span class="num">2:</span>    <span class="kw">exports</span> zoo.animal.care.medical;
+<span class="num">3:</span>    <span class="kw">requires</span> zoo.animal.feeding;
+<span class="num">4:</span> }</code></pre>
+  <ul class="trace">
+    <li>Line 1 — module-এর নাম।</li>
+    <li>Line 2 — যে একটি package অন্য module-এর জন্য export করা হচ্ছে।</li>
+    <li>Line 3 — <code>requires</code> বলে দেয় আরেকটি module প্রয়োজন। খেয়াল করুন, <code>Task</code> আসলে ব্যবহার করছে <em>internal</em> package <code>zoo.animal.care.details</code> — তবু requires হয় module ধরে, package ধরে নয়।</li>
+  </ul>
+
+<pre><code>javac -p mods -d care
+   care/zoo/animal/care/details/*.java
+   care/zoo/animal/care/medical/*.java
+   care/module-info.java
+
+jar -cvf mods/zoo.animal.care.jar -C care/ .</code></pre>
+
+  <div class="card remember">
+    <span class="card-label">★ REMEMBER</span>
+    <p>Package-গুলোর নাম module name-এর মতো একই prefix দিয়ে শুরু হয়েছে — এটা ইচ্ছাকৃত। ভাবতে পারেন module name তার সমনামের package ও সব subpackage "দাবি" করে নেয়।</p>
+  </div>
+
+  <h3>একাধিক exports ও requires — talks module</h3>
+<pre><code><span class="num">1:</span> <span class="kw">module</span> zoo.animal.talks {
+<span class="num">2:</span>    <span class="kw">exports</span> zoo.animal.talks.content;
+<span class="num">3:</span>    <span class="kw">exports</span> zoo.animal.talks.media;
+<span class="num">4:</span>    <span class="kw">exports</span> zoo.animal.talks.schedule;
+<span class="num">5:</span>
+<span class="num">6:</span>    <span class="kw">requires</span> zoo.animal.feeding;
+<span class="num">7:</span>    <span class="kw">requires</span> zoo.animal.care;
+<span class="num">8:</span> }</code></pre>
+  <p>Line 2–4 তিনটি package-কেই অন্য module থেকে ব্যবহারযোগ্য করে; line 6–7 বলে দেয় এই module কোন দুটি module-এর উপর নির্ভরশীল। প্রতিটি package-এর জন্য আলাদা <code>exports</code> line লাগবে — এক keyword-এর পরে কমা দিয়ে অনেকগুলো লেখা যায় না।</p>
+
+  <h3>কোনো exports নেই — staff module</h3>
+  <p><code>zoo.staff</code> তিনটি module require করে, কিন্তু কিছুই expose করে না:</p>
+<pre><code><span class="kw">module</span> zoo.staff {
+   <span class="kw">requires</span> zoo.animal.feeding;
+   <span class="kw">requires</span> zoo.animal.care;
+   <span class="kw">requires</span> zoo.animal.talks;
+}</code></pre>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ KEY RULE</span>
+    <p>Module ডায়াগ্রামের তীরচিহ্ন আক্ষরিকভাবে পড়ুন: একটি module থেকে অন্য module-এ যাওয়া তীর মানে উৎস module-এ <code>requires</code> এবং লক্ষ্য module-এ <code>exports</code>। কোনো module থেকে বের হওয়া তীরের সংখ্যা = তার <code>requires</code> statement-এর সংখ্যা।</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 4 ============ -->
+<section class="section" id="s4">
+  <div class="sec-num">Section 04</div>
+  <h2>Module Declaration-এর গভীরে</h2>
+
+  <div class="card remember">
+    <span class="card-label">★ REMEMBER</span>
+    <p>Module declaration-এ directive গুলো <strong>যেকোনো ক্রমে</strong> লেখা যায়। সব <code>exports</code> আগে আর সব <code>requires</code> পরে লেখাটা স্টাইলের ব্যাপার, নিয়ম নয়।</p>
+  </div>
+
+  <h3>নির্দিষ্ট module-এ package export</h3>
+<pre><code><span class="kw">module</span> zoo.animal.talks {
+   <span class="kw">exports</span> zoo.animal.talks.content <span class="kw">to</span> zoo.staff;
+   <span class="kw">exports</span> zoo.animal.talks.media;
+   <span class="kw">exports</span> zoo.animal.talks.schedule;
+
+   <span class="kw">requires</span> zoo.animal.feeding;
+   <span class="kw">requires</span> zoo.animal.care;
+}</code></pre>
+  <p><code>zoo.staff</code>-এর দিক থেকে কিছুই বদলায়নি। কিন্তু অন্য কোনো module আর <code>zoo.animal.talks.content</code> ব্যবহার করতে পারবে না। একে বলে <strong>qualified export</strong>।</p>
+
+  <div class="rules-box">
+    <h4>"Package export করা" আসলে কী কী উন্মুক্ত করে</h4>
+    <ul>
+      <li>সব <strong>public</strong> class, interface, enum এবং record export হয়।</li>
+      <li>ওই ফাইলগুলোর <strong>public ও protected</strong> field ও method দৃশ্যমান হয়।</li>
+      <li><code>private</code> সদস্য দৃশ্যমান হয় না — কারণ class-এর বাইরেই তা accessible নয়।</li>
+      <li>Package-private সদস্য দৃশ্যমান হয় না — কারণ package-এর বাইরেই তা accessible নয়।</li>
+    </ul>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Level</th><th>Module-এর ভেতরে</th><th>Module-এর বাইরে</th></tr>
+      <tr><td><code>private</code></td><td>শুধু class-এর ভেতরে</td><td class="no">কোনো access নেই</td></tr>
+      <tr><td>Package</td><td>শুধু package-এর ভেতরে</td><td class="no">কোনো access নেই</td></tr>
+      <tr><td><code>protected</code></td><td>শুধু package-এর ভেতরে বা subclass-এ</td><td>subclass থেকে accessible, <strong>যদি package export করা থাকে</strong></td></tr>
+      <tr><td><code>public</code></td><td>সব class-এর জন্য</td><td>accessible শুধু <strong>যদি package export করা থাকে</strong></td></tr>
+    </table>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p><code>public</code> আর access ladder-এর সর্বোচ্চ ধাপ নয়। Export না করা package-এর <code>public</code> class module-এর বাইরে অদৃশ্য। Exam এটা জিজ্ঞেস করে "কোন module package X reference করতে পারবে" এই ভাষায় — আগে <code>exports</code> দেখুন, পরে access modifier।</p>
+  </div>
+
+  <h3>requires transitive</h3>
+  <p><code>requires moduleName</code> মানে বর্তমান module ওই module-এর উপর নির্ভরশীল। আর <code>requires transitive moduleName</code> মানে — <strong>যে module এই module-কে requires করবে, সেও স্বয়ংক্রিয়ভাবে</strong> <code>moduleName</code>-এর উপর নির্ভরশীল হবে।</p>
+<pre><code><span class="kw">module</span> zoo.animal.feeding {
+   <span class="kw">exports</span> zoo.animal.feeding;
+}
+
+<span class="kw">module</span> zoo.animal.care {
+   <span class="kw">exports</span> zoo.animal.care.medical;
+   <span class="kw">requires transitive</span> zoo.animal.feeding;
+}
+
+<span class="kw">module</span> zoo.animal.talks {
+   <span class="kw">exports</span> zoo.animal.talks.content <span class="kw">to</span> zoo.staff;
+   <span class="kw">exports</span> zoo.animal.talks.media;
+   <span class="kw">exports</span> zoo.animal.talks.schedule;
+   <span class="cm">// no longer needed requires zoo.animal.feeding;</span>
+   <span class="cm">// no longer needed requires zoo.animal.care;</span>
+   <span class="kw">requires transitive</span> zoo.animal.care;
+}
+
+<span class="kw">module</span> zoo.staff {
+   <span class="cm">// no longer needed requires zoo.animal.feeding;</span>
+   <span class="cm">// no longer needed requires zoo.animal.care;</span>
+   <span class="kw">requires</span> zoo.animal.talks;
+}</code></pre>
+
+  <div class="rules-box">
+    <h4>zoo.animal.care-এ transitive যোগ করার ফলাফল</h4>
+    <ul>
+      <li><code>zoo.animal.talks</code> চাইলে <code>requires zoo.animal.feeding</code> লিখতে <strong>পারে</strong>, কিন্তু বাধ্যতামূলক নয়।</li>
+      <li><code>zoo.animal.feeding</code>-এ access ছাড়া <code>zoo.animal.care</code> <strong>compile বা execute হবে না</strong>।</li>
+      <li><code>zoo.animal.care</code>-এ access ছাড়া <code>zoo.animal.talks</code> <strong>compile বা execute হবে না</strong>।</li>
+    </ul>
+    <p style="margin-top:10px;margin-bottom:0">এই নিয়মগুলো তখনও প্রযোজ্য যখন <code>zoo.animal.care</code> ও <code>zoo.animal.talks</code> আসলে <code>zoo.animal.feeding</code>-এর কোনো package ব্যবহারই করে না।</p>
+  </div>
+
+  <h3>Duplicate requires statement</h3>
+<pre><code><span class="kw">module</span> bad.module {
+   <span class="kw">requires</span> zoo.animal.talks;
+   <span class="err">requires transitive</span> zoo.animal.talks;   <span class="cm">// DOES NOT COMPILE</span>
+}</code></pre>
+  <ul class="trace">
+    <li>একই module-কে দুবার <code>requires</code> clause-এ লেখা Java allow করে না — এটা redundant এবং সাধারণত coding error।</li>
+    <li><code>requires transitive</code> হলো <em>requires + বাড়তি behavior</em>, তাই দুই ধরন মেশালেও সেটা duplicate-ই।</li>
+    <li>Error ধরা পড়ে <strong>দ্বিতীয়</strong> statement-এ। "কোন line-এ প্রথম compiler error?" — উত্তরে পরের line বেছে নিন।</li>
+  </ul>
+
+  <h3>opens — reflection চালু করা</h3>
+  <p>Reflection দিয়ে runtime-এ code পরিদর্শন ও কল করা যায়, এমনকি access control ভেঙেও ফেলা যায়। ঝুঁকিপূর্ণ বলেই module system দাবি করে যে developer module declaration-এ স্পষ্টভাবে অনুমতি দিক।</p>
+<pre><code><span class="kw">module</span> zoo.animal.talks {
+   <span class="kw">opens</span> zoo.animal.talks.schedule;
+   <span class="kw">opens</span> zoo.animal.talks.media <span class="kw">to</span> zoo.staff;
+}</code></pre>
+  <p>প্রথমটি এই module ব্যবহারকারী যেকোনো module-কে reflection-এর অনুমতি দেয়। দ্বিতীয়টি শুধু <code>zoo.staff</code>-কে দেয়।</p>
+
+  <h4>পুরো module open করা</h4>
+<pre><code><span class="kw">open module</span> zoo.animal.talks {
+}
+
+<span class="kw">open module</span> zoo.animal.talks {
+   <span class="err">opens</span> zoo.animal.talks.schedule;    <span class="cm">// DOES NOT COMPILE</span>
+}</code></pre>
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p>যে module <code>open</code> modifier ব্যবহার করে, সে <code>opens</code> directive ব্যবহার করতে <strong>পারবে না</strong> — কারণ package গুলো তো ইতিমধ্যেই open। একটি অক্ষরের পার্থক্য খেয়াল করুন: <code>open</code> হলো <em>module modifier</em>, আর <code>opens</code> হলো <em>directive</em>।</p>
+  </div>
+
+  <div class="vs-grid">
+    <div class="left">
+      <h4>exports</h4>
+      <ul>
+        <li>Compile-time ও runtime access</li>
+        <li>public type-এর public/protected সদস্য উন্মুক্ত করে</li>
+        <li><code>exports pkg;</code> / <code>exports pkg to mod;</code></li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>opens</h4>
+      <ul>
+        <li>Runtime <strong>reflective</strong> access</li>
+        <li>Package ধরে, অথবা <code>open module</code> দিয়ে পুরো module</li>
+        <li><code>opens pkg;</code> / <code>opens pkg to mod;</code></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SECTION 5 ============ -->
+<section class="section" id="s5">
+  <div class="sec-num">Section 05</div>
+  <h2>Service তৈরি করা</h2>
+
+  <p>একটি <strong>service</strong> গঠিত হয় — একটি interface, interface যেসব class reference করে সেগুলো, এবং interface-এর implementation খুঁজে বের করার একটি উপায় নিয়ে। <strong>Implementation গুলো service-এর অংশ নয়।</strong> বইয়ের উদাহরণে চারটি module ব্যবহার করা হয়েছে; চারটি module বাধ্যতামূলক নয়, তবে exam-এ এভাবেই দেখানো হয়।</p>
+
+  <h3>১. Service provider interface — <code>zoo.tours.api</code></h3>
+<pre><code><span class="cm">// Souvenir.java</span>
+<span class="kw">package</span> zoo.tours.api;
+<span class="kw">public record</span> Souvenir(String description) { }
+
+<span class="cm">// Tour.java</span>
+<span class="kw">package</span> zoo.tours.api;
+<span class="kw">public interface</span> Tour {
+   String name();
+   <span class="kw">int</span> length();
+   Souvenir getSouvenir();
+}
+
+<span class="cm">// module-info.java</span>
+<span class="kw">module</span> zoo.tours.api {
+   <span class="kw">exports</span> zoo.tours.api;
+}</code></pre>
+  <p>তিনটি method-ই implicit <code>public</code> modifier ব্যবহার করছে। <code>Souvenir</code> service-এর অংশ, কারণ interface একে reference করে। Service provider "interface" আসলে abstract class-ও হতে পারে, তবে exam-এ শুধু interface-ই দেখবেন।</p>
+
+  <h3>২. Service locator — <code>zoo.tours.reservations</code></h3>
+<pre><code><span class="cm">// TourFinder.java</span>
+<span class="kw">package</span> zoo.tours.reservations;
+
+<span class="kw">import</span> java.util.*;
+<span class="kw">import</span> zoo.tours.api.*;
+
+<span class="kw">public class</span> TourFinder {
+   <span class="kw">public static</span> Tour findSingleTour() {
+      ServiceLoader&lt;Tour&gt; loader = ServiceLoader.load(Tour.class);
+      <span class="kw">for</span> (Tour tour : loader)
+         <span class="kw">return</span> tour;
+      <span class="kw">return null</span>;
+   }
+   <span class="kw">public static</span> List&lt;Tour&gt; findAllTours() {
+      List&lt;Tour&gt; tours = <span class="kw">new</span> ArrayList&lt;&gt;();
+      ServiceLoader&lt;Tour&gt; loader = ServiceLoader.load(Tour.class);
+      <span class="kw">for</span> (Tour tour : loader)
+         tours.add(tour);
+      <span class="kw">return</span> tours;
+   }
+}
+
+<span class="cm">// module-info.java</span>
+<span class="kw">module</span> zoo.tours.reservations {
+   <span class="kw">exports</span> zoo.tours.reservations;
+   <span class="kw">requires</span> zoo.tours.api;
+   <span class="kw">uses</span> zoo.tours.api.Tour;
+}</code></pre>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ KEY RULE</span>
+    <p><code>requires</code> এবং <code>uses</code> — দুটোই লাগে। <strong>একটি compilation-এর জন্য, আরেকটি lookup-এর জন্য।</strong> <code>uses</code> নেয় fully qualified <em>interface</em> name, package name নয়।</p>
+  </div>
+
+  <h4>ServiceLoader-এর যে দুটি method জানতেই হবে</h4>
+<pre><code><span class="kw">public final class</span> ServiceLoader&lt;S&gt; <span class="kw">implements</span> Iterable&lt;S&gt; {
+   <span class="kw">public static</span> &lt;S&gt; ServiceLoader&lt;S&gt; load(Class&lt;S&gt; service) { ... }
+   <span class="kw">public</span> Stream&lt;Provider&lt;S&gt;&gt; stream() { ... }
+}</code></pre>
+  <p>Loader-এর উপর loop করলে সরাসরি service type পাওয়া যায়। কিন্তু <code>Stream</code> চাইলে <strong>ভিন্ন type</strong> আসে — <code>Stream&lt;Provider&lt;S&gt;&gt;</code>, কারণ Stream নিয়ন্ত্রণ করে element কখন evaluate হবে। তাই প্রতিটি <code>Provider</code>-এর উপর <code>get()</code> কল করতে হয়:</p>
+<pre><code>ServiceLoader.load(Tour.class)
+  .stream()
+  .map(Provider::get)
+  .mapToInt(Tour::length)
+  .max()
+  .ifPresent(System.out::println);</code></pre>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <ul>
+      <li><code>ServiceLoader</code>-এ <code>getStream()</code> নামে কোনো method <strong>নেই</strong>।</li>
+      <li><code>ServiceLoader.load(X.class).stream().toList()</code> কে <code>List&lt;X&gt;</code> হিসেবে নিলে <span class="no">compile হয় না</span> — ওটা <code>Provider</code>-এর list। মাঝে <code>.map(Provider::get)</code> লাগবে।</li>
+      <li><code>ServiceLoader.load()</code> কল তুলনামূলকভাবে ব্যয়বহুল; বাস্তব application-এ result cache করা উচিত।</li>
+    </ul>
+  </div>
+
+  <h3>৩. Consumer — <code>zoo.visitor</code></h3>
+<pre><code><span class="cm">// Tourist.java</span>
+<span class="kw">package</span> zoo.visitor;
+
+<span class="kw">import</span> java.util.*;
+<span class="kw">import</span> zoo.tours.api.*;
+<span class="kw">import</span> zoo.tours.reservations.*;
+
+<span class="kw">public class</span> Tourist {
+   <span class="kw">public static void</span> main(String[] args) {
+      Tour tour = TourFinder.findSingleTour();
+      System.out.println(<span class="str">"Single tour: "</span> + tour);
+
+      List&lt;Tour&gt; tours = TourFinder.findAllTours();
+      System.out.println(<span class="str">"# tours: "</span> + tours.size());
+   }
+}
+
+<span class="cm">// module-info.java</span>
+<span class="kw">module</span> zoo.visitor {
+   <span class="kw">requires</span> zoo.tours.api;
+   <span class="kw">requires</span> zoo.tours.reservations;
+}</code></pre>
+  <p>কোনো implementation থাকার <em>আগে</em> রান করলে:</p>
+<pre><code>java -p mods -m zoo.visitor/zoo.visitor.Tourist
+
+Single tour: <span class="kw">null</span>
+# tours: <span class="num">0</span></code></pre>
+  <ul class="trace">
+    <li><code>findSingleTour()</code> কোনো provider পায় না, তাই enhanced for loop-এর body কখনো চলে না এবং <code>null</code> return হয়।</li>
+    <li><code>null</code> reference-এর সাথে String concatenation করলে <code>null</code> লেখাটাই print হয় — <strong>কোনো NullPointerException হয় না</strong>।</li>
+    <li><code>findAllTours()</code> খালি list return করে (null নয়), তাই <code>size()</code> হয় <code>0</code>।</li>
+  </ul>
+
+  <h3>৪. Service provider — <code>zoo.tours.agency</code></h3>
+<pre><code><span class="cm">// TourImpl.java</span>
+<span class="kw">package</span> zoo.tours.agency;
+<span class="kw">import</span> zoo.tours.api.*;
+
+<span class="kw">public class</span> TourImpl <span class="kw">implements</span> Tour {
+   <span class="kw">public</span> String name()      { <span class="kw">return</span> <span class="str">"Behind the Scenes"</span>; }
+   <span class="kw">public int</span> length()       { <span class="kw">return</span> <span class="num">120</span>; }
+   <span class="kw">public</span> Souvenir getSouvenir() {
+      <span class="kw">return new</span> Souvenir(<span class="str">"stuffed animal"</span>);
+   }
+}
+
+<span class="cm">// module-info.java</span>
+<span class="kw">module</span> zoo.tours.agency {
+   <span class="kw">requires</span> zoo.tours.api;
+   <span class="kw">provides</span> zoo.tours.api.Tour <span class="kw">with</span> zoo.tours.agency.TourImpl;
+}</code></pre>
+  <p>Implementation-যুক্ত package <strong>export করা হয়নি</strong> — caller যেন সরাসরি তাকে reference না করে। Syntax:</p>
+<pre><code>provides interfaceName <span class="kw">with</span> className;</code></pre>
+  <p>Provider package করে একই command আবার চালালে:</p>
+<pre><code>Single tour: zoo.tours.agency.TourImpl@1936f0f5
+# tours: <span class="num">1</span></code></pre>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ KEY RULE</span>
+    <p>কিছুই recompile করা হয়নি। নতুন service provider module যোগ করলে বিদ্যমান module-এর <strong>শূন্যটি</strong> recompile করতে হয় — service locator নিজেই module path-এ নতুন provider দেখে নেয়। এটাই loose coupling-এর সুবিধা।</p>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p><code>provides</code>-এ <strong>আগে interface</strong>, <strong>পরে implementation</strong>, মাঝে <code>with</code>। Exam যেসব ভুল রূপ দেখায়: <code>provides Impl with Interface</code>, <code>provides Interface by Impl</code>, <code>provides Interface using Impl</code>। কেবল <code>with</code>-ই অস্তিত্বশীল।</p>
+  </div>
+
+  <h3>Directive ও service রিভিউ</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Artifact</th><th>Service-এর অংশ?</th><th>যেসব directive লাগে</th></tr>
+      <tr><td>Service provider interface</td><td class="yes">হ্যাঁ</td><td><code>exports</code></td></tr>
+      <tr><td>Service provider</td><td class="no">না</td><td><code>requires</code><br><code>provides</code></td></tr>
+      <tr><td>Service locator</td><td class="yes">হ্যাঁ</td><td><code>exports</code><br><code>requires</code><br><code>uses</code></td></tr>
+      <tr><td>Consumer</td><td class="no">না</td><td><code>requires</code></td></tr>
+    </table>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Directive</th><th>বর্ণনা</th></tr>
+      <tr><td><code>exports package;</code><br><code>exports package to module;</code></td><td>Package-কে module-এর বাইরে available করে</td></tr>
+      <tr><td><code>requires module;</code><br><code>requires transitive module;</code></td><td>অন্য module-কে dependency হিসেবে নির্দিষ্ট করে</td></tr>
+      <tr><td><code>opens package;</code><br><code>opens package to module;</code></td><td>Reflection-এর মাধ্যমে package ব্যবহারের অনুমতি দেয়</td></tr>
+      <tr><td><code>provides serviceInterface with implName;</code></td><td>Service available করে</td></tr>
+      <tr><td><code>uses serviceInterface;</code></td><td>Service reference করে</td></tr>
+    </table>
+  </div>
+
+  <div class="card remember">
+    <span class="card-label">★ REMEMBER</span>
+    <p><strong>কোনো module-ই service provider-এর উপর <code>requires</code> দেয় না।</strong> Provider হলো implementation, যা runtime-এ আবিষ্কৃত হয়। Consumer এবং service locator — দুজনেই <em>service provider interface</em> module-কে requires করে।</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 6 ============ -->
+<section class="section" id="s6">
+  <div class="sec-num">Section 06</div>
+  <h2>Module আবিষ্কার করা (Discovering)</h2>
+
+  <p>এই command গুলোর output মুখস্থ করার <em>দরকার নেই</em>। কিন্তু command-এর syntax এবং সেগুলো কী করে — তা <em>জানতেই হবে</em>।</p>
+
+  <h3>Built-in module চেনা</h3>
+  <p><code>java.base</code>-এ exam-এর প্রায় সব package আছে। <code>requires java.base</code> কখনোই লিখতে হয় না — এটি সব modular application-এ স্বয়ংক্রিয়ভাবে available। স্পষ্ট করে লিখলেও ফাইল compile হবে, তবে সেটা redundant, তাই বাদ দেওয়াই ভালো। ব্যাপারটা class-এ <code>java.lang</code> স্বয়ংক্রিয়ভাবে import হওয়ার মতোই।</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Module name</th><th>কী থাকে</th><th>বইয়ে কভারেজ</th></tr>
+      <tr><td><code>java.base</code></td><td>Collections, math, IO, NIO.2, concurrency ইত্যাদি</td><td>বইয়ের বেশিরভাগ অংশ</td></tr>
+      <tr><td><code>java.desktop</code></td><td>AWT ও Swing</td><td>নাম ছাড়া exam-এ নেই</td></tr>
+      <tr><td><code>java.logging</code></td><td>Logging</td><td>নাম ছাড়া exam-এ নেই</td></tr>
+      <tr><td><code>java.sql</code></td><td>JDBC</td><td>নাম ছাড়া exam-এ নেই</td></tr>
+      <tr><td><code>java.xml</code></td><td>XML</td><td>নাম ছাড়া exam-এ নেই</td></tr>
+    </table>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <ul>
+      <li><code>java</code> দিয়ে শুরু হওয়া module গুলো আপনার ব্যবহার করার মতো API; <code>jdk</code> দিয়ে শুরু হওয়াগুলো JDK-নির্দিষ্ট। প্রায় ২০টি <code>java.*</code> এবং প্রায় ৩০টি <code>jdk.*</code> module আছে।</li>
+      <li><code>java.util</code> একটি <span class="no">package</span>, module নয়। <code>jdk.base</code> বলে কিছু নেই — module-টির নাম <code>java.base</code>।</li>
+      <li>তালিকা মুখস্থ করতে হবে না, কিন্তু বানানো নামের ভিড় থেকে আসল module name চিনতে পারতে হবে।</li>
+    </ul>
+  </div>
+
+  <h3>Module describe করা</h3>
+  <p>নিচের দুটি command সমতুল্য:</p>
+<pre><code>java -p mods -d zoo.animal.feeding
+java -p mods --describe-module zoo.animal.feeding</code></pre>
+<pre><code>zoo.animal.feeding file:///absolutePath/mods/zoo.animal.feeding.jar
+exports zoo.animal.feeding
+requires java.base mandated</code></pre>
+  <ul class="trace">
+    <li>Declaration-এ কোনো requires না থাকলেও <code>requires java.base mandated</code> দেখা যায় — <code>java.base</code> প্রতিটি module-এ স্বয়ংক্রিয়ভাবে যুক্ত হয়। <strong><code>mandated</code> শব্দটি শেষে বসে।</strong></li>
+    <li>Qualified export দেখায় এভাবে: <code>qualified exports zoo.animal.care.medical to zoo.staff</code>।</li>
+    <li><code>contains zoo.animal.care.details</code> মানে module-এ এমন একটি package আছে যা <strong>একেবারেই export করা হয়নি</strong>।</li>
+  </ul>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p><code>-d</code> command ভেদে <strong>দুই রকম অর্থ</strong> বহন করে:</p>
+    <ul>
+      <li><code>javac -d &lt;dir&gt;</code> — class ফাইলের output directory।</li>
+      <li><code>java -d &lt;module&gt;</code> — <code>--describe-module</code>-এর short form।</li>
+      <li><code>jar -d</code> — এটিও <code>--describe-module</code>।</li>
+    </ul>
+  </div>
+
+  <h3>Module তালিকা ও resolution দেখা</h3>
+<pre><code>java --list-modules              <span class="cm">// ~70 lines: java.base@21, java.compiler@21, ...</span>
+java -p mods --list-modules      <span class="cm">// custom module ও তাদের path যোগ হয়</span>
+
+java --show-module-resolution
+   -p feeding
+   -m zoo.animal.feeding/zoo.animal.feeding.Task</code></pre>
+  <div class="vs-grid">
+    <div class="left">
+      <h4>--list-modules</h4>
+      <ul>
+        <li>Observable module-এর তালিকা দেখায়</li>
+        <li>প্রিন্ট করেই <strong>বেরিয়ে যায়</strong> — program <span class="no">রান করে না</span></li>
+        <li>JDK module-এ version (<code>@21</code>), custom module-এ file path</li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>--show-module-resolution</h4>
+      <ul>
+        <li>Module resolution-এর debugging view</li>
+        <li>প্রচুর output দেয়, <strong>তারপর program রান করে</strong> (শেষে <code>All fed!</code>)</li>
+        <li>শুরুতে <em>root</em> module দেখায়</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>jar দিয়ে describe</h3>
+<pre><code>jar -f mods/zoo.animal.feeding.jar -d
+jar --file mods/zoo.animal.feeding.jar --describe-module</code></pre>
+  <p>Output-এর একমাত্র পার্থক্য — JAR সংস্করণে filename-এ <code>module-info.class</code> যুক্ত থাকে। Exam-এর জন্য যা জরুরি: <strong><code>java</code> ও <code>jar</code> দুটোই module describe করতে পারে।</strong></p>
+
+  <h3>jdeps — dependency জানা</h3>
+  <p>Describe-এর বিপরীতে <code>jdeps</code> module declaration-এর পাশাপাশি <strong>আসল code</strong>-ও দেখে, তাই কোন dependency আসলে <em>ব্যবহৃত</em> হচ্ছে তা বলে দেয়, শুধু ঘোষিত নয়। যেসব প্রজেক্ট এখনো modularize হয়নি, তাদের জন্য এটাই টুল।</p>
+<pre><code><span class="cm">// Animatronic.java  — note: no module-info.java exists here</span>
+<span class="kw">package</span> zoo.dinos;
+<span class="kw">import</span> java.time.*;
+<span class="kw">import</span> java.util.*;
+<span class="kw">import</span> sun.misc.Unsafe;
+
+<span class="kw">public class</span> Animatronic {
+   <span class="kw">private</span> List&lt;String&gt; names;
+   <span class="kw">private</span> LocalDate visitDate;
+   ...
+   <span class="kw">public void</span> unsafeMethod() {
+      Unsafe unsafe = Unsafe.getUnsafe();
+   }
+}</code></pre>
+<pre><code>jdeps zoo.dino.jar
+
+zoo.dino.jar -> java.base
+zoo.dino.jar -> jdk.unsupported
+   zoo.dinos -> java.lang   java.base
+   zoo.dinos -> java.time   java.base
+   zoo.dinos -> java.util   java.base
+   zoo.dinos -> sun.misc    JDK internal API (jdk.unsupported)
+
+jdeps -s zoo.dino.jar          <span class="cm">// summary: only the module lines</span>
+jdeps -summary zoo.dino.jar    <span class="cm">// equivalent</span>
+
+jdeps --jdk-internals zoo.dino.jar
+jdeps -jdkinternals zoo.dino.jar   <span class="cm">// equivalent</span></code></pre>
+  <ul class="trace">
+    <li>Output-এ <code>java.base</code> সবসময় থাকে।</li>
+    <li><code>--jdk-internals</code> দেখায় কোন class internal API কল করছে, সাথে suggested replacement-এর একটি table।</li>
+    <li><code>jdk.unsupported</code> প্রকাশিত module তালিকায় <strong>নেই</strong> — এতে internal library আছে যা ব্যবহার করা উচিত নয়, ভবিষ্যতে হারিয়ে যেতে পারে।</li>
+    <li><code>jdeps</code>-এর <code>--module-path</code> option-এর <strong>কোনো short form নেই</strong>, অন্য command-এর মতো নয়।</li>
+  </ul>
+
+  <h3>jmod</h3>
+  <p>Oracle বেশিরভাগ module-এর জন্য JAR ফাইল সুপারিশ করে। <strong>JMOD ফাইল শুধু তখনই সুপারিশ করা হয় যখন native library</strong> বা এমন কিছু থাকে যা JAR-এ রাখা যায় না। মনে রাখার মূল কথা: <code>jmod</code> শুধু JMOD ফাইল নিয়ে কাজ করে।</p>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Operation</th><th>বর্ণনা</th></tr>
+      <tr><td><code>create</code></td><td>JMOD ফাইল তৈরি করে</td></tr>
+      <tr><td><code>extract</code></td><td>JMOD থেকে সব ফাইল বের করে; unzip-এর মতো কাজ করে</td></tr>
+      <tr><td><code>describe</code></td><td><code>requires</code>-সহ module-এর বিস্তারিত প্রিন্ট করে</td></tr>
+      <tr><td><code>list</code></td><td>JMOD ফাইলের সব ফাইল তালিকাভুক্ত করে</td></tr>
+      <tr><td><code>hash</code></td><td>Hash প্রিন্ট বা রেকর্ড করে</td></tr>
+    </table>
+  </div>
+
+  <h3>jlink ও jpackage</h3>
+<pre><code>jlink --module-path mods --add-modules zoo.animal.talks --output zooApp</code></pre>
+  <p>এটি তৈরি করে <strong>runtime image</strong>: একটি <em>folder</em> যাতে থাকে <code>bin</code>, <code>conf</code>, <code>include</code>, <code>legal</code>, <code>lib</code>, <code>man</code> এবং একটি <code>release</code> ফাইল — zip করলে প্রায় ১৫ MB, যেখানে পুরো JDK ১৫০ MB+। এটি একক "image file" <strong>নয়</strong>।</p>
+<pre><code>jpackage --name feedingTask --module-path mods
+   --module zoo.animal.feeding/zoo.animal.feeding.Task</code></pre>
+  <p>এটি তৈরি করে <strong>application image</strong>: নির্দিষ্ট platform-এর জন্য একটি একক executable (Windows-এ <code>.exe</code>, Mac-এ <code>.dmg</code> — এখানে <code>feedingTask-1.0.dmg</code>)। Non-modular JAR-এর জন্য:</p>
+<pre><code>jpackage --name myApp --input myDir --main-class com.wiley.java.Cat
+   --main-jar myApp.jar</code></pre>
+
+  <div class="vs-grid">
+    <div class="left">
+      <h4>jlink</h4>
+      <ul>
+        <li>Output: runtime image = একটি <strong>directory</strong></li>
+        <li>শুধু <strong>modular application</strong></li>
+        <li><code>-p</code>/<code>--module-path</code>, <code>--add-modules</code>, <code>--output</code></li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>jpackage</h4>
+      <ul>
+        <li>Output: application image = একক <strong>executable</strong></li>
+        <li><strong>Modular ও non-modular</strong> — দুটোই</li>
+        <li><code>-n</code>/<code>--name</code>, <code>-i</code>/<code>--input</code>, <code>--main-class</code>, <code>--main-jar</code>, <code>--app-version</code> (default 1.0)</li>
+      </ul>
+    </div>
+  </div>
+  <p>দুটোই Java-র প্রয়োজনীয় অংশ সরবরাহ করে, এবং দুটোর ক্ষেত্রেই target system-এ <strong>আগে থেকে JDK ইনস্টল থাকার দরকার নেই</strong>।</p>
+
+  <div class="card remember">
+    <span class="card-label">★ REMEMBER</span>
+    <p><code>jimage</code> ব্যবহৃত হয় Java image ফাইল <em>পরিদর্শন</em> করতে — এটি image তৈরি করে না। "কোনটি <code>.exe</code> বানায় আর কোনটি directory?" প্রশ্নের উত্তর <strong>jpackage এবং jlink</strong>।</p>
+  </div>
+
+  <h3>Command-line option রিভিউ</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>বর্ণনা</th><th>Syntax</th></tr>
+      <tr><td>Nonmodular code compile</td><td><code>javac -cp classpath -d directory classesToCompile</code><br><code>javac --class-path ...</code> · <code>javac -classpath ...</code></td></tr>
+      <tr><td>Nonmodular code run</td><td><code>java -cp classpath package.className</code><br><code>java -classpath ...</code> · <code>java --class-path ...</code></td></tr>
+      <tr><td>Module compile</td><td><code>javac -p moduleFolderName -d directory classesToCompileIncludingModuleInfo</code><br><code>javac --module-path ...</code></td></tr>
+      <tr><td>Module run</td><td><code>java -p moduleFolderName -m moduleName/package.className</code><br><code>java --module-path ... --module ...</code></td></tr>
+      <tr><td>Module describe</td><td><code>java -p moduleFolderName -d moduleName</code><br><code>java --module-path ... --describe-module moduleName</code><br><code>jar -f jarName -d</code> · <code>jar --file jarName --describe-module</code></td></tr>
+      <tr><td>Available module তালিকা</td><td><code>java --list-modules</code><br><code>java -p moduleFolderName --list-modules</code></td></tr>
+      <tr><td>Dependency দেখা</td><td><code>jdeps -s --module-path moduleFolderName jarName</code><br><code>jdeps -summary ...</code> · <code>jdeps --jdk-internals jarName</code> · <code>jdeps -jdkinternals jarName</code></td></tr>
+      <tr><td>Module resolution দেখানো</td><td><code>java --show-module-resolution -p moduleFolderName -m moduleName</code></td></tr>
+      <tr><td>Runtime image তৈরি</td><td><code>jlink -p moduleFolderName --add-modules moduleName --output zooApp</code></td></tr>
+      <tr><td>Self-contained application তৈরি</td><td><code>jpackage -n name -p moduleFolderName -m moduleName/package.className</code><br><code>jpackage -n myApp -i myDir --main-class package.className --main-jar appJar.jar</code></td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============ SECTION 7 ============ -->
+<section class="section" id="s7">
+  <div class="sec-num">Section 07</div>
+  <h2>Module-এর প্রকারভেদ তুলনা</h2>
+
+  <h3>Named module</h3>
+  <p><strong>Named module</strong>-এ JAR-এর root-এ package-গুলোর পাশে একটি <code>module-info.java</code> ফাইল থাকে, এবং এটি থাকে <strong>module path</strong>-এ। আলাদা করে কিছু না বললে যেকোনো module-ই named module। মনে রাখার কৌশল: named module-এর <em>নাম</em> থাকে <code>module-info.java</code>-র ভেতরে, আর নিজে থাকে module path-এ।</p>
+  <div class="card remember">
+    <span class="card-label">★ REMEMBER</span>
+    <p>অধ্যায় ৭ থেকে: <code>sealed</code> class-এর subclass ভিন্ন package-এ রাখার একমাত্র উপায় হলো একই <strong>named module</strong>-এর ভেতরে থাকা।</p>
+  </div>
+
+  <h3>Automatic module</h3>
+  <p><strong>Automatic module</strong> module path-এ থাকে কিন্তু এতে <code>module-info.java</code> <strong>থাকে না</strong> — একটি সাধারণ JAR-কে module path-এ রাখলে সেটি module হিসেবে গণ্য হয়। Java নিজেই module name ঠিক করে নেয়, এবং একে reference করা code এমনভাবে আচরণ করে যেন <code>module-info.java</code> উপস্থিত। এটি <strong>স্বয়ংক্রিয়ভাবে সব package export করে</strong>।</p>
+
+  <p>Library লেখকদের উৎসাহিত করা হয়েছিল <code>META-INF/MANIFEST.MF</code>-এ <code>Automatic-Module-Name</code> property দিয়ে তাদের ইচ্ছাকৃত module name ঘোষণা করতে। Manifest হলো colon দিয়ে আলাদা করা key/value জোড়ার একটি text ফাইল; Java 21-এর default:</p>
+<pre><code>Manifest-Version: 1.0
+Created-By: 21 (Oracle Corporation)</code></pre>
+
+  <div class="rules-box">
+    <h4>Automatic module name নির্ধারণের algorithm</h4>
+    <ol>
+      <li><code>MANIFEST.MF</code>-এ <code>Automatic-Module-Name</code> থাকলে <strong>সেটাই ব্যবহার হবে</strong>, এখানেই শেষ।</li>
+      <li>JAR নাম থেকে file extension সরান।</li>
+      <li>নামের শেষ থেকে version information সরান। Version মানে digit ও dot, শেষে বাড়তি তথ্য থাকতে পারে — যেমন <code>-1.0.0</code> বা <code>-1.0-RC</code>।</li>
+      <li>অবশিষ্ট যেসব character letter বা number নয়, সেগুলো dot দিয়ে প্রতিস্থাপন করুন।</li>
+      <li>পরপর একাধিক dot-কে একটি dot বানান।</li>
+      <li>ফলাফলের প্রথম বা শেষ character dot হলে সেটি সরিয়ে ফেলুন।</li>
+    </ol>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>#</th><th>বর্ণনা</th><th>Example 1</th><th>Example 2</th></tr>
+      <tr><td>1</td><td>শুরুর JAR নাম</td><td><code>commons2-x-1.0.0-SNAPSHOT.jar</code></td><td><code>mod_$-1.0.jar</code></td></tr>
+      <tr><td>2</td><td>File extension সরানো</td><td><code>commons2-x-1.0.0-SNAPSHOT</code></td><td><code>mod_$-1.0</code></td></tr>
+      <tr><td>3</td><td>Version information সরানো</td><td><code>commons2-x</code></td><td><code>mod_$</code></td></tr>
+      <tr><td>4</td><td>Special character প্রতিস্থাপন</td><td><code>commons2.x</code></td><td><code>mod..</code></td></tr>
+      <tr><td>5</td><td>পরপর dot প্রতিস্থাপন</td><td><code>commons2.x</code></td><td><code>mod.</code></td></tr>
+      <tr><td>6</td><td>শুরু/শেষের dot সরানো</td><td><code>commons2.x</code></td><td><code>mod</code></td></tr>
+    </table>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <ul>
+      <li><code>emily-1.0.0.jar</code> → <code>emily</code> · <code>emily-1.0.0-SNAPSHOT.jar</code> → <code>emily</code> (শেষের tag version-এর সাথেই চলে যায়)।</li>
+      <li><code>emily_the_cat-1.0.0.jar</code> → <code>emily.the.cat</code>। Underscore হয় <strong>dot</strong>, dash নয় — আর module name-এ dash কখনোই allowed নয়।</li>
+      <li><code>emily.$.jar</code> → <code>emily</code>। <code>$</code> হয় dot, ফলে <code>emily..</code>, তা সংকুচিত হয়ে <code>emily.</code>, শেষে trailing dot সরে যায়।</li>
+    </ul>
+  </div>
+
+  <h3>Unnamed module</h3>
+  <p><strong>Unnamed module</strong> থাকে <strong>classpath</strong>-এ। Automatic module-এর মতোই এটি সাধারণ JAR; পার্থক্য হলো এটি module path-এ নয়, classpath-এ। তাই একে পুরোনো code এবং module-এর তুলনায় দ্বিতীয় শ্রেণির নাগরিক হিসেবে ধরা হয়। সাধারণত এতে <code>module-info.java</code> থাকে না; <strong>যদি থেকেও যায়, সেটি উপেক্ষা করা হয়</strong>, কারণ এটি classpath-এ আছে। Unnamed module named module-কে কোনো package export করে না, তবে classpath বা module path-এর যেকোনো JAR পড়তে পারে।</p>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ KEY RULE</span>
+    <p><strong>Classpath-এর code module path access করতে পারে।</strong> কিন্তু <strong>module path-এর code classpath থেকে পড়তে পারে না।</strong> এই একটিমাত্র অসমতা exam-এর অনেক প্রশ্নের উত্তর দিয়ে দেয়।</p>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Property</th><th>Named</th><th>Automatic</th><th>Unnamed</th></tr>
+      <tr><td><code>module-info.java</code> ফাইল থাকে?</td><td class="yes">হ্যাঁ</td><td class="no">না</td><td>থাকলেও উপেক্ষিত</td></tr>
+      <tr><td><strong>Named</strong> module-এ কোন package export করে?</td><td><code>module-info.java</code>-তে যেগুলো আছে</td><td>সব package</td><td class="no">কোনোটিই না</td></tr>
+      <tr><td><strong>Automatic</strong> module-এ কোন package export করে?</td><td><code>module-info.java</code>-তে যেগুলো আছে</td><td>সব package</td><td>সব package</td></tr>
+      <tr><td><strong>Module path</strong>-এর অন্য module পড়তে পারে?</td><td class="yes">হ্যাঁ</td><td class="yes">হ্যাঁ</td><td class="no">না</td></tr>
+      <tr><td><strong>Classpath</strong>-এর অন্য JAR পড়তে পারে?</td><td class="yes">হ্যাঁ</td><td class="yes">হ্যাঁ</td><td class="yes">হ্যাঁ</td></tr>
+    </table>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p>২য় ও ৩য় সারির অসমতা খেয়াল করুন: unnamed module named module-কে <strong>কোনো</strong> package export করে না, কিন্তু automatic module-কে <strong>সব</strong> package export করে। আর automatic module সবসময় সবাইকে সবকিছু export করে।</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 8 ============ -->
+<section class="section" id="s8">
+  <div class="sec-num">Section 08</div>
+  <h2>Application Migration</h2>
+
+  <h3>ক্রম নির্ধারণ (Determining the order)</h3>
+  <p>প্রজেক্টগুলোর মধ্যে dependency একটি graph তৈরি করে। তীর যায় <strong>যে প্রজেক্ট dependency চায় তার থেকে</strong> <strong>যে প্রজেক্ট সেটা সরবরাহ করে তার দিকে</strong> — module-এর ভাষায়, <code>requires</code> থেকে <code>exports</code>-এর দিকে। যেসব প্রজেক্টের <strong>কোনো dependency নেই তারা নিচে</strong>; যারা অন্যের উপর নির্ভরশীল তারা উপরে। দুটি প্রজেক্টের মাঝে তীর না থাকলে যেকোনো ক্রমই চলে।</p>
+
+  <div class="vs-grid">
+    <div class="left">
+      <h4>Bottom-up migration</h4>
+      <ol>
+        <li>এখনো migrate হয়নি এমন সবচেয়ে নিচের প্রজেক্ট বেছে নিন।</li>
+        <li><code>module-info.java</code> যোগ করুন — উপরের JAR যেসব package ব্যবহার করে তাদের <code>exports</code>, আর নিজের dependency-র জন্য <code>requires</code>।</li>
+        <li>ওই named module-কে classpath থেকে module path-এ সরান।</li>
+        <li>যেগুলো এখনো migrate হয়নি সেগুলো classpath-এ unnamed module হিসেবেই থাকুক।</li>
+        <li>পরের নিচের প্রজেক্ট নিয়ে পুনরাবৃত্তি করুন।</li>
+      </ol>
+      <p style="font-size:.93rem;margin-top:8px">উপযুক্ত যখন আপনি প্রতিটি JAR নিজে convert <strong>করতে পারেন</strong>। মাঝপথে মিশ্রণ: named + unnamed।</p>
+    </div>
+    <div class="right">
+      <h4>Top-down migration</h4>
+      <ol>
+        <li><strong>সব</strong> প্রজেক্ট module path-এ রাখুন।</li>
+        <li>এখনো migrate হয়নি এমন সবচেয়ে উপরের প্রজেক্ট বেছে নিন।</li>
+        <li><code>module-info.java</code> যোগ করে ওই automatic module-কে named module বানান; <code>requires</code>-এ অন্যদের <strong>automatic module name</strong> ব্যবহার করুন।</li>
+        <li>পরের উপরের প্রজেক্ট নিয়ে পুনরাবৃত্তি করুন।</li>
+      </ol>
+      <p style="font-size:.93rem;margin-top:8px">উপযুক্ত যখন প্রতিটি JAR আপনার <strong>নিয়ন্ত্রণে নেই</strong>। মাঝপথে মিশ্রণ: named + automatic।</p>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Category</th><th>Bottom-Up</th><th>Top-Down</th></tr>
+      <tr><td>যে প্রজেক্ট সবার উপর নির্ভরশীল</td><td>Classpath-এ unnamed module</td><td>Module path-এ named module</td></tr>
+      <tr><td>যে প্রজেক্টের কোনো dependency নেই</td><td>Module path-এ named module</td><td>Module path-এ automatic module</td></tr>
+    </table>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p>"Top-down migration-এ named module ছাড়া বাকি সব module হলো ______ এবং থাকে ______-এ।" → <strong>automatic, module path</strong>। Top-down শুরুই হয় <em>সবকিছু</em> module path-এ রেখে, তাই classpath-এ কিছুই থাকে না।</p>
+  </div>
+
+  <h3>বড় প্রজেক্ট module-এ ভাগ করা</h3>
+  <p>Package গুলোকে যৌক্তিক গ্রুপে ভাগ করে dependency আঁকুন। Package-এর চেয়ে module সাধারণত কম হয়, কারণ কিছু package একই module ভাগ করে নেয়। JPMS <strong>cyclic dependency অনুমোদন করে না</strong>: <code>zoo.tickets.delivery</code> যদি <code>zoo.tickets.discount</code>-কে requires করে, তবে <code>zoo.tickets.discount</code> আর <code>zoo.tickets.delivery</code>-কে requires করতে পারবে না। প্রচলিত সমাধান হলো — শেয়ার করা code নিয়ে <strong>নতুন একটি module তৈরি করা</strong>, যাতে চক্রটি ভেঙে যায়।</p>
+
+  <h3>Cyclic dependency-তে compile ব্যর্থ হওয়া</h3>
+<pre><code><span class="cm">// Butterfly.java</span>
+<span class="kw">package</span> zoo.butterfly;
+<span class="kw">public class</span> Butterfly {
+   <span class="kw">private</span> Caterpillar caterpillar;
+}
+<span class="cm">// module-info.java</span>
+<span class="kw">module</span> zoo.butterfly {
+   <span class="kw">exports</span> zoo.butterfly;
+   <span class="kw">requires</span> zoo.caterpillar;
+}
+
+<span class="cm">// Caterpillar.java</span>
+<span class="kw">package</span> zoo.caterpillar;
+<span class="kw">public class</span> Caterpillar {
+   Butterfly emergeCocoon() { <span class="cm">// logic omitted</span> }
+}
+<span class="cm">// module-info.java</span>
+<span class="kw">module</span> zoo.caterpillar {
+   <span class="kw">exports</span> zoo.caterpillar;
+   <span class="err">requires</span> zoo.butterfly;   <span class="cm">// stalemate — neither module can be compiled</span>
+}</code></pre>
+  <ul class="trace">
+    <li><code>zoo.caterpillar</code> তৈরি না হওয়া পর্যন্ত <code>zoo.butterfly</code> compile হবে না।</li>
+    <li><code>zoo.butterfly</code> তৈরি না হওয়া পর্যন্ত <code>zoo.caterpillar</code> compile হবে না।</li>
+    <li>ফলে কোনোটিই কখনো compile হবে না। Module system compile-time-এই cyclic dependency আটকে দেয় — এটি bug নয়, feature।</li>
+    <li>তিনটি module-এও একই নিয়ম: <code>ballA</code> requires <code>ballB</code>, <code>ballB</code> requires <code>ballC</code> হলে <code>ballC</code> আর <code>ballA</code>-কে requires করতে <span class="no">পারবে না</span>।</li>
+  </ul>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ KEY RULE</span>
+    <p>একই module-এর <strong>package গুলোর মধ্যে</strong> cyclic dependency Java <strong>অনুমোদন করে</strong>। নিষেধ শুধু <strong>module-এর মধ্যে</strong> চক্রে। একটি cyclic dependency-তে <strong>অন্তত দুটি</strong> <code>requires</code> statement লাগে, এবং দুই <em>বা তার বেশি</em> module জড়িত থাকতে পারে।</p>
+  </div>
+</section>
+
+<!-- ============ RECAP ============ -->
+<section class="recap" id="recap">
+  <h2>সংক্ষিপ্ত রিভিউ</h2>
+
+  <h4>Modules-এর পরিচয়</h4>
+  <ul>
+    <li>JPMS = module JAR-এর format + JDK-র partitioning + বাড়তি command-line option; এটি JAR hell সমাধান করে।</li>
+    <li>Module = এক বা একাধিক package + module-এর root-এ <code>module-info.java</code>।</li>
+  </ul>
+
+  <h4>তৈরি ও চালানো</h4>
+  <ul>
+    <li><code>javac -p mods -d outDir files… module-info.java</code>; <code>java -p mods -m moduleName/package.ClassName</code>; <code>jar -cvf mods/x.jar -C dir/ .</code></li>
+    <li>Module ও class-এর মাঝে একটি slash; বাকি সব জায়গায় dot। Module name-এ dot চলে, dash কখনোই নয়।</li>
+  </ul>
+
+  <h4>Directives</h4>
+  <ul>
+    <li><code>exports</code> (চাইলে <code>to</code>), <code>requires</code> / <code>requires transitive</code>, <code>opens</code> (চাইলে <code>to</code>), <code>provides … with …</code>, <code>uses</code>। যেকোনো ক্রমে।</li>
+    <li>একই module দুটি <code>requires</code> clause-এ থাকলে compile হয় না; <code>open module</code> + <code>opens</code> একসাথেও compile হয় না।</li>
+    <li>Package export না করলে <code>public</code>-ও module-এর বাইরে পৌঁছায় না।</li>
+  </ul>
+
+  <h4>Services</h4>
+  <ul>
+    <li>Service = service provider interface + service locator। Service <em>provider</em> (implementation) ও consumer service-এর অংশ <strong>নয়</strong>।</li>
+    <li>SPI: <code>exports</code>। Locator: <code>exports</code>, <code>requires</code>, <code>uses</code>। Provider: <code>requires</code>, <code>provides</code>। Consumer: <code>requires</code>।</li>
+    <li><code>ServiceLoader.load()</code> iterable; <code>stream()</code> দেয় <code>Stream&lt;Provider&lt;S&gt;&gt;</code>, তাই <code>.map(Provider::get)</code> লাগে।</li>
+  </ul>
+
+  <h4>Module আবিষ্কার</h4>
+  <ul>
+    <li><code>java -d</code> / <code>--describe-module</code>, <code>--list-modules</code> (রান করে না), <code>--show-module-resolution</code> (রান করে), <code>jar -f x.jar -d</code>।</li>
+    <li><code>jdeps</code> (<code>-s</code>/<code>-summary</code>, <code>--jdk-internals</code>/<code>-jdkinternals</code>); JMOD ফাইলের জন্য <code>jmod</code>; <code>jlink</code> → directory; <code>jpackage</code> → executable।</li>
+    <li>প্রতিটি module-এর describe output-এ <code>requires java.base mandated</code> দেখা যায়।</li>
+  </ul>
+
+  <h4>Module-এর প্রকার</h4>
+  <ul>
+    <li>Named = module-info + module path। Automatic = module-info নেই + module path, সব export করে। Unnamed = classpath, named module-কে কিছুই export করে না।</li>
+    <li>Automatic module name: manifest আগে; না থাকলে extension ও version বাদ, special character → dot, dot সংকোচন, প্রান্তের dot ছাঁটাই।</li>
+  </ul>
+
+  <h4>Migration</h4>
+  <ul>
+    <li>Bottom-up: নিচ থেকে শুরু, বাকিরা classpath-এ unnamed। Top-down: আগে সব module path-এ, বাকিরা automatic।</li>
+    <li>Module-এর মধ্যে চক্র কখনো compile হয় না; একই module-এর package-এর মধ্যে চক্র ঠিক আছে।</li>
+  </ul>
+</section>
+
+<!-- ============ CHEAT SHEET ============ -->
+<section class="section" id="cheat">
+  <div class="sec-num">Cheat Sheet</div>
+  <h2>Exam Traps চিট-শিট</h2>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>পরিস্থিতি</th><th>কী টেস্ট হয়</th><th>রায়</th></tr>
+      <tr><td><code>class dragon { exports com.dragon.fire; }</code></td><td>Declaration-এ <code>module</code> keyword লাগে</td><td class="no">Compile হয় না</td></tr>
+      <tr><td><code>module-info.java</code> রাখা হয়েছে <code>zoo/staff</code>-এর ভেতরে</td><td>এটি module-এর root-এ থাকতে হবে</td><td class="no">বৈধ module নয়</td></tr>
+      <tr><td><code>module zoo-staff { }</code></td><td>Module name-এ dash অবৈধ</td><td class="no">Compile হয় না</td></tr>
+      <tr><td><code>module com.food.supplier {}</code> — এর <code>main()</code> চলবে?</td><td>Export অন্য module-এর জন্য, launcher-এর জন্য নয়</td><td class="yes">হ্যাঁ, চলবে</td></tr>
+      <tr><td>একই module <code>requires</code> ও <code>requires transitive</code>-এ</td><td>Duplicate requires; error দ্বিতীয় line-এ</td><td class="no">Compile হয় না</td></tr>
+      <tr><td><code>open module X { opens pkg; }</code></td><td><code>open</code> modifier থাকলে <code>opens</code> নিষিদ্ধ</td><td class="no">Compile হয় না</td></tr>
+      <tr><td><code>export animal.behavior;</code> / <code>require animal;</code></td><td>Directive-এর বানান — সবসময় বহুবচন</td><td class="no">এমন directive নেই</td></tr>
+      <tr><td><code>provides magic.Magic with dragon.Dragon;</code></td><td>আগে interface, পরে implementation, keyword <code>with</code></td><td class="yes">সঠিক রূপ</td></tr>
+      <tr><td>কোনো module কি service provider-কে <code>requires</code> করে?</td><td>Provider runtime-এ আবিষ্কৃত হয়</td><td class="no">কোনোটিই না</td></tr>
+      <tr><td>দ্বিতীয় service provider module যোগ করা হলো</td><td>কতগুলো বিদ্যমান module recompile লাগবে</td><td class="yes">শূন্য</td></tr>
+      <tr><td><code>ServiceLoader.load(X.class).stream().toList()</code> কে <code>List&lt;X&gt;</code> ধরা</td><td><code>stream()</code> দেয় <code>Provider</code> object</td><td class="no">Compile হয় না</td></tr>
+      <tr><td><code>ServiceLoader.getStream()</code></td><td>এই method-এর অস্তিত্ব নেই</td><td class="no">Compile হয় না</td></tr>
+      <tr><td><code>java -p x -m zoo.talks/zoo/animal/Peacocks</code></td><td>Class name-এ dot লাগে, slash নয়</td><td class="no">অবৈধ command</td></tr>
+      <tr><td><code>java --module-path x -p n/c</code></td><td>একই option দুবার; <code>-p</code> ≠ <code>-m</code></td><td class="no">অবৈধ command</td></tr>
+      <tr><td><code>java --module-path x-x -m n/c</code></td><td>Folder name-এ dash allowed</td><td class="yes">বৈধ command</td></tr>
+      <tr><td><code>javac -d</code> বনাম <code>java -d</code></td><td>Output directory বনাম <code>--describe-module</code></td><td class="yes">দুটোই বৈধ, অর্থ ভিন্ন</td></tr>
+      <tr><td><code>requires mandated java.base</code></td><td>Describe output-এ শব্দের ক্রম</td><td class="no">হবে <code>requires java.base mandated</code></td></tr>
+      <tr><td><code>java.util</code> / <code>jdk.base</code> module name হিসেবে</td><td>Package বনাম module; আসল বনাম বানানো</td><td class="no">কোনোটিই JDK module নয়</td></tr>
+      <tr><td><code>--list-modules</code> কি program রান করে?</td><td>Observable module প্রিন্ট করেই বেরিয়ে যায়</td><td class="no">না</td></tr>
+      <tr><td><code>emily_the_cat-1.0.0.jar</code> → automatic name</td><td>Underscore হয়ে যায় dot</td><td class="yes"><code>emily.the.cat</code></td></tr>
+      <tr><td><code>emily.$.jar</code> → automatic name</td><td>Dot সংকোচন ও trailing dot অপসারণ</td><td class="yes"><code>emily</code></td></tr>
+      <tr><td><code>module-info.java</code>-সহ JAR classpath-এ রাখা</td><td>Unnamed module ফাইলটি উপেক্ষা করে</td><td class="no">Named module নয়</td></tr>
+      <tr><td>Unnamed module → named module-এ export</td><td>Classpath-এর code module path-এ অদৃশ্য</td><td class="no">কিছুই export করে না</td></tr>
+      <tr><td>Unnamed module → automatic module-এ export</td><td>Automatic module সবকিছু পড়তে পারে</td><td class="yes">সব package</td></tr>
+      <tr><td>Unnamed module-এ <code>requires dog;</code> লেখা</td><td>Unnamed module-এ <code>module-info.java</code> নেই</td><td class="no">প্রযোজ্য নয়</td></tr>
+      <tr><td>দুটি module একে অপরকে requires করছে</td><td>Module-এর মধ্যে cyclic dependency</td><td class="no">Compile হয় না</td></tr>
+      <tr><td>একই module-এর দুটি package একে অপরকে reference করছে</td><td>Module-এর ভেতরে চক্র allowed</td><td class="yes">Compile হয়</td></tr>
+      <tr><td>কোনটি <code>.exe</code> বানায়, কোনটি directory?</td><td><code>jimage</code> শুধু পরিদর্শন করে</td><td class="yes">jpackage, তারপর jlink</td></tr>
+    </table>
+  </div>
+</section>
+
+<footer>OCP Java SE 21 Developer Study Guide · Boyarsky &amp; Selikoff · অধ্যায় ১২ — Modules · বিস্তারিত হ্যান্ডনোট</footer>
+</div>
+</body>
+</html>

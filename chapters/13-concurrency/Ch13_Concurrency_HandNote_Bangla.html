@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 — অধ্যায় ১৩ · Concurrency (বিস্তারিত হ্যান্ডনোট)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6f8;   --card:#ffffff;  --ink:#2f3437;   --muted:#7b8a93;
+  --kw:#7c5cbf;   --str:#3a8a5c;   --num:#b8860b;   --err:#c44d3e;  --cm:#a89a8a;
+  --icode-bg:#f3ece4; --icode-fg:#9a5030;
+  --accent:#c96442; --accent2:#d4845e;
+  --line:#ece3da;
+  --yes:#3b7d57;  --no:#c44d3e;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; padding:28px 16px 70px;
+  background:var(--bg); color:var(--ink);
+  font-family:'Noto Sans Bengali','Source Sans 3',system-ui,sans-serif;
+  font-size:17px; line-height:1.95;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:980px;margin:0 auto;}
+h1,h2,h3,h4{font-family:'Noto Sans Bengali',system-ui,sans-serif;line-height:1.55;}
+p{margin:0 0 14px;}
+ul,ol{margin:0 0 15px;padding-left:22px;}
+li{margin-bottom:8px;}
+code,pre,.mono{font-family:'JetBrains Mono',ui-monospace,monospace;}
+code{background:var(--icode-bg);color:var(--icode-fg);padding:1.5px 6px;border-radius:5px;font-size:.82em;}
+pre{
+  background:#fdfaf7;border-radius:12px;padding:16px 18px;margin:0 0 16px;
+  overflow-x:auto;box-shadow:inset 0 2px 8px rgba(140,110,90,.10);
+  font-size:13.6px;line-height:1.62;
+}
+pre code{background:none;color:#3b3f42;padding:0;font-size:inherit;}
+.kw{color:var(--kw);font-weight:600;} .str{color:var(--str);} .num{color:var(--num);}
+.err{color:var(--err);font-weight:700;} .cm{color:var(--cm);font-style:italic;}
+
+.header{
+  background:linear-gradient(135deg,#ffffff 0%,#fbf7f4 100%);
+  border-radius:18px;padding:34px 32px;margin-bottom:26px;
+  box-shadow:0 6px 26px rgba(120,110,100,.10);
+}
+.badge{
+  display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:700;
+  letter-spacing:.9px;text-transform:uppercase;padding:7px 15px;border-radius:999px;
+  box-shadow:0 3px 10px rgba(201,100,66,.28);
+}
+.header h1{font-size:1.95rem;margin:18px 0 6px;font-weight:800;}
+.header h1 .dim{color:var(--muted);font-weight:400;font-size:1.1rem;}
+.header .sub{font-style:italic;color:var(--muted);margin-bottom:20px;}
+.objectives{
+  background:linear-gradient(135deg,#f0f9f3,#f7fcf8);
+  border-left:4px solid #5aab7b;border-radius:12px;padding:16px 20px;
+}
+.objectives h4{margin:0 0 8px;color:#3b7d57;font-size:.95rem;}
+.objectives ul{margin:0;padding-left:20px;}
+.objectives li{margin-bottom:5px;font-size:.95rem;}
+
+.toc{
+  background:var(--card);border-radius:14px;padding:24px 28px;margin-bottom:30px;
+  box-shadow:0 4px 18px rgba(120,110,100,.08);
+}
+.toc h3{margin:0 0 14px;font-size:1.05rem;color:var(--accent);}
+.toc ol{columns:2;column-gap:34px;margin:0;padding-left:22px;}
+.toc li{margin-bottom:8px;break-inside:avoid;}
+.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted #cfc4b8;}
+.toc a:hover{color:var(--accent);}
+@media(max-width:660px){.toc ol{columns:1;}}
+
+.section{
+  background:var(--card);border-radius:14px;padding:28px 30px;margin-bottom:26px;
+  box-shadow:0 4px 18px rgba(120,110,100,.08);
+}
+.sec-num{
+  font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;
+  letter-spacing:1.6px;color:var(--accent);text-transform:uppercase;
+}
+.section h2{font-size:1.42rem;margin:6px 0 20px;padding-bottom:12px;border-bottom:2px solid var(--line);}
+.section h3{font-size:1.12rem;margin:26px 0 10px;color:#43484c;}
+.section h4{font-size:1rem;margin:20px 0 8px;color:#5a6166;}
+
+.card{
+  border-radius:14px;padding:15px 20px;margin:18px 0;
+  box-shadow:0 3px 12px rgba(120,110,100,.09);
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(120,110,100,.15);}
+.card p:last-child,.card ul:last-child{margin-bottom:0;}
+.card-label{
+  font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+  letter-spacing:1.1px;text-transform:uppercase;margin-bottom:7px;display:block;
+}
+.exam-trap{background:linear-gradient(135deg,#fef2f0,#fff8f7);border-left:4px solid #e06b5e;}
+.exam-trap .card-label{color:#c0453a;}
+.key-rule{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:4px solid #5aab7b;}
+.key-rule .card-label{color:#3b7d57;}
+.remember{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:4px solid #d4a24c;}
+.remember .card-label{color:#a9772a;}
+
+.rules-box{
+  background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-top:4px solid #5aab7b;
+  border-radius:12px;padding:18px 22px;margin:18px 0;
+  box-shadow:0 3px 12px rgba(120,110,100,.08);
+}
+.rules-box h4{margin:0 0 10px;color:#3b7d57;font-size:.95rem;font-weight:700;}
+.rules-box ul,.rules-box ol{margin:0;}
+
+.vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0;}
+.vs-grid > div{
+  background:var(--card);border-radius:12px;padding:16px 18px;
+  box-shadow:0 3px 12px rgba(120,110,100,.10);
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.vs-grid > div:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(120,110,100,.15);}
+.vs-grid h4{margin:0 0 8px;font-size:1rem;}
+.vs-grid .left h4{color:#7c5cbf;}
+.vs-grid .right h4{color:#3b7d57;}
+.vs-grid ul,.vs-grid ol{padding-left:19px;margin:0;font-size:.95rem;}
+@media(max-width:660px){.vs-grid{grid-template-columns:1fr;}}
+
+.tbl-wrap{overflow-x:auto;margin:18px 0;border-radius:12px;box-shadow:0 3px 14px rgba(120,110,100,.10);}
+table{width:100%;border-collapse:collapse;background:var(--card);border-radius:12px;overflow:hidden;font-size:.93rem;}
+th{background:#f0e8de;text-align:left;padding:11px 14px;font-weight:700;color:#4a4038;font-size:.88rem;}
+td{padding:10px 14px;border-top:1px solid #f1eae2;vertical-align:top;}
+tr:hover td{background:#fdfbf9;}
+td code,th code{font-size:.85em;}
+.yes{color:var(--yes);font-weight:700;}
+.no{color:var(--no);font-weight:700;}
+
+.trace{background:#fdfaf7;border-radius:12px;padding:14px 18px 14px 36px;margin:0 0 16px;
+  box-shadow:inset 0 2px 8px rgba(140,110,90,.08);font-size:.96rem;}
+.trace li{margin-bottom:6px;}
+
+.recap{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-radius:14px;padding:28px 30px;
+  margin-bottom:26px;box-shadow:0 4px 18px rgba(120,110,100,.10);}
+.recap h2{font-size:1.4rem;margin:0 0 18px;padding-bottom:12px;border-bottom:2px solid #f0e2c8;}
+.recap h4{color:#a9772a;margin:18px 0 6px;font-size:1rem;}
+.recap ul{margin:0;padding-left:20px;}
+
+footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:34px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="header">
+  <span class="badge">OCP Java SE 21 Developer — Exam 1Z0-830</span>
+  <h1>অধ্যায় ১৩ · Concurrency <span class="dim">(বিস্তারিত হ্যান্ডনোট)</span></h1>
+  <p class="sub">Platform ও virtual thread, Concurrency API, thread-safety, concurrent collection, threading problem এবং parallel stream।</p>
+  <div class="objectives">
+    <h4>এই অধ্যায়ে কভার হওয়া exam objectives</h4>
+    <ul>
+      <li>Platform ও virtual thread তৈরি করা। <code>Runnable</code> ও <code>Callable</code> object ব্যবহার, thread lifecycle পরিচালনা, এবং বিভিন্ন Executor service ও concurrent API দিয়ে task চালানো।</li>
+      <li>Locking mechanism ও concurrent API ব্যবহার করে thread-safe code লেখা।</li>
+      <li>Java collection concurrently প্রসেস করা এবং parallel stream ব্যবহার করা।</li>
+      <li>Sequential ও parallel stream-এ decomposition, concatenation, reduction, grouping ও partitioning করা।</li>
+    </ul>
+  </div>
+</div>
+
+<div class="toc">
+  <h3>সূচিপত্র</h3>
+  <ol>
+    <li><a href="#s1">Threads-এর পরিচয়</a></li>
+    <li><a href="#s2">Concurrency API দিয়ে Thread তৈরি</a></li>
+    <li><a href="#s3">Thread-Safe Code লেখা</a></li>
+    <li><a href="#s4">Concurrent Collection ব্যবহার</a></li>
+    <li><a href="#s5">Threading সমস্যা চিহ্নিত করা</a></li>
+    <li><a href="#s6">Parallel Stream নিয়ে কাজ</a></li>
+    <li><a href="#recap">সংক্ষিপ্ত রিভিউ</a></li>
+    <li><a href="#cheat">Exam Traps চিট-শিট</a></li>
+  </ol>
+</div>
+
+<!-- ============ SECTION 1 ============ -->
+<section class="section" id="s1">
+  <div class="sec-num">Section 01</div>
+  <h2>Threads-এর পরিচয়</h2>
+
+  <h3>মূল পরিভাষা</h3>
+  <p><strong>Thread</strong> হলো execution-এর ক্ষুদ্রতম একক, যা operating system schedule করতে পারে। <strong>Process</strong> হলো পরস্পর সম্পর্কিত thread-এর একটি গ্রুপ যারা একই shared environment-এ চলে — অর্থাৎ তারা একই memory space ভাগ করে এবং সরাসরি একে অপরের সাথে যোগাযোগ করতে পারে। <strong>Task</strong> হলো একটি thread-এর সম্পাদিত একক কাজ; একটি thread একাধিক স্বাধীন task করতে পারে, তবে একসাথে একটি করেই।</p>
+
+  <p>Java process চালায় <strong>platform thread</strong> দিয়ে, যাদের operating system thread-এর সাথে <strong>one-to-one mapping</strong> থাকে। JVM দুই ধরনের platform thread পরিচালনা করে: <strong>system thread</strong> — JVM নিজে তৈরি করে ও background-এ চলে (যেমন garbage collection), এবং <strong>user-defined thread</strong> — application developer তৈরি করে।</p>
+
+  <div class="card remember">
+    <span class="card-label">★ REMEMBER</span>
+    <p>এখানে "shared memory" বলতে বোঝায় <code>static</code> variable এবং thread-এ pass করা instance ও local variable। একটি thread যদি কোনো <code>static</code> variable আপডেট করে, সেই তথ্য process-এর অন্য thread-গুলো সঙ্গে সঙ্গেই পড়তে পারে।</p>
+  </div>
+
+  <h3>Platform thread বনাম virtual thread</h3>
+  <p>Platform thread অনেকটা ব্যক্তিগত butler-এর মতো, যে সবসময় পাশে দাঁড়িয়ে থাকে — CPU-এর ভারী ব্যবহার না হলে এটা অপচয়। <strong>Carrier thread</strong> হলো এক restaurant server-এর মতো, যে অনেক টেবিল সামলায়; টেবিলগুলো হলো <strong>virtual thread</strong>, যারা অনেক কম resource খরচ করে — I/O বা network resource-এর জন্য অপেক্ষা করার ক্ষেত্রে এগুলোই ভালো পছন্দ।</p>
+
+  <div class="vs-grid">
+    <div class="left">
+      <h4>Platform thread</h4>
+      <ul>
+        <li>OS thread-এর সাথে one-to-one</li>
+        <li>Resource intensive — দশ লাখ thread <code>OutOfMemoryError</code> দিতে পারে</li>
+        <li>Priority সেট করা যায় (১–১০)</li>
+        <li>Default-এ non-daemon, তবে পরিবর্তনযোগ্য</li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>Virtual thread</h4>
+      <ul>
+        <li>প্রয়োজনের সময় carrier thread-এ চলে, এবং <strong>প্রতিবার একই carrier thread নাও পেতে পারে</strong></li>
+        <li>হালকা — দশ লাখ thread সহজেই চলে</li>
+        <li>Priority <strong>সবসময় ৫</strong>, পরিবর্তন করা যায় না</li>
+        <li><strong>সবসময়</strong> daemon</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p>নতুন তৈরি <strong>virtual</strong> Thread-এ <code>setPriority()</code> কল করলে <strong>কোনো effect হয় না</strong> — এটি ৫-এই (<code>Thread.NORM_PRIORITY</code>) থাকে। এটি compile error দেয় না, exception-ও ছোড়ে না।</p>
+  </div>
+
+  <h3>Thread concurrency, scheduling ও priority</h3>
+  <p><strong>Concurrency</strong> মানে একাধিক thread ও process একই সময়ে চালানো। <strong>Thread scheduler</strong> ঠিক করে কোন thread চলবে — যেমন <em>round-robin</em> পদ্ধতিতে প্রতিটি thread বৃত্তাকার ক্রমে সমান সংখ্যক CPU cycle পায়। <strong>Context switch</strong> হলো একটি thread-এর বর্তমান state সংরক্ষণ করে পরে তা পুনরুদ্ধার করে execution চালিয়ে যাওয়া; এতে খরচ আছে, তাই scheduler যত কম সম্ভব context switch করার চেষ্টা করে।</p>
+  <p><strong>Thread priority</strong>-র মান ১ (<code>Thread.MIN_PRIORITY</code>) থেকে ১০ (<code>Thread.MAX_PRIORITY</code>), আর ৫ হলো <code>Thread.NORM_PRIORITY</code>। Thread শুরুর আগে <em>অথবা</em> চলাকালীন — দুই সময়েই সেট করা যায়।</p>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ KEY RULE</span>
+    <p>Thread priority <strong>কেবল একটি পরামর্শ</strong>। Thread কোন ক্রমে চলবে JVM তার কোনো নিশ্চয়তা দেয় না। যথেষ্ট resource থাকলে সব thread একসাথেই চলতে পারে।</p>
+  </div>
+
+  <h3>Thread তৈরি করা</h3>
+  <p>Task সংজ্ঞায়িত করার সবচেয়ে প্রচলিত উপায় <code>Runnable</code> interface — কোনো argument নেয় না, কোনো data ফেরত দেয় না:</p>
+<pre><code><span class="kw">@FunctionalInterface public interface</span> Runnable {
+   <span class="kw">void</span> run();
+}</code></pre>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Code</th><th>Type</th><th>বর্ণনা</th></tr>
+      <tr><td><code>var builder = Thread.ofPlatform();</code><br><code>Thread thread = builder.start(runnable);</code></td><td>Platform</td><td>Factory</td></tr>
+      <tr><td><code>var builder = Thread.ofVirtual();</code><br><code>Thread thread = builder.start(runnable);</code></td><td>Virtual</td><td>Factory</td></tr>
+      <tr><td><code>Thread thread = new Thread(runnable);</code><br><code>thread.start();</code></td><td>Platform</td><td>Constructor</td></tr>
+    </table>
+  </div>
+
+  <p>Java 21-এর আগে constructor ব্যবহারই পরামর্শ দেওয়া হতো। Java 21 থেকে <strong>factory method বেশি পছন্দনীয়</strong>, কারণ আপনি কোন ধরনের thread পাচ্ছেন তা স্পষ্ট হয়, আর builder তৈরি হওয়ায় name-এর মতো attribute সেট করা যায়। এখনই চালাতে <code>start()</code>, পরে চালাতে <code>unstarted()</code>:</p>
+<pre><code>Thread t = Thread.ofVirtual().unstarted(task);
+<span class="cm">// Do some other stuff</span>
+t.start();</code></pre>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p><code>Thread</code> বা <code>Runnable</code>-এ <code>start()</code>-এর বদলে <code>run()</code> কল করলে <strong>নতুন কোনো thread শুরু হয় না</strong>। Compile ঠিকই হয়, কিন্তু বর্তমান thread-এই <em>synchronously</em> চলে — যার ফলে অনিরাপদ code-ও নীরবে deterministic হয়ে যায়:</p>
+<pre style="margin:8px 0 0"><code><span class="kw">new</span> Thread(printInventory).run();   <span class="cm">// synchronous — no new thread</span></code></pre>
+  </div>
+
+  <h3>একাধিক thread-এর output অনুমান করা</h3>
+<pre><code><span class="num">12:</span> <span class="kw">public static void</span> main(String[] args) <span class="kw">throws</span> InterruptedException {
+<span class="num">14:</span>    Runnable printInventory = () -&gt; System.out.println(<span class="str">"Printing zoo inventory"</span>);
+<span class="num">16:</span>    Runnable printRecords = () -&gt; {
+<span class="num">17:</span>       <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">3</span>; i++)
+<span class="num">18:</span>          System.out.println(<span class="str">"Printing record: "</span> + i);
+<span class="num">19:</span>    };
+<span class="num">20:</span>    System.out.println(<span class="str">"begin"</span>);
+<span class="num">21:</span>    <span class="kw">var</span> platformThread = Thread.ofPlatform().priority(<span class="num">10</span>).start(printInventory);
+<span class="num">24:</span>    <span class="kw">var</span> virtualThread = Thread.ofVirtual().start(printRecords);
+<span class="num">26:</span>    <span class="kw">var</span> constructorThread = <span class="kw">new</span> Thread(printInventory);
+<span class="num">27:</span>    constructorThread.start();
+<span class="num">28:</span>    System.out.println(<span class="str">"end"</span>);
+<span class="num">29:</span>    platformThread.join();
+<span class="num">30:</span>    virtualThread.join();
+<span class="num">31:</span>    constructorThread.join();
+<span class="num">32:</span> }</code></pre>
+  <ul class="trace">
+    <li>মোট চারটি thread: <code>main()</code> user thread এবং line 21–27-এ তৈরি তিনটি।</li>
+    <li>ক্রম <strong>runtime-এর আগে জানা যায় না</strong> — প্রতিটি নতুন thread একটি <em>asynchronous</em> task, তাই <code>main()</code> ফলাফলের জন্য অপেক্ষা করে না।</li>
+    <li><code>priority(10)</code> কেবল পরামর্শ; এটি ক্রম নিয়ন্ত্রণ করবে ধরে নেওয়া যাবে না।</li>
+    <li>একটি thread-এর <em>ভেতরে</em> ক্রম এখনো linear — <code>for</code> loop ঠিক ক্রমেই চলে, আর <code>begin</code> সবসময় <code>end</code>-এর আগে আসে।</li>
+    <li><code>join()</code> বলে দেয় যে তিনটি thread শেষ হওয়ার আগে <code>main()</code> শেষ হবে না। এটি <code>InterruptedException</code> ছোড়ে, যা <code>main()</code> declare করেছে।</li>
+  </ul>
+
+  <h3>Daemon thread</h3>
+  <p><strong>Daemon thread</strong> program শেষ হলে JVM-কে বেরিয়ে যেতে বাধা দেয় না। যখন কেবল daemon thread-গুলোই চলছে, তখন Java application terminate হয়ে যায়।</p>
+<pre><code><span class="num">10:</span> <span class="kw">var</span> job = Thread.ofPlatform().start(Zoo::pause);   <span class="cm">// user thread</span>
+<span class="cm">// Output: "Main method finished!" ... 10-second wait ... "Thread finished!"</span>
+
+<span class="num">10:</span> <span class="kw">var</span> job = Thread.ofPlatform().daemon(<span class="kw">true</span>).start(Zoo::pause);
+<span class="cm">// Output: "Main method finished!" only — JVM exits without the second line</span></code></pre>
+
+  <h3>Thread-এর জীবনচক্র</h3>
+  <div class="rules-box">
+    <h4>ছয়টি thread state (<code>getState()</code> দিয়ে জানা যায়)</h4>
+    <ul>
+      <li><code>NEW</code> — প্রতিটি thread এখান থেকেই শুরু হয়, <code>start()</code>-এর আগে।</li>
+      <li><code>RUNNABLE</code> — <code>start()</code> কল হওয়ামাত্র। এর মানে thread চলার <em>যোগ্য</em>, ঠিক এই মুহূর্তে চলছেই এমন নয়।</li>
+      <li><code>BLOCKED</code>, <code>WAITING</code>, <code>TIMED_WAITING</code> — <code>RUNNABLE</code> থেকে পৌঁছানো বিরতির state। এখানে CPU resource ব্যবহার হয় না (<code>TIMED_WAITING</code>-এর timer ছাড়া)।</li>
+      <li><code>TERMINATED</code> — কাজ শেষ, অথবা uncaught exception ছোড়া হয়েছে। আর কোনো কাজ হয় না।</li>
+    </ul>
+  </div>
+
+  <p>একটি thread waiting state-এ গেলে অন্য thread তার উপর <code>interrupt()</code> কল করে তাকে আবার <code>RUNNABLE</code>-এ ফেরাতে পারে। যেসব method thread-কে wait করায়, তাদের বেশিরভাগই <code>InterruptedException</code> declare করে।</p>
+<pre><code><span class="kw">var</span> thread = Thread.ofPlatform().start(() -&gt; {
+   <span class="kw">try</span> {
+      Thread.sleep(<span class="num">1000</span>);
+   } <span class="kw">catch</span> (InterruptedException e) {
+      System.out.println(<span class="str">"Interrupted!"</span>);
+   }});
+thread.interrupt();   <span class="cm">// prints Interrupted! and then resumes running</span></code></pre>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p>ইতিমধ্যেই <code>RUNNABLE</code> state-এ থাকা thread-এ <code>interrupt()</code> কল করলে <strong>কোনো exception ছোড়া হয় না</strong>। Thread নিজে থেকে <code>Thread.interrupted()</code> চেক করে দেখতে পারে সম্প্রতি interrupt পাঠানো হয়েছে কি না। কোনো thread-এ অসমর্থিত operation কল করলে (যেমন suspended thread-কে interrupt করা) <code>IllegalThreadStateException</code> ছোড়া হয়।</p>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Term</th><th>বর্ণনা</th></tr>
+      <tr><td>Carrier thread</td><td>System thread যা virtual thread block না থাকলে সেগুলো চালায়</td></tr>
+      <tr><td>Daemon thread</td><td>যে thread program শেষ হলে JVM-এর প্রস্থানে বাধা দেয় না</td></tr>
+      <tr><td>Platform thread</td><td>যে thread operating system schedule করে</td></tr>
+      <tr><td>Process</td><td>একই shared environment-এ চলা সম্পর্কিত thread-এর গ্রুপ</td></tr>
+      <tr><td>System thread</td><td>JVM-এর তৈরি thread যা background-এ চলে, যেমন garbage collector</td></tr>
+      <tr><td>Task</td><td>একটি thread-এর সম্পাদিত একক কাজ</td></tr>
+      <tr><td>Thread</td><td>Schedule করা যায় এমন execution-এর ক্ষুদ্রতম একক</td></tr>
+      <tr><td>User-defined thread</td><td>নির্দিষ্ট কাজের জন্য developer-এর তৈরি thread</td></tr>
+      <tr><td>Virtual thread</td><td>হালকা thread, প্রয়োজনে carrier thread-এ map হয়</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============ SECTION 2 ============ -->
+<section class="section" id="s2">
+  <div class="sec-num">Section 02</div>
+  <h2>Concurrency API দিয়ে Thread তৈরি</h2>
+
+  <p><code>java.util.concurrent</code> package — যাকে আমরা <strong>Concurrency API</strong> বলি — thread পরিচালনার জটিল কাজটি সামলায়। এর <code>ExecutorService</code> interface এমন service সংজ্ঞায়িত করে যা thread তৈরি ও পরিচালনা করে; <code>Executors</code> factory class থেকে instance নিয়ে তারপর task পাঠাতে হয়। যেকোনো আলাদা task চালানোর দরকার হলেই এটি ব্যবহারের পরামর্শ দেওয়া হয় — <em>এমনকি একটিমাত্র thread লাগলেও</em>।</p>
+
+  <h3>Single-thread executor</h3>
+<pre><code><span class="kw">try</span> (ExecutorService service = Executors.newSingleThreadExecutor()) {
+   System.out.println(<span class="str">"begin"</span>);
+   service.execute(printInventory);
+   service.execute(printRecords);
+   service.execute(printInventory);
+   System.out.println(<span class="str">"end"</span>);
+}</code></pre>
+  <ul class="trace">
+    <li>এখন মাত্র দুটি thread: <code>main()</code> আর একটি service thread — তাই চার-thread সংস্করণের চেয়ে output কম পরিবর্তনশীল।</li>
+    <li>Single-thread executor-এ task গুলো <strong>ক্রমানুসারে চলার নিশ্চয়তা আছে</strong>, তাই <code>printRecords</code> loop অন্য task দ্বারা বিঘ্নিত হয় না।</li>
+    <li><code>end</code> তবু executor task চলাকালীনই ছাপা হতে পারে, কারণ <code>main()</code> হলো <code>ExecutorService</code>-এর থেকে স্বাধীন একটি thread।</li>
+  </ul>
+
+  <h3>Task submit করা</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Method name</th><th>বর্ণনা</th></tr>
+      <tr><td><code>void execute(Runnable command)</code></td><td>ভবিষ্যতে কোনো এক সময় <code>Runnable</code> task চালায়</td></tr>
+      <tr><td><code>Future&lt;?&gt; submit(Runnable task)</code></td><td><code>Runnable</code> task চালায় এবং task-এর প্রতিনিধি <code>Future</code> ফেরত দেয়</td></tr>
+      <tr><td><code>&lt;T&gt; Future&lt;T&gt; submit(Callable&lt;T&gt; task)</code></td><td><code>Callable</code> task চালায় এবং pending ফলাফলের <code>Future</code> ফেরত দেয়</td></tr>
+      <tr><td><code>&lt;T&gt; List&lt;Future&lt;T&gt;&gt; invokeAll(Collection&lt;? extends Callable&lt;T&gt;&gt; tasks)</code></td><td>সব task চালিয়ে <strong>সবগুলোর</strong> শেষ হওয়া পর্যন্ত অপেক্ষা করে। মূল collection-এর একই ক্রমে <code>Future</code>-এর <code>List</code> ফেরত দেয়</td></tr>
+      <tr><td><code>&lt;T&gt; T invokeAny(Collection&lt;? extends Callable&lt;T&gt;&gt; tasks)</code></td><td>সব task চালিয়ে <strong>অন্তত একটি</strong> শেষ হওয়া পর্যন্ত অপেক্ষা করে</td></tr>
+    </table>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p><code>execute()</code> ফেরত দেয় <strong><code>void</code></strong> — এটি "fire-and-forget" method। এর ফলাফল <code>Future</code>-এ assign করলে <span class="no">compile হয় না</span>:</p>
+<pre style="margin:8px 0 0"><code>r.add(<span class="err">service.execute</span>(() -&gt; {count++;}));   <span class="cm">// DOES NOT COMPILE</span>
+r.add(service.submit(() -&gt; {count++;}));   <span class="cm">// fine — returns Future&lt;?&gt;</span></code></pre>
+  </div>
+
+  <h3>Future দিয়ে ফলাফলের অপেক্ষা</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Method name</th><th>বর্ণনা</th></tr>
+      <tr><td><code>boolean isDone()</code></td><td>Task শেষ হলে, exception ছুড়লে বা cancel হলে <code>true</code></td></tr>
+      <tr><td><code>boolean isCancelled()</code></td><td>স্বাভাবিকভাবে শেষ হওয়ার আগেই cancel হলে <code>true</code></td></tr>
+      <tr><td><code>boolean cancel(boolean mayInterruptIfRunning)</code></td><td>Cancel করার চেষ্টা করে; সফল হলে <code>true</code>, না পারলে বা ইতিমধ্যেই শেষ হলে <code>false</code></td></tr>
+      <tr><td><code>V get()</code></td><td>ফলাফল আনে, না পাওয়া পর্যন্ত <strong>অনির্দিষ্টকাল</strong> অপেক্ষা করে</td></tr>
+      <tr><td><code>V get(long timeout, TimeUnit unit)</code></td><td>নির্দিষ্ট সময় অপেক্ষা করে। সময়ের মধ্যে ফলাফল না এলে checked <code>TimeoutException</code> ছোড়ে</td></tr>
+    </table>
+  </div>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ KEY RULE</span>
+    <p><code>Runnable.run()</code> যেহেতু <code>void</code> ফেরত দেয়, তাই <code>submit(Runnable)</code>-এর <code>Future</code>-এ <code>get()</code> কল করলে সফল সমাপ্তির পর <strong>সবসময় <code>null</code></strong> আসে।</p>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Enum name</th><th>বর্ণনা</th></tr>
+      <tr><td><code>TimeUnit.NANOSECONDS</code></td><td>সেকেন্ডের এক-বিলিয়ন ভাগ</td></tr>
+      <tr><td><code>TimeUnit.MICROSECONDS</code></td><td>সেকেন্ডের এক-মিলিয়ন ভাগ</td></tr>
+      <tr><td><code>TimeUnit.MILLISECONDS</code></td><td>সেকেন্ডের এক-হাজার ভাগ</td></tr>
+      <tr><td><code>TimeUnit.SECONDS</code> · <code>MINUTES</code> · <code>HOURS</code> · <code>DAYS</code></td><td>সেকেন্ড, মিনিট, ঘণ্টা, দিন</td></tr>
+    </table>
+  </div>
+
+  <h3>Callable</h3>
+<pre><code><span class="kw">@FunctionalInterface public interface</span> Callable&lt;V&gt; {
+   V call() <span class="kw">throws</span> Exception;
+}</code></pre>
+  <div class="vs-grid">
+    <div class="left">
+      <h4>Runnable.run()</h4>
+      <ul>
+        <li><code>void</code> ফেরত দেয়</li>
+        <li>Checked exception ছুড়তে পারে না</li>
+        <li>Unchecked exception ছুড়তে পারে</li>
+        <li>Functional interface — lambda দিয়ে লেখা যায়</li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>Callable.call()</h4>
+      <ul>
+        <li>Generic type <code>V</code> ফেরত দেয়</li>
+        <li>Checked exception ছুড়তে <strong>পারে</strong></li>
+        <li>Unchecked exception ছুড়তে পারে</li>
+        <li>Functional interface — lambda দিয়ে লেখা যায়</li>
+      </ul>
+    </div>
+  </div>
+<pre><code><span class="kw">try</span> (<span class="kw">var</span> service = Executors.newSingleThreadExecutor()) {
+   Future&lt;Integer&gt; result = service.submit(() -&gt; <span class="num">30</span> + <span class="num">11</span>);
+   System.out.println(result.get());   <span class="cm">// 41</span>
+}</code></pre>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p>বৈধ <code>Callable</code> lambda <strong>কোনো parameter নেয় না</strong> এবং একটি মান <strong>ফেরত দেয়</strong>। তাই <code>() -&gt; 5</code> এবং <code>() -&gt; {System.out.print("Giraffe"); return 10;}</code> বৈধ; কিন্তু <code>a -&gt; {return 10;}</code> parameter নেয়, আর <code>() -&gt; {String s = "";}</code> কিছুই ফেরত দেয় না। Brace-এর ভেতরে <code>return</code>-এর পরে semicolon বাদ পড়লে খেয়াল করুন — <code>() -&gt; {return null}</code> আদৌ বৈধ lambda নয়।</p>
+  </div>
+
+  <h3>Thread executor বন্ধ করা</h3>
+  <p>Thread executor প্রথম task চালানোর সময় একটি <strong>non-daemon</strong> thread তৈরি করে, তাই বন্ধ করতে ভুলে গেলে application কখনোই terminate হয় না:</p>
+<pre><code><span class="kw">public class</span> MissingClose {
+   <span class="kw">public static void</span> main(String[] args) {
+      <span class="kw">var</span> service = Executors.newSingleThreadExecutor();
+      service.submit(() -&gt; System.out.println(<span class="str">"Never stops"</span>));
+   } }   <span class="cm">// runs but never terminates</span></code></pre>
+  <p>সমাধান হলো try-with-resources block, যা <code>close()</code> কল করে — executor বন্ধ করে দেয় যাতে নতুন task গ্রহণ না হয়, তারপর সবগুলো শেষ হওয়া পর্যন্ত অপেক্ষা করে। মনে রাখুন <code>close()</code> এসেছে Java 19-এ; পুরোনো code-এ স্পষ্ট <code>shutdown()</code> বা <code>shutdownNow()</code> দেখা যায়।</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Scenario</th><th>বর্ণনা</th><th>নতুন task নেয়?</th><th><code>isShutdown()</code></th><th><code>isTerminated()</code></th></tr>
+      <tr><td>Active</td><td>Task গ্রহণ করে</td><td class="yes">হ্যাঁ</td><td><code>false</code></td><td><code>false</code></td></tr>
+      <tr><td><code>shutdown()</code></td><td>অপেক্ষমাণ task শেষ করে, কিন্তু নতুন নেয় না</td><td class="no">না</td><td><code>true</code></td><td>task চলাকালীন <code>false</code>; শেষ হলে <code>true</code></td></tr>
+      <tr><td><code>close()</code></td><td><code>shutdown()</code> কল করে তারপর termination-এর অপেক্ষা করে</td><td class="no">না</td><td><code>true</code></td><td><code>true</code></td></tr>
+      <tr><td><code>shutdownNow()</code></td><td>চলমান task থামায় এবং অপেক্ষমাণ task cancel করে</td><td class="no">না</td><td><code>true</code></td><td>task চলাকালীন <code>false</code>; শেষ হলে <code>true</code></td></tr>
+    </table>
+  </div>
+
+  <div class="card remember">
+    <span class="card-label">★ REMEMBER</span>
+    <p><code>awaitTermination(2, TimeUnit.SECONDS)</code> নির্দিষ্ট সময় অপেক্ষা করে, তারপর task এখনো চললে কেবল <strong><code>false</code> ফেরত দেয়</strong> — exception ছোড়ে না। অন্যদিকে try-with-resources block task-গুলোকে সুন্দরভাবে শেষ হতে দেয়।</p>
+  </div>
+
+  <h3>Task scheduling</h3>
+  <p><code>ScheduledExecutorService</code> হলো <code>ExecutorService</code>-এর subinterface, পাওয়া যায় <code>Executors.newSingleThreadScheduledExecutor()</code> থেকে। প্রতিটি method <code>ScheduledFuture</code> ফেরত দেয়, যা <code>Future</code>-এর মতোই কেবল <code>getDelay()</code> যুক্ত।</p>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Method name</th><th>বর্ণনা</th></tr>
+      <tr><td><code>schedule(Callable&lt;V&gt; callable, long delay, TimeUnit unit)</code></td><td>নির্দিষ্ট delay-এর পর <code>Callable</code> task চালায়</td></tr>
+      <tr><td><code>schedule(Runnable command, long delay, TimeUnit unit)</code></td><td>নির্দিষ্ট delay-এর পর <code>Runnable</code> task চালায়</td></tr>
+      <tr><td><code>scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit)</code></td><td>Initial delay-এর পর প্রতি <code>period</code>-এ নতুন task তৈরি করে</td></tr>
+      <tr><td><code>scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit)</code></td><td><strong>এক execution শেষ হওয়া ও পরেরটি শুরু হওয়ার মাঝে</strong> নির্দিষ্ট delay রেখে নতুন task তৈরি করে</td></tr>
+    </table>
+  </div>
+
+  <div class="vs-grid">
+    <div class="left">
+      <h4>scheduleAtFixedRate</h4>
+      <ul>
+        <li>প্রতি period-এ নতুন task জমা দেয়, <strong>আগেরটি শেষ হয়েছে কি না তা না দেখেই</strong></li>
+        <li>নির্দিষ্ট বিরতির কাজের জন্য ভালো, যেমন দৈনিক health check</li>
+        <li>বিপদ: প্রতিটি task যদি বিরতির চেয়ে বেশি সময় নেয়, task জমতে জমতে memory শেষ হয়ে যায়</li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>scheduleWithFixedDelay</h4>
+      <ul>
+        <li>নতুন task তৈরি করে <strong>কেবল আগেরটি শেষ হওয়ার পর</strong></li>
+        <li>১২:০০-এ শুরু হয়ে ৫ মিনিট লাগা task, ২ মিনিট period → পরেরটি শুরু <strong>১২:০৭</strong>-এ</li>
+        <li>নির্দিষ্ট সময় গুরুত্বপূর্ণ না হলে ভালো</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p>Scheduling ঘিরে দুটি ঘন ঘন আসা compile error:</p>
+    <ul>
+      <li><code>ScheduledExecutorService</code>-কে <code>ExecutorService</code> variable-এ assign করে তারপর <code>scheduleWithFixedDelay()</code> কল করা — reference type অবশ্যই <code>ScheduledExecutorService</code> হতে হবে।</li>
+      <li><code>scheduleAtFixedRate()</code> ও <code>scheduleWithFixedDelay()</code> কেবল <code>Runnable</code> সমর্থন করে, <strong><code>Callable</code> নয়</strong>। ওই lambda-র ভেতরে <code>return null;</code> লিখলে compile হয় না।</li>
+    </ul>
+    <p>আরেকটি বিষয়: scheduled execution-এর সময় আসার আগেই <code>ScheduledExecutorService</code> পুরোপুরি বন্ধ হয়ে গেলে ওই task গুলো কেবল <strong>বাতিল হয়ে যায়</strong>।</p>
+  </div>
+
+  <h3>Pool দিয়ে concurrency বাড়ানো</h3>
+  <p><strong>Thread pool</strong> হলো আগে থেকেই তৈরি, পুনঃব্যবহারযোগ্য thread-এর একটি গ্রুপ। Single-thread executor thread খালি হওয়ার অপেক্ষা করে, কিন্তু pooled executor পরের task concurrently চালাতে পারে; pool-এ thread ফুরিয়ে গেলে task <strong>queue</strong>-তে গিয়ে অপেক্ষা করে।</p>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Method name</th><th>বর্ণনা</th></tr>
+      <tr><td><code>ExecutorService newSingleThreadExecutor()</code></td><td>একটি worker <strong>platform</strong> thread ও unbounded queue নিয়ে single-threaded executor; ফলাফল submission ক্রমে ক্রমানুসারে প্রসেস হয়</td></tr>
+      <tr><td><code>ScheduledExecutorService newSingleThreadScheduledExecutor()</code></td><td>Platform thread-এর single-threaded executor যা delay-এর পর বা পর্যায়ক্রমে command চালাতে পারে</td></tr>
+      <tr><td><code>ExecutorService newCachedThreadPool()</code></td><td>প্রয়োজনে নতুন thread তৈরি করে, তবে আগে তৈরি thread খালি থাকলে পুনঃব্যবহার করে</td></tr>
+      <tr><td><code>ExecutorService newFixedThreadPool(int)</code></td><td>নির্দিষ্ট সংখ্যক thread ও shared unbounded queue নিয়ে platform thread pool</td></tr>
+      <tr><td><code>ScheduledExecutorService newScheduledThreadPool(int)</code></td><td>Delay-এর পর বা পর্যায়ক্রমে command চালাতে সক্ষম platform thread pool</td></tr>
+      <tr><td><code>ExecutorService newVirtualThreadPerTaskExecutor()</code></td><td>প্রতিটি task-এর জন্য নতুন <strong>virtual</strong> thread তৈরি করে</td></tr>
+    </table>
+  </div>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ KEY RULE</span>
+    <p>উপরের প্রতিটি factory method <strong>platform</strong> thread-এর জন্য, <em>শুধু</em> <code>newVirtualThreadPerTaskExecutor()</code> ছাড়া। Virtual thread <strong>pool করা হয় না</strong> — এগুলো এত হালকা যে প্রতিটি task-এর জন্য নতুন একটি ব্যবহার করা হয়। <code>newPlatformThreadPool()</code> বা <code>newPlatformThreadPerTaskExecutor()</code> বলে কিছু নেই।</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 3 ============ -->
+<section class="section" id="s3">
+  <div class="sec-num">Section 03</div>
+  <h2>Thread-Safe Code লেখা</h2>
+
+  <p><strong>Thread-safety</strong> হলো একটি object-এর সেই বৈশিষ্ট্য যা একাধিক thread একই সময়ে চালালেও নিরাপদ execution নিশ্চিত করে। যেসব কৌশল আলোচনা করা হয়েছে: atomic class, <code>synchronized</code> block, <code>Lock</code> framework এবং <code>CyclicBarrier</code>।</p>
+
+  <h3>সমস্যা: race condition</h3>
+<pre><code><span class="num">1:</span> <span class="kw">import</span> java.util.concurrent.*;
+<span class="num">2:</span> <span class="kw">public class</span> SheepManager {
+<span class="num">3:</span>     <span class="kw">private int</span> sheepCount = <span class="num">0</span>;
+<span class="num">4:</span>     <span class="kw">private void</span> incrementAndReport() {
+<span class="num">5:</span>        System.out.print((++sheepCount) + <span class="str">" "</span>);
+<span class="num">6:</span>     }
+<span class="num">7:</span>     <span class="kw">public static void</span> main(String[] args) {
+<span class="num">8:</span>        <span class="kw">try</span> (<span class="kw">var</span> service = Executors.newFixedThreadPool(<span class="num">20</span>)) {
+<span class="num">9:</span>           SheepManager manager = <span class="kw">new</span> SheepManager();
+<span class="num">10:</span>          <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">10</span>; i++)
+<span class="num">11:</span>             service.submit(() -&gt; manager.incrementAndReport());
+<span class="num">12:</span> } } }</code></pre>
+  <p>সম্ভাব্য output-এ <code>1 2 3 4 5 6 7 8 9 10</code> যেমন থাকতে পারে, তেমনি <code>1 9 8 7 3 6 6 2 4 5</code>-ও — কিছু সংখ্যা দুবার ছাপা, কিছু একেবারেই অনুপস্থিত।</p>
+  <ul class="trace">
+    <li>Pre-increment operator <code>++</code> <strong>atomic নয়</strong>: এটি আলাদা একটি read আর একটি write।</li>
+    <li>দুটি thread "পুরনো" মান পড়ে ফেলে একটিও নতুন মান লেখার আগেই, ফলে একটি assignment অন্যটিকে মুছে দেয় এবং একটি increment হারিয়ে যায়।</li>
+    <li>একাধিক task একই সময়ে চলার এই অনাকাঙ্ক্ষিত ফলাফলই <strong>race condition</strong>।</li>
+  </ul>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p><code>volatile</code> modifier নিশ্চিত করে যে operation চলাকালীন কোনো thread মাঝামাঝি মান দেখবে না — কিন্তু <code>sheepCount</code>-এ এটি যোগ করা thread-safety-র জন্য <strong>যথেষ্ট নয়</strong>, কারণ <code>++sheepCount</code> এখনো আলাদা read ও write operation। Atomic variable আর <code>volatile</code>-চিহ্নিত variable-এর পার্থক্যটা জেনে রাখুন।</p>
+  </div>
+
+  <h3>Atomic class</h3>
+  <p><strong>Atomic</strong> মানে একটি operation অন্য thread-এর হস্তক্ষেপ ছাড়াই একক execution unit হিসেবে সম্পন্ন হওয়া।</p>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Class name</th><th>বর্ণনা</th></tr>
+      <tr><td><code>AtomicBoolean</code></td><td>Atomically আপডেটযোগ্য <code>boolean</code> মান</td></tr>
+      <tr><td><code>AtomicInteger</code></td><td>Atomically আপডেটযোগ্য <code>int</code> মান</td></tr>
+      <tr><td><code>AtomicLong</code></td><td>Atomically আপডেটযোগ্য <code>long</code> মান</td></tr>
+    </table>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Method name</th><th>বর্ণনা</th></tr>
+      <tr><td><code>get()</code></td><td>বর্তমান মান আনে</td></tr>
+      <tr><td><code>set(type newValue)</code></td><td>মান বসায়, assignment <code>=</code> operator-এর সমতুল্য</td></tr>
+      <tr><td><code>getAndSet(type newValue)</code></td><td>Atomically নতুন মান বসিয়ে পুরনো মান ফেরত দেয়</td></tr>
+      <tr><td><code>incrementAndGet()</code></td><td>Atomic pre-increment, <code>++value</code>-এর সমতুল্য</td></tr>
+      <tr><td><code>getAndIncrement()</code></td><td>Atomic post-increment, <code>value++</code>-এর সমতুল্য</td></tr>
+      <tr><td><code>decrementAndGet()</code></td><td>Atomic pre-decrement, <code>--value</code>-এর সমতুল্য</td></tr>
+      <tr><td><code>getAndDecrement()</code></td><td>Atomic post-decrement, <code>value--</code>-এর সমতুল্য</td></tr>
+    </table>
+  </div>
+<pre><code><span class="num">3:</span> <span class="kw">private</span> AtomicInteger sheepCount = <span class="kw">new</span> AtomicInteger(<span class="num">0</span>);
+<span class="num">4:</span> <span class="kw">private void</span> incrementAndReport() {
+<span class="num">5:</span>    System.out.print(sheepCount.incrementAndGet() + <span class="str">" "</span>);
+<span class="num">6:</span> }
+<span class="cm">// 2 3 1 4 5 6 7 8 9 10   |   1 4 3 2 5 6 7 8 9 10</span></code></pre>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ KEY RULE</span>
+    <p>Atomic class নিশ্চিত করে যে <strong>১ থেকে ১০ সবসময়ই ছাপা হবে</strong> — কোনো মান হারাবে না। কিন্তু <strong>ক্রমের কোনো নিশ্চয়তা নেই</strong>। Atomicity data-র শুদ্ধতা ঠিক করে, ক্রম নয়।</p>
+  </div>
+
+  <h3>synchronized block</h3>
+  <p><strong>Monitor</strong> (বা lock) হলো এমন একটি কাঠামো যা <strong>mutual exclusion</strong> সমর্থন করে — অর্থাৎ নির্দিষ্ট কোনো code segment একসাথে সর্বোচ্চ একটি thread চালাতে পারে। Java-তে <em>যেকোনো</em> <code>Object</code> monitor হিসেবে ব্যবহার করা যায়।</p>
+<pre><code><span class="kw">var</span> manager = <span class="kw">new</span> SheepManager();
+<span class="kw">synchronized</span>(manager) {
+   <span class="cm">// Work to be completed by one thread at a time</span>
+}</code></pre>
+  <p>আগত প্রতিটি thread দেখে অন্য কোনো thread ইতিমধ্যেই block-এ আছে কি না। Lock না পেলে thread <code>BLOCKED</code> state-এ যায় যতক্ষণ না lock পায়।</p>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p>এই "সমাধান" <strong>কাজ করে না</strong>:</p>
+<pre style="margin:8px 0 6px"><code><span class="num">10:</span> <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">10</span>; i++) {
+<span class="num">11:</span>    <span class="kw">synchronized</span>(manager) {
+<span class="num">12:</span>       service.submit(() -&gt; manager.incrementAndReport());
+<span class="num">13:</span>    }
+<span class="num">14:</span> }</code></pre>
+    <p>এটি thread <strong>তৈরি</strong> করাকে synchronize করেছে, thread-এর <strong>execution</strong>-কে নয়। Thread গুলো একটি একটি করে তৈরি হয় ঠিকই, কিন্তু চলে একসাথেই। আরেকটি কথা মনে রাখুন: প্রতিটি thread যদি <em>ভিন্ন</em> object-এ synchronize করে, তাহলে code মোটেই thread-safe নয়।</p>
+  </div>
+
+  <p>Block-টিকে method-এর ভেতরে নিলে সমস্যা মেটে এবং ধারাবাহিকভাবে <code>1 2 3 4 5 6 7 8 9 10</code> আসে:</p>
+<pre><code><span class="num">4:</span> <span class="kw">private void</span> incrementAndReport() {
+<span class="num">5:</span>    <span class="kw">synchronized</span>(<span class="kw">this</span>) {
+<span class="num">6:</span>       System.out.print((++sheepCount) + <span class="str">" "</span>);
+<span class="num">7:</span>    }
+<span class="num">8:</span> }</code></pre>
+
+  <h3>Method synchronize করা</h3>
+  <div class="vs-grid">
+    <div class="left">
+      <h4>Instance method</h4>
+<pre style="margin:0"><code><span class="kw">void</span> sing() {
+   <span class="kw">synchronized</span>(<span class="kw">this</span>) {
+      System.out.print(<span class="str">"La la la!"</span>);
+   }
+}
+<span class="kw">synchronized void</span> sing() {
+   System.out.print(<span class="str">"La la la!"</span>);
+}</code></pre>
+      <p style="font-size:.93rem;margin:8px 0 0">Monitor = <strong>object নিজেই</strong>।</p>
+    </div>
+    <div class="right">
+      <h4>Static method</h4>
+<pre style="margin:0"><code><span class="kw">static void</span> dance() {
+   <span class="kw">synchronized</span>(SheepManager.class) {
+      System.out.print(<span class="str">"Time to dance!"</span>);
+   }
+}
+<span class="kw">static synchronized void</span> dance() {
+   System.out.print(<span class="str">"Time to dance!"</span>);
+}</code></pre>
+      <p style="font-size:.93rem;margin:8px 0 0">Monitor = <strong>class object</strong>। সব instance জুড়ে access ক্রমবদ্ধ করতে ব্যবহার করুন।</p>
+    </div>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p><code>static synchronized</code> method আর instance-এর <code>synchronized(this)</code> block <strong>ভিন্ন object-এ lock নেয়</strong> — একটি class object, আরেকটি instance। তারা পরস্পরকে বাদ দেয় <em>না</em>। একইভাবে, shared data স্পর্শ করা একটি method-ও যদি unsynchronized থাকে, class টি thread-safe নয়।</p>
+  </div>
+
+  <h3>Lock framework</h3>
+  <div class="vs-grid">
+    <div class="left">
+      <h4>synchronized block</h4>
+<pre style="margin:0"><code><span class="kw">var</span> object = <span class="kw">new</span> Object();
+<span class="kw">synchronized</span>(object) {
+   <span class="cm">// Protected code</span>
+}</code></pre>
+    </div>
+    <div class="right">
+      <h4>Lock instance</h4>
+<pre style="margin:0"><code><span class="kw">var</span> myLock = <span class="kw">new</span> ReentrantLock();
+<span class="kw">try</span> {
+   myLock.lock();
+   <span class="cm">// Protected code</span>
+} <span class="kw">finally</span> {
+   myLock.unlock();
+}</code></pre>
+    </div>
+  </div>
+  <p>দুটি ধারণাগতভাবে সমতুল্য। <code>ReentrantLock</code> হলো <code>Lock</code>-এর একটি সরল implementation যা mutual exclusion সমর্থন করে: একসাথে সর্বোচ্চ একটি thread lock ধরে রাখতে পারে। <code>try/finally</code> ব্যবহার করা ভালো অভ্যাস, যাতে অর্জিত lock সবসময় release হয়।</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Method name</th><th>বর্ণনা</th></tr>
+      <tr><td><code>void lock()</code></td><td>Lock চায় এবং না পাওয়া পর্যন্ত <strong>block হয়ে থাকে</strong></td></tr>
+      <tr><td><code>void unlock()</code></td><td>Lock ছেড়ে দেয়</td></tr>
+      <tr><td><code>boolean tryLock()</code></td><td>Lock চায় এবং <strong>সঙ্গে সঙ্গেই ফেরে</strong>, পেয়েছে কি না তা boolean-এ জানায়</td></tr>
+      <tr><td><code>boolean tryLock(long timeout, TimeUnit unit)</code></td><td>Lock চায় এবং নির্দিষ্ট সময় পর্যন্ত অপেক্ষা করে; boolean ফেরত দেয়</td></tr>
+    </table>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p>যে lock আপনি ধরে রাখেননি সেটি release করলে runtime-এ exception হয়:</p>
+<pre style="margin:8px 0 6px"><code><span class="kw">var</span> lock = <span class="kw">new</span> ReentrantLock();
+lock.unlock();   <span class="err">// IllegalMonitorStateException</span></code></pre>
+    <p>এ কারণেই <strong><code>tryLock()</code>-এর return value সবসময় চেক করতে হবে</strong>। যে code <code>tryLock()</code> কল করে ফলাফল না দেখেই <code>finally</code>-তে শর্তহীনভাবে <code>unlock()</code> করে, সেটি কখনো ঠিকঠাক চলবে, কখনো <code>IllegalMonitorStateException</code> ছুড়বে — একই program-এ দুটি ফলাফলই সম্ভব।</p>
+  </div>
+
+  <h3>একই lock দুবার নেওয়া</h3>
+<pre><code><span class="kw">var</span> myLock = <span class="kw">new</span> ReentrantLock();
+<span class="kw">if</span> (myLock.tryLock()) {
+   <span class="kw">try</span> {
+      myLock.lock();               <span class="cm">// acquired twice...</span>
+      System.out.println(<span class="str">"Lock obtained, entering protected code"</span>);
+   } <span class="kw">finally</span> {
+      myLock.unlock();             <span class="cm">// ...but released only once</span>
+   } }</code></pre>
+  <ul class="trace">
+    <li><code>ReentrantLock</code> একটি <strong>counter</strong> রাখে — একটি thread-কে কতবার lock দেওয়া হয়েছে।</li>
+    <li>অন্য thread-দের জন্য মুক্ত করতে হলে <strong>যতবার lock নেওয়া হয়েছে ততবার</strong> <code>unlock()</code> কল করতে হবে।</li>
+    <li>পরে কোনো thread এখানে <code>myLock.tryLock()</code> কল করলে <code>false</code> ছাপে।</li>
+    <li><code>tryLock()</code>-এর ক্ষেত্রে <code>unlock()</code> কল করবেন কেবল তখনই, যখন সেটি <code>true</code> ফেরত দিয়েছে।</li>
+  </ul>
+
+  <div class="rules-box">
+    <h4>synchronized block-এর তুলনায় ReentrantLock যা বাড়তি দেয়</h4>
+    <ul>
+      <li><strong>Block না হয়েই</strong> lock চাওয়ার ক্ষমতা (<code>tryLock()</code>)।</li>
+      <li><strong>নির্দিষ্ট সময় পর্যন্ত</strong> block হয়ে lock চাওয়ার ক্ষমতা।</li>
+      <li><strong>Fairness</strong> property — যে ক্রমে lock চাওয়া হয়েছে সেই ক্রমেই দেওয়া হয়। <code>boolean</code> নেওয়া constructor দিয়ে সেট হয়; default <code>false</code>, এবং এটি বড় ধরনের slowdown আনতে পারে, তাই একান্ত প্রয়োজন ছাড়া চালু করবেন না।</li>
+    </ul>
+  </div>
+
+  <h4>ReentrantReadWriteLock</h4>
+  <p>এতে read ও write-এর জন্য আলাদা lock আছে। Runtime-এ <strong>write lock একসাথে একটি thread-ই ধরতে পারে</strong>, কিন্তু <strong>read lock অনেক thread একসাথে ধরতে পারে</strong>।</p>
+<pre><code><span class="kw">var</span> lock = <span class="kw">new</span> ReentrantReadWriteLock();
+lock.writeLock().lock();
+lock.readLock().lock();
+System.out.println(lock.isWriteLocked());      <span class="cm">// true</span>
+System.out.println(lock.getReadLockCount());   <span class="cm">// 1</span>
+
+lock.writeLock().unlock();
+System.out.println(lock.isWriteLocked());      <span class="cm">// false</span>
+System.out.println(lock.getReadLockCount());   <span class="cm">// 1</span>
+
+lock.readLock().unlock();
+System.out.println(lock.getReadLockCount());   <span class="cm">// 0</span></code></pre>
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p><strong>Write lock নেওয়ার পর read lock</strong> সহজেই পাওয়া যায়, কারণ read হলো write-এর একটি উপসেট। কিন্তু আগে read lock নিয়ে তারপর write lock নিতে গেলে code <strong>চিরকাল ঝুলে থাকে</strong> — read থেকে write-এ upgrade করা যায় না।</p>
+<pre style="margin:8px 0 0"><code><span class="kw">var</span> lock = <span class="kw">new</span> ReentrantReadWriteLock();
+lock.readLock().lock();
+lock.writeLock().lock();   <span class="err">// Wait forever</span></code></pre>
+  </div>
+
+  <h3>CyclicBarrier দিয়ে task সাজানো</h3>
+  <p><code>CyclicBarrier</code>-এর constructor একটি <strong>limit</strong> নেয় — কতগুলো thread-এর জন্য অপেক্ষা করতে হবে। প্রতিটি thread একটি ধাপ শেষ করে <code>await()</code> কল করে। ততগুলো thread <code>await()</code> কল করলেই barrier ভেঙে যায় এবং সব thread এগিয়ে যায়।</p>
+<pre><code><span class="kw">public void</span> performTask(CyclicBarrier c1, CyclicBarrier c2) {
+   <span class="kw">try</span> {
+      removeLions();
+      c1.await();
+      cleanPen();
+      c2.await();
+      addLions();
+   } <span class="kw">catch</span> (InterruptedException | BrokenBarrierException e) {
+      <span class="cm">// Handle checked exceptions here</span>
+   }
+}
+<span class="cm">// in main:</span>
+<span class="kw">try</span> (<span class="kw">var</span> service = Executors.newFixedThreadPool(<span class="num">4</span>)) {
+   <span class="kw">var</span> manager = <span class="kw">new</span> LionPenManager();
+   <span class="kw">var</span> c1 = <span class="kw">new</span> CyclicBarrier(<span class="num">4</span>);
+   <span class="kw">var</span> c2 = <span class="kw">new</span> CyclicBarrier(<span class="num">4</span>, () -&gt; System.out.println(<span class="str">"*** Pen Cleaned!"</span>));
+   <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">4</span>; i++)
+      service.submit(() -&gt; manager.performTask(c1, c2));
+}</code></pre>
+  <p>Output সম্পূর্ণ সাজানো হয়ে যায়: চারটি "Removing lions", তারপর চারটি "Cleaning the pen", তারপর <code>*** Pen Cleaned!</code>, তারপর চারটি "Adding lions"। দুই-argument constructor barrier ভাঙার সময় একটি <code>Runnable</code> চালায়।</p>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p>Barrier-এ limit-এর <strong>চেয়ে কম thread পৌঁছালে</strong> barrier কখনো ভাঙে না এবং program <strong>চিরকাল অপেক্ষা করে</strong>। <code>CyclicBarrier(10)</code>-এ মাত্র ৯টি thread <code>await()</code> কল করলে code ঝুলে যায় — exception ছোড়ে না, কিছু ছাপেও না। এমনকি ঠিক ১০ করে দিলেও parallel stream-এ ঝুঁকি থাকে, কারণ JVM ১০টি thread না-ও বরাদ্দ করতে পারে।</p>
+  </div>
+
+  <div class="card remember">
+    <span class="card-label">★ REMEMBER</span>
+    <p><code>CyclicBarrier</code> পুনঃব্যবহারযোগ্য। Limit-এ পৌঁছালে barrier ভেঙে যায়, সব thread মুক্তি পায়, আর অপেক্ষমাণ সংখ্যা শূন্যে ফেরে। Limit ৫ হলে এবং ১৫টি thread <code>await()</code> কল করলে barrier <strong>তিনবার</strong> সক্রিয় হয়।</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 4 ============ -->
+<section class="section" id="s4">
+  <div class="sec-num">Section 04</div>
+  <h2>Concurrent Collection ব্যবহার</h2>
+
+  <h3>Memory consistency error</h3>
+  <p><strong>Memory consistency error</strong> ঘটে যখন দুটি thread-এর কাছে একই data-র ভিন্ন ভিন্ন চিত্র থাকে। দুটি thread একই nonconcurrent collection পরিবর্তন করলে JVM <code>ConcurrentModificationException</code> ছুড়তে পারে — এমনকি একটিমাত্র thread-এও এটি ঘটতে পারে:</p>
+<pre><code><span class="num">11:</span> <span class="kw">var</span> foodData = <span class="kw">new</span> HashMap&lt;String, Integer&gt;();
+<span class="num">12:</span> foodData.put(<span class="str">"penguin"</span>, <span class="num">1</span>);
+<span class="num">13:</span> foodData.put(<span class="str">"flamingo"</span>, <span class="num">2</span>);
+<span class="num">14:</span> <span class="kw">for</span> (String key : foodData.keySet())
+<span class="num">15:</span>    foodData.remove(key);   <span class="err">// ConcurrentModificationException</span></code></pre>
+  <ul class="trace">
+    <li>Exception ছোড়া হয় loop-এর <strong>দ্বিতীয়</strong> iteration-এ, কারণ প্রথম উপাদান সরানোর পর <code>keySet()</code>-এর iterator সঠিকভাবে আপডেট হয় না।</li>
+    <li>Line 11-কে <code>new ConcurrentHashMap&lt;String, Integer&gt;()</code> করলে সমস্যা মিটে যায় — object সরানোমাত্রই <code>keySet()</code>-এর iterator আপডেট হয়।</li>
+  </ul>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ KEY RULE</span>
+    <p><code>synchronized</code> block বা method-এর বাইরে একাধিক thread কোনো collection পরিবর্তন করলেই concurrent collection ব্যবহার করুন — <em>সমস্যা আশা না করলেও</em>। ব্যতিক্রম: collection যদি <strong>immutable</strong> হয় এবং immutable object ধারণ করে, তাহলে concurrent collection লাগে না, কারণ কিছুই বদলায় না।</p>
+  </div>
+
+  <h3>Concurrent collection class-গুলো</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Class name</th><th>Java Collections interfaces</th><th>Sorted?</th><th>Blocking?</th></tr>
+      <tr><td><code>ConcurrentHashMap</code></td><td><code>Map</code>, <code>ConcurrentMap</code></td><td class="no">না</td><td class="no">না</td></tr>
+      <tr><td><code>ConcurrentLinkedQueue</code></td><td><code>Queue</code></td><td class="no">না</td><td class="no">না</td></tr>
+      <tr><td><code>ConcurrentSkipListMap</code></td><td><code>Map</code>, <code>SequencedMap</code>, <code>SortedMap</code>, <code>NavigableMap</code>, <code>ConcurrentMap</code>, <code>ConcurrentNavigableMap</code></td><td class="yes">হ্যাঁ</td><td class="no">না</td></tr>
+      <tr><td><code>ConcurrentSkipListSet</code></td><td><code>Set</code>, <code>SequencedSet</code>, <code>SortedSet</code>, <code>NavigableSet</code></td><td class="yes">হ্যাঁ</td><td class="no">না</td></tr>
+      <tr><td><code>CopyOnWriteArrayList</code></td><td><code>List</code>, <code>SequencedCollection</code></td><td class="no">না</td><td class="no">না</td></tr>
+      <tr><td><code>CopyOnWriteArraySet</code></td><td><code>Set</code></td><td class="no">না</td><td class="no">না</td></tr>
+      <tr><td><code>LinkedBlockingQueue</code></td><td><code>Queue</code>, <code>BlockingQueue</code></td><td class="no">না</td><td class="yes">হ্যাঁ</td></tr>
+    </table>
+  </div>
+
+  <div class="card remember">
+    <span class="card-label">★ REMEMBER</span>
+    <p>Class-এর নামে <strong>Skip</strong> দেখলেই ভাবুন "<strong>sorted</strong> concurrent" collection। <code>LinkedBlockingQueue</code>-ই একমাত্র blocking — এতে timeout নেওয়া overloaded <code>offer()</code> ও <code>poll()</code> আছে। Exam-এর জন্য class-specific concurrent method জানার দরকার নেই, কেবল <code>get()</code>, <code>set()</code>-এর মতো inherited method-ই যথেষ্ট।</p>
+  </div>
+
+  <h3>CopyOnWrite class-গুলো</h3>
+  <p>এগুলো <strong>প্রতিবার কোনো reference যোগ, অপসারণ বা পরিবর্তন করলেই collection-এর একটি copy তৈরি করে</strong>, তারপর মূল reference-কে সেই copy-র দিকে নির্দেশ করায়। Iterator যাতে পরিবর্তন না দেখে, সেজন্য এগুলো ব্যবহৃত হয়।</p>
+<pre><code>List&lt;Integer&gt; favNumbers = <span class="kw">new</span> CopyOnWriteArrayList&lt;&gt;(List.of(<span class="num">4</span>, <span class="num">3</span>, <span class="num">42</span>));
+<span class="kw">for</span> (<span class="kw">var</span> n : favNumbers) {
+   System.out.print(n + <span class="str">" "</span>);   <span class="cm">// 4 3 42</span>
+   favNumbers.add(n + <span class="num">1</span>);
+}
+System.out.println(<span class="str">"Size: "</span> + favNumbers.size());   <span class="cm">// Size: 6</span></code></pre>
+  <ul class="trace">
+    <li>Iterator পরিবর্তিত হয় না, তাই loop চলে <strong>ঠিক তিনবার</strong>।</li>
+    <li>Collection তবু বড় হয় — শেষ size ৬।</li>
+    <li>সাধারণ <code>ArrayList</code> হলে runtime-এ <code>ConcurrentModificationException</code> ছোড়া হতো।</li>
+    <li>এই class গুলো প্রচুর memory খেতে পারে, তাই যেখানে write-এর চেয়ে read অনেক বেশি সেখানেই উপযুক্ত।</li>
+  </ul>
+
+  <h3>Synchronized collection পাওয়া</h3>
+  <p><code>Collections</code> class-এ static method আছে যা বিদ্যমান nonconcurrent collection-এর synchronized সংস্করণ ফেরত দেয়, underlying collection-এর মতো একই type-এ: <code>synchronizedCollection()</code>, <code>synchronizedList()</code>, <code>synchronizedMap()</code>, <code>synchronizedNavigableMap()</code>, <code>synchronizedNavigableSet()</code>, <code>synchronizedSet()</code>, <code>synchronizedSortedMap()</code>, <code>synchronizedSortedSet()</code>।</p>
+
+  <div class="vs-grid">
+    <div class="left">
+      <h4>নতুন code লিখছেন</h4>
+      <ul>
+        <li>Collection তৈরি আপনার নিয়ন্ত্রণে</li>
+        <li><strong>Concurrent collection class</strong> ব্যবহার করুন (<code>ConcurrentHashMap</code> ইত্যাদি)</li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>বাইরে থেকে collection পেয়েছেন</h4>
+      <ul>
+        <li>Nonconcurrent collection আপনাকে pass করা হয়েছে</li>
+        <li><strong><code>Collections.synchronizedXxx()</code></strong> method ব্যবহার করুন</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SECTION 5 ============ -->
+<section class="section" id="s5">
+  <div class="sec-num">Section 05</div>
+  <h2>Threading সমস্যা চিহ্নিত করা</h2>
+
+  <p><strong>Threading problem</strong> ঘটে যখন দুই বা তার বেশি thread অপ্রত্যাশিত ও অনাকাঙ্ক্ষিতভাবে পরস্পরের সাথে মিথস্ক্রিয়া করে। <strong>Liveness</strong> হলো application-এর সময়মতো execute করার ক্ষমতা; liveness সমস্যা প্রায়ই ঘটে যখন কোনো thread চিরকালের জন্য <code>BLOCKED</code> বা <code>WAITING</code> state-এ ঢুকে পড়ে, অথবা বারবার এসব state-এ ঢুকছে-বেরোচ্ছে। Exam-এর জন্য তিন ধরন গুরুত্বপূর্ণ।</p>
+
+  <h3>Deadlock</h3>
+  <p><strong>Deadlock</strong> ঘটে যখন দুই বা তার বেশি thread <strong>চিরকালের জন্য block হয়ে থাকে, প্রত্যেকে অন্যের অপেক্ষায়</strong>।</p>
+<pre><code><span class="kw">public void</span> eatAndDrink(Food food, Water water) {
+   <span class="kw">synchronized</span>(food) {
+      System.out.println(name() + <span class="str">" Got Food!"</span>);
+      move();
+      <span class="kw">synchronized</span>(water) { System.out.println(name() + <span class="str">" Got Water!"</span>); }
+   } }
+<span class="kw">public void</span> drinkAndEat(Food food, Water water) {
+   <span class="kw">synchronized</span>(water) {
+      System.out.println(name() + <span class="str">" Got Water!"</span>);
+      move();
+      <span class="kw">synchronized</span>(food) { System.out.println(name() + <span class="str">" Got Food!"</span>); }
+   } }</code></pre>
+  <ul class="trace">
+    <li>Foxy খাবার নিয়ে পানির দিকে যায়; Tails ততক্ষণে পানি নিয়ে খাবারের অপেক্ষায় বসে আছে।</li>
+    <li>Program ছাপে <code>Foxy Got Food!</code> ও <code>Tails Got Water!</code>, তারপর <strong>অনির্দিষ্টকাল ঝুলে থাকে</strong>।</li>
+    <li>দুই অংশগ্রহণকারীই স্থায়ীভাবে block, এমন resource-এর অপেক্ষায় যা কখনো পাওয়া যাবে না।</li>
+    <li>গুরুত্বপূর্ণ: deadlock <strong>কোনো exception ছোড়ে না</strong> — কেবল ঝুলে থাকে।</li>
+  </ul>
+
+  <h3>Starvation ও livelock</h3>
+  <div class="vs-grid">
+    <div class="left">
+      <h4>Starvation</h4>
+      <ul>
+        <li><strong>একটি thread</strong> ক্রমাগত shared resource বা lock থেকে বঞ্চিত হয়</li>
+        <li>Thread টি সক্রিয় থাকে, কিন্তু কাজ শেষ করতে পারে না</li>
+        <li>অন্য thread গুলো প্রতিবারই আগে resource নিয়ে নেয়</li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>Livelock</h4>
+      <ul>
+        <li>দুই বা তার বেশি thread <strong>ধারণাগতভাবে চিরকাল blocked, কিন্তু প্রত্যেকেই সক্রিয়</strong></li>
+        <li>Resource starvation-এর একটি বিশেষ রূপ — thread গুলো lock নেওয়ার চেষ্টা করে, ব্যর্থ হয়, আবার শুরু করে</li>
+        <li>প্রায়ই ব্যর্থ deadlock recovery-র ফল, যেখানে প্রত্যেকে নিজের lock ছেড়ে অন্যেরটা ধরে</li>
+        <li>ধরা কঠিন: thread গুলোকে সচল দেখায়</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p>Deadlock বনাম livelock একটি ক্লাসিক fill-in-the-blank। <strong>দুটিতেই</strong> thread চিরকাল blocked; পার্থক্যকারী হলো — <strong>livelock-এ thread গুলোকে সক্রিয় দেখায়</strong>, আর deadlock-এ তারা সত্যিই block হয়ে অপেক্ষা করছে। কোনো code-এ দুটি thread কেবল একে অপরের monitor-এর জন্য <em>অপেক্ষা</em> করলে সেটি deadlock, <strong>livelock নয়</strong>।</p>
+  </div>
+
+  <h3>Race condition</h3>
+  <p><strong>Race condition</strong> হলো সেই অনাকাঙ্ক্ষিত ফলাফল যা ঘটে যখন ক্রমানুসারে সম্পন্ন হওয়ার কথা এমন দুটি task একই সময়ে সম্পন্ন হয়। দুই ব্যবহারকারী Olivia ও Sophia একই সময়ে <code>ZooFan</code> username চাইলেন:</p>
+  <div class="rules-box">
+    <h4>তিনটি সম্ভাব্য ফলাফল, খারাপ থেকে ভালো</h4>
+    <ol>
+      <li><strong>দুজনেই</strong> একই username-এ account তৈরি করে ফেলল — সবচেয়ে খারাপ, data নষ্ট হয়।</li>
+      <li><strong>কেউই</strong> পারল না, দুজনেই error পেল — বিরক্তিকর, তবে data integrity রক্ষা পেল।</li>
+      <li><strong>একজন</strong> পারল, অন্যজন error পেল — সাধারণত সেরা সমাধান; integrity রক্ষা পেল আর অন্তত একজন এগোতে পারল।</li>
+    </ol>
+    <p style="margin:10px 0 0">Exam-এর জন্য: সামলানো না হলে race condition অবৈধ data তৈরি করে, এবং <strong>দুজনকেই ব্যর্থ করা-ও সিস্টেমে অবৈধ data ঢুকতে দেওয়ার চেয়ে ভালো</strong>।</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 6 ============ -->
+<section class="section" id="s6">
+  <div class="sec-num">Section 06</div>
+  <h2>Parallel Stream নিয়ে কাজ</h2>
+
+  <p><strong>Serial stream</strong> হলো এমন stream যেখানে ফলাফল ক্রমবদ্ধ এবং একসাথে একটি entry-ই প্রসেস হয়। <strong>Parallel stream</strong> একাধিক thread ব্যবহার করে ফলাফল concurrently প্রসেস করতে পারে। এটি ব্যবহার করলে শুধু performance নয়, <strong>প্রত্যাশিত ফলাফলও</strong> বদলে যেতে পারে।</p>
+
+  <div class="card remember">
+    <span class="card-label">★ REMEMBER</span>
+    <p>Multithreaded program-এ random সংখ্যা তৈরি করতে <code>ThreadLocalRandom</code> ব্যবহার করুন। <code>current()</code> দিয়ে instance নিন, তারপর instance method গুলো: <code>ints()</code>, <code>ints(low, highExclusive)</code>, <code>ints(count)</code>, <code>ints(count, low, highExclusive)</code>, <code>nextInt(highExclusive)</code>, <code>nextInt(low, highExclusive)</code> — double ও long-এর জন্যও সমতুল্য method আছে।</p>
+  </div>
+
+  <h3>Parallel stream তৈরি</h3>
+<pre><code>Collection&lt;Integer&gt; collection = List.of(<span class="num">1</span>, <span class="num">2</span>);
+
+Stream&lt;Integer&gt; p1 = collection.stream().parallel();   <span class="cm">// from an existing stream</span>
+Stream&lt;Integer&gt; p2 = collection.parallelStream();      <span class="cm">// from a Collection</span></code></pre>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <ul>
+      <li><strong><code>ParallelStream</code> নামে কোনো class নেই</strong> — <code>new ParallelStream(c)</code> কখনোই compile হয় না।</li>
+      <li><code>parallelStream()</code> সংজ্ঞায়িত <strong><code>Collection</code></strong>-এ, <code>Stream</code>-এ নয়। আর <code>parallel()</code> সংজ্ঞায়িত <strong><code>Stream</code></strong>-এ, <code>Collection</code>-এ নয়। এই দুটি গুলিয়ে ফেলাই সবচেয়ে প্রচলিত distractor।</li>
+      <li>ইতিমধ্যেই parallel এমন stream-এ আবার <code>parallel()</code> কল করা <strong>বৈধ</strong>, এবং এটি একই object ফেরত দিতে পারে।</li>
+      <li><code>isParallel()</code> দিয়ে দেখা যায় stream টি parallel processing সমর্থন করে কি না। কিছু operation parallel attribute ধরে রাখে, কিছু রাখে না।</li>
+    </ul>
+  </div>
+
+  <h3>Parallel decomposition</h3>
+  <p><strong>Parallel decomposition</strong> মানে একটি task-কে ছোট ছোট অংশে ভাগ করে concurrently চালানো, তারপর ফলাফল একত্র করা। <code>doWork()</code> পাঁচ সেকেন্ড ঘুমালে:</p>
+<pre><code><span class="num">11:</span> List.of(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>)
+<span class="num">12:</span>    .stream()            <span class="cm">// 1 2 3 4 5      Time: 25 seconds</span>
+<span class="num">12:</span>    .parallelStream()    <span class="cm">// 3 2 1 5 4      Time: 5 seconds</span>
+<span class="num">13:</span>    .map(w -&gt; doWork(w))
+<span class="num">14:</span>    .forEach(s -&gt; System.out.print(s + <span class="str">" "</span>));</code></pre>
+  <p>Parallel stream-এ <code>map()</code> ও <code>forEach()</code> একাধিক <code>Runnable</code> lambda একটি pooled thread executor-এ জমা দিয়ে ফলাফলের অপেক্ষা করার সমতুল্য। কম processor-এর মেশিনে সময় ১০ বা ১৫ সেকেন্ডও হতে পারে।</p>
+  <p><code>forEach()</code>-এর বদলে <code>forEachOrdered()</code> দিলে <code>1 2 3 4 5</code> ফিরে আসে, আর সময় ৫ সেকেন্ডই থাকে — কিছু সুবিধা হারালেও <code>map()</code> এখনো parallel-এই চলে।</p>
+
+  <h3>ক্রমনির্ভর operation</h3>
+  <div class="vs-grid">
+    <div class="left">
+      <h4>ক্রমের নিশ্চয়তা নেই</h4>
+      <ul>
+        <li><code>findAny()</code> — যে thread আগে ফলাফল দেয় তারটিই আসে; parallel stream-এ প্রায় এলোমেলো</li>
+        <li>Parallel stream-এ <code>forEach()</code></li>
+        <li>Parallel stream-এ <code>peek()</code></li>
+        <li><code>sorted()</code>-এর পরও <code>forEach()</code> — sort-এর পরেও stream <em>parallel-ই থাকে</em>, তাই ছাপা এলোমেলো</li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>ক্রম রক্ষিত হয়</h4>
+      <ul>
+        <li><code>findFirst()</code>, <code>limit()</code>, <code>skip()</code> — ক্রম রক্ষিত, তবে thread coordination-এর কারণে performance কমতে পারে</li>
+        <li><code>forEachOrdered()</code></li>
+        <li>Parallel stream-এ ক্রমনির্ভর operation-এর ফলাফল serial stream-এর সাথে সঙ্গতিপূর্ণ — যেমন <code>skip(5).limit(2).findFirst()</code> দুই ক্ষেত্রেই একই ফল দেয়</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p><code>findAny()</code> প্রথম উপাদান ফেরত দেওয়ার <strong>কোনো নিশ্চয়তা কখনোই দেয় না</strong> — এমনকি <em>serial</em> stream-এও নয়, যেখানে এটি কেবল <em>প্রায়ই</em> তা করে। আর parallel stream-এ <code>findAny()</code>-র আগে <code>sorted()</code> দিলেও তা সবচেয়ে ছোট মান ফেরত দেয় <strong>না</strong>।</p>
+  </div>
+
+  <h3>reduce() দিয়ে ফলাফল একত্র করা</h3>
+<pre><code>&lt;U&gt; U reduce(U identity,
+   BiFunction&lt;U,? <span class="kw">super</span> T,U&gt; accumulator,
+   BinaryOperator&lt;U&gt; combiner)</code></pre>
+<pre><code>System.out.println(List.of(<span class="str">'w'</span>, <span class="str">'o'</span>, <span class="str">'l'</span>, <span class="str">'f'</span>)
+   .parallelStream()
+   .reduce(<span class="str">""</span>,
+      (s1, c) -&gt; s1 + c,
+      (s2, s3) -&gt; s2 + s3));   <span class="cm">// wolf</span></code></pre>
+  <p>Parallel stream-এ <code>reduce()</code> কাজ করে <strong>উপাদানের জোড়ায় জোড়ায়</strong> reduction চালিয়ে intermediate মান তৈরি করে, তারপর সেগুলো combine করে। Serial stream-এ <code>wolf</code> এক অক্ষর করে গড়ে ওঠে; parallel stream-এ <code>wo</code> ও <code>lf</code> তৈরি হয়ে তারপর জোড়া লাগে।</p>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ KEY RULE</span>
+    <p>নিশ্চিত করুন যে <strong>accumulator ও combiner যে ক্রমেই কল হোক, একই ফলাফল দেয়</strong>। এই শর্ত serial stream-এও প্রযোজ্য, তবে সেখানে ফলাফল সবসময় ক্রমবদ্ধ বলে সমস্যাটা হয়তো চোখেই পড়বে না।</p>
+  </div>
+
+<pre><code>System.out.println(List.of(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>)
+   .parallelStream()
+   .reduce(<span class="num">0</span>, (a, b) -&gt; (a - b)));   <span class="cm">// PROBLEMATIC ACCUMULATOR: -21, 3, or other</span>
+
+System.out.println(List.of(<span class="str">"w"</span>,<span class="str">"o"</span>,<span class="str">"l"</span>,<span class="str">"f"</span>)
+   .parallelStream()
+   .reduce(<span class="str">"X"</span>, String::concat));   <span class="cm">// XwXoXlXf  (serial gives Xwolf)</span></code></pre>
+  <ul class="trace">
+    <li>বিয়োগ ক্রমনির্ভর, তাই প্রথম snippet serial ও parallel stream-এ ভিন্ন মান দিতে পারে।</li>
+    <li><code>"X"</code> সত্যিকারের identity মান নয়। Parallel processing-এ identity <strong>একাধিক উপাদানে</strong> প্রয়োগ হয়, ফলে আসে <code>XwXoXlXf</code>।</li>
+    <li><code>reduce()</code>-এর এক ও দুই argument-এর সংস্করণও parallel processing সমর্থন করলেও, parallel stream-এ <strong>তিন-argument সংস্করণ</strong>ই পছন্দনীয় — স্পষ্ট combiner থাকলে JVM operation গুলো আরও দক্ষভাবে ভাগ করতে পারে।</li>
+  </ul>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p>তিন-argument <code>reduce()</code>-এ <em>type</em> খেয়াল করুন। Identity <code>0</code> হলে accumulator-এর প্রথম parameter <code>Integer</code>, আর দ্বিতীয়টি stream-এর উপাদান। তাই <code>(c1, c2) -&gt; c1.length() + c2.length()</code> <span class="no">compile হয় না</span> — <code>Integer</code>-এ <code>length()</code> কল করা যায় না।</p>
+  </div>
+
+  <h3>collect() দিয়ে ফলাফল একত্র করা</h3>
+<pre><code>&lt;R&gt; R collect(Supplier&lt;R&gt; supplier,
+   BiConsumer&lt;R, ? <span class="kw">super</span> T&gt; accumulator,
+   BiConsumer&lt;R, R&gt; combiner)</code></pre>
+<pre><code>Stream&lt;String&gt; stream = Stream.of(<span class="str">"w"</span>, <span class="str">"o"</span>, <span class="str">"l"</span>, <span class="str">"f"</span>).parallel();
+SortedSet&lt;String&gt; set = stream.collect(ConcurrentSkipListSet::<span class="kw">new</span>,
+   Set::add,
+   Set::addAll);
+System.out.println(set);   <span class="cm">// [f, l, o, w]</span></code></pre>
+  <p>ফলাফল একত্র করতে <strong>concurrent collection</strong> ব্যবহার করুন, যাতে concurrent thread গুলো <code>ConcurrentModificationException</code> না ঘটায়। আর মনে রাখুন, <code>List</code>-এর মতো ক্রমবদ্ধ কাঠামোয় collect করলে serial বা parallel — যাই হোক, উপাদান একই ক্রমে থাকতে হবে, যা performance কমাতে পারে।</p>
+
+  <div class="rules-box">
+    <h4>collect() দিয়ে parallel reduction-এর শর্ত</h4>
+    <ul>
+      <li>Stream টি parallel।</li>
+      <li><code>collect()</code> operation-এর parameter-এর <code>Characteristics.CONCURRENT</code> বৈশিষ্ট্য আছে।</li>
+      <li>হয় stream টি unordered, <em>নয়তো</em> collector-এর <code>Characteristics.UNORDERED</code> আছে।</li>
+    </ul>
+    <p style="margin:10px 0 0">এর কোনোটি না মিললে <code>collect()</code> <strong>single-threaded ভাবে</strong> চলে — কাজ করে ঠিকই, কেবল parallel হয় না।</p>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p><code>Collectors.toSet()</code>-এর <code>UNORDERED</code> আছে কিন্তু <strong><code>CONCURRENT</code> নেই</strong>। তাই <code>parallelStream.collect(Collectors.toSet())</code> parallel stream-এও parallel reduction <span class="no">নয়</span>। যে দুটি collector-family <code>UNORDERED</code> ও <code>CONCURRENT</code> দুটোই — সেগুলো হলো <code>toConcurrentMap()</code> এবং <code>groupingByConcurrent()</code>।</p>
+  </div>
+
+<pre><code>Stream&lt;String&gt; ohMy = Stream.of(<span class="str">"lions"</span>, <span class="str">"tigers"</span>, <span class="str">"bears"</span>).parallel();
+ConcurrentMap&lt;Integer, String&gt; map = ohMy
+   .collect(Collectors.toConcurrentMap(String::length, k -&gt; k,
+      (s1, s2) -&gt; s1 + <span class="str">","</span> + s2));
+System.out.println(map);            <span class="cm">// {5=lions,bears, 6=tigers}</span>
+System.out.println(map.getClass()); <span class="cm">// java.util.concurrent.ConcurrentHashMap</span>
+
+<span class="kw">var</span> ohMy2 = Stream.of(<span class="str">"lions"</span>, <span class="str">"tigers"</span>, <span class="str">"bears"</span>).parallel();
+ConcurrentMap&lt;Integer, List&lt;String&gt;&gt; map2 = ohMy2.collect(
+   Collectors.groupingByConcurrent(String::length));
+System.out.println(map2);           <span class="cm">// {5=[lions, bears], 6=[tigers]}</span></code></pre>
+  <p>ফলাফল <code>ConcurrentMap</code> reference-এ assign করুন; নির্দিষ্ট class-এর নিশ্চয়তা নেই, কেবল এটুকুই যে সেটি <code>ConcurrentMap</code> implement করে।</p>
+
+  <h3>Stateful stream এড়ানো</h3>
+  <p><strong>Stateful lambda expression</strong> হলো সেটি, যার ফলাফল এমন কোনো state-এর উপর নির্ভর করে যা pipeline চলাকালীন বদলে যেতে পারে।</p>
+<pre><code><span class="kw">public</span> List&lt;Integer&gt; addValues(IntStream source) {
+   <span class="kw">var</span> data = Collections.synchronizedList(<span class="kw">new</span> ArrayList&lt;Integer&gt;());
+   source.filter(s -&gt; s % <span class="num">2</span> == <span class="num">0</span>)
+      .forEach(i -&gt; { data.add(i); });   <span class="err">// STATEFUL: DON'T DO THIS!</span>
+   <span class="kw">return</span> data;
+}
+<span class="cm">// serial:   [2, 4, 6, 8, 10]</span>
+<span class="cm">// parallel: [6, 8, 10, 2, 4]</span>
+
+<span class="kw">public</span> List&lt;Integer&gt; addValuesBetter(IntStream source) {
+   <span class="kw">return</span> source.filter(s -&gt; s % <span class="num">2</span> == <span class="num">0</span>)
+      .boxed()
+      .collect(Collectors.toList());     <span class="cm">// same ordered result either way</span>
+}</code></pre>
+  <p>Data side effect এড়াতে parallel stream-এ stateful operation পরিহার করুন — serial stream-এও, কারণ এটি ভবিষ্যতে code parallelize করার সুযোগ নষ্ট করে।</p>
+</section>
+
+<!-- ============ RECAP ============ -->
+<section class="recap" id="recap">
+  <h2>সংক্ষিপ্ত রিভিউ</h2>
+
+  <h4>Threads-এর পরিচয়</h4>
+  <ul>
+    <li>Platform thread OS thread-এর সাথে ১:১; virtual thread প্রয়োজনের সময় carrier thread-এ চলে, সবসময় daemon, আর priority সবসময় ৫।</li>
+    <li>ছয়টি state: <code>NEW</code>, <code>RUNNABLE</code>, <code>BLOCKED</code>, <code>WAITING</code>, <code>TIMED_WAITING</code>, <code>TERMINATED</code>। Priority ১–১০ কেবল পরামর্শ। <code>run()</code> synchronous; <code>start()</code> নয়।</li>
+  </ul>
+
+  <h4>Concurrency API</h4>
+  <ul>
+    <li><code>execute()</code> দেয় <code>void</code>; <code>submit()</code> দেয় <code>Future</code>। <code>Runnable</code>-এর <code>Future</code>-এ <code>get()</code> সবসময় <code>null</code>।</li>
+    <li><code>Callable.call()</code> generic type ফেরত দেয় ও checked exception ছুড়তে পারে; <code>Runnable.run()</code> কোনোটিই পারে না।</li>
+    <li>সবসময় try-with-resources ব্যবহার করুন; বন্ধ না করা executor JVM-কে জীবিত রাখে। কেবল <code>newVirtualThreadPerTaskExecutor()</code> virtual thread বানায়, আর virtual thread কখনো pool হয় না।</li>
+  </ul>
+
+  <h4>Thread-safety</h4>
+  <ul>
+    <li><code>++</code> atomic নয়; শুধু <code>volatile</code> দিয়ে সমস্যা মেটে না; atomic class মান রক্ষা করে, ক্রম নয়; <code>synchronized</code> দুটোই রক্ষা করে।</li>
+    <li><code>ReentrantLock</code>: <code>tryLock()</code>-এর return value চেক করুন, যতবার lock ততবার unlock করুন, আর না-ধরা lock unlock করলে <code>IllegalMonitorStateException</code> মনে রাখুন।</li>
+    <li><code>CyclicBarrier</code> ঠিক limit-সংখ্যক thread <code>await()</code> কল করলেই মুক্তি দেয়; নইলে ঝুলে থাকে। এটি পুনঃব্যবহারযোগ্য।</li>
+  </ul>
+
+  <h4>Concurrent collection</h4>
+  <ul>
+    <li><code>ConcurrentModificationException</code> একটিমাত্র thread-এও হতে পারে; concurrent collection memory consistency error ঠিক করে।</li>
+    <li>Skip = sorted concurrent। <code>CopyOnWrite</code> class প্রতিবার পরিবর্তনে copy বানায়, তাই চলমান iterator মূলটাই দেখে। <code>LinkedBlockingQueue</code>-ই একমাত্র blocking।</li>
+  </ul>
+
+  <h4>Threading সমস্যা</h4>
+  <ul>
+    <li>Deadlock — একে অপরের অপেক্ষায় চিরকাল blocked (ঝুলে থাকে, exception নেই)। Starvation — একটি thread ক্রমাগত বঞ্চিত। Livelock — চিরকাল blocked কিন্তু সক্রিয়।</li>
+    <li>Race condition — ক্রমানুসারে হওয়ার কথা এমন task একসাথে হয়ে অবৈধ data তৈরি করে।</li>
+  </ul>
+
+  <h4>Parallel stream</h4>
+  <ul>
+    <li><code>Collection.parallelStream()</code> ও <code>Stream.parallel()</code>; <code>ParallelStream</code> নামে কোনো class নেই।</li>
+    <li><code>findAny()</code>-র নিশ্চয়তা কখনোই নেই; <code>findFirst()</code>, <code>limit()</code>, <code>skip()</code>, <code>forEachOrdered()</code> ক্রম রক্ষা করে।</li>
+    <li>তিন-argument <code>reduce()</code> পছন্দ করুন; সত্যিকারের identity ও ক্রম-নিরপেক্ষ accumulator/combiner ব্যবহার করুন। <code>toConcurrentMap()</code> ও <code>groupingByConcurrent()</code> সত্যিকারের parallel reduction দেয়; <code>toSet()</code> দেয় না। Stateful lambda এড়ান।</li>
+  </ul>
+</section>
+
+<!-- ============ CHEAT SHEET ============ -->
+<section class="section" id="cheat">
+  <div class="sec-num">Cheat Sheet</div>
+  <h2>Exam Traps চিট-শিট</h2>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>পরিস্থিতি</th><th>কী টেস্ট হয়</th><th>রায়</th></tr>
+      <tr><td><code>new Thread(task).run()</code></td><td><code>run()</code> বনাম <code>start()</code></td><td class="no">Synchronously চলে — নতুন thread নেই</td></tr>
+      <tr><td><code>Thread.ofVirtual()</code> তারপর <code>setPriority(10)</code></td><td>Virtual thread-এর priority অপরিবর্তনীয়</td><td class="no">কোনো effect নেই — ৫-ই থাকে</td></tr>
+      <tr><td>শুধু daemon thread বাকি আছে</td><td>JVM প্রস্থানের শর্ত</td><td class="yes">JVM terminate হয়</td></tr>
+      <tr><td><code>RUNNABLE</code> thread-এ <code>interrupt()</code></td><td>Interrupt-এর আচরণ</td><td class="no">কোনো exception নেই</td></tr>
+      <tr><td><code>r.add(service.execute(task))</code></td><td><code>execute()</code> দেয় <code>void</code></td><td class="no">Compile হয় না</td></tr>
+      <tr><td><code>submit(Runnable)</code>-এর <code>Future</code>-এ <code>get()</code></td><td>Runnable-এর return value নেই</td><td class="yes">সবসময় <code>null</code></td></tr>
+      <tr><td><code>a -&gt; {return 10;}</code> কে <code>Callable</code> ধরা</td><td><code>call()</code> parameter নেয় না</td><td class="no">বৈধ Callable নয়</td></tr>
+      <tr><td><code>() -&gt; {return null}</code></td><td>Brace-এর ভেতরে semicolon নেই</td><td class="no">বৈধ lambda নয়</td></tr>
+      <tr><td>try-with-resources বা shutdown ছাড়া executor</td><td>Non-daemon executor thread</td><td class="no">Program কখনো terminate হয় না</td></tr>
+      <tr><td><code>ExecutorService s = ...ScheduledExecutor()</code> তারপর <code>scheduleWithFixedDelay()</code></td><td>Reference type হতে হবে <code>ScheduledExecutorService</code></td><td class="no">Compile হয় না</td></tr>
+      <tr><td><code>scheduleWithFixedDelay()</code> lambda-তে <code>return null;</code></td><td>কেবল <code>Runnable</code> সমর্থিত</td><td class="no">Compile হয় না</td></tr>
+      <tr><td>১২:০০-এ ৫ মিনিটের task, <code>scheduleWithFixedDelay</code> period ২ মিনিট</td><td>Delay গোনা হয় termination-এর পর</td><td class="yes">পরেরটি শুরু ১২:০৭-এ</td></tr>
+      <tr><td>৫-সেকেন্ডের task-এ <code>awaitTermination(2, SECONDS)</code></td><td>Timeout-এর আচরণ</td><td class="yes"><code>false</code> ফেরে, exception নেই</td></tr>
+      <tr><td><code>Executors.newPlatformThreadPool()</code></td><td>বানানো factory method</td><td class="no">অস্তিত্ব নেই</td></tr>
+      <tr><td>Virtual thread pool করা</td><td>Virtual thread per-task</td><td class="no">Pool করা হয় না</td></tr>
+      <tr><td>একাধিক thread-এ <code>volatile int</code> ও <code>++count</code></td><td><code>++</code> = read + write</td><td class="no">তবু thread-safe নয়</td></tr>
+      <tr><td>১০ thread একটি atomic counter বাড়াচ্ছে</td><td>Atomicity বনাম ordering</td><td class="yes">সব মান থাকে, ক্রমের নিশ্চয়তা নেই</td></tr>
+      <tr><td><code>service.submit(...)</code>-এর চারপাশে <code>synchronized</code></td><td>তৈরি synchronize, execution নয়</td><td class="no">Race ঠিক হয় না</td></tr>
+      <tr><td><code>static synchronized</code> method বনাম <code>synchronized(this)</code></td><td>Class object বনাম instance monitor</td><td class="no">ভিন্ন lock — পারস্পরিক বাধা নেই</td></tr>
+      <tr><td><code>new ReentrantLock().unlock()</code></td><td>না-ধরা lock ছাড়া</td><td class="no"><code>IllegalMonitorStateException</code></td></tr>
+      <tr><td><code>tryLock()</code>-এর ফলাফল চেক না করা</td><td><code>finally</code>-তে শর্তহীন <code>unlock()</code></td><td class="no">হয় ছাপে, নয় exception ছোড়ে</td></tr>
+      <tr><td><code>lock()</code> দুবার, <code>unlock()</code> একবার</td><td>Reentrant hold count</td><td class="no">Lock কখনো মুক্ত হয় না</td></tr>
+      <tr><td><code>readLock().lock()</code> তারপর <code>writeLock().lock()</code></td><td>Read lock upgrade করা যায় না</td><td class="no">চিরকাল অপেক্ষা</td></tr>
+      <tr><td><code>CyclicBarrier(10)</code>-এ ৯টি thread <code>await()</code></td><td>Barrier limit-এ পৌঁছায় না</td><td class="no">চিরকাল অপেক্ষা</td></tr>
+      <tr><td><code>HashMap</code>-এর keySet iterate করে remove</td><td>Iterator আপডেট হয় না</td><td class="no"><code>ConcurrentModificationException</code></td></tr>
+      <tr><td>৩-উপাদানের <code>CopyOnWriteArrayList</code> loop-এ add</td><td>Iterator মূল copy দেখে</td><td class="yes">৩ বার loop, শেষ size ৬</td></tr>
+      <tr><td>দুই thread <code>o1</code>/<code>o2</code> বিপরীত ক্রমে lock করছে</td><td>Deadlock, livelock নয়</td><td class="no">ঝুলে যেতে পারে; exception নেই</td></tr>
+      <tr><td><code>new ParallelStream(collection)</code></td><td>এমন class নেই</td><td class="no">Compile হয় না</td></tr>
+      <tr><td><code>collection.parallel()</code> / <code>stream.parallelStream()</code></td><td>Method অন্য type-এর</td><td class="no">Compile হয় না</td></tr>
+      <tr><td>ইতিমধ্যেই parallel stream-এ আবার <code>parallel()</code></td><td>Idempotent কল</td><td class="yes">অনুমোদিত</td></tr>
+      <tr><td>Parallel stream-এ <code>sorted().findAny()</code></td><td>findAny ক্রম মানে না</td><td class="no">ফলাফলের নিশ্চয়তা নেই</td></tr>
+      <tr><td>Parallel-এ <code>reduce("X", String::concat)</code></td><td>"X" সত্যিকারের identity নয়</td><td class="no">দেয় <code>XwXoXlXf</code></td></tr>
+      <tr><td><code>reduce(0, (c1,c2) -&gt; c1.length() + c2.length(), ...)</code></td><td>Accumulator-এর type</td><td class="no">Compile হয় না</td></tr>
+      <tr><td><code>parallelStream.collect(Collectors.toSet())</code></td><td>toSet-এ <code>CONCURRENT</code> নেই</td><td class="no">Parallel reduction নয়</td></tr>
+      <tr><td><code>groupingByConcurrent()</code> / <code>toConcurrentMap()</code></td><td>UNORDERED + CONCURRENT</td><td class="yes">সত্যিকারের parallel reduction</td></tr>
+    </table>
+  </div>
+</section>
+
+<footer>OCP Java SE 21 Developer Study Guide · Boyarsky &amp; Selikoff · অধ্যায় ১৩ — Concurrency · বিস্তারিত হ্যান্ডনোট</footer>
+</div>
+</body>
+</html>

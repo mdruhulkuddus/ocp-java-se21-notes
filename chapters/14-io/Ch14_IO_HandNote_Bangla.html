@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 — অধ্যায় ১৪ · I/O (বিস্তারিত হ্যান্ডনোট)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6f8;   --card:#ffffff;  --ink:#2f3437;   --muted:#7b8a93;
+  --kw:#7c5cbf;   --str:#3a8a5c;   --num:#b8860b;   --err:#c44d3e;  --cm:#a89a8a;
+  --icode-bg:#f3ece4; --icode-fg:#9a5030;
+  --accent:#c96442; --accent2:#d4845e;
+  --line:#ece3da;
+  --yes:#3b7d57;  --no:#c44d3e;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; padding:28px 16px 70px;
+  background:var(--bg); color:var(--ink);
+  font-family:'Noto Sans Bengali','Source Sans 3',system-ui,sans-serif;
+  font-size:17px; line-height:1.95;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:980px;margin:0 auto;}
+h1,h2,h3,h4{font-family:'Noto Sans Bengali',system-ui,sans-serif;line-height:1.55;}
+p{margin:0 0 14px;}
+ul,ol{margin:0 0 15px;padding-left:22px;}
+li{margin-bottom:8px;}
+code,pre,.mono{font-family:'JetBrains Mono',ui-monospace,monospace;}
+code{background:var(--icode-bg);color:var(--icode-fg);padding:1.5px 6px;border-radius:5px;font-size:.82em;}
+pre{
+  background:#fdfaf7;border-radius:12px;padding:16px 18px;margin:0 0 16px;
+  overflow-x:auto;box-shadow:inset 0 2px 8px rgba(140,110,90,.10);
+  font-size:13.6px;line-height:1.62;
+}
+pre code{background:none;color:#3b3f42;padding:0;font-size:inherit;}
+.kw{color:var(--kw);font-weight:600;} .str{color:var(--str);} .num{color:var(--num);}
+.err{color:var(--err);font-weight:700;} .cm{color:var(--cm);font-style:italic;}
+
+.header{
+  background:linear-gradient(135deg,#ffffff 0%,#fbf7f4 100%);
+  border-radius:18px;padding:34px 32px;margin-bottom:26px;
+  box-shadow:0 6px 26px rgba(120,110,100,.10);
+}
+.badge{
+  display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:700;
+  letter-spacing:.9px;text-transform:uppercase;padding:7px 15px;border-radius:999px;
+  box-shadow:0 3px 10px rgba(201,100,66,.28);
+}
+.header h1{font-size:1.95rem;margin:18px 0 6px;font-weight:800;}
+.header h1 .dim{color:var(--muted);font-weight:400;font-size:1.1rem;}
+.header .sub{font-style:italic;color:var(--muted);margin-bottom:20px;}
+.objectives{
+  background:linear-gradient(135deg,#f0f9f3,#f7fcf8);
+  border-left:4px solid #5aab7b;border-radius:12px;padding:16px 20px;
+}
+.objectives h4{margin:0 0 8px;color:#3b7d57;font-size:.95rem;}
+.objectives ul{margin:0;padding-left:20px;}
+.objectives li{margin-bottom:5px;font-size:.95rem;}
+
+.toc{
+  background:var(--card);border-radius:14px;padding:24px 28px;margin-bottom:30px;
+  box-shadow:0 4px 18px rgba(120,110,100,.08);
+}
+.toc h3{margin:0 0 14px;font-size:1.05rem;color:var(--accent);}
+.toc ol{columns:2;column-gap:34px;margin:0;padding-left:22px;}
+.toc li{margin-bottom:8px;break-inside:avoid;}
+.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted #cfc4b8;}
+.toc a:hover{color:var(--accent);}
+@media(max-width:660px){.toc ol{columns:1;}}
+
+.section{
+  background:var(--card);border-radius:14px;padding:28px 30px;margin-bottom:26px;
+  box-shadow:0 4px 18px rgba(120,110,100,.08);
+}
+.sec-num{
+  font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;
+  letter-spacing:1.6px;color:var(--accent);text-transform:uppercase;
+}
+.section h2{font-size:1.42rem;margin:6px 0 20px;padding-bottom:12px;border-bottom:2px solid var(--line);}
+.section h3{font-size:1.12rem;margin:26px 0 10px;color:#43484c;}
+.section h4{font-size:1rem;margin:20px 0 8px;color:#5a6166;}
+
+.card{
+  border-radius:14px;padding:15px 20px;margin:18px 0;
+  box-shadow:0 3px 12px rgba(120,110,100,.09);
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(120,110,100,.15);}
+.card p:last-child,.card ul:last-child{margin-bottom:0;}
+.card-label{
+  font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+  letter-spacing:1.1px;text-transform:uppercase;margin-bottom:7px;display:block;
+}
+.exam-trap{background:linear-gradient(135deg,#fef2f0,#fff8f7);border-left:4px solid #e06b5e;}
+.exam-trap .card-label{color:#c0453a;}
+.key-rule{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:4px solid #5aab7b;}
+.key-rule .card-label{color:#3b7d57;}
+.remember{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:4px solid #d4a24c;}
+.remember .card-label{color:#a9772a;}
+
+.rules-box{
+  background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-top:4px solid #5aab7b;
+  border-radius:12px;padding:18px 22px;margin:18px 0;
+  box-shadow:0 3px 12px rgba(120,110,100,.08);
+}
+.rules-box h4{margin:0 0 10px;color:#3b7d57;font-size:.95rem;font-weight:700;}
+.rules-box ul,.rules-box ol{margin:0;}
+
+.vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0;}
+.vs-grid > div{
+  background:var(--card);border-radius:12px;padding:16px 18px;
+  box-shadow:0 3px 12px rgba(120,110,100,.10);
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.vs-grid > div:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(120,110,100,.15);}
+.vs-grid h4{margin:0 0 8px;font-size:1rem;}
+.vs-grid .left h4{color:#7c5cbf;}
+.vs-grid .right h4{color:#3b7d57;}
+.vs-grid ul,.vs-grid ol{padding-left:19px;margin:0;font-size:.95rem;}
+@media(max-width:660px){.vs-grid{grid-template-columns:1fr;}}
+
+.tbl-wrap{overflow-x:auto;margin:18px 0;border-radius:12px;box-shadow:0 3px 14px rgba(120,110,100,.10);}
+table{width:100%;border-collapse:collapse;background:var(--card);border-radius:12px;overflow:hidden;font-size:.93rem;}
+th{background:#f0e8de;text-align:left;padding:11px 14px;font-weight:700;color:#4a4038;font-size:.88rem;}
+td{padding:10px 14px;border-top:1px solid #f1eae2;vertical-align:top;}
+tr:hover td{background:#fdfbf9;}
+td code,th code{font-size:.85em;}
+.yes{color:var(--yes);font-weight:700;}
+.no{color:var(--no);font-weight:700;}
+
+.trace{background:#fdfaf7;border-radius:12px;padding:14px 18px 14px 36px;margin:0 0 16px;
+  box-shadow:inset 0 2px 8px rgba(140,110,90,.08);font-size:.96rem;}
+.trace li{margin-bottom:6px;}
+
+.recap{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-radius:14px;padding:28px 30px;
+  margin-bottom:26px;box-shadow:0 4px 18px rgba(120,110,100,.10);}
+.recap h2{font-size:1.4rem;margin:0 0 18px;padding-bottom:12px;border-bottom:2px solid #f0e2c8;}
+.recap h4{color:#a9772a;margin:18px 0 6px;font-size:1rem;}
+.recap ul{margin:0;padding-left:20px;}
+
+footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:34px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="header">
+  <span class="badge">OCP Java SE 21 Developer — Exam 1Z0-830</span>
+  <h1>অধ্যায় ১৪ · I/O <span class="dim">(বিস্তারিত হ্যান্ডনোট)</span></h1>
+  <p class="sub">File ও path, NIO.2 API, I/O stream, ফাইল read/write, serialization, user interaction এবং advanced file attribute।</p>
+  <div class="objectives">
+    <h4>এই অধ্যায়ে কভার হওয়া exam objectives</h4>
+    <ul>
+      <li>I/O stream ব্যবহার করে console ও file data read ও write করা।</li>
+      <li>Java object serialize ও de-serialize করা।</li>
+      <li><code>java.nio.file</code> API ব্যবহার করে <code>Path</code> object ও তাদের property construct, traverse, create, read ও write করা।</li>
+    </ul>
+  </div>
+</div>
+
+<div class="toc">
+  <h3>সূচিপত্র</h3>
+  <ol>
+    <li><a href="#s1">File ও Directory Reference করা</a></li>
+    <li><a href="#s2">File ও Path নিয়ে কাজ</a></li>
+    <li><a href="#s3">I/O Stream-এর পরিচয়</a></li>
+    <li><a href="#s4">File Read ও Write করা</a></li>
+    <li><a href="#s5">Data Serialize করা</a></li>
+    <li><a href="#s6">User-এর সাথে ইন্টারঅ্যাকশন</a></li>
+    <li><a href="#s7">Advanced API নিয়ে কাজ</a></li>
+    <li><a href="#recap">সংক্ষিপ্ত রিভিউ</a></li>
+    <li><a href="#cheat">Exam Traps চিট-শিট</a></li>
+  </ol>
+</div>
+
+<!-- ============ SECTION 1 ============ -->
+<section class="section" id="s1">
+  <div class="sec-num">Section 01</div>
+  <h2>File ও Directory Reference করা</h2>
+
+  <h3>File system-এর ধারণা</h3>
+  <p>Storage device-এর ভেতরে একটি <strong>file</strong> data ধরে রাখে। File গুলো <strong>directory</strong> ব্যবহার করে হায়ারার্কিতে সাজানো হয় — directory এমন একটি অবস্থান যা file এবং অন্য directory দুটোই রাখতে পারে। Java-তে আমরা প্রায়ই directory-কে file-এর মতোই ট্রিট করি, একই class ও method ব্যবহার করে; এই অধ্যায়ে "file" বলতে প্রায়ই "file বা directory" বোঝানো হয়।</p>
+  <p><strong>File system</strong> কম্পিউটারের ভেতরে data read/write-এর দায়িত্বে থাকে; JVM স্বয়ংক্রিয়ভাবে local file system-এর সাথে সংযোগ করে। <strong>Root directory</strong> হলো সবচেয়ে উপরের directory — Windows-এ <code>C:\</code>, Linux-এ <code>/</code>। <strong>Path</strong> হলো file বা directory-র একটি উপস্থাপনা; separator-এর বাঁ দিকের মান ডান দিকের মানের parent।</p>
+
+  <div class="rules-box">
+    <h4>Absolute বনাম relative — exam-এর কনভেনশন</h4>
+    <ul>
+      <li>Path যদি forward slash (<code>/</code>) দিয়ে শুরু হয়, এটি <strong>absolute</strong>, root হলো <code>/</code> — যেমন <code>/bird/parrot.png</code>।</li>
+      <li>Path যদি drive letter (<code>C:</code>) দিয়ে শুরু হয়, এটি <strong>absolute</strong>, root হলো ওই drive letter — যেমন <code>C:/bird/info</code>।</li>
+      <li>অন্যথায় এটি <strong>relative</strong> path — যেমন <code>bird/parrot.png</code>।</li>
+    </ul>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Symbol</th><th>বর্ণনা</th></tr>
+      <tr><td><code>.</code></td><td>বর্তমান directory-র রেফারেন্স</td></tr>
+      <tr><td><code>..</code></td><td>বর্তমান directory-র parent-এর রেফারেন্স</td></tr>
+    </table>
+  </div>
+  <p>Current directory <code>/fish/shark/hammerhead</code> হলে <code>../swim.txt</code> সমতুল্য <code>/fish/shark/swim.txt</code>, আর <code>../../clownfish</code> সমতুল্য <code>/fish/clownfish</code>। <code>/fish/clownfish/../shark/./swim.txt</code>-এর মতো অপ্রয়োজনীয় অংশ <code>normalize()</code> দিয়ে সরানো যায়।</p>
+
+  <p><strong>Symbolic link</strong> হলো একটি বিশেষ file যা অন্য file বা directory-র pointer হিসেবে কাজ করে। <code>/zoo/user/favorite</code> থেকে <code>/fish/shark</code>-এ link থাকলে <code>/fish/shark/swim.txt</code> ও <code>/zoo/user/favorite/swim.txt</code> একই file নির্দেশ করে।</p>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ KEY RULE</span>
+    <p>পুরোনো <strong>I/O API symbolic link সমর্থন করে না</strong>। NIO.2-তে symbolic link তৈরি, শনাক্ত ও navigate করার পূর্ণ সাপোর্ট আছে।</p>
+  </div>
+
+  <h3>File তৈরি করা</h3>
+<pre><code>File zooFile1 = <span class="kw">new</span> File(<span class="str">"/home/tiger/data/stripes.txt"</span>);
+File zooFile2 = <span class="kw">new</span> File(<span class="str">"/home/tiger"</span>, <span class="str">"data/stripes.txt"</span>);
+
+File parent = <span class="kw">new</span> File(<span class="str">"/home/tiger"</span>);
+File zooFile3 = <span class="kw">new</span> File(parent, <span class="str">"data/stripes.txt"</span>);
+
+System.out.println(zooFile1.exists());</code></pre>
+  <p>তিনটিই একই অবস্থান নির্দেশ করে। শেষ constructor-এ parent হিসেবে <code>null</code> pass করলে সেটি উপেক্ষা করা হয় এবং এটি একক-<code>String</code> constructor-এর মতোই আচরণ করে।</p>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p><strong>তিন-parameter-এর কোনো <code>File</code> constructor নেই</strong> — <code>new File("/weather", "winter", "snow.dat")</code> compile হয় না। <code>(File, String)</code> constructor আছে, কিন্তু <strong><code>(String, File)</code> constructor নেই</strong>।</p>
+  </div>
+
+  <h3>Path তৈরি করা</h3>
+  <p><code>Path</code> একটি <strong>interface</strong>, তাই এর কোনো constructor নেই। সাধারণ factory method:</p>
+<pre><code><span class="kw">public static</span> Path of(String first, String... more)</code></pre>
+<pre><code>Path zooPath1 = Path.of(<span class="str">"/home/tiger/data/stripes.txt"</span>);
+Path zooPath2 = Path.of(<span class="str">"/home"</span>, <span class="str">"tiger"</span>, <span class="str">"data"</span>, <span class="str">"stripes.txt"</span>);
+
+System.out.println(Files.exists(zooPath1));</code></pre>
+  <p>Varargs মানগুলো একত্র হয় এবং OS-নির্ভর file separator দিয়ে স্বয়ংক্রিয়ভাবে আলাদা হয়।</p>
+
+  <div class="rules-box">
+    <h4>Path পাওয়ার চারটি উপায়</h4>
+    <ul>
+      <li><code>Path.of("/home", "tiger", "data")</code> — পছন্দনীয় factory method।</li>
+      <li><code>Paths.get("/home", "tiger", "data")</code> — পুরোনো <code>Paths</code> helper class; signature একই, তবে ভবিষ্যতে deprecated হতে পারে।</li>
+      <li><code>FileSystems.getDefault().getPath("/home/tiger/data/stripes.txt")</code> — <code>Path.of()</code> ভেতরে এটাই ব্যবহার করে।</li>
+      <li><code>Path.of(URI.create("https://www.selikoff.net"))</code> — URI থেকে, <code>file://</code> বা <code>https://</code>-এর মতো scheme সহ।</li>
+    </ul>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p><code>new Path("jaguar.txt")</code> <span class="no">compile হয় না</span> — <code>Path</code> একটি interface। আর <code>Path</code>-এর static method হলো <code>of()</code>, <strong><code>get()</code> নয়</strong>; <code>get()</code> আছে <code>Paths</code>-এ। এই দুটি নাম অদলবদল করাই ক্লাসিক distractor।</p>
+  </div>
+
+  <h3>File ও Path-এর মধ্যে রূপান্তর</h3>
+<pre><code>File file = <span class="kw">new</span> File(<span class="str">"rabbit"</span>);
+Path newPath = file.toPath();
+File backToFile = newPath.toFile();</code></pre>
+  <p>অনেক পুরোনো library <code>File</code> ব্যবহার করে। নতুন application-এ NIO.2-এর <code>Path</code> ব্যবহার করুন — এতে অনেক বেশি feature আছে।</p>
+</section>
+
+<!-- ============ SECTION 2 ============ -->
+<section class="section" id="s2">
+  <div class="sec-num">Section 02</div>
+  <h2>File ও Path নিয়ে কাজ</h2>
+
+  <h3>Shared functionality</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>বর্ণনা</th><th>I/O <code>File</code> instance method</th><th>NIO.2 <code>Path</code> instance method</th></tr>
+      <tr><td>file/directory-র নাম পাওয়া</td><td><code>getName()</code></td><td><code>getFileName()</code></td></tr>
+      <tr><td>Parent directory বা <code>null</code></td><td><code>getParent()</code></td><td><code>getParent()</code></td></tr>
+      <tr><td>Absolute path কি না</td><td><code>isAbsolute()</code></td><td><code>isAbsolute()</code></td></tr>
+      <tr><td>Absolute path পাওয়া</td><td><code>getAbsolutePath()</code></td><td><code>toAbsolutePath()</code></td></tr>
+    </table>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>বর্ণনা</th><th>I/O <code>File</code> instance method</th><th>NIO.2 <code>Files</code> <em>static</em> method</th></tr>
+      <tr><td>Delete করা</td><td><code>delete()</code></td><td><code>deleteIfExists(Path p)</code> throws <code>IOException</code></td></tr>
+      <tr><td>অস্তিত্ব যাচাই</td><td><code>exists()</code></td><td><code>exists(Path p, LinkOption... o)</code></td></tr>
+      <tr><td>Directory কি না</td><td><code>isDirectory()</code></td><td><code>isDirectory(Path p, LinkOption... o)</code></td></tr>
+      <tr><td>File কি না</td><td><code>isFile()</code></td><td><code>isRegularFile(Path p, LinkOption... o)</code></td></tr>
+      <tr><td>শেষ modify করার সময়</td><td><code>lastModified()</code></td><td><code>getLastModifiedTime(Path p, LinkOption... o)</code></td></tr>
+      <tr><td>Byte সংখ্যা</td><td><code>length()</code></td><td><code>size(Path p)</code></td></tr>
+      <tr><td>Directory-র contents</td><td><code>listFiles()</code></td><td><code>list(Path p)</code></td></tr>
+      <tr><td>Directory তৈরি</td><td><code>mkdir()</code></td><td><code>createDirectory(Path p, FileAttribute... a)</code></td></tr>
+      <tr><td>Directory + parent তৈরি</td><td><code>mkdirs()</code></td><td><code>createDirectories(Path p, FileAttribute... a)</code></td></tr>
+      <tr><td>Rename/move</td><td><code>renameTo(File dest)</code></td><td><code>move(Path src, Path dest, CopyOption... o)</code></td></tr>
+    </table>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p><code>java.io.File</code> হলো I/O class; <code>Files</code> হলো NIO.2-এর <em>helper</em> class, যার method গুলো <strong>static</strong> এবং <code>Path</code> instance নিয়ে কাজ করে, <code>File</code> নিয়ে নয়। API-এর মধ্যে নাম মেলানোর ফাঁদেও সাবধান: এটি <code>Files.createDirectory()</code>, <strong><code>Files.mkdir()</code> নয়</strong>। <code>Files.mkdir(...)</code> লিখলে compile হয় না।</p>
+  </div>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ KEY RULE</span>
+    <p>যেসব method file access বা পরিবর্তন করে, বিশেষত <code>Files</code>-এর, সেগুলো সাধারণত <code>IOException</code> declare করে — আর সেই checked exception <strong>অবশ্যই handle বা declare করতে হবে</strong>। Exam-এর একটি ঘন ঘন আসা কৌশল হলো <code>throws IOException</code> ছাড়া <code>Files.deleteIfExists()</code> বা <code>Files.size()</code> কল করা: সেটি compile হয় না। উল্লেখযোগ্য ব্যতিক্রম <code>Files.exists()</code> — file না থাকলে যদি এটি exception ছুড়ত, তাহলে <code>false</code> ফেরত দিতেই পারত না।</p>
+  </div>
+
+  <h3>Optional NIO.2 parameter</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Enum type</th><th>Interface inherited</th><th>Enum value</th><th>বিবরণ</th></tr>
+      <tr><td><code>LinkOption</code></td><td><code>CopyOption</code>, <code>OpenOption</code></td><td><code>NOFOLLOW_LINKS</code></td><td>Symbolic link অনুসরণ করবে না</td></tr>
+      <tr><td rowspan="3"><code>StandardCopyOption</code></td><td rowspan="3"><code>CopyOption</code></td><td><code>ATOMIC_MOVE</code></td><td>File-কে atomic file system operation হিসেবে move করে</td></tr>
+      <tr><td><code>COPY_ATTRIBUTES</code></td><td>বিদ্যমান attribute নতুন file-এ copy করে</td></tr>
+      <tr><td><code>REPLACE_EXISTING</code></td><td>File আগে থেকেই থাকলে overwrite করে</td></tr>
+      <tr><td rowspan="6"><code>StandardOpenOption</code></td><td rowspan="6"><code>OpenOption</code></td><td><code>APPEND</code></td><td>Write-এর জন্য খোলা থাকলে শেষে append করে</td></tr>
+      <tr><td><code>CREATE</code></td><td>না থাকলে নতুন file তৈরি করে</td></tr>
+      <tr><td><code>CREATE_NEW</code></td><td>কেবল না থাকলেই তৈরি করে; অন্যথায় ব্যর্থ হয়</td></tr>
+      <tr><td><code>READ</code></td><td>Read access-এর জন্য খোলে</td></tr>
+      <tr><td><code>TRUNCATE_EXISTING</code></td><td>File মুছে শুরু থেকে append করে</td></tr>
+      <tr><td><code>WRITE</code></td><td>Write access-এর জন্য খোলে</td></tr>
+      <tr><td><code>FileVisitOption</code></td><td>N/A</td><td><code>FOLLOW_LINKS</code></td><td>Symbolic link অনুসরণ করে</td></tr>
+    </table>
+  </div>
+  <p><code>LinkOption</code> যেহেতু <code>CopyOption</code> inherit করে, একটি কলেই ভিন্ন type মেশানো যায়:</p>
+<pre><code>Files.move(source, target,
+   LinkOption.NOFOLLOW_LINKS,
+   StandardCopyOption.ATOMIC_MOVE);</code></pre>
+
+  <h3>Path immutable</h3>
+<pre><code>Path p = Path.of(<span class="str">"whale"</span>);
+p.resolve(<span class="str">"krill"</span>);
+System.out.println(p);   <span class="cm">// whale — the result was discarded</span></code></pre>
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p><code>String</code>-এর মতোই <code>Path</code> <strong>immutable</strong>। ফলাফল assign না করে <code>Path</code>-এর কোনো method কল করা মানে কার্যত কিছুই না করা। Exam প্রায়ই <code>p1.normalize().relativize(x);</code>-কে আলাদা line-এ লুকিয়ে রেখে পরে অপরিবর্তিত <code>p1</code> প্রিন্ট করে।</p>
+  </div>
+
+  <h3>Path দেখা ও অংশ নেওয়া</h3>
+<pre><code>Path path = Path.of(<span class="str">"/land/hippo/harry.happy"</span>);
+System.out.println(<span class="str">"The Path is: "</span> + path);
+<span class="kw">for</span>(<span class="kw">int</span> i=<span class="num">0</span>; i&lt;path.getNameCount(); i++)
+   System.out.println(<span class="str">"   Element "</span> + i + <span class="str">" is: "</span> + path.getName(i));</code></pre>
+<pre><code>The Path is: /land/hippo/harry.happy
+   Element 0 is: land
+   Element 1 is: hippo
+   Element 2 is: harry.happy</code></pre>
+  <ul class="trace">
+    <li><code>toString()</code>-ই <code>Path</code>-এর <strong>একমাত্র</strong> method যা <code>String</code> ফেরত দেয়; বাকিরা সাধারণত <code>Path</code> ফেরত দেয়।</li>
+    <li><code>getNameCount()</code> ও <code>getName()</code> <strong>root অন্তর্ভুক্ত করে না</strong>, absolute path হলেও নয়।</li>
+    <li><code>Path.of("/").getNameCount()</code> হলো <code>0</code>, আর এতে <code>getName(0)</code> কল করলে <code>IllegalArgumentException</code> ছোড়ে।</li>
+  </ul>
+
+<pre><code><span class="kw">var</span> p = Path.of(<span class="str">"/mammal/omnivore/raccoon.image"</span>);
+p.subpath(<span class="num">0</span>, <span class="num">3</span>);   <span class="cm">// mammal/omnivore/raccoon.image</span>
+p.subpath(<span class="num">1</span>, <span class="num">2</span>);   <span class="cm">// omnivore</span>
+p.subpath(<span class="num">1</span>, <span class="num">3</span>);   <span class="cm">// omnivore/raccoon.image</span>
+
+p.subpath(<span class="num">0</span>, <span class="num">4</span>);   <span class="err">// IllegalArgumentException — max index is 3</span>
+p.subpath(<span class="num">1</span>, <span class="num">1</span>);   <span class="err">// IllegalArgumentException — empty path</span></code></pre>
+  <p><code>subpath()</code> inclusive <code>beginIndex</code> ও exclusive <code>endIndex</code> নেয়, zero-indexed, root বাদ দেয় — এবং absolute path-এ প্রয়োগ করলেও <strong>relative</strong> path ফেরত দেয়।</p>
+
+  <h3>Path element অ্যাক্সেস</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Path</th><th><code>getFileName()</code></th><th><code>getRoot()</code></th><th><code>getParent()</code> chain</th></tr>
+      <tr><td><code>zoo</code></td><td><code>zoo</code></td><td class="no"><code>null</code></td><td>(নেই)</td></tr>
+      <tr><td><code>/zoo/armadillo/shells.txt</code></td><td><code>shells.txt</code></td><td><code>/</code></td><td><code>/zoo/armadillo</code> → <code>/zoo</code> → <code>/</code></td></tr>
+      <tr><td><code>./armadillo/../shells.txt</code></td><td><code>shells.txt</code></td><td class="no"><code>null</code></td><td><code>./armadillo/..</code> → <code>./armadillo</code> → <code>.</code></td></tr>
+    </table>
+  </div>
+  <ul class="trace">
+    <li>Relative path-এ <code>getRoot()</code> <code>null</code> ফেরত দেয়।</li>
+    <li><code>getParent()</code> root-এ বা relative path-এর শীর্ষে <code>null</code> দেয়, এবং <strong>current working directory-র বাইরে যায় না</strong>।</li>
+    <li>এই method গুলো <strong>path symbol resolve করে না</strong> — <code>..</code> ও <code>.</code> সাধারণ path element হিসেবেই গণ্য হয়।</li>
+  </ul>
+
+  <h3>resolve() — concatenation</h3>
+<pre><code>Path path1 = Path.of(<span class="str">"/cats/../panther"</span>);
+Path path2 = Path.of(<span class="str">"food"</span>);
+System.out.println(path1.resolve(path2));    <span class="cm">// /cats/../panther/food</span>
+
+Path path3 = Path.of(<span class="str">"/turkey/food"</span>);
+System.out.println(path3.resolve(<span class="str">"/tiger/cage"</span>));   <span class="cm">// /tiger/cage</span></code></pre>
+  <div class="card key-rule">
+    <span class="card-label">✓ KEY RULE</span>
+    <p><code>resolve()</code> দেখলেই ভাবুন <strong>concatenation</strong>। এটি path symbol পরিষ্কার করে না। আর <strong>argument যদি absolute path হয়, সেই argument-ই ফেরত আসে</strong> — <code>resolve()</code> দিয়ে দুটি absolute path জোড়া দেওয়া যায় না।</p>
+  </div>
+
+  <h3>relativize() — একটি থেকে আরেকটিতে যাওয়ার পথ</h3>
+<pre><code><span class="kw">var</span> path1 = Path.of(<span class="str">"fish.txt"</span>);
+<span class="kw">var</span> path2 = Path.of(<span class="str">"friendly/birds.txt"</span>);
+System.out.println(path1.relativize(path2));   <span class="cm">// ../friendly/birds.txt</span>
+System.out.println(path2.relativize(path1));   <span class="cm">// ../../fish.txt</span></code></pre>
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p><code>relativize()</code>-এর জন্য দুটি path-ই <strong>হয় absolute, নয় relative</strong> হতে হবে; মেশালে <code>IllegalArgumentException</code>। Windows-এ দুটি absolute path-এর root/drive letter-ও এক হতে হবে, নইলে exception।</p>
+<pre style="margin:8px 0 0"><code>Path.of(<span class="str">"/primate/chimpanzee"</span>).relativize(Path.of(<span class="str">"bananas.txt"</span>));
+   <span class="err">// IllegalArgumentException</span></code></pre>
+  </div>
+
+  <h3>normalize() ও toRealPath()</h3>
+<pre><code>Path.of(<span class="str">"./armadillo/../shells.txt"</span>).normalize();   <span class="cm">// shells.txt</span>
+Path.of(<span class="str">"/cats/../panther/food"</span>).normalize();      <span class="cm">// /panther/food</span>
+Path.of(<span class="str">"../../fish.txt"</span>).normalize();             <span class="cm">// ../../fish.txt (unchanged)</span>
+
+<span class="kw">var</span> p1 = Path.of(<span class="str">"/pony/../weather.txt"</span>);
+<span class="kw">var</span> p2 = Path.of(<span class="str">"/weather.txt"</span>);
+p1.equals(p2);                                 <span class="cm">// false</span>
+p1.normalize().equals(p2.normalize());         <span class="cm">// true</span></code></pre>
+  <p><code>normalize()</code> কেবল যেসব redundancy কমানো <em>যায়</em> সেগুলোই সরায় — এর মূল উদ্দেশ্য সমতুল্য path তুলনা করতে দেওয়া।</p>
+
+  <div class="vs-grid">
+    <div class="left">
+      <h4>normalize()</h4>
+      <ul>
+        <li>সম্পূর্ণ textual — কমানো-যোগ্য <code>.</code> ও <code>..</code> সরায়</li>
+        <li>File system স্পর্শ <strong>করে না</strong></li>
+        <li>File না থাকলেও কখনো throw করে না</li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>toRealPath()</h4>
+      <ul>
+        <li>Redundant symbol সরায় <em>এবং</em> relative হলে working directory-র সাথে জোড়ে</li>
+        <li><strong>Symbolic link অনুসরণ করে</strong> (উপেক্ষা করতে optional <code>LinkOption</code>)</li>
+        <li><strong>Path না থাকলে exception ছোড়ে</strong></li>
+        <li><code>Path.of(".").toRealPath()</code> দিয়ে current working directory পাওয়া যায়</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>বর্ণনা</th><th><code>Path</code> instance method</th></tr>
+      <tr><td>File path as string</td><td><code>String toString()</code></td></tr>
+      <tr><td>একটি segment</td><td><code>Path getName(int index)</code></td></tr>
+      <tr><td>Segment সংখ্যা</td><td><code>int getNameCount()</code></td></tr>
+      <tr><td>নির্দিষ্ট রেঞ্জের segment</td><td><code>Path subpath(int beginIndex, int endIndex)</code></td></tr>
+      <tr><td>শেষ segment</td><td><code>Path getFileName()</code></td></tr>
+      <tr><td>সরাসরি parent</td><td><code>Path getParent()</code></td></tr>
+      <tr><td>Top-level segment</td><td><code>Path getRoot()</code></td></tr>
+      <tr><td>Path জোড়া দেওয়া</td><td><code>Path resolve(String p)</code> · <code>Path resolve(Path p)</code></td></tr>
+      <tr><td>প্রদত্ত path-এ যাওয়ার পথ</td><td><code>Path relativize(Path p)</code></td></tr>
+      <tr><td>অপ্রয়োজনীয় অংশ সরানো</td><td><code>Path normalize()</code></td></tr>
+      <tr><td>Link অনুসরণ করে আসল path</td><td><code>Path toRealPath()</code></td></tr>
+    </table>
+  </div>
+
+  <h3>তৈরি, copy, move, delete</h3>
+  <div class="vs-grid">
+    <div class="left">
+      <h4>createDirectory()</h4>
+      <ul>
+        <li>Directory <strong>আগে থেকেই থাকলে</strong> throw করে</li>
+        <li>Parent directory না থাকলেও throw করে</li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>createDirectories()</h4>
+      <ul>
+        <li>Target <strong>এবং অনুপস্থিত সব parent</strong> তৈরি করে</li>
+        <li>সবকিছু আগে থেকেই থাকলে <strong>কিছু না করেই</strong> শেষ হয় — exception নেই</li>
+      </ul>
+    </div>
+  </div>
+
+<pre><code>Files.copy(Path.of(<span class="str">"/panda/bamboo.txt"</span>), Path.of(<span class="str">"/panda-save/bamboo.txt"</span>));
+Files.copy(Path.of(<span class="str">"/turtle"</span>), Path.of(<span class="str">"/turtleCopy"</span>));   <span class="cm">// SHALLOW copy</span>
+
+Files.copy(Path.of(<span class="str">"book.txt"</span>), Path.of(<span class="str">"movie.txt"</span>),
+   StandardCopyOption.REPLACE_EXISTING);</code></pre>
+  <ul class="trace">
+    <li>Directory copy করলে সেটি <strong>shallow</strong> — ভেতরের file ও subdirectory copy হয় না। Deep copy-র জন্য recursion লাগে।</li>
+    <li><code>REPLACE_EXISTING</code> ছাড়া target আগে থেকেই থাকলে <code>copy()</code> throw করে।</li>
+    <li>I/O stream-এর সাথে দুটি overload: <code>copy(InputStream in, Path target, CopyOption... o)</code> এবং <code>copy(Path source, OutputStream out)</code>।</li>
+  </ul>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p>File-কে directory-র "ভেতরে" copy করা যেভাবে ভাবছেন সেভাবে কাজ করে না:</p>
+<pre style="margin:8px 0 6px"><code><span class="kw">var</span> file = Path.of(<span class="str">"food.txt"</span>);
+<span class="kw">var</span> directory = Path.of(<span class="str">"/enclosure"</span>);   <span class="cm">// both exist</span>
+Files.copy(file, directory);              <span class="err">// throws at runtime</span></code></pre>
+    <p>Command টি <code>/enclosure</code> নামে একটি নতুন <em>file</em> তৈরির চেষ্টা করে, আর ওই path আগে থেকেই থাকায় throw করে। <code>/enclosure</code> যদি <em>না</em> থাকত, তাহলে <code>food.txt</code>-এর বিষয়বস্তু নিয়ে <code>/enclosure</code> নামের একটি file তৈরি হতো। সঠিক target হলো <code>/enclosure/food.txt</code>। <strong>এটি <code>move()</code>-এর ক্ষেত্রেও প্রযোজ্য।</strong></p>
+  </div>
+
+<pre><code>Files.move(Path.of(<span class="str">"C:\\zoo"</span>), Path.of(<span class="str">"C:\\zoo-new"</span>));
+Files.move(Path.of(<span class="str">"mouse.txt"</span>), Path.of(<span class="str">"gerbil.txt"</span>),
+   StandardCopyOption.ATOMIC_MOVE);</code></pre>
+  <p><strong>Atomic move</strong> হলো একটি একক, অবিভাজ্য operation — file system পর্যবেক্ষণকারী কোনো process কখনো অসম্পূর্ণ বা আংশিক লেখা file দেখে না। File system এটি সমর্থন না করলে <code>AtomicMoveNotSupportedException</code> ছোড়া হয়। খেয়াল রাখুন, <code>ATOMIC_MOVE</code> <code>StandardCopyOption</code>-এর সদস্য হলেও <code>copy()</code>-তে pass করলে সম্ভবত exception ছুড়বে।</p>
+
+  <div class="vs-grid">
+    <div class="left">
+      <h4>delete(Path)</h4>
+      <ul>
+        <li><code>void</code> ফেরত দেয়</li>
+        <li>Path না থাকলে <strong>throw করে</strong> (<code>NoSuchFileException</code>)</li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>deleteIfExists(Path)</h4>
+      <ul>
+        <li><code>boolean</code> ফেরত দেয় — delete হলে <code>true</code>, নইলে <code>false</code></li>
+        <li>Path কেবল অনুপস্থিত থাকলে throw করে না</li>
+      </ul>
+    </div>
+  </div>
+  <p><strong>খালি নয় এমন directory</strong>-তে দুটোই throw করে — directory delete করতে হলে সেটি খালি হতে হবে। Path যদি symbolic link হয়, <strong>link-টিই delete হয়, তার target নয়</strong>। দুটোই <code>IOException</code> declare করে।</p>
+
+  <h3>isSameFile() ও mismatch()</h3>
+<pre><code>Files.isSameFile(Path.of(<span class="str">"/animals/cobra"</span>), Path.of(<span class="str">"/animals/snake"</span>));
+   <span class="cm">// true — snake is a symbolic link to cobra</span>
+
+Files.mismatch(Path.of(<span class="str">"/animals/monkey.txt"</span>), Path.of(<span class="str">"/animals/wolf.txt"</span>));
+   <span class="cm">// 1 — "Harold" vs "Howler" first differ at index 1</span></code></pre>
+  <ul class="trace">
+    <li><code>isSameFile()</code> সব path symbol resolve করে এবং symbolic link অনুসরণ করে — <code>equals()</code> কোনোটিই করে না।</li>
+    <li>বিশেষ ক্ষেত্র: দুটি path <code>equals()</code>-এ সমান হলে <code>isSameFile()</code> <strong>file আছে কি না না দেখেই</strong> <code>true</code> ফেরত দেয়।</li>
+    <li><code>mismatch()</code> <em>contents</em> তুলনা করে: file এক হলে <code>-1</code>, নইলে প্রথম পার্থক্যের index।</li>
+    <li><code>mismatch()</code> <strong>symmetric</strong> — argument অদলবদল করলেও একই ফল।</li>
+  </ul>
+</section>
+
+<!-- ============ SECTION 3 ============ -->
+<section class="section" id="s3">
+  <div class="sec-num">Section 03</div>
+  <h2>I/O Stream-এর পরিচয়</h2>
+
+  <p><strong>I/O stream</strong> হলো ক্রমানুসারে উপস্থাপিত data element-এর একটি তালিকা — ধারণাগতভাবে প্রায় অন্তহীন জলের ধারা, যা একবারে এক ঢেউ করে পড়া হয়। যেহেতু একবারে সামান্য অংশই ধরা থাকে, তাই ১ TB ফাইলও খুব কম memory-র প্রোগ্রাম দিয়ে প্রসেস করা যায়।</p>
+
+  <div class="card remember">
+    <span class="card-label">★ REMEMBER</span>
+    <p>এখানে "I/O stream" মানে <code>java.io</code>-র stream। বই যখন শুধু "stream" বলে, তখন সেটি অধ্যায় ১০-এর Stream API। এই নামের মিলটাই একটি ইচ্ছাকৃত exam trap।</p>
+  </div>
+
+  <div class="rules-box">
+    <h4>প্রতিটি I/O stream class শ্রেণিবদ্ধ করার তিনটি অক্ষ</h4>
+    <ul>
+      <li><strong>Byte বনাম character:</strong> byte stream binary data read/write করে, নাম শেষ হয় <code>InputStream</code>/<code>OutputStream</code>-এ; character stream text নিয়ে কাজ করে, নাম শেষ হয় <code>Reader</code>/<code>Writer</code>-এ।</li>
+      <li><strong>Input বনাম output:</strong> বেশিরভাগ <code>InputStream</code>-এর একটি সঙ্গী <code>OutputStream</code> আছে, আর বেশিরভাগ <code>Reader</code>-এর একটি <code>Writer</code>।</li>
+      <li><strong>Low-level বনাম high-level:</strong> low-level stream সরাসরি data source-এর সাথে যুক্ত; high-level stream আরেকটি stream-কে <em>wrap</em> করে তৈরি হয়।</li>
+    </ul>
+  </div>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ KEY RULE</span>
+    <p>নামে "Stream" না থাকলেও <strong>character stream-ও I/O stream</strong>। আর exam-এর জন্য জানার মতো low-level class কেবল সেগুলোই যেগুলো <strong>file</strong> নিয়ে কাজ করে — বাকি প্রতিটি non-abstract stream class high-level।</p>
+  </div>
+
+  <h3>Wrapping</h3>
+<pre><code><span class="kw">try</span> (<span class="kw">var</span> br = <span class="kw">new</span> BufferedReader(<span class="kw">new</span> FileReader(<span class="str">"zoo-data.txt"</span>))) {
+   System.out.println(br.readLine());
+}
+
+<span class="kw">try</span> (<span class="kw">var</span> ois = <span class="kw">new</span> ObjectInputStream(
+         <span class="kw">new</span> BufferedInputStream(
+            <span class="kw">new</span> FileInputStream(<span class="str">"zoo-data.ser"</span>)))) {
+   System.out.print(ois.readObject());
+}</code></pre>
+  <p>High-level stream অন্য high-level stream-ও wrap করতে পারে। এখানে low-level <code>FileInputStream</code> file-এর সাথে যুক্ত, <code>BufferedInputStream</code> performance বাড়ায়, আর <code>ObjectInputStream</code> data-কে Java object হিসেবে ব্যাখ্যা করে।</p>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p>ভুল wrapping এই অধ্যায়ের সবচেয়ে প্রচলিত compile trap:</p>
+<pre style="margin:8px 0 6px"><code><span class="kw">new</span> BufferedInputStream(<span class="kw">new</span> FileReader(<span class="str">"z.txt"</span>));     <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">new</span> BufferedWriter(<span class="kw">new</span> FileOutputStream(<span class="str">"z.txt"</span>));    <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">new</span> ObjectInputStream(<span class="kw">new</span> FileOutputStream(<span class="str">"z.txt"</span>));  <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">new</span> BufferedInputStream(<span class="kw">new</span> InputStream());          <span class="err">// DOES NOT COMPILE</span></code></pre>
+    <p>প্রথম দুটি <code>Reader</code>/<code>Writer</code>-এর সাথে <code>InputStream</code>/<code>OutputStream</code> মেশায়। তৃতীয়টি input stream-এ একটি <code>OutputStream</code> ঢোকায়। চতুর্থটি ব্যর্থ কারণ <code>InputStream</code> <strong>abstract</strong>।</p>
+  </div>
+
+  <div class="card remember">
+    <span class="card-label">★ REMEMBER</span>
+    <p>নিয়মের ব্যতিক্রম: <code>InputStreamReader</code> একটি <code>Reader</code> যা <code>InputStream</code> নেয়, আর <code>OutputStreamWriter</code> একটি <code>Writer</code> যা <code>OutputStream</code> নেয় — নামে দুই অংশই আছে এমন একমাত্র class এগুলোই। <code>PrintWriter</code> <code>OutputStream</code> বা <code>Writer</code> দুটোই নিতে পারে। <strong><code>PrintReader</code> বলে কিছু নেই</strong>, আর <code>PrintStream</code> একটি <code>OutputStream</code> যার নামে "Output" নেই।</p>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Abstract class</th><th>বর্ণনা</th></tr>
+      <tr><td><code>InputStream</code></td><td>সব input byte stream-এর abstract class</td></tr>
+      <tr><td><code>OutputStream</code></td><td>সব output byte stream-এর abstract class</td></tr>
+      <tr><td><code>Reader</code></td><td>সব input character stream-এর abstract class</td></tr>
+      <tr><td><code>Writer</code></td><td>সব output character stream-এর abstract class</td></tr>
+    </table>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Class name</th><th>Level</th><th>বর্ণনা</th></tr>
+      <tr><td><code>FileInputStream</code></td><td>Low</td><td>File data byte হিসেবে পড়ে</td></tr>
+      <tr><td><code>FileOutputStream</code></td><td>Low</td><td>File data byte হিসেবে লেখে</td></tr>
+      <tr><td><code>FileReader</code></td><td>Low</td><td>File data character হিসেবে পড়ে</td></tr>
+      <tr><td><code>FileWriter</code></td><td>Low</td><td>File data character হিসেবে লেখে</td></tr>
+      <tr><td><code>BufferedInputStream</code></td><td>High</td><td>বিদ্যমান <code>InputStream</code> থেকে buffered ভাবে byte পড়ে</td></tr>
+      <tr><td><code>BufferedOutputStream</code></td><td>High</td><td>বিদ্যমান <code>OutputStream</code>-এ buffered ভাবে byte লেখে</td></tr>
+      <tr><td><code>BufferedReader</code></td><td>High</td><td>বিদ্যমান <code>Reader</code> থেকে buffered ভাবে character পড়ে</td></tr>
+      <tr><td><code>BufferedWriter</code></td><td>High</td><td>বিদ্যমান <code>Writer</code>-এ buffered ভাবে character লেখে</td></tr>
+      <tr><td><code>ObjectInputStream</code></td><td>High</td><td>বিদ্যমান <code>InputStream</code> থেকে primitive ও object graph deserialize করে</td></tr>
+      <tr><td><code>ObjectOutputStream</code></td><td>High</td><td>বিদ্যমান <code>OutputStream</code>-এ primitive ও object graph serialize করে</td></tr>
+      <tr><td><code>PrintStream</code></td><td>High</td><td>Java object-এর formatted রূপ binary stream-এ লেখে</td></tr>
+      <tr><td><code>PrintWriter</code></td><td>High</td><td>Java object-এর formatted রূপ character stream-এ লেখে</td></tr>
+    </table>
+  </div>
+
+  <div class="card remember">
+    <span class="card-label">★ REMEMBER</span>
+    <p>Character encoding ঠিক করে character কীভাবে byte হিসেবে সংরক্ষিত হবে। <code>Charset.forName("UTF-8")</code>, <code>Charset.forName("US-ASCII")</code>, <code>Charset.forName("UTF-16")</code> দিয়ে নির্দিষ্ট করা যায়। Encoding মুখস্থ করতে হবে না, কেবল নামগুলো চিনলেই হবে।</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 4 ============ -->
+<section class="section" id="s4">
+  <div class="sec-num">Section 04</div>
+  <h2>File Read ও Write করা</h2>
+
+  <h3>Low-level উপায়</h3>
+<pre><code><span class="kw">void</span> copyStream(InputStream in, OutputStream out) <span class="kw">throws</span> IOException {
+   <span class="kw">int</span> b;
+   <span class="kw">while</span> ((b = in.read()) != -<span class="num">1</span>) {
+      out.write(b);
+   }
+}</code></pre>
+  <div class="card key-rule">
+    <span class="card-label">✓ KEY RULE</span>
+    <p><code>read()</code> <code>byte</code> নয়, <code>int</code> ফেরত দেয় — কারণ stream-এর শেষ বোঝানোর জন্য <code>byte</code>-এ কোনো অতিরিক্ত মান অবশিষ্ট নেই। <strong><code>-1</code> মানে stream-এর শেষ।</strong> সঙ্গতি রক্ষার জন্য output stream-ও <code>int</code> ব্যবহার করে।</p>
+  </div>
+
+<pre><code><span class="num">10:</span> <span class="kw">void</span> copyStream(InputStream in, OutputStream out) <span class="kw">throws</span> IOException {
+<span class="num">11:</span>    <span class="kw">int</span> batchSize = <span class="num">1024</span>;
+<span class="num">12:</span>    <span class="kw">var</span> buffer = <span class="kw">new byte</span>[batchSize];
+<span class="num">13:</span>    <span class="kw">int</span> lengthRead;
+<span class="num">14:</span>    <span class="kw">while</span> ((lengthRead = in.read(buffer, <span class="num">0</span>, batchSize)) &gt; <span class="num">0</span>) {
+<span class="num">15:</span>       out.write(buffer, <span class="num">0</span>, lengthRead);
+<span class="num">16:</span>       out.flush();
+<span class="num">17:</span>    }
+<span class="num">18:</span> }</code></pre>
+  <ul class="trace">
+    <li>Offset ও length প্রযোজ্য হয় <em>array</em>-এর উপর: offset 3, length 5 মানে array-র ৩ নম্বর অবস্থান থেকে শুরু করে সর্বোচ্চ পাঁচটি মান পড়া।</li>
+    <li><code>lengthRead</code> return মানটি <strong>অত্যন্ত জরুরি</strong>। এটি উপেক্ষা করে সবসময় পুরো buffer লিখলে আগের iteration-এর অবশিষ্ট byte জুড়ে যাবে।</li>
+    <li><code>flush()</code> জমা হওয়া data সঙ্গে সঙ্গে disk-এ লেখার অনুরোধ করে। এর খরচ আছে, তাই মাঝে মাঝে ব্যবহার করুন — প্রতিটি write-এর পরে নয়।</li>
+  </ul>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p><code>while(reader.read(buffer) != -1) { writer.write(buffer); }</code>-এর মতো code compile হয় কিন্তু <strong>ভুল</strong>: এটি আসলে কতটি character পড়া হয়েছে তা উপেক্ষা করে, তাই কেবল তখনই ঠিকভাবে copy করে যখন file-এর দৈর্ঘ্য buffer size-এর ঠিক গুণিতক। নইলে শেষ write-টি অবশিষ্ট character-গুলোর নকল বসায়।</p>
+  </div>
+
+  <h3>High-level উপায়</h3>
+<pre><code><span class="num">26:</span> <span class="kw">void</span> copyTextFile(File src, File dest) <span class="kw">throws</span> IOException {
+<span class="num">27:</span>    <span class="kw">try</span> (<span class="kw">var</span> reader = <span class="kw">new</span> BufferedReader(<span class="kw">new</span> FileReader(src));
+<span class="num">28:</span>       <span class="kw">var</span> writer = <span class="kw">new</span> BufferedWriter(<span class="kw">new</span> FileWriter(dest))) {
+<span class="num">29:</span>       String line = <span class="kw">null</span>;
+<span class="num">30:</span>       <span class="kw">while</span> ((line = reader.readLine()) != <span class="kw">null</span>) {
+<span class="num">31:</span>          writer.write(line);
+<span class="num">32:</span>          writer.newLine();
+<span class="num">33:</span>       } } }</code></pre>
+  <ul class="trace">
+    <li>Source না থাকলে <code>FileNotFoundException</code> (যা <code>IOException</code> inherit করে) ছোড়া হয়।</li>
+    <li>Destination থাকলে সেটি <strong>overwrite</strong> হয়। Append করতে <code>FileWriter</code>-এ optional <code>boolean</code> দ্বিতীয় parameter দিন।</li>
+    <li><code>readLine()</code> line break ফেলে দেয়, তাই <code>newLine()</code> সেগুলো ফিরিয়ে দেয়।</li>
+    <li>try-with-resources চেইনের প্রতিটি object বন্ধ করে।</li>
+  </ul>
+
+  <p>Byte data-র জন্য বেছে নিতেন <code>BufferedInputStream</code>, <code>BufferedOutputStream</code>, <code>FileInputStream</code> ও <code>FileOutputStream</code>, <code>readLine()</code>-এর বদলে <code>readAllBytes()</code> কল করে ফলাফল <code>byte[]</code>-এ রাখতেন।</p>
+
+  <h3>PrintStream ও PrintWriter</h3>
+<pre><code><span class="kw">try</span> (<span class="kw">var</span> reader = <span class="kw">new</span> BufferedReader(<span class="kw">new</span> FileReader(src));
+   <span class="kw">var</span> writer = <span class="kw">new</span> PrintWriter(<span class="kw">new</span> FileWriter(dest))) {
+   String line = <span class="kw">null</span>;
+   <span class="kw">while</span> ((line = reader.readLine()) != <span class="kw">null</span>)
+      writer.println(line);
+}</code></pre>
+  <p>চারটি মূল method: <code>print()</code>, <code>println()</code>, <code>format()</code> ও <code>printf()</code>।</p>
+  <div class="card key-rule">
+    <span class="card-label">✓ KEY RULE</span>
+    <p>Print stream class-এর method গুলো <strong>কোনো checked exception ছোড়ে না</strong> — নইলে প্রতিবার <code>System.out.print()</code> কল করতে গিয়ে exception ধরতে হতো। এগুলো <code>checkError()</code>-এর মাধ্যমে সমস্যা জানায়, অন্যথায় নীরবে ব্যর্থ হয়। <code>System.out</code> ও <code>System.err</code> হলো <code>PrintStream</code>; <code>System.in</code> একটি <code>InputStream</code>।</p>
+  </div>
+  <p>Line separator OS ভেদে <code>\n</code> বা <code>\r\n</code>; <code>println()</code> এটি সামলায়। সরাসরি পেতে <code>System.lineSeparator()</code> বা <code>System.getProperty("line.separator")</code> ব্যবহার করুন।</p>
+
+  <h3>Files দিয়ে সহজতর</h3>
+<pre><code>String string = Files.readString(input);        Files.writeString(output, string);
+<span class="kw">byte</span>[] bytes = Files.readAllBytes(input);       Files.write(output, bytes);
+List&lt;String&gt; lines = Files.readAllLines(input); Files.write(output, lines);</code></pre>
+  <p>তিনটিই <strong>পুরো file একবারে</strong> পড়ে, সব contents memory-তে রাখে — বড় file-এ <code>OutOfMemoryError</code> হতে পারে। Lazy বিকল্প:</p>
+<pre><code><span class="kw">try</span> (Stream&lt;String&gt; s = Files.lines(path)) {
+   s.filter(f -&gt; f.startsWith(<span class="str">"WARN:"</span>))
+      .map(f -&gt; f.substring(<span class="num">5</span>))
+      .forEach(System.out::println);
+}</code></pre>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p><code>readAllLines()</code> একটি <code>List</code> ফেরত দেয়; <code>lines()</code> একটি <code>Stream</code>। তাই <code>readAllLines()</code>-এর ফলাফলে Stream API method <strong>পাওয়া যায় না</strong>:</p>
+<pre style="margin:8px 0 6px"><code>Files.readAllLines(Path.of(<span class="str">"birds.txt"</span>))
+   <span class="err">.filter</span>(s -&gt; s.length() &gt; <span class="num">2</span>)      <span class="cm">// DOES NOT COMPILE</span>
+   .forEach(System.out::println);</code></pre>
+    <p><code>forEach()</code> দুটোতেই চলে (<code>List</code> একটি <code>Iterable</code>), কিন্তু <code>filter()</code>, <code>map()</code>, <code>flatMap()</code> কেবল Stream-এ।</p>
+  </div>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ KEY RULE</span>
+    <p>NIO.2-এর stream-ভিত্তিক method (<code>Files.list()</code>, <code>Files.lines()</code>, <code>Files.walk()</code>, <code>Files.find()</code>) file system-এর সাথে একটি connection খোলে যা <strong>অবশ্যই বন্ধ করতে হবে</strong> try-with-resources দিয়ে; terminal operation এগুলো বন্ধ করে <em>না</em>। অধ্যায় ১০-এর stream বন্ধ করার দরকার নেই।</p>
+  </div>
+
+<pre><code><span class="kw">try</span> (<span class="kw">var</span> reader = Files.newBufferedReader(input);
+     <span class="kw">var</span> writer = Files.newBufferedWriter(output)) {
+   String line = <span class="kw">null</span>;
+   <span class="kw">while</span> ((line = reader.readLine()) != <span class="kw">null</span>) {
+      writer.write(line);
+      writer.newLine();
+   } }</code></pre>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Class</th><th>Method</th><th>বর্ণনা</th></tr>
+      <tr><td>সব input stream</td><td><code>int read()</code></td><td>একটি byte পড়ে, না থাকলে <code>-1</code></td></tr>
+      <tr><td><code>InputStream</code> / <code>Reader</code></td><td><code>int read(byte[] b)</code> / <code>int read(char[] c)</code></td><td>Buffer-এ মান পড়ে, সংখ্যা ফেরত দেয়</td></tr>
+      <tr><td><code>InputStream</code> / <code>Reader</code></td><td><code>int read(b, int offset, int length)</code></td><td><code>offset</code> থেকে শুরু করে সর্বোচ্চ <code>length</code> মান পড়ে</td></tr>
+      <tr><td>সব output stream</td><td><code>void write(int b)</code></td><td>একটি byte লেখে</td></tr>
+      <tr><td><code>OutputStream</code> / <code>Writer</code></td><td><code>void write(byte[] b)</code> / <code>write(char[] c)</code></td><td>মানের array লেখে</td></tr>
+      <tr><td><code>InputStream</code></td><td><code>byte[] readAllBytes()</code></td><td>Data byte হিসেবে পড়ে</td></tr>
+      <tr><td><code>BufferedReader</code></td><td><code>String readLine()</code></td><td>একটি line পড়ে</td></tr>
+      <tr><td><code>Writer</code></td><td><code>void write(String line)</code></td><td>একটি line লেখে</td></tr>
+      <tr><td><code>BufferedWriter</code></td><td><code>void newLine()</code></td><td>নতুন line লেখে</td></tr>
+      <tr><td>সব output stream</td><td><code>void flush()</code></td><td>Buffered data stream দিয়ে flush করে</td></tr>
+      <tr><td>সব stream</td><td><code>void close()</code></td><td>Stream বন্ধ করে ও resource ছাড়ে</td></tr>
+    </table>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th><code>Files</code> static method</th><th>বর্ণনা</th></tr>
+      <tr><td><code>byte[] readAllBytes(Path path)</code></td><td>সব data byte হিসেবে পড়ে</td></tr>
+      <tr><td><code>String readString(Path path)</code></td><td>সব data <code>String</code>-এ পড়ে</td></tr>
+      <tr><td><code>List&lt;String&gt; readAllLines(Path path)</code></td><td>সব data <code>List</code>-এ পড়ে</td></tr>
+      <tr><td><code>Stream&lt;String&gt; lines(Path path)</code></td><td><strong>Lazily</strong> data পড়ে</td></tr>
+      <tr><td><code>void write(Path path, byte[] bytes)</code></td><td>Byte-এর array লেখে</td></tr>
+      <tr><td><code>void writeString(Path path, String string)</code></td><td><code>String</code> লেখে</td></tr>
+      <tr><td><code>void write(Path path, List&lt;String&gt; list)</code></td><td>Line-এর list লেখে</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============ SECTION 5 ============ -->
+<section class="section" id="s5">
+  <div class="sec-num">Section 05</div>
+  <h2>Data Serialize করা</h2>
+
+  <p><strong>Serialization</strong> হলো memory-তে থাকা object-কে byte stream-এ রূপান্তরের প্রক্রিয়া; <strong>deserialization</strong> হলো byte stream থেকে আবার object-এ ফেরানো।</p>
+
+  <h3>Serializable interface</h3>
+  <p><code>java.io.Serializable</code> একটি <strong>marker interface</strong> — এতে কোনো method নেই, তাই যেকোনো class এটি implement করতে পারে। এর উদ্দেশ্য হলো serialize করা process-কে জানানো যে আপনি সঠিক পদক্ষেপ নিয়েছেন।</p>
+<pre><code><span class="kw">import</span> java.io.Serializable;
+<span class="kw">public class</span> Gorilla <span class="kw">implements</span> Serializable {
+   <span class="kw">private static final long</span> serialVersionUID = <span class="num">1L</span>;
+   <span class="kw">private</span> String name;
+   <span class="kw">private int</span> age;
+   <span class="kw">private</span> Boolean friendly;
+   <span class="kw">private transient</span> String favoriteFood;
+}</code></pre>
+
+  <div class="rules-box">
+    <h4>একটি class কীভাবে serializable বানাবেন</h4>
+    <ul>
+      <li>Class-টিকে <code>Serializable</code> চিহ্নিত করতে হবে।</li>
+      <li>প্রতিটি instance member হয় <strong>serializable</strong>, নয় <strong><code>transient</code></strong> চিহ্নিত, নয়তো serialization-এর সময় <strong><code>null</code></strong> হতে হবে।</li>
+      <li>দ্বিতীয় নিয়মটি <strong>recursively</strong> প্রয়োগ করুন — serializable একটি field-এর নিজের field যদি serializable না হয়, চেইন ভেঙে যায়।</li>
+    </ul>
+  </div>
+
+<pre><code><span class="kw">public class</span> Cat <span class="kw">implements</span> Serializable { <span class="kw">private</span> Tail tail = <span class="kw">new</span> Tail(); }
+<span class="kw">public class</span> Tail <span class="kw">implements</span> Serializable { <span class="kw">private</span> Fur fur = <span class="kw">new</span> Fur(); }
+<span class="kw">public class</span> Fur {}    <span class="err">// not Serializable → Cat is not serializable</span></code></pre>
+  <p>সমাধান: <code>fur</code>-কে <code>transient</code> করুন, অথবা <code>Fur</code>-কে <code>Serializable</code> বানান। ভুলভাবে তৈরি class serialize করার চেষ্টা করলে <code>NotSerializableException</code> ছোড়া হয়।</p>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <ul>
+      <li>শুধু <code>Object</code> type-এর একটি field (যেমন <code>private Object stripes = new Object();</code>) পুরো class-কে <strong>non-serializable</strong> করে দেয় — <code>Object</code> <code>Serializable</code> implement করে না। Code compile হয় কিন্তু runtime-এ throw করে।</li>
+      <li><strong>Record স্বয়ংক্রিয়ভাবে serializable নয়।</strong> <code>record R(String name) {}</code> নয়; <code>record R(String name) implements Serializable {}</code> হ্যাঁ।</li>
+      <li><code>serialVersionUID</code> <strong>সুপারিশকৃত, বাধ্যতামূলক নয়</strong>।</li>
+      <li><code>static</code> field-কে <code>transient</code> করার তেমন প্রভাব নেই — <code>serialVersionUID</code> ছাড়া কেবল <strong>instance</strong> member-ই serialize হয়।</li>
+    </ul>
+  </div>
+
+  <h3>ObjectOutputStream ও ObjectInputStream</h3>
+<pre><code><span class="cm">// ObjectInputStream</span>
+<span class="kw">public</span> Object readObject() <span class="kw">throws</span> IOException, ClassNotFoundException
+<span class="cm">// ObjectOutputStream</span>
+<span class="kw">public void</span> writeObject(Object obj) <span class="kw">throws</span> IOException</code></pre>
+
+<pre><code><span class="kw">void</span> saveToFile(List&lt;Gorilla&gt; gorillas, File dataFile) <span class="kw">throws</span> IOException {
+   <span class="kw">try</span> (<span class="kw">var</span> out = <span class="kw">new</span> ObjectOutputStream(
+           <span class="kw">new</span> BufferedOutputStream(<span class="kw">new</span> FileOutputStream(dataFile)))) {
+      <span class="kw">for</span> (Gorilla gorilla : gorillas)
+         out.writeObject(gorilla);
+   }
+}
+
+List&lt;Gorilla&gt; readFromFile(File dataFile) <span class="kw">throws</span> IOException, ClassNotFoundException {
+   <span class="kw">var</span> gorillas = <span class="kw">new</span> ArrayList&lt;Gorilla&gt;();
+   <span class="kw">try</span> (<span class="kw">var</span> in = <span class="kw">new</span> ObjectInputStream(
+         <span class="kw">new</span> BufferedInputStream(<span class="kw">new</span> FileInputStream(dataFile)))) {
+      <span class="kw">while</span> (<span class="kw">true</span>) {
+         <span class="kw">var</span> object = in.readObject();
+         <span class="kw">if</span> (object <span class="kw">instanceof</span> Gorilla g)
+            gorillas.add(g);
+      }
+   } <span class="kw">catch</span> (EOFException e) {
+      <span class="cm">// File end reached</span>
+   }
+   <span class="kw">return</span> gorillas;
+}</code></pre>
+  <ul class="trace">
+    <li><code>readObject()</code> কল করার সময় <strong><code>null</code> ও <code>-1</code>-এর কোনো বিশেষ অর্থ নেই</strong> — কেউ ওই মানগুলোও serialize করে থাকতে পারে। তাই একটি infinite loop ব্যবহার করা হয়, যা <code>EOFException</code>-এ শেষ হয়।</li>
+    <li><code>readObject()</code> checked <code>ClassNotFoundException</code> declare করে, কারণ deserialization-এর সময় class না-ও থাকতে পারে।</li>
+    <li><code>available()</code> দিয়ে শেষ শনাক্ত করা যায় না — এটি কেবল অন্য thread block না করে পড়া যায় এমন block-সংখ্যা জানায়, আর byte বাকি থাকলেও <code>0</code> দিতে পারে।</li>
+  </ul>
+
+  <h3>Deserialization-এ object তৈরির প্রক্রিয়া</h3>
+  <div class="card key-rule">
+    <span class="card-label">✓ KEY RULE</span>
+    <p>Deserialization-এ serialized class-এর constructor <strong>এবং</strong> instance initializer <strong>কল হয় না</strong>। Java hierarchy-তে পাওয়া <strong>প্রথম non-serializable parent class-এর no-arg constructor</strong> কল করে। Static ও transient field উপেক্ষিত হয়, আর অনুপস্থিত মান Java-র default পায় (<code>null</code>, <code>0</code>)।</p>
+  </div>
+
+<pre><code><span class="cm">// Mammal.java — NOT Serializable</span>
+<span class="kw">public class</span> Mammal {
+   <span class="kw">private int</span> id;
+   <span class="kw">public</span> Mammal() { <span class="kw">this</span>.id = <span class="num">4</span>; }
+}
+
+<span class="cm">// Chimpanzee.java</span>
+<span class="kw">public class</span> Chimpanzee <span class="kw">extends</span> Mammal <span class="kw">implements</span> Serializable {
+   <span class="kw">private static final long</span> serialVersionUID = <span class="num">2L</span>;
+   <span class="kw">private transient</span> String name;
+   <span class="kw">private transient int</span> age = <span class="num">10</span>;
+   <span class="kw">private static char</span> type = <span class="str">'C'</span>;
+   { <span class="kw">this</span>.age = <span class="num">14</span>; }
+   <span class="kw">public</span> Chimpanzee() { <span class="kw">this</span>(<span class="str">"Unknown"</span>, <span class="num">12</span>, <span class="str">'Q'</span>); }
+   <span class="kw">public</span> Chimpanzee(String name, <span class="kw">int</span> age, <span class="kw">char</span> type) {
+      <span class="kw">this</span>.name = name; <span class="kw">this</span>.age = age; <span class="kw">this</span>.type = type; setId(<span class="num">9</span>);
+   }
+}</code></pre>
+<pre><code>Original:  [name=Ham,  age=2, type=B, id=9], [name=Enos, age=3, type=B, id=9]
+From Disk: [name=null, age=0, type=B, id=4], [name=null, age=0, type=B, id=4]</code></pre>
+  <ul class="trace">
+    <li><code>name</code> ও <code>age</code> <code>transient</code> → লেখা হয় না; ফিরে আসে <code>null</code> ও <code>0</code> হিসেবে।</li>
+    <li><code>type</code> <code>static</code> → লেখা হয় না; JVM-এ সবশেষে যে মান বসানো হয়েছিল সেটিই দেখায়।</li>
+    <li><code>Chimpanzee</code>-এর কোনো constructor চলে না, আর <code>age = 14</code> বসানো instance initializer-ও চলে না।</li>
+    <li><code>Mammal</code> <code>Serializable</code> নয়, তাই <strong>তার</strong> no-arg constructor চলে এবং <code>id</code> হয় <code>4</code>।</li>
+    <li><code>Serializable</code> class-এর subclass নিজেও serializable, interface উত্তরাধিকারসূত্রে পায়।</li>
+  </ul>
+
+  <div class="card remember">
+    <span class="card-label">★ REMEMBER</span>
+    <p><strong>private</strong> <code>readObject(ObjectInputStream)</code> ও <code>writeObject(ObjectOutputStream)</code> method declare করে serialization কাস্টমাইজ করা যায়। এগুলো override নয় — স্বয়ংক্রিয়ভাবে কল হয়। <code>readObject()</code> শুরু করুন <code>in.defaultReadObject()</code> দিয়ে, আর <code>writeObject()</code> শেষ করুন <code>out.defaultWriteObject()</code> দিয়ে।</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 6 ============ -->
+<section class="section" id="s6">
+  <div class="sec-num">Section 06</div>
+  <h2>User-এর সাথে ইন্টারঅ্যাকশন</h2>
+
+  <h3>System stream</h3>
+  <p><code>System.out</code> ও <code>System.err</code> দুটোই <code>PrintStream</code> instance; <code>System.in</code> একটি <code>InputStream</code>। <code>System.err</code> আলাদা stream-এ error জানায় — IDE হয়তো ভিন্ন রঙে দেখায়, আর server ভিন্ন log file-এ পাঠাতে পারে।</p>
+<pre><code><span class="kw">var</span> reader = <span class="kw">new</span> BufferedReader(<span class="kw">new</span> InputStreamReader(System.in));
+String userInput = reader.readLine();
+System.out.println(<span class="str">"You entered: "</span> + userInput);</code></pre>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p>এই অধ্যায়ে System stream-ই একমাত্র stream যেগুলো try-with-resources-এ ব্যবহার করা হয় <strong>না</strong>। এগুলো static ও পুরো application-এ শেয়ারড; বন্ধ করলে সব thread-এর জন্য স্থায়ীভাবে অনুপলব্ধ হয়ে যায়। দেখুন কী হয়:</p>
+<pre style="margin:8px 0 6px"><code><span class="kw">try</span> (<span class="kw">var</span> out = System.out) {}
+System.out.println(<span class="str">"Hello"</span>);      <span class="cm">// prints NOTHING — fails silently</span>
+
+<span class="kw">try</span> (<span class="kw">var</span> err = System.err) {}
+System.err.println(<span class="str">"Hello"</span>);      <span class="cm">// prints NOTHING — fails silently</span>
+
+<span class="kw">var</span> reader = <span class="kw">new</span> BufferedReader(<span class="kw">new</span> InputStreamReader(System.in));
+<span class="kw">try</span> (reader) {}
+String data = reader.readLine();     <span class="err">// IOException at runtime</span></code></pre>
+    <p><code>PrintStream</code>-এর ক্ষেত্রে নীরবে ব্যর্থ হয়, কারণ এর method কোনো checked exception ছোড়ে না। বেশিরভাগ <code>InputStream</code> implementation বন্ধ stream-এ কাজ করতে গেলে <strong>throw করে</strong>।</p>
+  </div>
+
+  <h3>Console class</h3>
+  <p><code>java.io.Console</code> একটি <strong>singleton</strong>, কেবল factory method দিয়েই পাওয়া যায়:</p>
+<pre><code>Console c = <span class="kw">new</span> Console();          <span class="err">// DOES NOT COMPILE — constructors are private</span>
+
+Console console = System.console();
+<span class="kw">if</span> (console != <span class="kw">null</span>) {
+   String userInput = console.readLine();
+   console.writer().println(<span class="str">"You entered: "</span> + userInput);
+   console.flush();
+} <span class="kw">else</span> {
+   System.err.println(<span class="str">"Console not available"</span>);
+}</code></pre>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ KEY RULE</span>
+    <p>Console উপলব্ধ না থাকলে <code>System.console()</code> <strong><code>null</code></strong> ফেরত দেয়, যা নির্ভর করে code কোথায় চলছে তার উপর। <strong>ব্যবহারের আগে সবসময় null চেক করুন</strong> — <code>var c = System.console();</code>-এর ঠিক পরেই <code>c.readLine()</code> কল করা code <em>NullPointerException ছুড়তে পারে</em>।</p>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Method</th><th>নোট</th></tr>
+      <tr><td><code>Reader reader()</code></td><td><code>System.in</code>-এর character-stream সমতুল্য</td></tr>
+      <tr><td><code>PrintWriter writer()</code></td><td><code>System.out</code>-এর character-stream সমতুল্য</td></tr>
+      <tr><td><code>String readLine()</code><br><code>String readLine(String fmt, Object... args)</code></td><td>Enter পর্যন্ত পড়ে; overload আগে একটি formatted prompt দেখায়</td></tr>
+      <tr><td><code>char[] readPassword()</code><br><code>char[] readPassword(String fmt, Object... args)</code></td><td>Input <strong>echo হয় না</strong>, আর <code>char[]</code> ফেরত দেয় — <code>String</code> নয়</td></tr>
+      <tr><td><code>format(String, Object...)</code> · <code>format(Locale, String, Object...)</code> · <code>printf(...)</code></td><td><code>printf()</code> ও <code>format()</code> পরস্পর বিনিময়যোগ্য</td></tr>
+      <tr><td><code>flush()</code></td><td>Output সত্যিই লেখা হয়েছে তা নিশ্চিত করে</td></tr>
+    </table>
+  </div>
+
+  <div class="card remember">
+    <span class="card-label">★ REMEMBER</span>
+    <p><code>readPassword()</code> দুটি কারণে <code>char[]</code> ফেরত দেয়: text স্ক্রিনে echo হয় না (যদিও encrypt হয় না), আর password কখনো <code>String</code> pool-এ ঢোকে না। খেয়াল রাখুন, <code>PrintStream</code>-এর বিপরীতে <code>Console</code>-এর writer method গুলো checked <code>IOException</code> <strong>ছোড়ে</strong>।</p>
+  </div>
+
+<pre><code>console.writer().println(<span class="str">"Welcome to Our Zoo!"</span>);
+console.format(<span class="str">"It has %d animals and employs %d people"</span>, <span class="num">391</span>, <span class="num">25</span>);
+console.writer().println();
+console.printf(<span class="str">"The zoo spans %5.1f acres"</span>, <span class="num">128.91</span>);
+console.flush();
+<span class="cm">// Welcome to Our Zoo!</span>
+<span class="cm">// It has 391 animals and employs 25 people</span>
+<span class="cm">// The zoo spans 128.9 acres</span></code></pre>
+</section>
+
+<!-- ============ SECTION 7 ============ -->
+<section class="section" id="s7">
+  <div class="sec-num">Section 07</div>
+  <h2>Advanced API নিয়ে কাজ</h2>
+
+  <h3>Input stream ম্যানিপুলেট করা</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Method</th><th>বর্ণনা</th></tr>
+      <tr><td><code>boolean markSupported()</code></td><td>Stream class <code>mark()</code> সমর্থন করলে <code>true</code></td></tr>
+      <tr><td><code>void mark(int readLimit)</code></td><td>Stream-এর বর্তমান অবস্থান চিহ্নিত করে</td></tr>
+      <tr><td><code>void reset()</code></td><td>Stream-কে <code>mark()</code> অবস্থানে ফেরানোর চেষ্টা করে</td></tr>
+      <tr><td><code>long skip(long n)</code></td><td>নির্দিষ্ট সংখ্যক character পড়ে <strong>ফেলে দেয়</strong></td></tr>
+    </table>
+  </div>
+
+<pre><code><span class="cm">// next values are LION</span>
+System.out.print((<span class="kw">char</span>) is.read());     <span class="cm">// L</span>
+<span class="kw">if</span> (is.markSupported()) {
+   is.mark(<span class="num">100</span>);
+   System.out.print((<span class="kw">char</span>) is.read());  <span class="cm">// I</span>
+   System.out.print((<span class="kw">char</span>) is.read());  <span class="cm">// O</span>
+   is.reset();
+}
+System.out.print((<span class="kw">char</span>) is.read());     <span class="cm">// I</span>
+System.out.print((<span class="kw">char</span>) is.read());     <span class="cm">// O</span>
+System.out.print((<span class="kw">char</span>) is.read());     <span class="cm">// N</span>
+<span class="cm">// Prints LIOION if mark() is supported, LION otherwise</span></code></pre>
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p>সব class <code>mark()</code> সমর্থন করে না বলে এই বিষয়ের প্রশ্নে সঠিক উত্তর সাধারণত "<strong>may</strong> print", "will always print" নয়। <code>mark()</code>-এ দেওয়া <code>readLimit</code> বলে <code>reset()</code>-এর আগে আপনি কত byte পড়ার আশা করছেন; সীমা ছাড়ালে throw করতে পারে। <code>markSupported()</code> চেক না করে <code>mark()</code>/<code>reset()</code> কল করলে runtime-এ exception হতে পারে।</p>
+  </div>
+
+<pre><code><span class="cm">// next values are TIGERS</span>
+System.out.print((<span class="kw">char</span>)is.read());   <span class="cm">// T</span>
+is.skip(<span class="num">2</span>);                          <span class="cm">// skips I and G</span>
+is.read();                            <span class="cm">// reads E but doesn't output it</span>
+System.out.print((<span class="kw">char</span>)is.read());   <span class="cm">// R</span>
+System.out.print((<span class="kw">char</span>)is.read());   <span class="cm">// S</span>
+<span class="cm">// Prints TRS</span></code></pre>
+  <p><code>skip()</code> আসলে কতগুলো মান skip হয়েছে তা ফেরত দেয় — stream-এর শেষের কাছে <code>skip(1000)</code> হয়তো <code>20</code> দেবে।</p>
+
+  <h3>File attribute জানা</h3>
+  <p><code>isDirectory()</code> ও <code>isRegularFile()</code>-এর পাশাপাশি <code>Files</code>-এ আছে <code>isSymbolicLink()</code>, যা <code>File</code> পারে না। খেয়াল রাখুন, symbolic link-এর জন্যও <code>isDirectory()</code> বা <code>isRegularFile()</code> <code>true</code> দিতে পারে, যদি link ওই ধরনেই <em>resolve</em> হয়।</p>
+  <p><code>Files</code> আরও দেয় <code>isHidden()</code>, <code>isReadable()</code>, <code>isWritable()</code> ও <code>isExecutable()</code>। <code>isHidden()</code> ছাড়া বাকিগুলো কোনো checked exception declare করে না এবং <strong>file না থাকলে <code>false</code> ফেরত দেয়</strong>।</p>
+
+  <h3>Attribute view</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Attributes interface</th><th>View interface</th><th>বর্ণনা</th></tr>
+      <tr><td><code>BasicFileAttributes</code></td><td><code>BasicFileAttributeView</code></td><td>সব file system-এ সমর্থিত মৌলিক সেট</td></tr>
+      <tr><td><code>DosFileAttributes</code></td><td><code>DosFileAttributeView</code></td><td>মৌলিক + DOS/Windows-নির্দিষ্ট attribute</td></tr>
+      <tr><td><code>PosixFileAttributes</code></td><td><code>PosixFileAttributeView</code></td><td>মৌলিক + POSIX attribute (Unix, Linux, Mac)</td></tr>
+    </table>
+  </div>
+
+<pre><code><span class="cm">// Read-only</span>
+<span class="kw">var</span> path = Path.of(<span class="str">"/turtles/sea.txt"</span>);
+BasicFileAttributes data = Files.readAttributes(path, BasicFileAttributes.class);
+data.isDirectory();  data.isRegularFile();  data.isSymbolicLink();
+data.size();         data.lastModifiedTime();
+
+<span class="cm">// Updatable view</span>
+BasicFileAttributeView view =
+   Files.getFileAttributeView(path, BasicFileAttributeView.class);
+BasicFileAttributes attributes = view.readAttributes();
+FileTime lastModifiedTime = FileTime.fromMillis(
+   attributes.lastModifiedTime().toMillis() + <span class="num">10_000</span>);
+view.setTimes(lastModifiedTime, <span class="kw">null</span>, <span class="kw">null</span>);</code></pre>
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p><code>setTimes(lastModifiedTime, lastAccessTime, createTime)</code> কেবল <strong><code>BasicFileAttributeView</code></strong>-এ আছে, read-only <code>BasicFileAttributes</code>-এ কখনো নয়। <code>BasicFileAttributes</code> variable-এ <code>a.setTimes(...)</code> কল করলে compile হয় না। যে মান বদলাতে চান না তার জন্য <code>null</code> pass করুন।</p>
+  </div>
+  <p>এক কলেই সব attribute পড়া মানে file system-এ কম যাতায়াত, যা একাধিক আলাদা method কল করার চেয়ে <strong>বেশি performant</strong> — আর view দিয়ে এমন file-system-নির্দিষ্ট attribute-ও পাওয়া যায় যা <code>Files</code>-এর method দিতে পারে না।</p>
+
+  <h3>Directory tree traverse করা</h3>
+  <div class="vs-grid">
+    <div class="left">
+      <h4>Depth-first search</h4>
+      <ul>
+        <li>Root থেকে কোনো leaf পর্যন্ত যায়, তারপর ফিরে এসে বাদ পড়া path পূরণ করে</li>
+        <li>অন্তহীন খোঁজ ঠেকাতে <strong>search depth</strong> সীমা ব্যবহার করে</li>
+        <li><strong>NIO.2-এর Stream API method গুলো এটাই ব্যবহার করে</strong></li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>Breadth-first search</h4>
+      <ul>
+        <li>পরের depth-এ যাওয়ার আগে প্রতিটি depth-এর সব element প্রসেস করে</li>
+        <li>ভারসাম্যপূর্ণ ও অনুমানযোগ্য</li>
+        <li>বেশি memory লাগে — visited node-এর তালিকা রাখতে হয়</li>
+      </ul>
+    </div>
+  </div>
+
+<pre><code><span class="kw">public static</span> Stream&lt;Path&gt; walk(Path start, FileVisitOption... options)
+<span class="kw">public static</span> Stream&lt;Path&gt; walk(Path start, <span class="kw">int</span> maxDepth, FileVisitOption... options)</code></pre>
+<pre><code><span class="kw">public long</span> getPathSize(Path source) <span class="kw">throws</span> IOException {
+   <span class="kw">try</span> (<span class="kw">var</span> s = Files.walk(source)) {
+      <span class="kw">return</span> s.parallel()
+            .filter(p -&gt; !Files.isDirectory(p))
+            .mapToLong(<span class="kw">this</span>::getSize)
+            .sum();
+   }
+}</code></pre>
+  <ul class="trace">
+    <li><code>walk()</code> <strong>lazy evaluation</strong> ব্যবহার করে, তাই বিশাল tree-তেও memory কম লাগে।</li>
+    <li>এক-argument সংস্করণের default max depth হলো <code>Integer.MAX_VALUE</code>। Depth <code>0</code> মানে কেবল current path নিজেই।</li>
+    <li>Helper <code>getSize()</code> <code>Files.size()</code>-এর <code>IOException</code>-কে <code>UncheckedIOException</code>-এ মুড়ে দেয়, যাতে lambda-র ভেতরে ব্যবহার করা যায়।</li>
+  </ul>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ KEY RULE</span>
+    <p><code>walk()</code> ব্যতিক্রম: বেশিরভাগ NIO.2 method default-এ symbolic link <strong>অনুসরণ করে</strong> এবং <code>NOFOLLOW_LINKS</code> দিয়ে বন্ধ করা হয়, কিন্তু <code>walk()</code> <code>FileVisitOption.FOLLOW_LINKS</code> না দিলে link <strong>অনুসরণ করে না</strong>। ওই option ব্যবহার করলে <code>walk()</code> visited path ট্র্যাক করে এবং কোনো path দুবার এলে <code>FileSystemLoopException</code> ছোড়ে (একটি <strong>cycle</strong>)।</p>
+  </div>
+
+  <h3>find() দিয়ে directory খোঁজা</h3>
+<pre><code><span class="kw">public static</span> Stream&lt;Path&gt; find(Path start,
+   <span class="kw">int</span> maxDepth,
+   BiPredicate&lt;Path, BasicFileAttributes&gt; matcher,
+   FileVisitOption... options) <span class="kw">throws</span> IOException</code></pre>
+<pre><code><span class="kw">var</span> path = Path.of(<span class="str">"/bigcats"</span>);
+<span class="kw">long</span> minSize = <span class="num">1_000</span>;
+<span class="kw">try</span> (<span class="kw">var</span> s = Files.find(path, <span class="num">10</span>,
+      (p, a) -&gt; a.isRegularFile()
+         &amp;&amp; p.toString().endsWith(<span class="str">".java"</span>)
+         &amp;&amp; a.size() &gt; minSize)) {
+   s.forEach(System.out::println);
+}</code></pre>
+  <ul class="trace">
+    <li><code>find()</code> <code>walk()</code>-এর মতোই, তবে একটি <code>BiPredicate</code> নেয় এবং depth limit <strong>বাধ্যতামূলক</strong>।</li>
+    <li><code>BiPredicate</code>-এর দুটি parameter হলো একটি <code>Path</code> ও একটি <code>BasicFileAttributes</code> — Java নিজেই attribute এনে দেয়।</li>
+    <li><code>maxDepth</code> <strong><code>0</code> মানে কেবল শুরুর path-টুকুই</strong> খোঁজা হয়, তাই কোনো directory-র নিচের symbolic link খুঁজলে কিছুই প্রিন্ট হবে না।</li>
+  </ul>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ EXAM TRAP</span>
+    <p><code>Files.walk()</code> একটি <code>Stream&lt;Path&gt;</code> ফেরত দেয়, তাই এর উপর <code>filter()</code> <strong>এক-parameter</strong>-এর <code>Predicate</code> নেয়। <code>walk()</code>-এর পরে <code>.filter((p, a) -&gt; ...)</code> লিখলে <span class="no">compile হয় না</span> — দুই-parameter-এর <code>BiPredicate</code> রূপটি <code>find()</code>-এর।</p>
+  </div>
+
+  <div class="card remember">
+    <span class="card-label">★ REMEMBER</span>
+    <p>Directory তালিকা করার পুরোনো উপায় <code>Files.newDirectoryStream(path, "*.{txt,java}")</code>, যা একটি <code>DirectoryStream&lt;Path&gt;</code> দেয় এবং for-each loop দিয়ে iterate করা হয়। নতুন code-এ <code>Files.find()</code> ব্যবহার করুন, তবে exam-এ যেকোনোটি চিনতে পারা চাই।</p>
+  </div>
+
+  <h3>মূল API রিভিউ</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Class</th><th>উদ্দেশ্য</th></tr>
+      <tr><td><code>File</code></td><td>File system-এ অবস্থানের I/O উপস্থাপনা</td></tr>
+      <tr><td><code>Files</code></td><td><code>Path</code> নিয়ে কাজ করার helper method</td></tr>
+      <tr><td><code>Path</code></td><td>File system-এ অবস্থানের NIO.2 উপস্থাপনা</td></tr>
+      <tr><td><code>Paths</code></td><td><code>Path</code> পাওয়ার factory method ধারণ করে</td></tr>
+      <tr><td><code>InputStream</code></td><td>Byte-ভিত্তিক file পড়ার superclass</td></tr>
+      <tr><td><code>OutputStream</code></td><td>Byte-ভিত্তিক file লেখার superclass</td></tr>
+      <tr><td><code>Reader</code></td><td>Character-ভিত্তিক file পড়ার superclass</td></tr>
+      <tr><td><code>Writer</code></td><td>Character-ভিত্তিক file লেখার superclass</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============ RECAP ============ -->
+<section class="recap" id="recap">
+  <h2>সংক্ষিপ্ত রিভিউ</h2>
+
+  <h4>File ও path</h4>
+  <ul>
+    <li>Absolute path <code>/</code> বা drive letter দিয়ে শুরু হয়; বাকি সব relative। Path symbol: <code>.</code> = বর্তমান, <code>..</code> = parent।</li>
+    <li><code>File</code> constructor ব্যবহার করে; <code>Path</code> একটি interface, তৈরি হয় <code>Path.of()</code>, <code>Paths.get()</code>, <code>FileSystems</code> বা <code>URI</code> দিয়ে। রূপান্তর <code>toPath()</code> / <code>toFile()</code> দিয়ে।</li>
+  </ul>
+
+  <h4>Path নিয়ে কাজ</h4>
+  <ul>
+    <li><code>Path</code> immutable — assign না করা method call কিছুই করে না। <code>toString()</code>-ই একমাত্র method যা <code>String</code> দেয়।</li>
+    <li><code>getNameCount()</code>, <code>getName()</code> ও <code>subpath()</code> root বাদ দেয় এবং ভুল index-এ <code>IllegalArgumentException</code> ছোড়ে।</li>
+    <li><code>resolve()</code> = concatenation (absolute argument জেতে)। <code>relativize()</code>-এ দুটি path একই ধরনের হতে হবে। <code>normalize()</code> textual; <code>toRealPath()</code> file system স্পর্শ করে এবং না থাকলে throw করে।</li>
+    <li><code>createDirectory()</code> বনাম <code>createDirectories()</code>; <code>delete()</code> বনাম <code>deleteIfExists()</code>; <code>copy()</code>/<code>move()</code>-এ <code>REPLACE_EXISTING</code> লাগে আর এগুলো কখনো file-কে directory-র "ভেতরে" রাখে না।</li>
+  </ul>
+
+  <h4>I/O stream</h4>
+  <ul>
+    <li>Byte (<code>InputStream</code>/<code>OutputStream</code>) বনাম character (<code>Reader</code>/<code>Writer</code>); input বনাম output; low-level (কেবল file class) বনাম high-level (বাকি সব)।</li>
+    <li>Wrap করার সময় কখনো family মেশাবেন না। <code>InputStream</code>/<code>Reader</code> ইত্যাদি abstract। <code>PrintReader</code> বলে কিছু নেই।</li>
+    <li><code>read()</code> <code>int</code> দেয়, stream-এর শেষে <code>-1</code>; buffered overload-এর return মান সবসময় ব্যবহার করুন।</li>
+  </ul>
+
+  <h4>Files-এর সুবিধাজনক method</h4>
+  <ul>
+    <li><code>readString()</code>, <code>readAllBytes()</code>, <code>readAllLines()</code> সবকিছু memory-তে তোলে; <code>lines()</code> lazy এবং <code>Stream</code> দেয়।</li>
+    <li>NIO.2-এর stream method গুলো try-with-resources দিয়ে বন্ধ করতেই হবে।</li>
+  </ul>
+
+  <h4>Serialization</h4>
+  <ul>
+    <li><code>Serializable</code> একটি marker interface; প্রতিটি instance member হয় serializable, <code>transient</code>, নয়তো <code>null</code>। Record-কে স্পষ্টভাবে implement করতে হয়।</li>
+    <li>Deserialization-এ serialized class-এর কোনো constructor বা instance initializer চলে না — কেবল প্রথম non-serializable parent-এর no-arg constructor চলে।</li>
+    <li><code>readObject()</code> <code>EOFException</code> পর্যন্ত loop করা হয়; এটি <code>ClassNotFoundException</code> declare করে।</li>
+  </ul>
+
+  <h4>User ও advanced API</h4>
+  <ul>
+    <li><code>System.out</code>/<code>System.err</code> হলো <code>PrintStream</code> (নীরব ব্যর্থতা); <code>System.in</code> একটি <code>InputStream</code>। এগুলো বন্ধ করবেন না।</li>
+    <li><code>Console</code> হলো <code>System.console()</code>-এর singleton যা <code>null</code> হতে পারে; <code>readPassword()</code> <code>char[]</code> দেয়।</li>
+    <li><code>mark()</code>/<code>reset()</code>/<code>skip()</code>; আগে <code>markSupported()</code> চেক করুন।</li>
+    <li><code>readAttributes()</code> read-only, <code>getFileAttributeView()</code> updatable (<code>setTimes()</code>)। <code>walk()</code> default-এ link অনুসরণ করে না; <code>find()</code> <code>BiPredicate</code> নেয় ও depth চায়।</li>
+  </ul>
+</section>
+
+<!-- ============ CHEAT SHEET ============ -->
+<section class="section" id="cheat">
+  <div class="sec-num">Cheat Sheet</div>
+  <h2>Exam Traps চিট-শিট</h2>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>পরিস্থিতি</th><th>কী টেস্ট হয়</th><th>রায়</th></tr>
+      <tr><td><code>new Path("jaguar.txt")</code></td><td><code>Path</code> একটি interface</td><td class="no">Compile হয় না</td></tr>
+      <tr><td><code>Path.get("cats","lynx.txt")</code></td><td><code>Path</code>-এ <code>of()</code>, <code>Paths</code>-এ <code>get()</code></td><td class="no">Compile হয় না</td></tr>
+      <tr><td><code>new File("/w", "winter", "snow.dat")</code></td><td>তিন-argument <code>File</code> constructor নেই</td><td class="no">Compile হয় না</td></tr>
+      <tr><td><code>new File("/dir", new File("f.txt"))</code></td><td>কেবল <code>(File, String)</code> আছে, <code>(String, File)</code> নেই</td><td class="no">Compile হয় না</td></tr>
+      <tr><td><code>Files.mkdir(p)</code></td><td>NIO.2-তে নাম <code>createDirectory()</code></td><td class="no">Compile হয় না</td></tr>
+      <tr><td><code>throws IOException</code> ছাড়া <code>Files.deleteIfExists()</code></td><td>Checked exception handle করতে হবে</td><td class="no">Compile হয় না</td></tr>
+      <tr><td><code>p.resolve("krill");</code> তারপর <code>p</code> প্রিন্ট</td><td><code>Path</code> immutability</td><td class="no">অপরিবর্তিত — ফলাফল হারিয়ে গেছে</td></tr>
+      <tr><td><code>Path.of("/").getName(0)</code></td><td>Root name count-এ নেই</td><td class="no"><code>IllegalArgumentException</code></td></tr>
+      <tr><td><code>p.subpath(1, 1)</code></td><td>খালি রেঞ্জ</td><td class="no"><code>IllegalArgumentException</code></td></tr>
+      <tr><td><code>Path.of("/turkey/food").resolve("/tiger/cage")</code></td><td>Absolute argument জেতে</td><td class="yes"><code>/tiger/cage</code></td></tr>
+      <tr><td>একটি absolute ও একটি relative path-এ <code>relativize()</code></td><td>দুটিই একই ধরনের হতে হবে</td><td class="no"><code>IllegalArgumentException</code></td></tr>
+      <tr><td>অনুপস্থিত path-এ <code>toRealPath()</code></td><td>File system স্পর্শ করে</td><td class="no">Throw করে</td></tr>
+      <tr><td><code>Files.copy(file, existingDirectory)</code></td><td>Target নতুন file-এর path, folder নয়</td><td class="no">Runtime-এ throw</td></tr>
+      <tr><td><code>REPLACE_EXISTING</code> ছাড়া বিদ্যমান target-এ <code>copy()</code>/<code>move()</code></td><td>Default overwrite আচরণ</td><td class="no">Throw করে</td></tr>
+      <tr><td>সবকিছু থাকা অবস্থায় <code>createDirectories()</code></td><td>Idempotent</td><td class="yes">নীরবে শেষ হয়</td></tr>
+      <tr><td>অনুপস্থিত path-এ <code>Files.delete()</code></td><td><code>delete</code> বনাম <code>deleteIfExists</code></td><td class="no">Throw করে; অন্যটি <code>false</code> দেয়</td></tr>
+      <tr><td>Symbolic link delete করা</td><td>Link বনাম target</td><td class="yes">Link-টিই মুছে যায়</td></tr>
+      <tr><td><code>/a/./b</code> ও <code>/a/b</code>-তে <code>equals()</code> বনাম <code>isSameFile()</code></td><td>Symbol resolution</td><td class="no"><code>equals()</code> false, <code>isSameFile()</code> true</td></tr>
+      <tr><td>অভিন্ন file-এ <code>Files.mismatch()</code></td><td>Return contract</td><td class="yes"><code>-1</code> ফেরত দেয়</td></tr>
+      <tr><td><code>new BufferedInputStream(new FileReader(f))</code></td><td>Byte ও character family মেশানো</td><td class="no">Compile হয় না</td></tr>
+      <tr><td><code>new BufferedInputStream(new InputStream())</code></td><td><code>InputStream</code> abstract</td><td class="no">Compile হয় না</td></tr>
+      <tr><td><code>PrintReader</code></td><td>এই class-এর অস্তিত্ব নেই</td><td class="no">Compile হয় না</td></tr>
+      <tr><td><code>while(reader.read(buffer) != -1) writer.write(buffer);</code></td><td>Read count উপেক্ষা</td><td class="no">অ-গুণিতক দৈর্ঘ্যের file নষ্ট করে</td></tr>
+      <tr><td><code>Files.readAllLines(p).filter(...)</code></td><td><code>List</code> বনাম <code>Stream</code></td><td class="no">Compile হয় না</td></tr>
+      <tr><td>try-with-resources ছাড়া <code>Files.lines()</code></td><td>NIO.2 stream file handle ধরে রাখে</td><td class="no">Resource leak</td></tr>
+      <tr><td><code>record R(String n) {}</code> serialize করা</td><td>Record স্বয়ংক্রিয়ভাবে serializable নয়</td><td class="no"><code>Serializable</code> implement করতেই হবে</td></tr>
+      <tr><td><code>Serializable</code> class-এ <code>private Object x = new Object();</code></td><td><code>Object</code> serializable নয়</td><td class="no">Runtime-এ throw</td></tr>
+      <tr><td>Deserialization-এ constructor/initializer</td><td>Object তৈরির প্রক্রিয়া</td><td class="no">কেবল প্রথম non-serializable parent-এর no-arg constructor চলে</td></tr>
+      <tr><td>Deserialization-এর পর <code>transient</code> ও <code>static</code> field</td><td>কী লেখা হয়</td><td class="no">Default / JVM-এর সর্বশেষ মান</td></tr>
+      <tr><td><code>try (var out = System.out) {}</code> তারপর প্রিন্ট</td><td>System stream বন্ধ করা</td><td class="no">নীরবে কিছুই প্রিন্ট হয় না</td></tr>
+      <tr><td>বন্ধ করা <code>System.in</code> wrapper থেকে পড়া</td><td>InputStream throw করে</td><td class="no"><code>IOException</code></td></tr>
+      <tr><td><code>new Console()</code></td><td>Private constructor-এর singleton</td><td class="no">Compile হয় না</td></tr>
+      <tr><td>null চেক ছাড়া <code>System.console()</code> ব্যবহার</td><td>Console অনুপলব্ধ হতে পারে</td><td class="no">সম্ভাব্য <code>NullPointerException</code></td></tr>
+      <tr><td>"will always print" ভাষায় <code>mark()</code>/<code>reset()</code> প্রশ্ন</td><td><code>markSupported()</code> false হতে পারে</td><td class="no">কেবল "may print" নিরাপদ</td></tr>
+      <tr><td><code>BasicFileAttributes</code>-এ <code>a.setTimes(...)</code></td><td>View বনাম read-only attributes</td><td class="no">Compile হয় না</td></tr>
+      <tr><td><code>Files.walk(p).filter((p, a) -&gt; ...)</code></td><td><code>Predicate</code> বনাম <code>BiPredicate</code></td><td class="no">Compile হয় না</td></tr>
+      <tr><td><code>Files.find(dir, 0, ...)</code></td><td>Depth 0 = কেবল শুরুর path</td><td class="no">নিচে কিছুই খোঁজে না</td></tr>
+      <tr><td><code>Files.walk()</code> ও symbolic link</td><td>Default link আচরণ</td><td class="no"><code>FOLLOW_LINKS</code> ছাড়া অনুসরণ করে না</td></tr>
+    </table>
+  </div>
+</section>
+
+<footer>OCP Java SE 21 Developer Study Guide · Boyarsky &amp; Selikoff · অধ্যায় ১৪ — I/O · বিস্তারিত হ্যান্ডনোট</footer>
+</div>
+</body>
+</html>

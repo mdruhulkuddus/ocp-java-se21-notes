@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 — Chapter 12: Modules (Detailed Handnote)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6f8;   --card:#ffffff;  --ink:#2f3437;   --muted:#7b8a93;
+  --kw:#7c5cbf;   --str:#3a8a5c;   --num:#b8860b;   --err:#c44d3e;  --cm:#a89a8a;
+  --icode-bg:#f3ece4; --icode-fg:#9a5030;
+  --accent:#c96442; --accent2:#d4845e;
+  --line:#ece3da;
+  --yes:#3b7d57;  --no:#c44d3e;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; padding:28px 16px 70px;
+  background:var(--bg); color:var(--ink);
+  font-family:'Source Sans 3',system-ui,sans-serif;
+  font-size:16.5px; line-height:1.72;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:980px;margin:0 auto;}
+h1,h2,h3,h4{font-family:'Merriweather',Georgia,serif;line-height:1.34;}
+p{margin:0 0 14px;}
+ul,ol{margin:0 0 15px;padding-left:22px;}
+li{margin-bottom:7px;}
+code,pre,.mono{font-family:'JetBrains Mono',ui-monospace,monospace;}
+code{background:var(--icode-bg);color:var(--icode-fg);padding:1.5px 6px;border-radius:5px;font-size:.86em;}
+pre{
+  background:#fdfaf7;border-radius:12px;padding:16px 18px;margin:0 0 16px;
+  overflow-x:auto;box-shadow:inset 0 2px 8px rgba(140,110,90,.10);
+  font-size:13.6px;line-height:1.62;
+}
+pre code{background:none;color:#3b3f42;padding:0;font-size:inherit;}
+.kw{color:var(--kw);font-weight:600;} .str{color:var(--str);} .num{color:var(--num);}
+.err{color:var(--err);font-weight:700;} .cm{color:var(--cm);font-style:italic;}
+
+/* ---------- header ---------- */
+.header{
+  background:linear-gradient(135deg,#ffffff 0%,#fbf7f4 100%);
+  border-radius:18px;padding:34px 32px;margin-bottom:26px;
+  box-shadow:0 6px 26px rgba(120,110,100,.10);
+}
+.badge{
+  display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:700;
+  letter-spacing:.9px;text-transform:uppercase;padding:7px 15px;border-radius:999px;
+  box-shadow:0 3px 10px rgba(201,100,66,.28);
+}
+.header h1{font-size:2.05rem;margin:18px 0 6px;font-weight:900;letter-spacing:-.4px;}
+.header h1 .dim{color:var(--muted);font-weight:400;font-size:1.15rem;}
+.header .sub{font-style:italic;color:var(--muted);margin-bottom:20px;}
+.objectives{
+  background:linear-gradient(135deg,#f0f9f3,#f7fcf8);
+  border-left:4px solid #5aab7b;border-radius:12px;padding:16px 20px;
+}
+.objectives h4{margin:0 0 8px;color:#3b7d57;font-size:.94rem;text-transform:uppercase;letter-spacing:.6px;}
+.objectives ul{margin:0;padding-left:20px;}
+.objectives li{margin-bottom:5px;font-size:.95rem;}
+
+/* ---------- toc ---------- */
+.toc{
+  background:var(--card);border-radius:14px;padding:24px 28px;margin-bottom:30px;
+  box-shadow:0 4px 18px rgba(120,110,100,.08);
+}
+.toc h3{margin:0 0 14px;font-size:1.05rem;color:var(--accent);}
+.toc ol{columns:2;column-gap:34px;margin:0;padding-left:20px;}
+.toc li{margin-bottom:8px;break-inside:avoid;}
+.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted #cfc4b8;}
+.toc a:hover{color:var(--accent);}
+@media(max-width:660px){.toc ol{columns:1;}}
+
+/* ---------- sections ---------- */
+.section{
+  background:var(--card);border-radius:14px;padding:28px 30px;margin-bottom:26px;
+  box-shadow:0 4px 18px rgba(120,110,100,.08);
+}
+.sec-num{
+  font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;
+  letter-spacing:1.6px;color:var(--accent);text-transform:uppercase;
+}
+.section h2{
+  font-size:1.5rem;margin:6px 0 20px;padding-bottom:12px;border-bottom:2px solid var(--line);
+}
+.section h3{font-size:1.13rem;margin:26px 0 10px;color:#43484c;}
+.section h4{font-size:1rem;margin:20px 0 8px;color:#5a6166;}
+
+/* ---------- cards ---------- */
+.card{
+  border-radius:14px;padding:15px 20px;margin:18px 0;
+  box-shadow:0 3px 12px rgba(120,110,100,.09);
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(120,110,100,.15);}
+.card p:last-child,.card ul:last-child{margin-bottom:0;}
+.card-label{
+  font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+  letter-spacing:1.1px;text-transform:uppercase;margin-bottom:7px;display:block;
+}
+.exam-trap{background:linear-gradient(135deg,#fef2f0,#fff8f7);border-left:4px solid #e06b5e;}
+.exam-trap .card-label{color:#c0453a;}
+.key-rule{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:4px solid #5aab7b;}
+.key-rule .card-label{color:#3b7d57;}
+.remember{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:4px solid #d4a24c;}
+.remember .card-label{color:#a9772a;}
+
+.rules-box{
+  background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-top:4px solid #5aab7b;
+  border-radius:12px;padding:18px 22px;margin:18px 0;
+  box-shadow:0 3px 12px rgba(120,110,100,.08);
+}
+.rules-box h4{margin:0 0 10px;color:#3b7d57;font-family:'Source Sans 3',sans-serif;
+  font-size:.86rem;text-transform:uppercase;letter-spacing:.8px;font-weight:700;}
+.rules-box ul,.rules-box ol{margin:0;}
+
+/* ---------- vs grid ---------- */
+.vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0;}
+.vs-grid > div{
+  background:var(--card);border-radius:12px;padding:16px 18px;
+  box-shadow:0 3px 12px rgba(120,110,100,.10);
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.vs-grid > div:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(120,110,100,.15);}
+.vs-grid h4{margin:0 0 8px;font-size:1rem;}
+.vs-grid .left h4{color:#7c5cbf;}
+.vs-grid .right h4{color:#3b7d57;}
+.vs-grid ul{padding-left:19px;margin:0;font-size:.95rem;}
+@media(max-width:660px){.vs-grid{grid-template-columns:1fr;}}
+
+/* ---------- tables ---------- */
+.tbl-wrap{overflow-x:auto;margin:18px 0;border-radius:12px;box-shadow:0 3px 14px rgba(120,110,100,.10);}
+table{width:100%;border-collapse:collapse;background:var(--card);border-radius:12px;overflow:hidden;font-size:.93rem;}
+th{background:#f0e8de;text-align:left;padding:11px 14px;font-weight:700;color:#4a4038;font-size:.86rem;
+   text-transform:uppercase;letter-spacing:.5px;}
+td{padding:10px 14px;border-top:1px solid #f1eae2;vertical-align:top;}
+tr:hover td{background:#fdfbf9;}
+td code,th code{font-size:.85em;}
+.yes{color:var(--yes);font-weight:700;}
+.no{color:var(--no);font-weight:700;}
+
+/* ---------- trace ---------- */
+.trace{background:#fdfaf7;border-radius:12px;padding:14px 18px 14px 34px;margin:0 0 16px;
+  box-shadow:inset 0 2px 8px rgba(140,110,90,.08);font-size:.95rem;}
+.trace li{margin-bottom:6px;}
+
+/* ---------- recap ---------- */
+.recap{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-radius:14px;padding:28px 30px;
+  margin-bottom:26px;box-shadow:0 4px 18px rgba(120,110,100,.10);}
+.recap h2{font-size:1.45rem;margin:0 0 18px;padding-bottom:12px;border-bottom:2px solid #f0e2c8;}
+.recap h4{color:#a9772a;margin:18px 0 6px;font-size:1rem;}
+.recap ul{margin:0;padding-left:20px;}
+
+footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:34px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ============ HEADER ============ -->
+<div class="header">
+  <span class="badge">OCP Java SE 21 Developer — Exam 1Z0-830</span>
+  <h1>Chapter 12 · Modules <span class="dim">(Detailed Handnote)</span></h1>
+  <p class="sub">The Java Platform Module System — module declarations, directives, services, command-line tooling, module types, and migration strategies.</p>
+  <div class="objectives">
+    <h4>Exam objectives covered in this chapter</h4>
+    <ul>
+      <li>Define modules and expose module content, including that by reflection, and declare module dependencies.</li>
+      <li>Define services, providers, and consumers.</li>
+      <li>Compile Java code, create modular and non-modular JARs, runtime images.</li>
+      <li>Implement migration to modules using unnamed and automatic modules.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ TOC ============ -->
+<div class="toc">
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#s1">Introducing Modules</a></li>
+    <li><a href="#s2">Creating and Running a Modular Program</a></li>
+    <li><a href="#s3">Updating Our Example for Multiple Modules</a></li>
+    <li><a href="#s4">Diving into the Module Declaration</a></li>
+    <li><a href="#s5">Creating a Service</a></li>
+    <li><a href="#s6">Discovering Modules</a></li>
+    <li><a href="#s7">Comparing Types of Modules</a></li>
+    <li><a href="#s8">Migrating an Application</a></li>
+    <li><a href="#recap">Short Recap</a></li>
+    <li><a href="#cheat">Exam Traps Cheat Sheet</a></li>
+  </ol>
+</div>
+
+<!-- ============ SECTION 1 ============ -->
+<section class="section" id="s1">
+  <div class="sec-num">Section 01</div>
+  <h2>Introducing Modules</h2>
+
+  <p>A real project has hundreds or thousands of classes grouped into packages, and those packages are grouped into <strong>JAR</strong> files. A JAR is a zip file with some extra information and the extension <code>.jar</code>. When open-source libraries depend on other libraries, keeping compatible versions of every JAR available at runtime becomes what the community calls <strong>JAR hell</strong> — the wrong version of a class being loaded, or a <code>ClassNotFoundException</code> at runtime.</p>
+
+  <p>The <strong>Java Platform Module System (JPMS)</strong> groups code at a higher level than packages. The main purpose of a module is to provide groups of related packages that offer a particular set of functionality. It is like a JAR file, except the developer chooses which packages are accessible outside the module.</p>
+
+  <div class="rules-box">
+    <h4>The Java Platform Module System includes</h4>
+    <ul>
+      <li>A format for module JAR files</li>
+      <li>Partitioning of the JDK into modules</li>
+      <li>Additional command-line options for Java tools</li>
+    </ul>
+  </div>
+
+  <h3>What a module actually is</h3>
+  <p>A module is a group of <strong>one or more packages</strong> plus a special file called <code>module-info.java</code>. The contents of that file are the <em>module declaration</em>. Arrows between modules in a design diagram represent <strong>dependencies</strong> — one module relying on code in another.</p>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ Key Rule</span>
+    <p><code>module-info.java</code> is <strong>required to be inside all modules</strong>, and it must sit in the <strong>root directory</strong> of the module — not inside a package folder.</p>
+  </div>
+
+  <h3>Benefits of modules</h3>
+  <ul>
+    <li><strong>Better access control:</strong> beyond <code>private</code>/package/<code>protected</code>/<code>public</code>, you can have packages that are only accessible to other packages in the same module.</li>
+    <li><strong>Clearer dependency management:</strong> since modules specify what they rely on, Java can complain about a missing JAR at <em>startup</em> rather than when it is first accessed at runtime.</li>
+    <li><strong>Custom Java builds:</strong> create a Java runtime with only the parts of the JDK your program needs rather than the full one at over 150 MB.</li>
+    <li><strong>Improved security:</strong> omitting parts of the JDK means vulnerabilities in unused parts don't matter.</li>
+    <li><strong>Improved performance:</strong> a smaller Java package gives better startup time and a lower memory requirement.</li>
+    <li><strong>Unique package enforcement:</strong> Java can ensure each package comes from only one module.</li>
+  </ul>
+
+  <div class="card remember">
+    <span class="card-label">★ Remember</span>
+    <p>Using modules is <strong>optional</strong>. Every other Java 21 feature works without converting your application to modules. But the exam still tests the syntax heavily.</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 2 ============ -->
+<section class="section" id="s2">
+  <div class="sec-num">Section 02</div>
+  <h2>Creating and Running a Modular Program</h2>
+
+  <p>The book's running example is a zoo. The first module is <code>zoo.animal.feeding</code>, chosen because all other modules depend on it. It has one package with one class, plus the module declaration.</p>
+
+  <h3>Creating the files</h3>
+<pre><code><span class="kw">package</span> zoo.animal.feeding;
+
+<span class="kw">public class</span> Task {
+   <span class="kw">public static void</span> main(String... args) {
+      System.out.println(<span class="str">"All fed!"</span>);
+   }
+}</code></pre>
+
+  <p>And the simplest possible module declaration:</p>
+<pre><code><span class="kw">module</span> zoo.animal.feeding {
+}</code></pre>
+
+  <div class="rules-box">
+    <h4>Three differences between a module declaration and a regular class declaration</h4>
+    <ol>
+      <li><code>module-info.java</code> must be in the <strong>root directory</strong> of your module. Regular Java classes should be in packages.</li>
+      <li>The declaration must use the keyword <code>module</code> — not <code>class</code>, <code>interface</code>, or <code>enum</code>.</li>
+      <li>The module name follows the <strong>naming rules for package names</strong>. It often includes periods. Dashes (<code>-</code>) are <strong>not allowed</strong>, exactly as with class and package names.</li>
+    </ol>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+<pre style="margin:8px 0 6px"><code><span class="err">class</span> dragon {              <span class="cm">// DOES NOT COMPILE</span>
+   exports com.dragon.fire;
+}</code></pre>
+    <p>A module declaration that starts with <code>class</code> (or <code>interface</code>) never compiles, no matter how correct the directives inside look. The exam loves hiding this in line 1 while you scan lines 2–5 for the "real" error.</p>
+  </div>
+
+  <h3>Directory structure</h3>
+  <p><code>feeding</code> is the module directory, and <code>module-info.java</code> sits directly under it. Just as with a regular JAR, the <code>zoo.animal.feeding</code> package has one subfolder per portion of the name, and <code>Task</code> is in the deepest subfolder. A <code>mods</code> directory is created at the same level as the module to store module artifacts later. That directory can be named anything; <code>mods</code> is just a common name.</p>
+
+<pre><code>feeding
+ ├── module-info.java
+ └── zoo
+      └── animal
+           └── feeding
+                └── Task.java
+mods            <span class="cm">// sibling of feeding, holds the JARs</span></code></pre>
+
+  <h3>Compiling</h3>
+<pre><code>javac --module-path mods
+   -d feeding
+   feeding/zoo/animal/feeding/*.java feeding/module-info.java</code></pre>
+  <ul class="trace">
+    <li><code>-d feeding</code> — directory to place the generated class files in.</li>
+    <li>The end of the command is the list of <code>.java</code> files to compile; individually or via a wildcard.</li>
+    <li><code>--module-path mods</code> — location of any <strong>custom</strong> module files. Here it could have been omitted since there are no dependencies. Think of module-path as replacing classpath for a modular program.</li>
+  </ul>
+
+  <p>All four of these are valid alternatives using the short form <code>-p</code>:</p>
+<pre><code>javac -p mods -d feeding feeding/zoo/animal/feeding/*.java feeding/*.java
+javac -p mods -d feeding feeding/zoo/animal/feeding/*.java feeding/module-info.java
+javac -p mods -d feeding feeding/zoo/animal/feeding/Task.java feeding/module-info.java
+javac -p mods -d feeding feeding/zoo/animal/feeding/Task.java feeding/*.java</code></pre>
+
+  <div class="tbl-wrap">
+    <table>
+      <caption style="display:none">javac options</caption>
+      <tr><th>Use for</th><th>Abbreviation</th><th>Long form</th></tr>
+      <tr><td>Directory for class files</td><td><code>-d &lt;dir&gt;</code></td><td>n/a</td></tr>
+      <tr><td>Module path</td><td><code>-p &lt;path&gt;</code></td><td><code>--module-path &lt;path&gt;</code></td></tr>
+    </table>
+  </div>
+
+  <div class="card remember">
+    <span class="card-label">★ Remember</span>
+    <p>The classpath option still exists in three forms: <code>-cp</code>, <code>--class-path</code>, and <code>-classpath</code>. They are common when writing nonmodular programs.</p>
+  </div>
+
+  <h3>Running</h3>
+  <p>The syntax is the <strong>module name, a slash, then the fully qualified class name</strong>.</p>
+<pre><code>java --module-path feeding
+   --module zoo.animal.feeding/zoo.animal.feeding.Task
+
+java -p feeding
+   -m zoo.animal.feeding/zoo.animal.feeding.Task</code></pre>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>Only <strong>one</strong> slash appears, and it separates module from class. Everything <em>inside</em> the class name uses periods:</p>
+    <ul>
+      <li><code>-m zoo.animal.talks/zoo/animal/talks/Peacocks</code> — <span class="no">wrong</span>, package parts must use dots.</li>
+      <li><code>-m n.c</code> — <span class="no">wrong</span>, missing the slash.</li>
+      <li><code>-m n-c</code> — <span class="no">wrong</span>, a dash is not a separator.</li>
+      <li><code>--module-path x-x -m n/c</code> — <span class="yes">correct</span>. <code>x-x</code> is legal because a module <em>path</em> is a folder name, and folder names may contain dashes.</li>
+    </ul>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Use for</th><th>Abbreviation</th><th>Long form</th></tr>
+      <tr><td>Module name</td><td><code>-m &lt;name&gt;</code></td><td><code>--module &lt;name&gt;</code></td></tr>
+      <tr><td>Module path</td><td><code>-p &lt;path&gt;</code></td><td><code>--module-path &lt;path&gt;</code></td></tr>
+    </table>
+  </div>
+
+  <h3>Packaging</h3>
+<pre><code>jar -cvf mods/zoo.animal.feeding.jar -C feeding/ .</code></pre>
+  <p>There is nothing module-specific here — this packages everything under <code>feeding</code> into <code>zoo.animal.feeding.jar</code> in <code>mods</code>. Now the same run command works against the module path:</p>
+<pre><code>java -p mods -m zoo.animal.feeding/zoo.animal.feeding.Task</code></pre>
+  <p>The command is identical to the earlier one except the directory. Since the module path now points at <code>mods</code>, a <strong>module JAR</strong> is being run.</p>
+</section>
+
+<!-- ============ SECTION 3 ============ -->
+<section class="section" id="s3">
+  <div class="sec-num">Section 03</div>
+  <h2>Updating Our Example for Multiple Modules</h2>
+
+  <h3>exports — updating the feeding module</h3>
+  <p>The <code>exports</code> directive indicates that a module intends for those packages to be used by Java code <strong>outside</strong> the module. Without an <code>exports</code> directive, the module is only available to be run from the command line on its own.</p>
+<pre><code><span class="kw">module</span> zoo.animal.feeding {
+   <span class="kw">exports</span> zoo.animal.feeding;
+}</code></pre>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>An empty module such as <code>module com.food.supplier {}</code> exports <strong>no</strong> packages — but a <code>main()</code> method inside it <strong>can still be run</strong> from the command line. "Not exported" restricts other <em>modules</em>, not the launcher.</p>
+  </div>
+
+  <h3>requires — the care module</h3>
+  <p><code>zoo.animal.care</code> has two packages. <code>zoo.animal.care.medical</code> is intended for other modules; <code>zoo.animal.care.details</code> is internal and is never exported.</p>
+<pre><code><span class="cm">// HippoBirthday.java</span>
+<span class="kw">package</span> zoo.animal.care.details;
+<span class="kw">import</span> zoo.animal.feeding.*;
+<span class="kw">public class</span> HippoBirthday {
+   <span class="kw">private</span> Task task;
+}
+
+<span class="cm">// Diet.java</span>
+<span class="kw">package</span> zoo.animal.care.medical;
+<span class="kw">public class</span> Diet { }</code></pre>
+
+<pre><code><span class="num">1:</span> <span class="kw">module</span> zoo.animal.care {
+<span class="num">2:</span>    <span class="kw">exports</span> zoo.animal.care.medical;
+<span class="num">3:</span>    <span class="kw">requires</span> zoo.animal.feeding;
+<span class="num">4:</span> }</code></pre>
+  <ul class="trace">
+    <li>Line 1 — the module name.</li>
+    <li>Line 2 — the one package exported for use by other modules.</li>
+    <li>Line 3 — <code>requires</code> specifies that another module is needed. Note that the <em>internal</em> package <code>zoo.animal.care.details</code> is the one that actually uses <code>Task</code>; requiring is per-module, not per-package.</li>
+  </ul>
+
+<pre><code>javac -p mods -d care
+   care/zoo/animal/care/details/*.java
+   care/zoo/animal/care/medical/*.java
+   care/module-info.java
+
+jar -cvf mods/zoo.animal.care.jar -C care/ .</code></pre>
+
+  <div class="card remember">
+    <span class="card-label">★ Remember</span>
+    <p>The packages begin with the same prefix as the module name, and this is intentional. Think of it as the module name "claiming" the matching package and all subpackages.</p>
+  </div>
+
+  <h3>Multiple exports and requires — the talks module</h3>
+<pre><code><span class="num">1:</span> <span class="kw">module</span> zoo.animal.talks {
+<span class="num">2:</span>    <span class="kw">exports</span> zoo.animal.talks.content;
+<span class="num">3:</span>    <span class="kw">exports</span> zoo.animal.talks.media;
+<span class="num">4:</span>    <span class="kw">exports</span> zoo.animal.talks.schedule;
+<span class="num">5:</span>
+<span class="num">6:</span>    <span class="kw">requires</span> zoo.animal.feeding;
+<span class="num">7:</span>    <span class="kw">requires</span> zoo.animal.care;
+<span class="num">8:</span> }</code></pre>
+  <p>Lines 2–4 allow other modules to reference all three packages; lines 6–7 list the two modules this one depends on. Each package needs its own <code>exports</code> line; you cannot list several after one keyword.</p>
+
+  <h3>No exports at all — the staff module</h3>
+  <p><code>zoo.staff</code> requires three modules and exposes nothing:</p>
+<pre><code><span class="kw">module</span> zoo.staff {
+   <span class="kw">requires</span> zoo.animal.feeding;
+   <span class="kw">requires</span> zoo.animal.care;
+   <span class="kw">requires</span> zoo.animal.talks;
+}</code></pre>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ Key Rule</span>
+    <p>Read the arrows in a module diagram literally: an arrow <strong>from</strong> a module <strong>to</strong> another is a <code>requires</code> in the source module and an <code>exports</code> in the target module. Count arrows out of a module = number of <code>requires</code> statements.</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 4 ============ -->
+<section class="section" id="s4">
+  <div class="sec-num">Section 04</div>
+  <h2>Diving into the Module Declaration</h2>
+
+  <div class="card remember">
+    <span class="card-label">★ Remember</span>
+    <p>Directives can appear in <strong>any order</strong> in the module declaration. Grouping all <code>exports</code> before all <code>requires</code> is a style choice, not a rule.</p>
+  </div>
+
+  <h3>Exporting a package to a specific module</h3>
+<pre><code><span class="kw">module</span> zoo.animal.talks {
+   <span class="kw">exports</span> zoo.animal.talks.content <span class="kw">to</span> zoo.staff;
+   <span class="kw">exports</span> zoo.animal.talks.media;
+   <span class="kw">exports</span> zoo.animal.talks.schedule;
+
+   <span class="kw">requires</span> zoo.animal.feeding;
+   <span class="kw">requires</span> zoo.animal.care;
+}</code></pre>
+  <p>From <code>zoo.staff</code> nothing has changed. No other module is allowed to access <code>zoo.animal.talks.content</code>. This is called a <strong>qualified export</strong>.</p>
+
+  <div class="rules-box">
+    <h4>What "exporting a package" actually exposes</h4>
+    <ul>
+      <li>All <strong>public</strong> classes, interfaces, enums, and records are exported.</li>
+      <li>Any <strong>public and protected</strong> fields and methods in those files are visible.</li>
+      <li><code>private</code> members are not visible — they are not accessible outside the class anyway.</li>
+      <li>Package-private members are not visible — they are not accessible outside the package anyway.</li>
+    </ul>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Level</th><th>Within module code</th><th>Outside module</th></tr>
+      <tr><td><code>private</code></td><td>Available only within class</td><td class="no">No access</td></tr>
+      <tr><td>Package</td><td>Available only within package</td><td class="no">No access</td></tr>
+      <tr><td><code>protected</code></td><td>Available only within package or to subclasses</td><td>Accessible to subclasses only <strong>if package is exported</strong></td></tr>
+      <tr><td><code>public</code></td><td>Available to all classes</td><td>Accessible only <strong>if package is exported</strong></td></tr>
+    </table>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p><code>public</code> is no longer the top of the access ladder. A <code>public</code> class in a non-exported package is invisible outside the module. The exam phrases this as "which module can reference package X" — check <code>exports</code> first, access modifier second.</p>
+  </div>
+
+  <h3>requires transitive</h3>
+  <p><code>requires moduleName</code> says the current module depends on <code>moduleName</code>. <code>requires transitive moduleName</code> means that <strong>any module that requires this module will also depend on</strong> <code>moduleName</code>.</p>
+<pre><code><span class="kw">module</span> zoo.animal.feeding {
+   <span class="kw">exports</span> zoo.animal.feeding;
+}
+
+<span class="kw">module</span> zoo.animal.care {
+   <span class="kw">exports</span> zoo.animal.care.medical;
+   <span class="kw">requires transitive</span> zoo.animal.feeding;
+}
+
+<span class="kw">module</span> zoo.animal.talks {
+   <span class="kw">exports</span> zoo.animal.talks.content <span class="kw">to</span> zoo.staff;
+   <span class="kw">exports</span> zoo.animal.talks.media;
+   <span class="kw">exports</span> zoo.animal.talks.schedule;
+   <span class="cm">// no longer needed requires zoo.animal.feeding;</span>
+   <span class="cm">// no longer needed requires zoo.animal.care;</span>
+   <span class="kw">requires transitive</span> zoo.animal.care;
+}
+
+<span class="kw">module</span> zoo.staff {
+   <span class="cm">// no longer needed requires zoo.animal.feeding;</span>
+   <span class="cm">// no longer needed requires zoo.animal.care;</span>
+   <span class="kw">requires</span> zoo.animal.talks;
+}</code></pre>
+
+  <div class="rules-box">
+    <h4>Effects of applying transitive to <code>requires zoo.animal.feeding</code> in zoo.animal.care</h4>
+    <ul>
+      <li><code>zoo.animal.talks</code> <strong>can optionally</strong> declare that it requires <code>zoo.animal.feeding</code>, but it is not required.</li>
+      <li><code>zoo.animal.care</code> <strong>cannot be compiled or executed</strong> without access to <code>zoo.animal.feeding</code>.</li>
+      <li><code>zoo.animal.talks</code> <strong>cannot be compiled or executed</strong> without access to <code>zoo.animal.care</code>.</li>
+    </ul>
+    <p style="margin-top:10px;margin-bottom:0">These hold even if <code>zoo.animal.care</code> and <code>zoo.animal.talks</code> never reference any package in <code>zoo.animal.feeding</code>.</p>
+  </div>
+
+  <h3>Duplicate requires statements</h3>
+<pre><code><span class="kw">module</span> bad.module {
+   <span class="kw">requires</span> zoo.animal.talks;
+   <span class="err">requires transitive</span> zoo.animal.talks;   <span class="cm">// DOES NOT COMPILE</span>
+}</code></pre>
+  <ul class="trace">
+    <li>Java does not allow you to repeat the same module in a <code>requires</code> clause — it is redundant and most likely a coding error.</li>
+    <li><code>requires transitive</code> is <em>requires plus extra behavior</em>, so mixing the two forms is still a duplicate.</li>
+    <li>The <strong>second</strong> statement is the one flagged. On the exam ("which is the first line to contain a compiler error?"), pick the later line.</li>
+  </ul>
+
+  <h3>opens — enabling reflection</h3>
+  <p>Reflection lets callers inspect and call code at runtime, and can even subvert access control. Because it is dangerous, the module system requires developers to explicitly allow it.</p>
+<pre><code><span class="kw">module</span> zoo.animal.talks {
+   <span class="kw">opens</span> zoo.animal.talks.schedule;
+   <span class="kw">opens</span> zoo.animal.talks.media <span class="kw">to</span> zoo.staff;
+}</code></pre>
+  <p>The first allows any module using this one to use reflection. The second grants that privilege only to <code>zoo.staff</code>.</p>
+
+  <h4>Opening an entire module</h4>
+<pre><code><span class="kw">open module</span> zoo.animal.talks {
+}
+
+<span class="kw">open module</span> zoo.animal.talks {
+   <span class="err">opens</span> zoo.animal.talks.schedule;    <span class="cm">// DOES NOT COMPILE</span>
+}</code></pre>
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>A module that uses the <code>open</code> modifier is <strong>not permitted</strong> to use the <code>opens</code> directive — the packages are already open. Watch the single letter <code>s</code>: <code>open</code> is a <em>module modifier</em>, <code>opens</code> is a <em>directive</em>.</p>
+  </div>
+
+  <div class="vs-grid">
+    <div class="left">
+      <h4>exports</h4>
+      <ul>
+        <li>Compile-time and runtime access</li>
+        <li>Exposes public/protected members of public types</li>
+        <li><code>exports pkg;</code> / <code>exports pkg to mod;</code></li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>opens</h4>
+      <ul>
+        <li>Runtime <strong>reflective</strong> access</li>
+        <li>Declared per package, or whole module via <code>open module</code></li>
+        <li><code>opens pkg;</code> / <code>opens pkg to mod;</code></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SECTION 5 ============ -->
+<section class="section" id="s5">
+  <div class="sec-num">Section 05</div>
+  <h2>Creating a Service</h2>
+
+  <p>A <strong>service</strong> is composed of an interface, any classes the interface references, and a way of looking up implementations of the interface. <strong>The implementations are not part of the service.</strong> The book's example uses four modules; you are not required to have four, but that is what the exam will show.</p>
+
+  <h3>1. The service provider interface — <code>zoo.tours.api</code></h3>
+<pre><code><span class="cm">// Souvenir.java</span>
+<span class="kw">package</span> zoo.tours.api;
+<span class="kw">public record</span> Souvenir(String description) { }
+
+<span class="cm">// Tour.java</span>
+<span class="kw">package</span> zoo.tours.api;
+<span class="kw">public interface</span> Tour {
+   String name();
+   <span class="kw">int</span> length();
+   Souvenir getSouvenir();
+}
+
+<span class="cm">// module-info.java</span>
+<span class="kw">module</span> zoo.tours.api {
+   <span class="kw">exports</span> zoo.tours.api;
+}</code></pre>
+  <p>All three interface methods use the implicit <code>public</code> modifier. <code>Souvenir</code> is part of the service because the interface references it. A service provider "interface" may be an abstract class, but the exam only shows an interface.</p>
+
+  <h3>2. The service locator — <code>zoo.tours.reservations</code></h3>
+<pre><code><span class="cm">// TourFinder.java</span>
+<span class="kw">package</span> zoo.tours.reservations;
+
+<span class="kw">import</span> java.util.*;
+<span class="kw">import</span> zoo.tours.api.*;
+
+<span class="kw">public class</span> TourFinder {
+   <span class="kw">public static</span> Tour findSingleTour() {
+      ServiceLoader&lt;Tour&gt; loader = ServiceLoader.load(Tour.class);
+      <span class="kw">for</span> (Tour tour : loader)
+         <span class="kw">return</span> tour;
+      <span class="kw">return null</span>;
+   }
+   <span class="kw">public static</span> List&lt;Tour&gt; findAllTours() {
+      List&lt;Tour&gt; tours = <span class="kw">new</span> ArrayList&lt;&gt;();
+      ServiceLoader&lt;Tour&gt; loader = ServiceLoader.load(Tour.class);
+      <span class="kw">for</span> (Tour tour : loader)
+         tours.add(tour);
+      <span class="kw">return</span> tours;
+   }
+}
+
+<span class="cm">// module-info.java</span>
+<span class="kw">module</span> zoo.tours.reservations {
+   <span class="kw">exports</span> zoo.tours.reservations;
+   <span class="kw">requires</span> zoo.tours.api;
+   <span class="kw">uses</span> zoo.tours.api.Tour;
+}</code></pre>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ Key Rule</span>
+    <p>Both <code>requires</code> and <code>uses</code> are needed — <strong>one for compilation, one for lookup</strong>. <code>uses</code> takes the fully qualified <em>interface</em> name, not a package.</p>
+  </div>
+
+  <h4>ServiceLoader methods you must know</h4>
+<pre><code><span class="kw">public final class</span> ServiceLoader&lt;S&gt; <span class="kw">implements</span> Iterable&lt;S&gt; {
+   <span class="kw">public static</span> &lt;S&gt; ServiceLoader&lt;S&gt; load(Class&lt;S&gt; service) { ... }
+   <span class="kw">public</span> Stream&lt;Provider&lt;S&gt;&gt; stream() { ... }
+}</code></pre>
+  <p>Looping over the loader gives you the service type directly. Requesting a <code>Stream</code> gives a <strong>different type</strong> — a <code>Stream&lt;Provider&lt;S&gt;&gt;</code>, because a stream controls when elements are evaluated. You must call <code>get()</code> on each <code>Provider</code>:</p>
+<pre><code>ServiceLoader.load(Tour.class)
+  .stream()
+  .map(Provider::get)
+  .mapToInt(Tour::length)
+  .max()
+  .ifPresent(System.out::println);</code></pre>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <ul>
+      <li>There is <strong>no</strong> <code>getStream()</code> method on <code>ServiceLoader</code>.</li>
+      <li><code>ServiceLoader.load(X.class).stream().toList()</code> does <span class="no">not compile</span> as a <code>List&lt;X&gt;</code> — it is a list of <code>Provider</code>. You need <code>.map(Provider::get)</code> in between.</li>
+      <li><code>ServiceLoader.load()</code> is relatively expensive; in a real application, cache the result.</li>
+    </ul>
+  </div>
+
+  <h3>3. The consumer — <code>zoo.visitor</code></h3>
+<pre><code><span class="cm">// Tourist.java</span>
+<span class="kw">package</span> zoo.visitor;
+
+<span class="kw">import</span> java.util.*;
+<span class="kw">import</span> zoo.tours.api.*;
+<span class="kw">import</span> zoo.tours.reservations.*;
+
+<span class="kw">public class</span> Tourist {
+   <span class="kw">public static void</span> main(String[] args) {
+      Tour tour = TourFinder.findSingleTour();
+      System.out.println(<span class="str">"Single tour: "</span> + tour);
+
+      List&lt;Tour&gt; tours = TourFinder.findAllTours();
+      System.out.println(<span class="str">"# tours: "</span> + tours.size());
+   }
+}
+
+<span class="cm">// module-info.java</span>
+<span class="kw">module</span> zoo.visitor {
+   <span class="kw">requires</span> zoo.tours.api;
+   <span class="kw">requires</span> zoo.tours.reservations;
+}</code></pre>
+  <p>Running it <em>before</em> any implementation exists:</p>
+<pre><code>java -p mods -m zoo.visitor/zoo.visitor.Tourist
+
+Single tour: <span class="kw">null</span>
+# tours: <span class="num">0</span></code></pre>
+  <ul class="trace">
+    <li><code>findSingleTour()</code> finds no providers, so the enhanced for loop body never runs and <code>null</code> is returned.</li>
+    <li>String concatenation with a <code>null</code> reference prints the text <code>null</code> — <strong>no NullPointerException</strong>.</li>
+    <li><code>findAllTours()</code> returns an empty (not null) list, so <code>size()</code> is <code>0</code>.</li>
+  </ul>
+
+  <h3>4. The service provider — <code>zoo.tours.agency</code></h3>
+<pre><code><span class="cm">// TourImpl.java</span>
+<span class="kw">package</span> zoo.tours.agency;
+<span class="kw">import</span> zoo.tours.api.*;
+
+<span class="kw">public class</span> TourImpl <span class="kw">implements</span> Tour {
+   <span class="kw">public</span> String name()      { <span class="kw">return</span> <span class="str">"Behind the Scenes"</span>; }
+   <span class="kw">public int</span> length()       { <span class="kw">return</span> <span class="num">120</span>; }
+   <span class="kw">public</span> Souvenir getSouvenir() {
+      <span class="kw">return new</span> Souvenir(<span class="str">"stuffed animal"</span>);
+   }
+}
+
+<span class="cm">// module-info.java</span>
+<span class="kw">module</span> zoo.tours.agency {
+   <span class="kw">requires</span> zoo.tours.api;
+   <span class="kw">provides</span> zoo.tours.api.Tour <span class="kw">with</span> zoo.tours.agency.TourImpl;
+}</code></pre>
+  <p>The package containing the implementation is <strong>not exported</strong> — callers should not refer to it directly. The syntax is:</p>
+<pre><code>provides interfaceName <span class="kw">with</span> className;</code></pre>
+  <p>After packaging the provider and rerunning the same command:</p>
+<pre><code>Single tour: zoo.tours.agency.TourImpl@1936f0f5
+# tours: <span class="num">1</span></code></pre>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ Key Rule</span>
+    <p>Nothing was recompiled. Adding a new service provider module requires <strong>zero</strong> recompiles of existing modules — the service locator simply observes the new provider on the module path. This is loose coupling in action.</p>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p><code>provides</code> takes the <strong>interface first</strong> and the <strong>implementation second</strong>, joined by <code>with</code>. Wrong forms the exam offers: <code>provides Impl with Interface</code>, <code>provides Interface by Impl</code>, <code>provides Interface using Impl</code>. Only <code>with</code> exists.</p>
+  </div>
+
+  <h3>Reviewing directives and services</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Artifact</th><th>Part of the service</th><th>Directives required</th></tr>
+      <tr><td>Service provider interface</td><td class="yes">Yes</td><td><code>exports</code></td></tr>
+      <tr><td>Service provider</td><td class="no">No</td><td><code>requires</code><br><code>provides</code></td></tr>
+      <tr><td>Service locator</td><td class="yes">Yes</td><td><code>exports</code><br><code>requires</code><br><code>uses</code></td></tr>
+      <tr><td>Consumer</td><td class="no">No</td><td><code>requires</code></td></tr>
+    </table>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Directive</th><th>Description</th></tr>
+      <tr><td><code>exports package;</code><br><code>exports package to module;</code></td><td>Makes package available outside module</td></tr>
+      <tr><td><code>requires module;</code><br><code>requires transitive module;</code></td><td>Specifies another module as dependency</td></tr>
+      <tr><td><code>opens package;</code><br><code>opens package to module;</code></td><td>Allows package to be used with reflection</td></tr>
+      <tr><td><code>provides serviceInterface with implName;</code></td><td>Makes service available</td></tr>
+      <tr><td><code>uses serviceInterface;</code></td><td>References service</td></tr>
+    </table>
+  </div>
+
+  <div class="card remember">
+    <span class="card-label">★ Remember</span>
+    <p><strong>No module ever needs <code>requires</code> on the service provider.</strong> The provider is the implementation, and it is discovered at runtime. Both the consumer and the service locator require the <em>service provider interface</em> module.</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 6 ============ -->
+<section class="section" id="s6">
+  <div class="sec-num">Section 06</div>
+  <h2>Discovering Modules</h2>
+
+  <p>You do <em>not</em> need to know the output of these commands. You <em>do</em> need to know the syntax of the commands and what they do.</p>
+
+  <h3>Identifying built-in modules</h3>
+  <p><code>java.base</code> contains most of the packages covered on the exam. You never need <code>requires java.base</code> — it is available to all modular applications. The file still compiles if you write it explicitly, but it is redundant, so omit it. It is analogous to <code>java.lang</code> being imported automatically in a class.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Module name</th><th>What it contains</th><th>Coverage in book</th></tr>
+      <tr><td><code>java.base</code></td><td>Collections, math, IO, NIO.2, concurrency, etc.</td><td>Most of the book</td></tr>
+      <tr><td><code>java.desktop</code></td><td>AWT and Swing</td><td>Not on exam beyond module name</td></tr>
+      <tr><td><code>java.logging</code></td><td>Logging</td><td>Not on exam beyond module name</td></tr>
+      <tr><td><code>java.sql</code></td><td>JDBC</td><td>Not on exam beyond module name</td></tr>
+      <tr><td><code>java.xml</code></td><td>XML</td><td>Not on exam beyond module name</td></tr>
+    </table>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <ul>
+      <li>Module names beginning with <code>java</code> are APIs you are likely to use; those beginning with <code>jdk</code> are specific to the JDK. There are about 20 <code>java.*</code> and about 30 <code>jdk.*</code> modules.</li>
+      <li><code>java.util</code> is a <span class="no">package</span>, not a module. <code>jdk.base</code> does not exist — the module is <code>java.base</code>.</li>
+      <li>You don't have to memorize the lists, but you must be able to pick real module names out of a lineup of invented ones.</li>
+    </ul>
+  </div>
+
+  <h3>Describing a module</h3>
+  <p>These two commands are equivalent:</p>
+<pre><code>java -p mods -d zoo.animal.feeding
+java -p mods --describe-module zoo.animal.feeding</code></pre>
+<pre><code>zoo.animal.feeding file:///absolutePath/mods/zoo.animal.feeding.jar
+exports zoo.animal.feeding
+requires java.base mandated</code></pre>
+  <ul class="trace">
+    <li><code>requires java.base mandated</code> appears even though the declaration requires nothing — <code>java.base</code> is added automatically to every module. <strong>The word <code>mandated</code> comes last.</strong></li>
+    <li>A qualified export shows as <code>qualified exports zoo.animal.care.medical to zoo.staff</code>.</li>
+    <li><code>contains zoo.animal.care.details</code> means a package exists in the module that is <strong>not exported at all</strong>.</li>
+  </ul>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p><code>-d</code> means <strong>two different things</strong> depending on the command:</p>
+    <ul>
+      <li><code>javac -d &lt;dir&gt;</code> — the output directory for class files.</li>
+      <li><code>java -d &lt;module&gt;</code> — short form of <code>--describe-module</code>.</li>
+      <li><code>jar -d</code> — also <code>--describe-module</code>.</li>
+    </ul>
+  </div>
+
+  <h3>Listing available modules and showing resolution</h3>
+<pre><code>java --list-modules              <span class="cm">// ~70 lines: java.base@21, java.compiler@21, ...</span>
+java -p mods --list-modules      <span class="cm">// adds custom modules with their file paths</span>
+
+java --show-module-resolution
+   -p feeding
+   -m zoo.animal.feeding/zoo.animal.feeding.Task</code></pre>
+  <div class="vs-grid">
+    <div class="left">
+      <h4>--list-modules</h4>
+      <ul>
+        <li>Lists observable modules</li>
+        <li><strong>Exits as soon as it prints</strong> — does <span class="no">not</span> run the program</li>
+        <li>JDK modules show a version (<code>@21</code>); custom modules show a file path</li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>--show-module-resolution</h4>
+      <ul>
+        <li>Debugging view of module resolution</li>
+        <li>Prints a lot of output, <strong>then runs the program</strong> (output ends with <code>All fed!</code>)</li>
+        <li>Starts by listing the <em>root</em> module</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Describing with jar</h3>
+<pre><code>jar -f mods/zoo.animal.feeding.jar -d
+jar --file mods/zoo.animal.feeding.jar --describe-module</code></pre>
+  <p>The output differs only in that the JAR version includes <code>module-info.class</code> in the filename. What matters for the exam: <strong>both <code>java</code> and <code>jar</code> can describe a module.</strong></p>
+
+  <h3>jdeps — learning about dependencies</h3>
+  <p>Unlike describing a module, <code>jdeps</code> looks at the <strong>code</strong> in addition to the module declaration, so it tells you what dependencies are actually <em>used</em> rather than simply declared. It is the tool for projects that have not yet been modularized.</p>
+<pre><code><span class="cm">// Animatronic.java  — note: no module-info.java exists here</span>
+<span class="kw">package</span> zoo.dinos;
+<span class="kw">import</span> java.time.*;
+<span class="kw">import</span> java.util.*;
+<span class="kw">import</span> sun.misc.Unsafe;
+
+<span class="kw">public class</span> Animatronic {
+   <span class="kw">private</span> List&lt;String&gt; names;
+   <span class="kw">private</span> LocalDate visitDate;
+   ...
+   <span class="kw">public void</span> unsafeMethod() {
+      Unsafe unsafe = Unsafe.getUnsafe();
+   }
+}</code></pre>
+<pre><code>jdeps zoo.dino.jar
+
+zoo.dino.jar -> java.base
+zoo.dino.jar -> jdk.unsupported
+   zoo.dinos -> java.lang   java.base
+   zoo.dinos -> java.time   java.base
+   zoo.dinos -> java.util   java.base
+   zoo.dinos -> sun.misc    JDK internal API (jdk.unsupported)
+
+jdeps -s zoo.dino.jar          <span class="cm">// summary: only the module lines</span>
+jdeps -summary zoo.dino.jar    <span class="cm">// equivalent</span>
+
+jdeps --jdk-internals zoo.dino.jar
+jdeps -jdkinternals zoo.dino.jar   <span class="cm">// equivalent</span></code></pre>
+  <ul class="trace">
+    <li><code>java.base</code> is always included in the output.</li>
+    <li><code>--jdk-internals</code> lists any classes calling an internal API, plus a table of suggested replacements.</li>
+    <li><code>jdk.unsupported</code> is <strong>not</strong> in the published module lists — it holds internal libraries you should not reference, as they may disappear.</li>
+    <li><code>jdeps</code> has a <code>--module-path</code> option with <strong>no short form</strong>, unlike other commands.</li>
+  </ul>
+
+  <h3>jmod</h3>
+  <p>Oracle recommends JAR files for most modules. <strong>JMOD files are recommended only when you have native libraries</strong> or something that can't go inside a JAR. The one thing to remember: <code>jmod</code> is only for working with JMOD files.</p>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Operation</th><th>Description</th></tr>
+      <tr><td><code>create</code></td><td>Creates JMOD file</td></tr>
+      <tr><td><code>extract</code></td><td>Extracts all files from JMOD; works like unzipping</td></tr>
+      <tr><td><code>describe</code></td><td>Prints module details such as <code>requires</code></td></tr>
+      <tr><td><code>list</code></td><td>Lists all files in JMOD file</td></tr>
+      <tr><td><code>hash</code></td><td>Prints or records hashes</td></tr>
+    </table>
+  </div>
+
+  <h3>jlink and jpackage</h3>
+<pre><code>jlink --module-path mods --add-modules zoo.animal.talks --output zooApp</code></pre>
+  <p>This creates a <strong>runtime image</strong>: a <em>folder</em> containing <code>bin</code>, <code>conf</code>, <code>include</code>, <code>legal</code>, <code>lib</code>, <code>man</code> and a <code>release</code> file — about 15 MB zipped versus a 150 MB+ JDK. It is <strong>not</strong> a single image file.</p>
+<pre><code>jpackage --name feedingTask --module-path mods
+   --module zoo.animal.feeding/zoo.animal.feeding.Task</code></pre>
+  <p>This creates an <strong>application image</strong>: a single executable for a specific platform (<code>.exe</code> on Windows, <code>.dmg</code> on Mac — here <code>feedingTask-1.0.dmg</code>). For a non-modular JAR:</p>
+<pre><code>jpackage --name myApp --input myDir --main-class com.wiley.java.Cat
+   --main-jar myApp.jar</code></pre>
+
+  <div class="vs-grid">
+    <div class="left">
+      <h4>jlink</h4>
+      <ul>
+        <li>Output: runtime image = a <strong>directory</strong></li>
+        <li><strong>Modular applications only</strong></li>
+        <li><code>-p</code>/<code>--module-path</code>, <code>--add-modules</code>, <code>--output</code></li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>jpackage</h4>
+      <ul>
+        <li>Output: application image = a single <strong>executable</strong></li>
+        <li><strong>Modular and non-modular</strong> applications</li>
+        <li><code>-n</code>/<code>--name</code>, <code>-i</code>/<code>--input</code>, <code>--main-class</code>, <code>--main-jar</code>, <code>--app-version</code> (defaults to 1.0)</li>
+      </ul>
+    </div>
+  </div>
+  <p>Both provide the parts of Java needed to run, and for both, <strong>a JDK need not already be installed</strong> on the target system.</p>
+
+  <div class="card remember">
+    <span class="card-label">★ Remember</span>
+    <p><code>jimage</code> is used to <em>inspect</em> a Java image file — it does not create one. If a question asks which commands create an <code>.exe</code> and a directory respectively, the answer is <strong>jpackage and jlink</strong>.</p>
+  </div>
+
+  <h3>Reviewing command-line options</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Description</th><th>Syntax</th></tr>
+      <tr><td>Compile nonmodular code</td><td><code>javac -cp classpath -d directory classesToCompile</code><br><code>javac --class-path ...</code> · <code>javac -classpath ...</code></td></tr>
+      <tr><td>Run nonmodular code</td><td><code>java -cp classpath package.className</code><br><code>java -classpath ...</code> · <code>java --class-path ...</code></td></tr>
+      <tr><td>Compile module</td><td><code>javac -p moduleFolderName -d directory classesToCompileIncludingModuleInfo</code><br><code>javac --module-path ...</code></td></tr>
+      <tr><td>Run module</td><td><code>java -p moduleFolderName -m moduleName/package.className</code><br><code>java --module-path ... --module ...</code></td></tr>
+      <tr><td>Describe module</td><td><code>java -p moduleFolderName -d moduleName</code><br><code>java --module-path ... --describe-module moduleName</code><br><code>jar -f jarName -d</code> · <code>jar --file jarName --describe-module</code></td></tr>
+      <tr><td>List available modules</td><td><code>java --list-modules</code><br><code>java -p moduleFolderName --list-modules</code></td></tr>
+      <tr><td>View dependencies</td><td><code>jdeps -s --module-path moduleFolderName jarName</code><br><code>jdeps -summary ...</code> · <code>jdeps --jdk-internals jarName</code> · <code>jdeps -jdkinternals jarName</code></td></tr>
+      <tr><td>Show module resolution</td><td><code>java --show-module-resolution -p moduleFolderName -m moduleName</code></td></tr>
+      <tr><td>Create runtime image</td><td><code>jlink -p moduleFolderName --add-modules moduleName --output zooApp</code></td></tr>
+      <tr><td>Create self-contained application</td><td><code>jpackage -n name -p moduleFolderName -m moduleName/package.className</code><br><code>jpackage -n myApp -i myDir --main-class package.className --main-jar appJar.jar</code></td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============ SECTION 7 ============ -->
+<section class="section" id="s7">
+  <div class="sec-num">Section 07</div>
+  <h2>Comparing Types of Modules</h2>
+
+  <h3>Named modules</h3>
+  <p>A <strong>named module</strong> contains a <code>module-info.java</code> file in the root of the JAR alongside one or more packages, and appears on the <strong>module path</strong>. Unless otherwise specified, a module is a named module. Memory aid: a named module has the <em>name inside</em> <code>module-info.java</code> and is on the module path.</p>
+  <div class="card remember">
+    <span class="card-label">★ Remember</span>
+    <p>From Chapter 7: the only way for subclasses of a <code>sealed</code> class to live in a different package is to be within the <strong>same named module</strong>.</p>
+  </div>
+
+  <h3>Automatic modules</h3>
+  <p>An <strong>automatic module</strong> appears on the module path but does <strong>not</strong> contain a <code>module-info.java</code> file — a regular JAR placed on the module path and treated as a module. Java automatically determines the module name, and code referencing it behaves as if a <code>module-info.java</code> were present. It <strong>automatically exports all packages</strong>.</p>
+
+  <p>Library authors were encouraged to declare their intended module name by adding an <code>Automatic-Module-Name</code> property to <code>META-INF/MANIFEST.MF</code>. The manifest is a text file of key/value pairs separated by a colon; the default in Java 21 is:</p>
+<pre><code>Manifest-Version: 1.0
+Created-By: 21 (Oracle Corporation)</code></pre>
+
+  <div class="rules-box">
+    <h4>Algorithm for determining an automatic module name</h4>
+    <ol>
+      <li>If the <code>MANIFEST.MF</code> specifies an <code>Automatic-Module-Name</code>, <strong>use that</strong> and stop.</li>
+      <li>Remove the file extension from the JAR name.</li>
+      <li>Remove any version information from the end of the name. A version is digits and dots with possible extra information at the end — for example <code>-1.0.0</code> or <code>-1.0-RC</code>.</li>
+      <li>Replace any remaining characters other than letters and numbers with dots.</li>
+      <li>Replace any sequences of dots with a single dot.</li>
+      <li>Remove the dot if it is the first or last character of the result.</li>
+    </ol>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>#</th><th>Description</th><th>Example 1</th><th>Example 2</th></tr>
+      <tr><td>1</td><td>Beginning JAR name</td><td><code>commons2-x-1.0.0-SNAPSHOT.jar</code></td><td><code>mod_$-1.0.jar</code></td></tr>
+      <tr><td>2</td><td>Remove file extension</td><td><code>commons2-x-1.0.0-SNAPSHOT</code></td><td><code>mod_$-1.0</code></td></tr>
+      <tr><td>3</td><td>Remove version information</td><td><code>commons2-x</code></td><td><code>mod_$</code></td></tr>
+      <tr><td>4</td><td>Replace special characters</td><td><code>commons2.x</code></td><td><code>mod..</code></td></tr>
+      <tr><td>5</td><td>Replace sequence of dots</td><td><code>commons2.x</code></td><td><code>mod.</code></td></tr>
+      <tr><td>6</td><td>Remove leading/trailing dots</td><td><code>commons2.x</code></td><td><code>mod</code></td></tr>
+    </table>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <ul>
+      <li><code>emily-1.0.0.jar</code> → <code>emily</code> · <code>emily-1.0.0-SNAPSHOT.jar</code> → <code>emily</code> (the trailing tag goes with the version).</li>
+      <li><code>emily_the_cat-1.0.0.jar</code> → <code>emily.the.cat</code>. Underscores become <strong>dots</strong>, not dashes, and dashes are never allowed in a module name.</li>
+      <li><code>emily.$.jar</code> → <code>emily</code>. The <code>$</code> becomes a dot, giving <code>emily..</code>, which collapses to <code>emily.</code>, and the trailing dot is removed.</li>
+    </ul>
+  </div>
+
+  <h3>Unnamed modules</h3>
+  <p>An <strong>unnamed module</strong> appears on the <strong>classpath</strong>. Like an automatic module it is a regular JAR; unlike an automatic module it is on the classpath rather than the module path, so it is treated as old code and a second-class citizen. It usually contains no <code>module-info.java</code>; <strong>if it happens to contain one, that file is ignored</strong> because it is on the classpath. Unnamed modules do not export any packages to named modules, but can read from any JARs on the classpath or module path.</p>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ Key Rule</span>
+    <p>Code on the <strong>classpath can access the module path</strong>. Code on the <strong>module path cannot read from the classpath</strong>. This single asymmetry answers many exam questions.</p>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Property</th><th>Named</th><th>Automatic</th><th>Unnamed</th></tr>
+      <tr><td>Does it contain a <code>module-info.java</code> file?</td><td class="yes">Yes</td><td class="no">No</td><td>Ignored if present</td></tr>
+      <tr><td>Which packages does it export to <strong>named</strong> modules?</td><td>Those in <code>module-info.java</code></td><td>All packages</td><td class="no">No packages</td></tr>
+      <tr><td>Which packages does it export to <strong>automatic</strong> modules?</td><td>Those in <code>module-info.java</code></td><td>All packages</td><td>All packages</td></tr>
+      <tr><td>Is it readable by other modules on the <strong>module path</strong>?</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td></tr>
+      <tr><td>Is it readable by other JARs on the <strong>classpath</strong>?</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+    </table>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>Note the asymmetry in row 2 vs row 3: an unnamed module exports <strong>no</strong> packages to named modules, but <strong>all</strong> packages to automatic modules. An automatic module always exports everything to everyone.</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 8 ============ -->
+<section class="section" id="s8">
+  <div class="sec-num">Section 08</div>
+  <h2>Migrating an Application</h2>
+
+  <h3>Determining the order</h3>
+  <p>Dependencies between projects form a graph. Arrows point <strong>from</strong> the project that requires the dependency <strong>to</strong> the one that makes it available — in module language, from <code>requires</code> to <code>exports</code>. Projects with <strong>no dependencies are at the bottom</strong>; projects that depend on others are at the top. When two projects have no arrow between them, either order is allowed.</p>
+
+  <div class="vs-grid">
+    <div class="left">
+      <h4>Bottom-up migration</h4>
+      <ol>
+        <li>Pick the lowest-level project not yet migrated.</li>
+        <li>Add <code>module-info.java</code> with <code>exports</code> for packages used by higher-level JARs and <code>requires</code> for its dependencies.</li>
+        <li>Move that named module from the classpath to the module path.</li>
+        <li>Leave not-yet-migrated projects as unnamed modules on the classpath.</li>
+        <li>Repeat with the next-lowest project.</li>
+      </ol>
+      <p style="font-size:.93rem;margin-top:8px">Best when you <strong>can</strong> convert every JAR. Mix during migration: named + unnamed.</p>
+    </div>
+    <div class="right">
+      <h4>Top-down migration</h4>
+      <ol>
+        <li>Place <strong>all</strong> projects on the module path.</li>
+        <li>Pick the highest-level project not yet migrated.</li>
+        <li>Add <code>module-info.java</code> to convert that automatic module into a named module; use other modules' <strong>automatic module names</strong> in <code>requires</code>.</li>
+        <li>Repeat with the next-highest project.</li>
+      </ol>
+      <p style="font-size:.93rem;margin-top:8px">Best when you <strong>don't control</strong> every JAR. Mix during migration: named + automatic.</p>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Category</th><th>Bottom-Up</th><th>Top-Down</th></tr>
+      <tr><td>Project that depends on all others</td><td>Unnamed module on classpath</td><td>Named module on module path</td></tr>
+      <tr><td>Project that has no dependencies</td><td>Named module on module path</td><td>Automatic module on module path</td></tr>
+    </table>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>"For a top-down migration, all modules other than named modules are ______ and are on the ______." → <strong>automatic, module path</strong>. Top-down starts by putting <em>everything</em> on the module path, so nothing stays on the classpath.</p>
+  </div>
+
+  <h3>Splitting a big project into modules</h3>
+  <p>Break packages into logical groupings and draw the dependencies. There will usually be fewer modules than packages because some packages share a module. The JPMS <strong>does not allow cyclic dependencies</strong>: if <code>zoo.tickets.delivery</code> requires <code>zoo.tickets.discount</code>, then <code>zoo.tickets.discount</code> is not allowed to require <code>zoo.tickets.delivery</code>. The common fix is to <strong>introduce another module</strong> holding the shared code, breaking the cycle.</p>
+
+  <h3>Failing to compile with a cyclic dependency</h3>
+<pre><code><span class="cm">// Butterfly.java</span>
+<span class="kw">package</span> zoo.butterfly;
+<span class="kw">public class</span> Butterfly {
+   <span class="kw">private</span> Caterpillar caterpillar;
+}
+<span class="cm">// module-info.java</span>
+<span class="kw">module</span> zoo.butterfly {
+   <span class="kw">exports</span> zoo.butterfly;
+   <span class="kw">requires</span> zoo.caterpillar;
+}
+
+<span class="cm">// Caterpillar.java</span>
+<span class="kw">package</span> zoo.caterpillar;
+<span class="kw">public class</span> Caterpillar {
+   Butterfly emergeCocoon() { <span class="cm">// logic omitted</span> }
+}
+<span class="cm">// module-info.java</span>
+<span class="kw">module</span> zoo.caterpillar {
+   <span class="kw">exports</span> zoo.caterpillar;
+   <span class="err">requires</span> zoo.butterfly;   <span class="cm">// stalemate — neither module can be compiled</span>
+}</code></pre>
+  <ul class="trace">
+    <li><code>zoo.butterfly</code> can't compile until <code>zoo.caterpillar</code> is built.</li>
+    <li><code>zoo.caterpillar</code> can't compile until <code>zoo.butterfly</code> is built.</li>
+    <li>Neither module can ever be compiled. The module system prevents cyclic dependencies at compile time — that's a feature, not a bug.</li>
+    <li>Three modules behave the same way: if <code>ballA</code> requires <code>ballB</code> and <code>ballB</code> requires <code>ballC</code>, then <code>ballC</code> <span class="no">cannot</span> require <code>ballA</code>.</li>
+  </ul>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ Key Rule</span>
+    <p>Java <strong>does</strong> allow a cyclic dependency between <strong>packages within a module</strong>. It only forbids cycles <strong>between modules</strong>. A cyclic dependency always involves <strong>at least two</strong> <code>requires</code> statements, and may involve two <em>or more</em> modules.</p>
+  </div>
+</section>
+
+<!-- ============ RECAP ============ -->
+<section class="recap" id="recap">
+  <h2>Short Recap</h2>
+
+  <h4>Introducing modules</h4>
+  <ul>
+    <li>JPMS = format for module JARs + partitioning of the JDK + extra command-line options; it solves JAR hell.</li>
+    <li>A module = one or more packages + <code>module-info.java</code> in the module's root directory.</li>
+  </ul>
+
+  <h4>Creating and running</h4>
+  <ul>
+    <li><code>javac -p mods -d outDir files… module-info.java</code>; <code>java -p mods -m moduleName/package.ClassName</code>; <code>jar -cvf mods/x.jar -C dir/ .</code></li>
+    <li>One slash between module and class; everything else uses dots. Module names allow dots, never dashes.</li>
+  </ul>
+
+  <h4>Directives</h4>
+  <ul>
+    <li><code>exports</code> (optionally <code>to</code>), <code>requires</code> / <code>requires transitive</code>, <code>opens</code> (optionally <code>to</code>), <code>provides … with …</code>, <code>uses</code>. Any order.</li>
+    <li>Repeating a module in two <code>requires</code> clauses does not compile; <code>open module</code> plus <code>opens</code> does not compile.</li>
+    <li><code>public</code> only reaches outside the module if the package is exported.</li>
+  </ul>
+
+  <h4>Services</h4>
+  <ul>
+    <li>Service = service provider interface + service locator. The service <em>provider</em> (implementation) and the consumer are <strong>not</strong> part of the service.</li>
+    <li>SPI: <code>exports</code>. Locator: <code>exports</code>, <code>requires</code>, <code>uses</code>. Provider: <code>requires</code>, <code>provides</code>. Consumer: <code>requires</code>.</li>
+    <li><code>ServiceLoader.load()</code> is iterable; <code>stream()</code> returns <code>Stream&lt;Provider&lt;S&gt;&gt;</code> and needs <code>.map(Provider::get)</code>.</li>
+  </ul>
+
+  <h4>Discovering modules</h4>
+  <ul>
+    <li><code>java -d</code> / <code>--describe-module</code>, <code>--list-modules</code> (doesn't run), <code>--show-module-resolution</code> (does run), <code>jar -f x.jar -d</code>.</li>
+    <li><code>jdeps</code> (<code>-s</code>/<code>-summary</code>, <code>--jdk-internals</code>/<code>-jdkinternals</code>); <code>jmod</code> for JMOD files; <code>jlink</code> → directory; <code>jpackage</code> → executable.</li>
+    <li><code>requires java.base mandated</code> shows for every module.</li>
+  </ul>
+
+  <h4>Module types</h4>
+  <ul>
+    <li>Named = module-info + module path. Automatic = no module-info + module path, exports everything. Unnamed = classpath, exports nothing to named modules.</li>
+    <li>Automatic module name: manifest wins; else strip extension and version, special chars → dots, collapse dots, trim edge dots.</li>
+  </ul>
+
+  <h4>Migration</h4>
+  <ul>
+    <li>Bottom-up: lowest first, unmigrated stay unnamed on the classpath. Top-down: everything on the module path first, unmigrated are automatic.</li>
+    <li>Cycles between modules never compile; cycles between packages inside one module are fine.</li>
+  </ul>
+</section>
+
+<!-- ============ CHEAT SHEET ============ -->
+<section class="section" id="cheat">
+  <div class="sec-num">Cheat Sheet</div>
+  <h2>Exam Traps Cheat Sheet</h2>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Scenario</th><th>What it tests</th><th>Verdict</th></tr>
+      <tr><td><code>class dragon { exports com.dragon.fire; }</code></td><td>Declaration must use the <code>module</code> keyword</td><td class="no">Does not compile</td></tr>
+      <tr><td><code>module-info.java</code> placed inside <code>zoo/staff</code></td><td>Must be in the module's root directory</td><td class="no">Not a valid module</td></tr>
+      <tr><td><code>module zoo-staff { }</code></td><td>Dashes are illegal in module names</td><td class="no">Does not compile</td></tr>
+      <tr><td><code>module com.food.supplier {}</code> — can its <code>main()</code> run?</td><td>Exporting is for other modules, not the launcher</td><td class="yes">Yes, it runs</td></tr>
+      <tr><td>Same module in <code>requires</code> and <code>requires transitive</code></td><td>Duplicate requires; error is on the second line</td><td class="no">Does not compile</td></tr>
+      <tr><td><code>open module X { opens pkg; }</code></td><td><code>open</code> modifier forbids the <code>opens</code> directive</td><td class="no">Does not compile</td></tr>
+      <tr><td><code>export animal.behavior;</code> / <code>require animal;</code></td><td>Directive spelling — always plural</td><td class="no">No such directive</td></tr>
+      <tr><td><code>provides magic.Magic with dragon.Dragon;</code></td><td>Interface first, implementation second, keyword <code>with</code></td><td class="yes">Correct form</td></tr>
+      <tr><td>Does any module <code>requires</code> the service provider?</td><td>Provider is discovered at runtime</td><td class="no">None do</td></tr>
+      <tr><td>Add a second service provider module</td><td>How many existing modules to recompile</td><td class="yes">Zero</td></tr>
+      <tr><td><code>ServiceLoader.load(X.class).stream().toList()</code> as <code>List&lt;X&gt;</code></td><td><code>stream()</code> yields <code>Provider</code> objects</td><td class="no">Does not compile</td></tr>
+      <tr><td><code>ServiceLoader.getStream()</code></td><td>Method does not exist</td><td class="no">Does not compile</td></tr>
+      <tr><td><code>java -p x -m zoo.talks/zoo/animal/Peacocks</code></td><td>Class name must use dots, not slashes</td><td class="no">Invalid command</td></tr>
+      <tr><td><code>java --module-path x -p n/c</code></td><td>Same option twice; <code>-p</code> ≠ <code>-m</code></td><td class="no">Invalid command</td></tr>
+      <tr><td><code>java --module-path x-x -m n/c</code></td><td>Dashes allowed in a folder name</td><td class="yes">Valid command</td></tr>
+      <tr><td><code>-d</code> on <code>javac</code> vs on <code>java</code></td><td>Output directory vs <code>--describe-module</code></td><td class="yes">Both valid, different meaning</td></tr>
+      <tr><td><code>requires mandated java.base</code></td><td>Word order in describe output</td><td class="no">It's <code>requires java.base mandated</code></td></tr>
+      <tr><td><code>java.util</code> / <code>jdk.base</code> as module names</td><td>Package vs module; real vs invented</td><td class="no">Neither is a JDK module</td></tr>
+      <tr><td><code>--list-modules</code> runs the program?</td><td>Exits after printing observable modules</td><td class="no">No</td></tr>
+      <tr><td><code>emily_the_cat-1.0.0.jar</code> → automatic name</td><td>Underscore becomes a dot</td><td class="yes"><code>emily.the.cat</code></td></tr>
+      <tr><td><code>emily.$.jar</code> → automatic name</td><td>Dot collapsing and trailing-dot removal</td><td class="yes"><code>emily</code></td></tr>
+      <tr><td>JAR with <code>module-info.java</code> placed on the classpath</td><td>Unnamed module ignores the file</td><td class="no">Not a named module</td></tr>
+      <tr><td>Unnamed module exporting to a named module</td><td>Classpath code is invisible to the module path</td><td class="no">Exports nothing</td></tr>
+      <tr><td>Unnamed module exporting to an automatic module</td><td>Automatic modules can read everything</td><td class="yes">All packages</td></tr>
+      <tr><td>Unnamed module writing <code>requires dog;</code></td><td>Unnamed modules have no <code>module-info.java</code></td><td class="no">Not applicable</td></tr>
+      <tr><td>Two modules requiring each other</td><td>Cyclic dependency between modules</td><td class="no">Does not compile</td></tr>
+      <tr><td>Two packages in one module referencing each other</td><td>Cycles allowed inside a module</td><td class="yes">Compiles</td></tr>
+      <tr><td>Which creates an <code>.exe</code> and which a directory?</td><td><code>jimage</code> only inspects</td><td class="yes">jpackage, then jlink</td></tr>
+    </table>
+  </div>
+</section>
+
+<footer>OCP Java SE 21 Developer Study Guide · Boyarsky &amp; Selikoff · Chapter 12 — Modules · Detailed Handnote</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 — Chapter 13: Concurrency · MCQ Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6f8;   --card:#ffffff;  --ink:#2f3437;   --muted:#7b8a93;
+  --kw:#7c5cbf;   --str:#3a8a5c;   --num:#b8860b;   --err:#c44d3e;  --cm:#a89a8a;
+  --icode-bg:#f3ece4; --icode-fg:#9a5030;
+  --accent:#c96442; --accent2:#d4845e;
+  --purple:#7a5cb8; --purple-top:#9b7fd4; --purple-pill:#b29ad9;
+  --yes:#3b7d57; --no:#c44d3e;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;padding:28px 16px 70px;background:var(--bg);color:var(--ink);
+  font-family:'Source Sans 3',system-ui,sans-serif;font-size:16.5px;line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:860px;margin:0 auto;}
+h1,h2,h3{font-family:'Merriweather',Georgia,serif;line-height:1.34;}
+p{margin:0 0 13px;}
+code,pre,.mono{font-family:'JetBrains Mono',ui-monospace,monospace;}
+code{background:var(--icode-bg);color:var(--icode-fg);padding:1.5px 6px;border-radius:5px;font-size:.85em;}
+pre{background:#fbf9fe;border-radius:12px;padding:15px 17px;margin:12px 0 14px;overflow-x:auto;
+  box-shadow:inset 0 2px 8px rgba(120,100,150,.10);font-size:13.4px;line-height:1.6;}
+pre code{background:none;color:#3b3f42;padding:0;font-size:inherit;}
+.kw{color:var(--kw);font-weight:600;} .str{color:var(--str);} .num{color:var(--num);}
+.err{color:var(--err);font-weight:700;} .cm{color:var(--cm);font-style:italic;}
+
+.header{
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#ffffff 0%,#fdf8f3 100%);
+  border-radius:18px;padding:34px 32px;margin-bottom:30px;
+  box-shadow:0 6px 26px rgba(120,110,100,.10);
+}
+.header::after{
+  content:'';position:absolute;top:-90px;right:-70px;width:280px;height:280px;
+  background:radial-gradient(circle,rgba(201,100,66,.16) 0%,rgba(201,100,66,0) 68%);
+  pointer-events:none;
+}
+.badge{
+  display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;padding:7px 15px;border-radius:999px;
+  box-shadow:0 3px 10px rgba(201,100,66,.28);
+}
+.header h1{font-size:1.95rem;margin:18px 0 6px;font-weight:900;letter-spacing:-.3px;}
+.header .sub{font-style:italic;color:var(--muted);margin-bottom:18px;}
+.pills{display:flex;flex-wrap:wrap;gap:8px;position:relative;}
+.pill{
+  background:var(--icode-bg);color:var(--icode-fg);font-family:'JetBrains Mono',monospace;
+  font-size:11.5px;padding:5px 11px;border-radius:999px;letter-spacing:.3px;
+}
+
+.q-card{
+  background:linear-gradient(135deg,#f4f0fa,#f9f6fd);
+  border-top:4px solid var(--purple-top);border-radius:14px;
+  padding:20px 24px;margin-bottom:20px;
+  box-shadow:0 3px 14px rgba(120,110,140,.10);
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.q-card:hover{transform:translateY(-2px);box-shadow:0 9px 24px rgba(120,110,140,.16);}
+.q-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+.q-num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:1rem;color:var(--purple);}
+.q-tag{
+  background:var(--purple-pill);color:#fff;font-family:'Source Sans 3',sans-serif;
+  font-size:10.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;
+  padding:3px 10px;border-radius:999px;
+}
+.prompt{font-weight:600;margin:0 0 6px;}
+.multi{font-weight:700;color:#8a5b47;font-size:.9rem;margin:0 0 8px;}
+.opts{list-style:none;padding:0;margin:12px 0 0;}
+.opts li{margin-bottom:7px;padding-left:30px;position:relative;}
+.opts li .lbl{
+  position:absolute;left:0;top:0;font-family:'JetBrains Mono',monospace;
+  font-weight:700;color:var(--purple);
+}
+details{margin-top:16px;border-top:1px dashed #cdbfe6;padding-top:12px;}
+summary{
+  cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12.5px;
+  font-weight:700;letter-spacing:.6px;color:var(--purple);text-transform:uppercase;
+  list-style:none;
+}
+summary::-webkit-details-marker{display:none;}
+summary::before{content:'▸ ';}
+details[open] summary::before{content:'▾ ';}
+summary:hover{color:#5f45a0;}
+.ans-key{
+  display:inline-block;background:#eef8f1;color:#3d8a5e;
+  font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;
+  padding:5px 13px;border-radius:8px;margin:12px 0 8px;
+}
+details p{margin:0 0 8px;font-size:.96rem;}
+details p:last-child{margin-bottom:0;}
+
+.revision{
+  background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:4px solid #d4a24c;
+  border-radius:14px;padding:26px 30px;margin-top:34px;
+  box-shadow:0 4px 18px rgba(120,110,100,.10);
+}
+.revision h2{font-size:1.3rem;margin:0 0 14px;color:#a9772a;}
+.revision ul{margin:0;padding-left:20px;}
+.revision li{margin-bottom:9px;}
+
+footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:30px;}
+@media(max-width:520px){.q-card{padding:18px 16px;} .header{padding:26px 20px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="header">
+  <span class="badge">OCP Java SE 21 · 1Z0-830</span>
+  <h1>Chapter 13 · Concurrency — MCQ Practice</h1>
+  <p class="sub">31 exam-style questions covering every section of the chapter. Answer first, then reveal.</p>
+  <div class="pills">
+    <span class="pill">platform vs virtual</span>
+    <span class="pill">thread states</span>
+    <span class="pill">run vs start</span>
+    <span class="pill">ExecutorService</span>
+    <span class="pill">Runnable / Callable</span>
+    <span class="pill">Future</span>
+    <span class="pill">scheduling</span>
+    <span class="pill">atomic</span>
+    <span class="pill">synchronized</span>
+    <span class="pill">ReentrantLock</span>
+    <span class="pill">CyclicBarrier</span>
+    <span class="pill">concurrent collections</span>
+    <span class="pill">deadlock / livelock</span>
+    <span class="pill">parallel streams</span>
+  </div>
+</div>
+
+<!-- Q1 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q1</span><span class="q-tag">Parallel streams</span></div>
+  <p class="prompt">Given the following code snippet, which options correctly create a parallel stream?</p>
+<pre><code><span class="kw">var</span> c = List.of(<span class="num">19</span>, <span class="num">66</span>);
+<span class="kw">var</span> s = ThreadLocalRandom.current().doubles();
+
+<span class="kw">var</span> p = ________________;</code></pre>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>new ParallelStream(s)</code></li>
+    <li><span class="lbl">B.</span> <code>c.parallel()</code></li>
+    <li><span class="lbl">C.</span> <code>c.parallelStream()</code></li>
+    <li><span class="lbl">D.</span> <code>s.parallel()</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C · D</div>
+    <p>There is no class called <code>ParallelStream</code> in the Java API, so A is out. <code>parallelStream()</code> is defined on <code>Collection</code>, which makes C correct; <code>parallel()</code> is defined on <code>Stream</code>, which makes D correct. B fails because <code>c</code> is a <code>List</code>, not a stream.</p>
+  </details>
+</div>
+
+<!-- Q2 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q2</span><span class="q-tag">ReentrantLock</span></div>
+  <p class="prompt">Given that the sum of the numbers from 1 (inclusive) to 10 (exclusive) is 45, what are the possible results of executing this program?</p>
+<pre><code><span class="num">4:</span>  <span class="kw">private</span> Lock vault = <span class="kw">new</span> ReentrantLock();
+<span class="num">5:</span>  <span class="kw">private int</span> total = <span class="num">0</span>;
+<span class="num">6:</span>  <span class="kw">public void</span> deposit(<span class="kw">int</span> value) {
+<span class="num">7:</span>     <span class="kw">try</span> {
+<span class="num">8:</span>        vault.tryLock();
+<span class="num">9:</span>        total += value;
+<span class="num">10:</span>    } <span class="kw">finally</span> { vault.unlock(); }
+<span class="num">11:</span> }
+<span class="num">14:</span> IntStream.range(<span class="num">1</span>, <span class="num">10</span>).parallel().forEach(s -&gt; bank.deposit(s));
+<span class="num">16:</span> System.out.println(bank.total);</code></pre>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> 45 is printed.</li>
+    <li><span class="lbl">B.</span> A number less than 45 is printed.</li>
+    <li><span class="lbl">C.</span> A number greater than 45 is printed.</li>
+    <li><span class="lbl">D.</span> An exception is thrown.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · D</div>
+    <p><code>tryLock()</code> returns immediately with <code>false</code> if the lock cannot be acquired, and this code never checks the return value on line 8 — so the protected code runs either way. When <code>tryLock()</code> happens to return <code>true</code> on every call, the program completes and prints 45 (A). On any execution where it returns <code>false</code> at least once, line 10 throws <code>IllegalMonitorStateException</code> (D). B would only be possible if line 10 did not throw.</p>
+  </details>
+</div>
+
+<!-- Q3 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q3</span><span class="q-tag">Runnable / Callable</span></div>
+  <p class="prompt">Which statements about the <code>Callable</code> <code>call()</code> and <code>Runnable</code> <code>run()</code> methods are correct?</p>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> Both methods return <code>void</code>.</li>
+    <li><span class="lbl">B.</span> Both can throw unchecked exceptions.</li>
+    <li><span class="lbl">C.</span> Both can be implemented with lambda expressions.</li>
+    <li><span class="lbl">D.</span> <code>Callable</code> returns a generic type.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · C · D</div>
+    <p><code>Runnable</code> returns <code>void</code> and <code>Callable</code> returns a generic type, so A is wrong and D is right. All methods can throw unchecked exceptions (B), and both are functional interfaces implementable with a lambda (C). Only <code>Callable</code> can throw <em>checked</em> exceptions.</p>
+  </details>
+</div>
+
+<!-- Q4 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q4</span><span class="q-tag">Scheduling</span></div>
+  <p class="prompt">Which lines need to be changed to make the code compile?</p>
+<pre><code><span class="kw">try</span> (ExecutorService service =                      <span class="cm">// w1</span>
+   Executors.newSingleThreadScheduledExecutor()) {
+   service.scheduleWithFixedDelay(() -&gt; {
+      System.out.println(<span class="str">"Open Zoo"</span>);
+      <span class="kw">return null</span>;                                 <span class="cm">// w2</span>
+   }, <span class="num">0</span>, <span class="num">1</span>, TimeUnit.MINUTES);
+   <span class="kw">var</span> result = service.submit(() -&gt;                <span class="cm">// w3</span>
+      System.out.println(<span class="str">"Wake Staff"</span>));
+   System.out.println(result.get());
+}</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> Only line w1.</li>
+    <li><span class="lbl">B.</span> Only line w2.</li>
+    <li><span class="lbl">C.</span> Lines w1 and w2.</li>
+    <li><span class="lbl">D.</span> None of the above; the code compiles.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C</div>
+    <p>Two problems. A <code>ScheduledExecutorService</code> is created but assigned to an <code>ExecutorService</code> variable, so <code>scheduleWithFixedDelay()</code> isn't visible — line w1 must be updated. And <code>scheduleWithFixedDelay()</code> supports only <code>Runnable</code>, not <code>Callable</code>, so returning a value on line w2 is invalid in that lambda.</p>
+  </details>
+</div>
+
+<!-- Q5 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q5</span><span class="q-tag">Atomic</span></div>
+  <p class="prompt">What statement about the following code is true?</p>
+<pre><code><span class="kw">var</span> value1 = <span class="kw">new</span> AtomicLong(<span class="num">0</span>);
+<span class="kw">final long</span>[] value2 = {<span class="num">0</span>};
+IntStream.iterate(<span class="num">1</span>, i -&gt; <span class="num">1</span>).limit(<span class="num">100</span>).parallel()
+   .forEach(i -&gt; value1.incrementAndGet());
+IntStream.iterate(<span class="num">1</span>, i -&gt; <span class="num">1</span>).limit(<span class="num">100</span>).parallel()
+   .forEach(i -&gt; ++value2[<span class="num">0</span>]);
+System.out.println(value1 + <span class="str">" "</span> + value2[<span class="num">0</span>]);</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> It outputs <code>100 100</code>.</li>
+    <li><span class="lbl">B.</span> It outputs <code>100 99</code>.</li>
+    <li><span class="lbl">C.</span> The output cannot be determined ahead of time.</li>
+    <li><span class="lbl">D.</span> The code does not compile.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C</div>
+    <p>The code compiles and runs without exception. The first value is always 100 because <code>AtomicLong.incrementAndGet()</code> is atomic. The second is nondeterministic — <code>++</code> is not atomic, so threads can overwrite each other's work and any value from 1 to 100 is possible. Since one part varies, the overall output cannot be predicted.</p>
+  </details>
+</div>
+
+<!-- Q6 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q6</span><span class="q-tag">Parallel streams</span></div>
+  <p class="prompt">Which statements about the following code are correct?</p>
+<pre><code><span class="kw">var</span> data = List.of(<span class="num">2</span>, <span class="num">5</span>, <span class="num">1</span>, <span class="num">9</span>, <span class="num">8</span>);
+data.stream().parallel()
+   .mapToInt(s -&gt; s)
+   .peek(System.out::print)
+   .forEachOrdered(System.out::print);</code></pre>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>peek()</code> will print the entries in sorted order: <code>12589</code>.</li>
+    <li><span class="lbl">B.</span> <code>peek()</code> will print the entries in an order that cannot be determined ahead of time.</li>
+    <li><span class="lbl">C.</span> <code>forEachOrdered()</code> will print the entries in the original order: <code>25198</code>.</li>
+    <li><span class="lbl">D.</span> <code>forEachOrdered()</code> will print the entries in an order that cannot be determined ahead of time.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · C</div>
+    <p>The code compiles. <code>peek()</code> on a parallel stream processes elements concurrently, so its order is unpredictable (B). <code>forEachOrdered()</code> processes elements in the order they are stored in the stream, giving <code>25198</code> (C). Nothing in the pipeline sorts, so A and D are both wrong.</p>
+  </details>
+</div>
+
+<!-- Q7 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q7</span><span class="q-tag">Threading problems</span></div>
+  <p class="prompt">Fill in the blanks: __________ occur(s) when two or more threads are blocked forever but both appear active. __________ occur(s) when two or more threads try to complete a related task at the same time, resulting in invalid or unexpected data.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> Livelock, Deadlock</li>
+    <li><span class="lbl">B.</span> Deadlock, Starvation</li>
+    <li><span class="lbl">C.</span> Livelock, Race conditions</li>
+    <li><span class="lbl">D.</span> Starvation, Race conditions</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C</div>
+    <p>Livelock is when threads are conceptually blocked forever although each is still active and trying to complete its task — "appear active" is the discriminator against deadlock. A race condition is the undesirable result when two tasks that should be sequential complete at the same time. Starvation is a single thread perpetually denied a resource, which doesn't match either blank.</p>
+  </details>
+</div>
+
+<!-- Q8 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q8</span><span class="q-tag">run vs start</span></div>
+  <p class="prompt">Assuming this class is accessed by only a single thread at a time, what is the result of calling <code>countIceCreamFlavors()</code>?</p>
+<pre><code><span class="kw">private static int</span> counter;
+<span class="kw">public static void</span> countIceCreamFlavors() {
+   counter = <span class="num">0</span>;
+   Runnable task = () -&gt; counter++;
+   LongStream.range(<span class="num">0</span>, <span class="num">500</span>)
+      .forEach(m -&gt; Thread.ofPlatform()
+        .priority(<span class="num">1</span>)
+        .unstarted(task)
+        .run());
+   System.out.println(counter);
+}</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> The method consistently prints a number less than 500.</li>
+    <li><span class="lbl">B.</span> The method consistently prints 500.</li>
+    <li><span class="lbl">C.</span> The method prints a value that cannot be determined ahead of time.</li>
+    <li><span class="lbl">D.</span> The method does not compile.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B</div>
+    <p>Be wary of <code>run()</code> vs <code>start()</code>. Although this looks concurrent, <code>run()</code> executes synchronously — each iteration of <code>forEach()</code> waits for it to finish before moving on, so the code is thread-safe and consistently prints 500. If <code>start()</code> had been used (or the stream were parallel), the output would be indeterminate and C would be correct.</p>
+  </details>
+</div>
+
+<!-- Q9 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q9</span><span class="q-tag">ExecutorService</span></div>
+  <p class="prompt">Which are true of <code>ExecutorService</code>?</p>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> If a task is submitted when no threads are available, the executor discards the task without completing it.</li>
+    <li><span class="lbl">B.</span> If a task is submitted when no threads are available, the executor adds the task to an internal queue and completes it when a thread is free.</li>
+    <li><span class="lbl">C.</span> Platform threads can be pooled using <code>ExecutorService</code>, but not virtual threads.</li>
+    <li><span class="lbl">D.</span> Both platform threads and virtual threads can be pooled using <code>ExecutorService</code>.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · C</div>
+    <p>When no thread is available, the submit call returns immediately and the task is queued internally (B). Only platform threads are pooled (C) — virtual threads are so lightweight that they don't benefit from pooling, which is why the factory method is named <code>newVirtualThreadPerTaskExecutor()</code>.</p>
+  </details>
+</div>
+
+<!-- Q10 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q10</span><span class="q-tag">Concurrent collections</span></div>
+  <p class="prompt">What is the result of executing the following code snippet?</p>
+<pre><code>SequencedCollection&lt;Integer&gt; lions = <span class="kw">new</span> ArrayList&lt;&gt;(List.of(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>));
+SequencedCollection&lt;Integer&gt; tigers = <span class="kw">new</span> CopyOnWriteArrayList&lt;&gt;(lions);
+Set&lt;Integer&gt; bears = <span class="kw">new</span> ConcurrentSkipListSet&lt;&gt;();
+bears.addAll(lions);
+<span class="kw">for</span> (Integer item: tigers) tigers.add(<span class="num">4</span>);   <span class="cm">// x1</span>
+<span class="kw">for</span> (Integer item: bears) bears.add(<span class="num">5</span>);     <span class="cm">// x2</span>
+System.out.println(lions.size() + <span class="str">" "</span> + tigers.size() + <span class="str">" "</span> + bears.size());</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> It outputs <code>3 6 4</code>.</li>
+    <li><span class="lbl">B.</span> It outputs <code>6 6 6</code>.</li>
+    <li><span class="lbl">C.</span> It compiles but throws an exception at runtime on line x1.</li>
+    <li><span class="lbl">D.</span> It compiles but enters an infinite loop at runtime.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A</div>
+    <p><code>CopyOnWriteArrayList</code> preserves the original list on iteration, so the first loop runs exactly three times and grows <code>tigers</code> to six. <code>ConcurrentSkipListSet</code> allows modification during iteration and enforces uniqueness, so the value 5 is added only once, giving four elements in <code>bears</code>. Neither copy is backed by <code>lions</code>, which stays at 3.</p>
+  </details>
+</div>
+
+<!-- Q11 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q11</span><span class="q-tag">Parallel streams</span></div>
+  <p class="prompt">What statement about the following code is true?</p>
+<pre><code>Integer i1 = List.of(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>).stream().findAny().get();
+<span class="kw">synchronized</span>(i1) {                       <span class="cm">// y1</span>
+   Integer i2 = List.of(<span class="num">6</span>, <span class="num">7</span>, <span class="num">8</span>, <span class="num">9</span>, <span class="num">10</span>)
+      .parallelStream()
+      .sorted()
+      .findAny().get();                    <span class="cm">// y2</span>
+   System.out.println(i1 + <span class="str">" "</span> + i2);
+}</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> The first value printed is always 1.</li>
+    <li><span class="lbl">B.</span> The second value printed is always 6.</li>
+    <li><span class="lbl">C.</span> The code will not compile because of line y1.</li>
+    <li><span class="lbl">D.</span> The output cannot be determined ahead of time.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">D</div>
+    <p>Two things to notice. Synchronizing on <code>i1</code> has no bearing on the results, and sorting a parallel stream does not make <code>findAny()</code> return the first record — it returns the value from whichever thread retrieves one first. A looks tempting, but even on a serial stream <code>findAny()</code> is free to select any element.</p>
+  </details>
+</div>
+
+<!-- Q12 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q12</span><span class="q-tag">Shutdown</span></div>
+  <p class="prompt">Assuming each call to <code>takeNap()</code> takes five seconds without throwing an exception, what is the expected result?</p>
+<pre><code><span class="kw">public void</span> shutdown() <span class="kw">throws</span> InterruptedException {
+   <span class="kw">var</span> service = Executors.newFixedThreadPool(<span class="num">4</span>);
+   <span class="kw">try</span> {
+      service.execute(() -&gt; takeNap());
+      service.execute(() -&gt; takeNap());
+      service.execute(() -&gt; takeNap());
+   } <span class="kw">finally</span> { service.shutdown(); }
+   service.awaitTermination(<span class="num">2</span>, TimeUnit.SECONDS);
+   System.out.println(<span class="str">"DONE!"</span>);
+}
+<span class="kw">public void</span> refactored() {
+   <span class="kw">try</span> (<span class="kw">var</span> service = Executors.newFixedThreadPool(<span class="num">4</span>)) {
+      service.execute(() -&gt; takeNap());
+      service.execute(() -&gt; takeNap());
+      service.execute(() -&gt; takeNap());
+   }
+   System.out.println(<span class="str">"DONE!"</span>);
+}</code></pre>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>shutdown()</code> pauses for approximately 2 seconds and then prints <code>DONE!</code>.</li>
+    <li><span class="lbl">B.</span> <code>shutdown()</code> pauses for approximately 15 seconds and then prints <code>DONE!</code>.</li>
+    <li><span class="lbl">C.</span> <code>refactored()</code> pauses for approximately 2 seconds and then prints <code>DONE!</code>.</li>
+    <li><span class="lbl">D.</span> <code>refactored()</code> pauses for approximately 5 seconds and then prints <code>DONE!</code>.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · D</div>
+    <p><code>awaitTermination()</code> waits the specified amount of time for the tasks to complete; since each five-second task is still running, it returns <code>false</code> after two seconds without throwing, so A is correct. The refactored version uses try-with-resources, which lets the tasks finish gracefully — with a pool of four and three tasks running concurrently, that's about five seconds (D).</p>
+  </details>
+</div>
+
+<!-- Q13 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q13</span><span class="q-tag">reduce()</span></div>
+  <p class="prompt">What statement about the following code is true?</p>
+<pre><code>System.out.print(List.of(<span class="str">"duck"</span>,<span class="str">"flamingo"</span>,<span class="str">"pelican"</span>)
+   .parallelStream().parallel()                    <span class="cm">// q1</span>
+   .reduce(<span class="num">0</span>,
+      (c1, c2) -&gt; c1.length() + c2.length(),       <span class="cm">// q2</span>
+      (s1, s2) -&gt; s1 + s2));                       <span class="cm">// q3</span></code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> It compiles and outputs the total length of all strings in the stream.</li>
+    <li><span class="lbl">B.</span> The code will not compile because of line q1.</li>
+    <li><span class="lbl">C.</span> The code will not compile because of line q2.</li>
+    <li><span class="lbl">D.</span> The code will not compile because of line q3.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C</div>
+    <p>With an identity of <code>0</code>, <code>c1</code> is an <code>Integer</code> and <code>c2</code> is a <code>String</code>. Calling <code>length()</code> on an <code>Integer</code> is not allowed, so the accumulator on line q2 fails to compile. Note that calling <code>parallel()</code> on an already-parallel stream is perfectly legal and may return the same object, so q1 is fine.</p>
+  </details>
+</div>
+
+<!-- Q14 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q14</span><span class="q-tag">Deadlock</span></div>
+  <p class="prompt">What statements about the following code snippet are true?</p>
+<pre><code>Object o1 = <span class="kw">new</span> Object();
+Object o2 = <span class="kw">new</span> Object();
+<span class="kw">try</span> (<span class="kw">var</span> service = Executors.newFixedThreadPool(<span class="num">2</span>)) {
+   <span class="kw">var</span> f1 = service.submit(() -&gt; {
+      <span class="kw">synchronized</span> (o1) {
+         <span class="kw">synchronized</span> (o2) { System.out.print(<span class="str">"Tortoise"</span>); }
+      } });
+   <span class="kw">var</span> f2 = service.submit(() -&gt; {
+      <span class="kw">synchronized</span> (o2) {
+         <span class="kw">synchronized</span> (o1) { System.out.print(<span class="str">"Hare"</span>); }
+      } });
+   f1.get();
+   f2.get();
+}</code></pre>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> The code will always output <code>Tortoise</code> followed by <code>Hare</code>.</li>
+    <li><span class="lbl">B.</span> If the code does output anything, the order cannot be determined.</li>
+    <li><span class="lbl">C.</span> The code compiles but may produce a deadlock at runtime.</li>
+    <li><span class="lbl">D.</span> The code compiles but may produce a livelock at runtime.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · C</div>
+    <p>Both tasks go to the same pool, so the order cannot be determined (B). The resources <code>o1</code> and <code>o2</code> are locked in opposite orders, so if the first thread grabs <code>o1</code> and the second grabs <code>o2</code> before either gets its second lock, the code hangs — a deadlock (C). It cannot be a livelock, since both threads are simply waiting rather than actively retrying. Note that a deadlock throws no exception.</p>
+  </details>
+</div>
+
+<!-- Q15 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q15</span><span class="q-tag">Parallel reduction</span></div>
+  <p class="prompt">Which statement about the following code snippet is correct?</p>
+<pre><code><span class="num">2:</span> <span class="kw">var</span> cats = Stream.of(<span class="str">"leopard"</span>, <span class="str">"lynx"</span>, <span class="str">"ocelot"</span>, <span class="str">"puma"</span>).parallel();
+<span class="num">4:</span> <span class="kw">var</span> bears = Stream.of(<span class="str">"panda"</span>,<span class="str">"grizzly"</span>,<span class="str">"polar"</span>).parallel();
+<span class="num">5:</span> <span class="kw">var</span> data = Stream.of(cats,bears).flatMap(s -&gt; s)
+<span class="num">6:</span>    .collect(Collectors.groupingByConcurrent(
+<span class="num">7:</span>       s -&gt; !s.startsWith(<span class="str">"p"</span>)));
+<span class="num">8:</span> System.out.println(data.get(<span class="kw">false</span>).size()
+<span class="num">9:</span>    + <span class="str">" "</span> + data.get(<span class="kw">true</span>).size());</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> It outputs <code>3 4</code>.</li>
+    <li><span class="lbl">B.</span> It outputs <code>4 3</code>.</li>
+    <li><span class="lbl">C.</span> The code will not compile because of line 6.</li>
+    <li><span class="lbl">D.</span> It compiles but throws an exception at runtime.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A</div>
+    <p>The <code>collect()</code> groups the seven animals by whether they do <em>not</em> start with <code>p</code>. Three do start with <code>p</code> (puma, panda, polar) and land under the key <code>false</code>; the other four land under <code>true</code>. So the output is <code>3 4</code>.</p>
+  </details>
+</div>
+
+<!-- Q16 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q16</span><span class="q-tag">Platform threads</span></div>
+  <p class="prompt">Which APIs exist for creating or working with platform threads?</p>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>Executors.newCachedThreadPool()</code></li>
+    <li><span class="lbl">B.</span> <code>Executors.newPlatformThreadPerTaskExecutor()</code></li>
+    <li><span class="lbl">C.</span> <code>new Thread()</code></li>
+    <li><span class="lbl">D.</span> <code>Thread.ofPlatform()</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · C · D</div>
+    <p>Every factory method on <code>Executors</code> works with platform threads except <code>newVirtualThreadPerTaskExecutor()</code>, so A qualifies. You can also create a platform thread with the constructor (C) or the factory method <code>Thread.ofPlatform()</code> (D). B is invented — there is no <code>newPlatformThreadPerTaskExecutor()</code>.</p>
+  </details>
+</div>
+
+<!-- Q17 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q17</span><span class="q-tag">ReentrantLock</span></div>
+  <p class="prompt">Which statement about methods in <code>ReentrantLock</code> is correct?</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> The <code>lock()</code> method will attempt to acquire a lock without waiting indefinitely for it.</li>
+    <li><span class="lbl">B.</span> By default, a <code>ReentrantLock</code> fairly releases to each thread in the order in which it was requested.</li>
+    <li><span class="lbl">C.</span> Calling the <code>unlock()</code> method once will release a resource so that other threads can obtain the lock.</li>
+    <li><span class="lbl">D.</span> None of the above.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">D</div>
+    <p><code>lock()</code> waits indefinitely — <code>tryLock()</code> is the non-blocking one, so A is wrong. Fairness defaults to <code>false</code> and must be enabled through an overloaded constructor, so B is wrong. And a thread may have called <code>lock()</code> or <code>tryLock()</code> multiple times; it must call <code>unlock()</code> once for each acquisition, so a single call doesn't necessarily release anything.</p>
+  </details>
+</div>
+
+<!-- Q18 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q18</span><span class="q-tag">Callable</span></div>
+  <p class="prompt">Which of the following lambda expressions are valid <code>Callable</code> expressions?</p>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>a -&gt; {return 10;}</code></li>
+    <li><span class="lbl">B.</span> <code>() -&gt; {String s = "";}</code></li>
+    <li><span class="lbl">C.</span> <code>() -&gt; 5</code></li>
+    <li><span class="lbl">D.</span> <code>() -&gt; {System.out.print("Giraffe"); return 10;}</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C · D</div>
+    <p>A <code>Callable</code> lambda takes no values and returns a generic type, which C and D both satisfy. A is wrong because it takes an input parameter. B is wrong because it does not return a value.</p>
+  </details>
+</div>
+
+<!-- Q19 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q19</span><span class="q-tag">Virtual threads</span></div>
+  <p class="prompt">What is the result of executing the following application?</p>
+<pre><code><span class="kw">public class</span> PrintConstants {
+   <span class="kw">public static void</span> main(String[] args) {
+      <span class="kw">var</span> s = Executors.newVirtualThreadPerTaskExecutor();
+      DoubleStream.of(<span class="num">3.14159</span>, <span class="num">2.71828</span>)                <span class="cm">// b1</span>
+         .forEach(c -&gt; s.submit(                        <span class="cm">// b2</span>
+            () -&gt; System.out.println(<span class="num">10</span> * c)));       <span class="cm">// b3</span>
+      s.execute(() -&gt; System.out.println(<span class="str">"Printed"</span>));
+   } }</code></pre>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> It compiles and outputs the two numbers followed by <code>Printed</code>.</li>
+    <li><span class="lbl">B.</span> The code will not compile because of line b2.</li>
+    <li><span class="lbl">C.</span> It compiles, but the output cannot be determined ahead of time.</li>
+    <li><span class="lbl">D.</span> It compiles but waits forever at runtime.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C · D</div>
+    <p>The application compiles and throws no exception. Even though the stream is processed sequentially, the tasks are handed to a thread executor that may complete them in any order (C). More importantly, the executor is never shut down and is not in a try-with-resources block, so the program runs but never terminates (D).</p>
+  </details>
+</div>
+
+<!-- Q20 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q20</span><span class="q-tag">execute vs submit</span></div>
+  <p class="prompt">What is the result of executing the following program?</p>
+<pre><code><span class="kw">static int</span> count = <span class="num">0</span>;
+<span class="kw">public static void</span> main(String[] args) <span class="kw">throws</span> Exception {
+   <span class="kw">try</span> (<span class="kw">var</span> service = Executors.newSingleThreadExecutor()) {
+      <span class="kw">var</span> r = <span class="kw">new</span> ArrayList&lt;Future&lt;?&gt;&gt;();
+      IntStream.iterate(<span class="num">0</span>, i -&gt; i + <span class="num">1</span>).limit(<span class="num">5</span>).forEach(
+         i -&gt; r.add(service.execute(() -&gt; {count++;}))   <span class="cm">// n1</span>
+      );
+      <span class="kw">for</span> (Future&lt;?&gt; result : r) {
+         System.out.print(result.get() + <span class="str">" "</span>);          <span class="cm">// n2</span>
+      }
+   } }</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> It prints <code>null null null null null</code></li>
+    <li><span class="lbl">B.</span> It hangs indefinitely at runtime.</li>
+    <li><span class="lbl">C.</span> The code will not compile because of line n1.</li>
+    <li><span class="lbl">D.</span> The code will not compile because of line n2.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C</div>
+    <p><code>execute()</code> returns <code>void</code>, not a <code>Future</code>, so it cannot be passed to <code>r.add()</code> — line n1 fails to compile. Had <code>submit()</code> been used instead, A would have been correct, since <code>submit(Runnable)</code> yields a <code>Future&lt;?&gt;</code> whose <code>get()</code> always returns <code>null</code>.</p>
+  </details>
+</div>
+
+<!-- Q21 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q21</span><span class="q-tag">findFirst / findAny</span></div>
+  <p class="prompt">Given the blanks on lines p1 and p2, which values guarantee that <code>1</code> is printed at runtime?</p>
+<pre><code><span class="kw">var</span> data = List.of(List.of(<span class="num">1</span>, <span class="num">2</span>),
+   List.of(<span class="num">3</span>, <span class="num">4</span>),
+   List.of(<span class="num">5</span>, <span class="num">6</span>));
+
+data._______________     <span class="cm">// p1</span>
+   .flatMap(s -&gt; s.stream())
+   .________________     <span class="cm">// p2</span>
+   .ifPresent(System.out::print);</code></pre>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>stream()</code> on p1, <code>findFirst()</code> on p2.</li>
+    <li><span class="lbl">B.</span> <code>stream()</code> on p1, <code>findAny()</code> on p2.</li>
+    <li><span class="lbl">C.</span> <code>parallelStream()</code> on p1, <code>findAny()</code> on p2.</li>
+    <li><span class="lbl">D.</span> <code>parallelStream()</code> on p1, <code>findFirst()</code> on p2.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · D</div>
+    <p><code>findFirst()</code> guarantees the first element of the stream is returned, whether the stream is serial or parallel — so both A and D print <code>1</code>. B may consistently print <code>1</code> in practice, but the behavior of <code>findAny()</code> is not guaranteed even on a serial stream. C is outright random at runtime.</p>
+  </details>
+</div>
+
+<!-- Q22 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q22</span><span class="q-tag">Single-thread executor</span></div>
+  <p class="prompt">Assuming one minute is enough time for the submitted tasks to complete, what is the result of executing <code>countSheep()</code>?</p>
+<pre><code><span class="kw">private</span> AtomicInteger s1 = <span class="kw">new</span> AtomicInteger(<span class="num">0</span>);   <span class="cm">// w1</span>
+<span class="kw">private int</span> s2 = <span class="num">0</span>;
+
+<span class="kw">private void</span> countSheep() <span class="kw">throws</span> InterruptedException {
+   <span class="kw">try</span> (<span class="kw">var</span> service = Executors.newSingleThreadExecutor()) {   <span class="cm">// w2</span>
+      <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">100</span>; i++)
+         service.execute(() -&gt; { s1.getAndIncrement(); s2++; });  <span class="cm">// w3</span>
+      Thread.sleep(<span class="num">60_000</span>);
+      System.out.println(s1 + <span class="str">" "</span> + s2);
+   }
+}</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> The method consistently prints <code>100 99</code>.</li>
+    <li><span class="lbl">B.</span> The method consistently prints <code>100 100</code>.</li>
+    <li><span class="lbl">C.</span> The output cannot be determined ahead of time.</li>
+    <li><span class="lbl">D.</span> The code will not compile because of line w3.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B</div>
+    <p>The key detail is that this is a <strong>single-thread</strong> executor, so no task executes concurrently and even the non-atomic <code>s2++</code> is safe. The results are valid and predictable: <code>100 100</code>. Had a multi-threaded executor been used, the <code>s2++</code> operations could overwrite each other and C would be correct.</p>
+  </details>
+</div>
+
+<!-- Q23 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q23</span><span class="q-tag">CyclicBarrier</span></div>
+  <p class="prompt">What is the result of executing the following application?</p>
+<pre><code><span class="kw">public static void</span> await(CyclicBarrier cb) {          <span class="cm">// j1</span>
+   <span class="kw">try</span> { cb.await(); } <span class="kw">catch</span> (Exception e) {}
+}
+<span class="kw">public static void</span> main(String[] args) {
+   <span class="kw">var</span> cb = <span class="kw">new</span> CyclicBarrier(<span class="num">10</span>,
+      () -&gt; System.out.println(<span class="str">"Stock Room Full!"</span>));    <span class="cm">// j2</span>
+   IntStream.iterate(<span class="num">1</span>, i -&gt; <span class="num">1</span>).limit(<span class="num">9</span>).parallel()
+      .forEach(i -&gt; await(cb));                          <span class="cm">// j3</span>
+}</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> It outputs <code>Stock Room Full!</code></li>
+    <li><span class="lbl">B.</span> The code will not compile because of line j2.</li>
+    <li><span class="lbl">C.</span> It compiles but throws an exception at runtime.</li>
+    <li><span class="lbl">D.</span> It compiles but waits forever at runtime.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">D</div>
+    <p>The code compiles fine. The barrier limit is 10, but the stream can produce at most 9 threads that reach it, so the limit is never reached and the program hangs. Even changing <code>limit(9)</code> to <code>limit(10)</code> could still hang, since the JVM might not allocate 10 threads to the parallel stream.</p>
+  </details>
+</div>
+
+<!-- Q24 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q24</span><span class="q-tag">synchronized</span></div>
+  <p class="prompt">What statements about the following class definition are true?</p>
+<pre><code><span class="kw">public final class</span> TicketManager {
+   <span class="kw">private int</span> tickets;
+   <span class="kw">private static</span> TicketManager instance;
+   <span class="kw">private</span> TicketManager() {}
+   <span class="kw">static synchronized</span> TicketManager getInstance() {           <span class="cm">// k1</span>
+      <span class="kw">if</span> (instance==<span class="kw">null</span>) instance = <span class="kw">new</span> TicketManager();      <span class="cm">// k2</span>
+      <span class="kw">return</span> instance;
+   }
+   <span class="kw">public int</span> getTicketCount() { <span class="kw">return</span> tickets; }
+   <span class="kw">public void</span> addTickets(<span class="kw">int</span> value) { tickets += value; }      <span class="cm">// k3</span>
+   <span class="kw">public void</span> sellTickets(<span class="kw">int</span> value) {
+      <span class="kw">synchronized</span> (<span class="kw">this</span>) {                                    <span class="cm">// k4</span>
+         tickets -= value;
+      } } }</code></pre>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> It compiles without issue.</li>
+    <li><span class="lbl">B.</span> The locks acquired on k1 and k4 are on the same object.</li>
+    <li><span class="lbl">C.</span> The class correctly protects the <code>tickets</code> data from race conditions.</li>
+    <li><span class="lbl">D.</span> At most one instance of <code>TicketManager</code> will be created in an application that uses this class.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · D</div>
+    <p>The class compiles (A). Since <code>getInstance()</code> is static and <code>sellTickets()</code> is an instance method, k1 locks the class object while k4 locks the instance — different objects, so B is wrong. The class is not thread-safe because <code>addTickets()</code> is unsynchronized and could run concurrently with <code>sellTickets()</code>, so C is wrong. D is correct: <code>getInstance()</code> is synchronized and the constructor is private, giving a working singleton.</p>
+  </details>
+</div>
+
+<!-- Q25 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q25</span><span class="q-tag">Future</span></div>
+  <p class="prompt">Assuming an implementation of <code>performCount()</code> is provided prior to runtime, which are possible results of executing this application?</p>
+<pre><code><span class="kw">public static void</span> performCount(<span class="kw">int</span> animal) { <span class="cm">/* OMITTED */</span> }
+<span class="kw">public static void</span> printResults(Future&lt;?&gt; f) {
+   <span class="kw">try</span> {
+      System.out.println(f.get(<span class="num">1</span>, TimeUnit.DAYS));           <span class="cm">// o1</span>
+   } <span class="kw">catch</span> (Exception e) {
+      System.out.println(<span class="str">"Exception!"</span>);
+   }
+}
+<span class="kw">public static void</span> main(String[] args) <span class="kw">throws</span> Exception {
+   <span class="kw">final var</span> r = <span class="kw">new</span> ArrayList&lt;Future&lt;?&gt;&gt;();
+   <span class="kw">try</span> (<span class="kw">var</span> s = Executors.newSingleThreadExecutor()) {
+      <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">10</span>; i++) {
+         <span class="kw">final int</span> animal = i;
+         r.add(s.submit(() -&gt; performCount(animal)));         <span class="cm">// o2</span>
+      }
+      r.forEach(f -&gt; printResults(f));
+   } }</code></pre>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> It outputs a number 10 times.</li>
+    <li><span class="lbl">B.</span> It outputs a <code>null</code> value 10 times.</li>
+    <li><span class="lbl">C.</span> It outputs <code>Exception!</code> 10 times.</li>
+    <li><span class="lbl">D.</span> The code will not compile because of line o2.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · C</div>
+    <p>The return type of <code>performCount()</code> is <code>void</code>, so <code>submit()</code> is interpreted as taking a <code>Runnable</code>. <code>submit(Runnable)</code> does return a <code>Future&lt;?&gt;</code>, but calling <code>get()</code> on it always yields <code>null</code> — hence B, and not A. The method can also throw a runtime exception, which <code>get()</code> then rethrows as an <code>ExecutionException</code>, giving C.</p>
+  </details>
+</div>
+
+<!-- Q26 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q26</span><span class="q-tag">Thread states</span></div>
+  <p class="prompt">A <code>Thread</code> object has been created but <code>start()</code> has not yet been called. What does <code>getState()</code> return?</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>NEW</code></li>
+    <li><span class="lbl">B.</span> <code>RUNNABLE</code></li>
+    <li><span class="lbl">C.</span> <code>WAITING</code></li>
+    <li><span class="lbl">D.</span> <code>TERMINATED</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A</div>
+    <p>Every thread is initialized with a <code>NEW</code> state and moves to <code>RUNNABLE</code> as soon as <code>start()</code> is called. Note that <code>RUNNABLE</code> only means the thread is <em>able</em> to be run — it may or may not actually be executing.</p>
+  </details>
+</div>
+
+<!-- Q27 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q27</span><span class="q-tag">Virtual threads</span></div>
+  <p class="prompt">What is the result of the following code?</p>
+<pre><code><span class="kw">var</span> t = Thread.ofVirtual().unstarted(task);
+t.setPriority(Thread.MAX_PRIORITY);
+System.out.println(t.getPriority());</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> It prints <code>10</code>.</li>
+    <li><span class="lbl">B.</span> It prints <code>5</code> — the call has no effect.</li>
+    <li><span class="lbl">C.</span> The code does not compile.</li>
+    <li><span class="lbl">D.</span> It throws <code>IllegalThreadStateException</code>.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B</div>
+    <p>The priority for virtual threads is always 5 (<code>Thread.NORM_PRIORITY</code>) and cannot be changed. Calling <code>setPriority()</code> on a newly created virtual thread compiles, throws nothing, and simply has no effect. Only platform threads accept a priority, set via the builder's <code>priority()</code> method — and even there it is only a suggestion.</p>
+  </details>
+</div>
+
+<!-- Q28 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q28</span><span class="q-tag">reduce()</span></div>
+  <p class="prompt">What is the output of the following code?</p>
+<pre><code>System.out.println(List.of(<span class="str">"w"</span>,<span class="str">"o"</span>,<span class="str">"l"</span>,<span class="str">"f"</span>)
+   .parallelStream()
+   .reduce(<span class="str">"X"</span>, String::concat));</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>Xwolf</code></li>
+    <li><span class="lbl">B.</span> <code>wolf</code></li>
+    <li><span class="lbl">C.</span> <code>XwXoXlXf</code></li>
+    <li><span class="lbl">D.</span> The code does not compile.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C</div>
+    <p><code>"X"</code> is not a true identity value for concatenation. On a serial stream the result would be <code>Xwolf</code>, but as part of the parallel process the identity is applied to multiple elements, producing <code>XwXoXlXf</code>. This is why the identity must genuinely be an identity for the accumulator.</p>
+  </details>
+</div>
+
+<!-- Q29 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q29</span><span class="q-tag">Parallel reduction</span></div>
+  <p class="prompt">Which are requirements for performing a parallel reduction with <code>collect()</code>?</p>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> The stream is parallel.</li>
+    <li><span class="lbl">B.</span> The parameter of the <code>collect()</code> operation has the <code>Characteristics.CONCURRENT</code> characteristic.</li>
+    <li><span class="lbl">C.</span> Either the stream is unordered or the collector has <code>Characteristics.UNORDERED</code>.</li>
+    <li><span class="lbl">D.</span> <code>Collectors.toSet()</code> satisfies all of the collector requirements.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · B · C</div>
+    <p>Those three conditions must all hold, or <code>collect()</code> executes in a single-threaded fashion. D is the trap: <code>Collectors.toSet()</code> does have <code>UNORDERED</code> but lacks <code>CONCURRENT</code>, so it is not a parallel reduction. The two collector families that qualify are <code>toConcurrentMap()</code> and <code>groupingByConcurrent()</code>.</p>
+  </details>
+</div>
+
+<!-- Q30 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q30</span><span class="q-tag">Concurrent collections</span></div>
+  <p class="prompt">What is the result of executing the following code snippet?</p>
+<pre><code><span class="num">11:</span> <span class="kw">var</span> foodData = <span class="kw">new</span> HashMap&lt;String, Integer&gt;();
+<span class="num">12:</span> foodData.put(<span class="str">"penguin"</span>, <span class="num">1</span>);
+<span class="num">13:</span> foodData.put(<span class="str">"flamingo"</span>, <span class="num">2</span>);
+<span class="num">14:</span> <span class="kw">for</span> (String key : foodData.keySet())
+<span class="num">15:</span>    foodData.remove(key);</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> It runs without error and leaves the map empty.</li>
+    <li><span class="lbl">B.</span> It throws a <code>ConcurrentModificationException</code> at runtime.</li>
+    <li><span class="lbl">C.</span> The code does not compile.</li>
+    <li><span class="lbl">D.</span> It enters an infinite loop at runtime.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B</div>
+    <p>The exception is thrown during the second iteration, because the iterator on <code>keySet()</code> is not properly updated after the first element is removed. Note that this happens with a <em>single</em> thread. Changing line 11 to use a <code>ConcurrentHashMap</code> prevents it, since that iterator is updated as soon as an object is removed.</p>
+  </details>
+</div>
+
+<!-- Q31 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q31</span><span class="q-tag">Scheduling</span></div>
+  <p class="prompt">A task is submitted with <code>service.scheduleWithFixedDelay(task, 0, 2, TimeUnit.MINUTES)</code>. The task starts running at 12:00 and takes five minutes to finish. When does the next execution start?</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> 12:02</li>
+    <li><span class="lbl">B.</span> 12:05</li>
+    <li><span class="lbl">C.</span> 12:07</li>
+    <li><span class="lbl">D.</span> 12:10</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C</div>
+    <p><code>scheduleWithFixedDelay()</code> measures the delay between the <em>termination</em> of one execution and the commencement of the next, so the task ends at 12:05 and the next begins two minutes later at 12:07. Had this been <code>scheduleAtFixedRate()</code>, a new task would have been submitted at 12:02 regardless of whether the previous one had finished.</p>
+  </details>
+</div>
+
+<div class="revision">
+  <h2>Quick Revision — the chapter's core traps</h2>
+  <ul>
+    <li><strong>run() vs start():</strong> <code>run()</code> executes synchronously on the current thread, which quietly makes unsafe code deterministic. Only <code>start()</code> spawns a thread.</li>
+    <li><strong>Virtual threads:</strong> always daemons, always priority 5 (<code>setPriority()</code> is a no-op), never pooled. Only <code>newVirtualThreadPerTaskExecutor()</code> creates them.</li>
+    <li><strong>execute() vs submit():</strong> <code>execute()</code> returns <code>void</code> — assigning it to a <code>Future</code> doesn't compile. <code>get()</code> on a <code>Runnable</code>'s <code>Future</code> always returns <code>null</code>.</li>
+    <li><strong>Callable lambdas:</strong> no parameters, must return a value. <code>Callable</code> can throw checked exceptions; <code>Runnable</code> cannot.</li>
+    <li><strong>Executors:</strong> an executor left un-closed keeps the JVM alive forever. <code>awaitTermination()</code> returns <code>false</code> on timeout rather than throwing.</li>
+    <li><strong>Scheduling:</strong> the reference type must be <code>ScheduledExecutorService</code>; <code>scheduleAtFixedRate</code> and <code>scheduleWithFixedDelay</code> accept only <code>Runnable</code>. Fixed <em>delay</em> is measured after the task ends.</li>
+    <li><strong>Atomicity:</strong> <code>++</code> is read-then-write, so neither plain nor <code>volatile</code> fields are safe. Atomic classes preserve every value but not ordering; <code>synchronized</code> preserves both.</li>
+    <li><strong>Monitors:</strong> a <code>static synchronized</code> method locks the class object, not the instance — they don't exclude each other. Synchronizing task <em>submission</em> doesn't synchronize task <em>execution</em>.</li>
+    <li><strong>ReentrantLock:</strong> <code>lock()</code> blocks forever, <code>tryLock()</code> doesn't; always check <code>tryLock()</code>'s result. Unlock once per acquisition, or you'll hit <code>IllegalMonitorStateException</code> or a stuck lock. Fairness defaults to <code>false</code>.</li>
+    <li><strong>CyclicBarrier:</strong> if fewer threads than the limit call <code>await()</code>, it hangs silently. It is reusable once broken.</li>
+    <li><strong>Collections:</strong> <code>ConcurrentModificationException</code> can happen with one thread. <code>CopyOnWriteArrayList</code> iterates the original snapshot while still growing. Skip = sorted concurrent.</li>
+    <li><strong>Liveness:</strong> deadlock hangs without an exception; livelock threads look active; starvation is one thread denied. Race conditions produce invalid data.</li>
+    <li><strong>Parallel streams:</strong> <code>parallelStream()</code> is on <code>Collection</code>, <code>parallel()</code> is on <code>Stream</code>, and there is no <code>ParallelStream</code> class. <code>findAny()</code> is never guaranteed; <code>findFirst()</code> is.</li>
+    <li><strong>Reductions:</strong> use a true identity and an order-independent accumulator. Check accumulator parameter types. <code>toSet()</code> is not a parallel reduction; <code>toConcurrentMap()</code> and <code>groupingByConcurrent()</code> are.</li>
+  </ul>
+</div>
+
+<footer>OCP Java SE 21 Developer Study Guide · Boyarsky &amp; Selikoff · Chapter 13 — Concurrency · MCQ Practice</footer>
+</div>
+</body>
+</html>
