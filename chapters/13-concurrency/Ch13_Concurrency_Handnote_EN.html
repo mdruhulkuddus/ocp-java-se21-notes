@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 — Chapter 13: Concurrency (Detailed Handnote)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6f8;   --card:#ffffff;  --ink:#2f3437;   --muted:#7b8a93;
+  --kw:#7c5cbf;   --str:#3a8a5c;   --num:#b8860b;   --err:#c44d3e;  --cm:#a89a8a;
+  --icode-bg:#f3ece4; --icode-fg:#9a5030;
+  --accent:#c96442; --accent2:#d4845e;
+  --line:#ece3da;
+  --yes:#3b7d57;  --no:#c44d3e;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; padding:28px 16px 70px;
+  background:var(--bg); color:var(--ink);
+  font-family:'Source Sans 3',system-ui,sans-serif;
+  font-size:16.5px; line-height:1.72;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:980px;margin:0 auto;}
+h1,h2,h3,h4{font-family:'Merriweather',Georgia,serif;line-height:1.34;}
+p{margin:0 0 14px;}
+ul,ol{margin:0 0 15px;padding-left:22px;}
+li{margin-bottom:7px;}
+code,pre,.mono{font-family:'JetBrains Mono',ui-monospace,monospace;}
+code{background:var(--icode-bg);color:var(--icode-fg);padding:1.5px 6px;border-radius:5px;font-size:.86em;}
+pre{
+  background:#fdfaf7;border-radius:12px;padding:16px 18px;margin:0 0 16px;
+  overflow-x:auto;box-shadow:inset 0 2px 8px rgba(140,110,90,.10);
+  font-size:13.6px;line-height:1.62;
+}
+pre code{background:none;color:#3b3f42;padding:0;font-size:inherit;}
+.kw{color:var(--kw);font-weight:600;} .str{color:var(--str);} .num{color:var(--num);}
+.err{color:var(--err);font-weight:700;} .cm{color:var(--cm);font-style:italic;}
+
+.header{
+  background:linear-gradient(135deg,#ffffff 0%,#fbf7f4 100%);
+  border-radius:18px;padding:34px 32px;margin-bottom:26px;
+  box-shadow:0 6px 26px rgba(120,110,100,.10);
+}
+.badge{
+  display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:700;
+  letter-spacing:.9px;text-transform:uppercase;padding:7px 15px;border-radius:999px;
+  box-shadow:0 3px 10px rgba(201,100,66,.28);
+}
+.header h1{font-size:2.05rem;margin:18px 0 6px;font-weight:900;letter-spacing:-.4px;}
+.header h1 .dim{color:var(--muted);font-weight:400;font-size:1.15rem;}
+.header .sub{font-style:italic;color:var(--muted);margin-bottom:20px;}
+.objectives{
+  background:linear-gradient(135deg,#f0f9f3,#f7fcf8);
+  border-left:4px solid #5aab7b;border-radius:12px;padding:16px 20px;
+}
+.objectives h4{margin:0 0 8px;color:#3b7d57;font-size:.94rem;text-transform:uppercase;letter-spacing:.6px;}
+.objectives ul{margin:0;padding-left:20px;}
+.objectives li{margin-bottom:5px;font-size:.95rem;}
+
+.toc{
+  background:var(--card);border-radius:14px;padding:24px 28px;margin-bottom:30px;
+  box-shadow:0 4px 18px rgba(120,110,100,.08);
+}
+.toc h3{margin:0 0 14px;font-size:1.05rem;color:var(--accent);}
+.toc ol{columns:2;column-gap:34px;margin:0;padding-left:20px;}
+.toc li{margin-bottom:8px;break-inside:avoid;}
+.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted #cfc4b8;}
+.toc a:hover{color:var(--accent);}
+@media(max-width:660px){.toc ol{columns:1;}}
+
+.section{
+  background:var(--card);border-radius:14px;padding:28px 30px;margin-bottom:26px;
+  box-shadow:0 4px 18px rgba(120,110,100,.08);
+}
+.sec-num{
+  font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;
+  letter-spacing:1.6px;color:var(--accent);text-transform:uppercase;
+}
+.section h2{font-size:1.5rem;margin:6px 0 20px;padding-bottom:12px;border-bottom:2px solid var(--line);}
+.section h3{font-size:1.13rem;margin:26px 0 10px;color:#43484c;}
+.section h4{font-size:1rem;margin:20px 0 8px;color:#5a6166;}
+
+.card{
+  border-radius:14px;padding:15px 20px;margin:18px 0;
+  box-shadow:0 3px 12px rgba(120,110,100,.09);
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(120,110,100,.15);}
+.card p:last-child,.card ul:last-child{margin-bottom:0;}
+.card-label{
+  font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+  letter-spacing:1.1px;text-transform:uppercase;margin-bottom:7px;display:block;
+}
+.exam-trap{background:linear-gradient(135deg,#fef2f0,#fff8f7);border-left:4px solid #e06b5e;}
+.exam-trap .card-label{color:#c0453a;}
+.key-rule{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:4px solid #5aab7b;}
+.key-rule .card-label{color:#3b7d57;}
+.remember{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:4px solid #d4a24c;}
+.remember .card-label{color:#a9772a;}
+
+.rules-box{
+  background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-top:4px solid #5aab7b;
+  border-radius:12px;padding:18px 22px;margin:18px 0;
+  box-shadow:0 3px 12px rgba(120,110,100,.08);
+}
+.rules-box h4{margin:0 0 10px;color:#3b7d57;font-family:'Source Sans 3',sans-serif;
+  font-size:.86rem;text-transform:uppercase;letter-spacing:.8px;font-weight:700;}
+.rules-box ul,.rules-box ol{margin:0;}
+
+.vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0;}
+.vs-grid > div{
+  background:var(--card);border-radius:12px;padding:16px 18px;
+  box-shadow:0 3px 12px rgba(120,110,100,.10);
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.vs-grid > div:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(120,110,100,.15);}
+.vs-grid h4{margin:0 0 8px;font-size:1rem;}
+.vs-grid .left h4{color:#7c5cbf;}
+.vs-grid .right h4{color:#3b7d57;}
+.vs-grid ul,.vs-grid ol{padding-left:19px;margin:0;font-size:.95rem;}
+@media(max-width:660px){.vs-grid{grid-template-columns:1fr;}}
+
+.tbl-wrap{overflow-x:auto;margin:18px 0;border-radius:12px;box-shadow:0 3px 14px rgba(120,110,100,.10);}
+table{width:100%;border-collapse:collapse;background:var(--card);border-radius:12px;overflow:hidden;font-size:.93rem;}
+th{background:#f0e8de;text-align:left;padding:11px 14px;font-weight:700;color:#4a4038;font-size:.86rem;
+   text-transform:uppercase;letter-spacing:.5px;}
+td{padding:10px 14px;border-top:1px solid #f1eae2;vertical-align:top;}
+tr:hover td{background:#fdfbf9;}
+td code,th code{font-size:.85em;}
+.yes{color:var(--yes);font-weight:700;}
+.no{color:var(--no);font-weight:700;}
+
+.trace{background:#fdfaf7;border-radius:12px;padding:14px 18px 14px 34px;margin:0 0 16px;
+  box-shadow:inset 0 2px 8px rgba(140,110,90,.08);font-size:.95rem;}
+.trace li{margin-bottom:6px;}
+
+.recap{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-radius:14px;padding:28px 30px;
+  margin-bottom:26px;box-shadow:0 4px 18px rgba(120,110,100,.10);}
+.recap h2{font-size:1.45rem;margin:0 0 18px;padding-bottom:12px;border-bottom:2px solid #f0e2c8;}
+.recap h4{color:#a9772a;margin:18px 0 6px;font-size:1rem;}
+.recap ul{margin:0;padding-left:20px;}
+
+footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:34px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="header">
+  <span class="badge">OCP Java SE 21 Developer — Exam 1Z0-830</span>
+  <h1>Chapter 13 · Concurrency <span class="dim">(Detailed Handnote)</span></h1>
+  <p class="sub">Platform and virtual threads, the Concurrency API, thread-safety, concurrent collections, threading problems, and parallel streams.</p>
+  <div class="objectives">
+    <h4>Exam objectives covered in this chapter</h4>
+    <ul>
+      <li>Create both platform and virtual threads. Use both <code>Runnable</code> and <code>Callable</code> objects, manage the thread lifecycle, and use different Executor services and concurrent API to run tasks.</li>
+      <li>Develop thread-safe code using locking mechanisms and the concurrent API.</li>
+      <li>Process Java collections concurrently and utilize parallel streams.</li>
+      <li>Perform decomposition, concatenation, and reduction, and grouping and partitioning on sequential and parallel streams.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="toc">
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#s1">Introducing Threads</a></li>
+    <li><a href="#s2">Creating Threads with the Concurrency API</a></li>
+    <li><a href="#s3">Writing Thread-Safe Code</a></li>
+    <li><a href="#s4">Using Concurrent Collections</a></li>
+    <li><a href="#s5">Identifying Threading Problems</a></li>
+    <li><a href="#s6">Working with Parallel Streams</a></li>
+    <li><a href="#recap">Short Recap</a></li>
+    <li><a href="#cheat">Exam Traps Cheat Sheet</a></li>
+  </ol>
+</div>
+
+<!-- ============ SECTION 1 ============ -->
+<section class="section" id="s1">
+  <div class="sec-num">Section 01</div>
+  <h2>Introducing Threads</h2>
+
+  <h3>Core terminology</h3>
+  <p>A <strong>thread</strong> is the smallest unit of execution that can be scheduled by the operating system. A <strong>process</strong> is a group of associated threads that execute in the same shared environment — meaning they share the same memory space and can communicate directly. A <strong>task</strong> is a single unit of work performed by a thread; a thread can complete multiple independent tasks, but only one at a time.</p>
+
+  <p>Java executes processes using <strong>platform threads</strong>, which have a <strong>one-to-one mapping with operating system threads</strong>. The JVM manages two kinds: a <strong>system thread</strong> created by the JVM that runs in the background (garbage collection, for example), and a <strong>user-defined thread</strong> created by the application developer.</p>
+
+  <div class="card remember">
+    <span class="card-label">★ Remember</span>
+    <p>"Shared memory" here means <code>static</code> variables plus instance and local variables passed to a thread. If one thread updates a <code>static</code> variable, that information is immediately available for other threads in the process to read.</p>
+  </div>
+
+  <h3>Platform threads vs. virtual threads</h3>
+  <p>Platform threads are like a personal butler standing by in case you need something — efficient only if you are heavily using the CPU. A <strong>carrier thread</strong> is the Java equivalent of one restaurant server handling many tables; the tables are <strong>virtual threads</strong>, which are far less resource intensive and are a good choice when you expect to wait for I/O or network resources.</p>
+
+  <div class="vs-grid">
+    <div class="left">
+      <h4>Platform thread</h4>
+      <ul>
+        <li>One-to-one with an OS thread</li>
+        <li>Resource intensive — a million of them may fail with <code>OutOfMemoryError</code></li>
+        <li>Priority can be set (1–10)</li>
+        <li>Non-daemon by default, but changeable</li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>Virtual thread</h4>
+      <ul>
+        <li>Runs on a carrier thread only when it needs to run, and <strong>not always the same one</strong></li>
+        <li>Lightweight — a million of them runs fine</li>
+        <li>Priority is <strong>always 5</strong> and cannot be changed</li>
+        <li><strong>Always</strong> a daemon</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>Calling <code>setPriority()</code> on a newly created <strong>virtual</strong> Thread has <strong>no effect</strong> — it stays at 5 (<code>Thread.NORM_PRIORITY</code>). It does not fail to compile and does not throw.</p>
+  </div>
+
+  <h3>Thread concurrency, scheduling, and priority</h3>
+  <p><strong>Concurrency</strong> is the property of executing multiple threads and processes at the same time. A <strong>thread scheduler</strong> decides which threads execute — for example, using a <em>round-robin</em> schedule where each thread gets an equal number of CPU cycles in circular order. A <strong>context switch</strong> is storing a thread's current state and later restoring it to continue execution; it has a cost, so schedulers try to minimize them.</p>
+  <p><strong>Thread priority</strong> ranges from 1 (<code>Thread.MIN_PRIORITY</code>) to 10 (<code>Thread.MAX_PRIORITY</code>), with 5 as <code>Thread.NORM_PRIORITY</code>. It can be set before a thread is started <em>or</em> while it is running.</p>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ Key Rule</span>
+    <p>Thread priority is <strong>just a suggestion</strong>. The JVM does not guarantee the order threads execute. If enough resources are available, all threads may simply run at the same time.</p>
+  </div>
+
+  <h3>Creating a thread</h3>
+  <p>The most common way to define a task is the <code>Runnable</code> interface — takes no arguments, returns no data:</p>
+<pre><code><span class="kw">@FunctionalInterface public interface</span> Runnable {
+   <span class="kw">void</span> run();
+}</code></pre>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Code</th><th>Type</th><th>Description</th></tr>
+      <tr><td><code>var builder = Thread.ofPlatform();</code><br><code>Thread thread = builder.start(runnable);</code></td><td>Platform</td><td>Factory</td></tr>
+      <tr><td><code>var builder = Thread.ofVirtual();</code><br><code>Thread thread = builder.start(runnable);</code></td><td>Virtual</td><td>Factory</td></tr>
+      <tr><td><code>Thread thread = new Thread(runnable);</code><br><code>thread.start();</code></td><td>Platform</td><td>Constructor</td></tr>
+    </table>
+  </div>
+
+  <p>Prior to Java 21 the constructor was the advised approach. Starting with Java 21 the <strong>factory method is preferable</strong> since it is clearer which type of thread you are getting, and it creates a builder so you can set attributes like the name. Use <code>start()</code> to run now or <code>unstarted()</code> to defer:</p>
+<pre><code>Thread t = Thread.ofVirtual().unstarted(task);
+<span class="cm">// Do some other stuff</span>
+t.start();</code></pre>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>Calling <code>run()</code> instead of <code>start()</code> on a <code>Thread</code> or a <code>Runnable</code> <strong>does not start a new thread</strong>. It compiles fine but runs <em>synchronously</em> on the current thread — which quietly makes otherwise-unsafe code deterministic:</p>
+<pre style="margin:8px 0 0"><code><span class="kw">new</span> Thread(printInventory).run();   <span class="cm">// synchronous — no new thread</span></code></pre>
+  </div>
+
+  <h3>Predicting output from multiple threads</h3>
+<pre><code><span class="num">12:</span> <span class="kw">public static void</span> main(String[] args) <span class="kw">throws</span> InterruptedException {
+<span class="num">14:</span>    Runnable printInventory = () -&gt; System.out.println(<span class="str">"Printing zoo inventory"</span>);
+<span class="num">16:</span>    Runnable printRecords = () -&gt; {
+<span class="num">17:</span>       <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">3</span>; i++)
+<span class="num">18:</span>          System.out.println(<span class="str">"Printing record: "</span> + i);
+<span class="num">19:</span>    };
+<span class="num">20:</span>    System.out.println(<span class="str">"begin"</span>);
+<span class="num">21:</span>    <span class="kw">var</span> platformThread = Thread.ofPlatform().priority(<span class="num">10</span>).start(printInventory);
+<span class="num">24:</span>    <span class="kw">var</span> virtualThread = Thread.ofVirtual().start(printRecords);
+<span class="num">26:</span>    <span class="kw">var</span> constructorThread = <span class="kw">new</span> Thread(printInventory);
+<span class="num">27:</span>    constructorThread.start();
+<span class="num">28:</span>    System.out.println(<span class="str">"end"</span>);
+<span class="num">29:</span>    platformThread.join();
+<span class="num">30:</span>    virtualThread.join();
+<span class="num">31:</span>    constructorThread.join();
+<span class="num">32:</span> }</code></pre>
+  <ul class="trace">
+    <li>Four threads total: the <code>main()</code> user thread plus three created on lines 21–27.</li>
+    <li>The order is <strong>unknown until runtime</strong> — each new thread is an <em>asynchronous</em> task, so <code>main()</code> does not wait for results before continuing.</li>
+    <li>The <code>priority(10)</code> call is only a suggestion; you cannot assume it influences ordering.</li>
+    <li>Order <em>within</em> a single thread is still linear — the <code>for</code> loop stays ordered, and <code>begin</code> always appears before <code>end</code>.</li>
+    <li><code>join()</code> tells <code>main()</code> not to end before the threads complete. It throws <code>InterruptedException</code>, which <code>main()</code> declares.</li>
+  </ul>
+
+  <h3>Daemon threads</h3>
+  <p>A <strong>daemon thread</strong> will not prevent the JVM from exiting when the program finishes. A Java application terminates when the only threads running are daemon threads.</p>
+<pre><code><span class="num">10:</span> <span class="kw">var</span> job = Thread.ofPlatform().start(Zoo::pause);   <span class="cm">// user thread</span>
+<span class="cm">// Output: "Main method finished!" ... 10-second wait ... "Thread finished!"</span>
+
+<span class="num">10:</span> <span class="kw">var</span> job = Thread.ofPlatform().daemon(<span class="kw">true</span>).start(Zoo::pause);
+<span class="cm">// Output: "Main method finished!" only — JVM exits without the second line</span></code></pre>
+
+  <h3>Thread life cycle</h3>
+  <div class="rules-box">
+    <h4>The six thread states (query with <code>getState()</code>)</h4>
+    <ul>
+      <li><code>NEW</code> — every thread is initialized here, before <code>start()</code>.</li>
+      <li><code>RUNNABLE</code> — entered as soon as <code>start()</code> is called. It means the thread is <em>able</em> to be run, not necessarily that it is running right now.</li>
+      <li><code>BLOCKED</code>, <code>WAITING</code>, <code>TIMED_WAITING</code> — paused states reached from <code>RUNNABLE</code>. No CPU resources are used (other than a timer for <code>TIMED_WAITING</code>).</li>
+      <li><code>TERMINATED</code> — the work completed or an uncaught exception was thrown. No more work is performed.</li>
+    </ul>
+  </div>
+
+  <p>Once a thread enters a waiting state, another thread can call <code>interrupt()</code> on it, moving it back to <code>RUNNABLE</code>. Most methods that cause a thread to wait also declare <code>InterruptedException</code>.</p>
+<pre><code><span class="kw">var</span> thread = Thread.ofPlatform().start(() -&gt; {
+   <span class="kw">try</span> {
+      Thread.sleep(<span class="num">1000</span>);
+   } <span class="kw">catch</span> (InterruptedException e) {
+      System.out.println(<span class="str">"Interrupted!"</span>);
+   }});
+thread.interrupt();   <span class="cm">// prints Interrupted! and then resumes running</span></code></pre>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>If <code>interrupt()</code> is called on a thread already in the <code>RUNNABLE</code> state, <strong>no exception is thrown</strong>. The thread can periodically check <code>Thread.interrupted()</code> to see whether an interrupt was sent recently. Calling an unsupported operation on a thread (such as interrupting a suspended thread) throws <code>IllegalThreadStateException</code>.</p>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Term</th><th>Description</th></tr>
+      <tr><td>Carrier thread</td><td>System thread that runs virtual threads when they are not blocked</td></tr>
+      <tr><td>Daemon thread</td><td>Thread that will not prevent the JVM from exiting when the program finishes</td></tr>
+      <tr><td>Platform thread</td><td>Thread that is scheduled by the operating system</td></tr>
+      <tr><td>Process</td><td>Group of associated threads that execute in the same shared environment</td></tr>
+      <tr><td>System thread</td><td>Thread created by the JVM that runs in the background, such as the garbage collector</td></tr>
+      <tr><td>Task</td><td>Single unit of work performed by a thread</td></tr>
+      <tr><td>Thread</td><td>Smallest unit of execution that can be scheduled</td></tr>
+      <tr><td>User-defined thread</td><td>Thread created by the application developer to accomplish a specific task</td></tr>
+      <tr><td>Virtual thread</td><td>Lightweight thread that is mapped to a carrier thread when needed to run</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============ SECTION 2 ============ -->
+<section class="section" id="s2">
+  <div class="sec-num">Section 02</div>
+  <h2>Creating Threads with the Concurrency API</h2>
+
+  <p>The <code>java.util.concurrent</code> package — the <strong>Concurrency API</strong> — handles the complicated work of managing threads. Its <code>ExecutorService</code> interface defines services that create and manage threads; you obtain an instance from the <code>Executors</code> factory class, then send it tasks. It is recommended any time you need to create and execute a separate task, <em>even if you need only a single thread</em>.</p>
+
+  <h3>The single-thread executor</h3>
+<pre><code><span class="kw">try</span> (ExecutorService service = Executors.newSingleThreadExecutor()) {
+   System.out.println(<span class="str">"begin"</span>);
+   service.execute(printInventory);
+   service.execute(printRecords);
+   service.execute(printInventory);
+   System.out.println(<span class="str">"end"</span>);
+}</code></pre>
+  <ul class="trace">
+    <li>Only two threads now: <code>main()</code> and one service thread — so the output varies less than the four-thread version.</li>
+    <li>With a single-thread executor, tasks are <strong>guaranteed to be executed sequentially</strong>, so the <code>printRecords</code> loop is never interrupted by other tasks.</li>
+    <li><code>end</code> may still appear while executor tasks are running, because <code>main()</code> is an independent thread from the <code>ExecutorService</code>.</li>
+  </ul>
+
+  <h3>Submitting tasks</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Method name</th><th>Description</th></tr>
+      <tr><td><code>void execute(Runnable command)</code></td><td>Executes <code>Runnable</code> task at some point in future</td></tr>
+      <tr><td><code>Future&lt;?&gt; submit(Runnable task)</code></td><td>Executes <code>Runnable</code> task at some point in future and returns <code>Future</code> representing task</td></tr>
+      <tr><td><code>&lt;T&gt; Future&lt;T&gt; submit(Callable&lt;T&gt; task)</code></td><td>Executes <code>Callable</code> task and returns <code>Future</code> representing pending results</td></tr>
+      <tr><td><code>&lt;T&gt; List&lt;Future&lt;T&gt;&gt; invokeAll(Collection&lt;? extends Callable&lt;T&gt;&gt; tasks)</code></td><td>Executes given tasks and waits for <strong>all</strong> to complete. Returns <code>List</code> of <code>Future</code> in the same order as the original collection</td></tr>
+      <tr><td><code>&lt;T&gt; T invokeAny(Collection&lt;? extends Callable&lt;T&gt;&gt; tasks)</code></td><td>Executes given tasks and waits for <strong>at least one</strong> to complete</td></tr>
+    </table>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p><code>execute()</code> returns <strong><code>void</code></strong> — it is a "fire-and-forget" method. Any code that assigns its result to a <code>Future</code> does <span class="no">not compile</span>:</p>
+<pre style="margin:8px 0 0"><code>r.add(<span class="err">service.execute</span>(() -&gt; {count++;}));   <span class="cm">// DOES NOT COMPILE</span>
+r.add(service.submit(() -&gt; {count++;}));   <span class="cm">// fine — returns Future&lt;?&gt;</span></code></pre>
+  </div>
+
+  <h3>Waiting for results with Future</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Method name</th><th>Description</th></tr>
+      <tr><td><code>boolean isDone()</code></td><td>Returns <code>true</code> if task was completed, threw an exception, or was cancelled</td></tr>
+      <tr><td><code>boolean isCancelled()</code></td><td>Returns <code>true</code> if task was cancelled before it completed normally</td></tr>
+      <tr><td><code>boolean cancel(boolean mayInterruptIfRunning)</code></td><td>Attempts to cancel execution; returns <code>true</code> if successfully cancelled, <code>false</code> if it could not be cancelled or is complete</td></tr>
+      <tr><td><code>V get()</code></td><td>Retrieves result, waiting <strong>endlessly</strong> if not yet available</td></tr>
+      <tr><td><code>V get(long timeout, TimeUnit unit)</code></td><td>Retrieves result, waiting the specified time. If not ready, a checked <code>TimeoutException</code> is thrown</td></tr>
+    </table>
+  </div>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ Key Rule</span>
+    <p>Since <code>Runnable.run()</code> returns <code>void</code>, calling <code>get()</code> on a <code>Future</code> from <code>submit(Runnable)</code> <strong>always returns <code>null</code></strong> upon successful completion.</p>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Enum name</th><th>Description</th></tr>
+      <tr><td><code>TimeUnit.NANOSECONDS</code></td><td>One-billionths of a second</td></tr>
+      <tr><td><code>TimeUnit.MICROSECONDS</code></td><td>One-millionths of a second</td></tr>
+      <tr><td><code>TimeUnit.MILLISECONDS</code></td><td>One-thousandths of a second</td></tr>
+      <tr><td><code>TimeUnit.SECONDS</code> · <code>MINUTES</code> · <code>HOURS</code> · <code>DAYS</code></td><td>Seconds, minutes, hours, days</td></tr>
+    </table>
+  </div>
+
+  <h3>Callable</h3>
+<pre><code><span class="kw">@FunctionalInterface public interface</span> Callable&lt;V&gt; {
+   V call() <span class="kw">throws</span> Exception;
+}</code></pre>
+  <div class="vs-grid">
+    <div class="left">
+      <h4>Runnable.run()</h4>
+      <ul>
+        <li>Returns <code>void</code></li>
+        <li>Cannot throw checked exceptions</li>
+        <li>Can throw unchecked exceptions</li>
+        <li>Functional interface — lambda-friendly</li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>Callable.call()</h4>
+      <ul>
+        <li>Returns a generic type <code>V</code></li>
+        <li><strong>Can</strong> throw checked exceptions</li>
+        <li>Can throw unchecked exceptions</li>
+        <li>Functional interface — lambda-friendly</li>
+      </ul>
+    </div>
+  </div>
+<pre><code><span class="kw">try</span> (<span class="kw">var</span> service = Executors.newSingleThreadExecutor()) {
+   Future&lt;Integer&gt; result = service.submit(() -&gt; <span class="num">30</span> + <span class="num">11</span>);
+   System.out.println(result.get());   <span class="cm">// 41</span>
+}</code></pre>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>A valid <code>Callable</code> lambda takes <strong>no</strong> parameters and <strong>returns</strong> a value. So <code>() -&gt; 5</code> and <code>() -&gt; {System.out.print("Giraffe"); return 10;}</code> are valid; <code>a -&gt; {return 10;}</code> takes a parameter, and <code>() -&gt; {String s = "";}</code> returns nothing. Watch for a missing semicolon after <code>return</code> inside braces — <code>() -&gt; {return null}</code> is not even a valid lambda.</p>
+  </div>
+
+  <h3>Shutting down a thread executor</h3>
+  <p>A thread executor creates a <strong>non-daemon</strong> thread on the first task executed, so forgetting to shut it down means your application never terminates:</p>
+<pre><code><span class="kw">public class</span> MissingClose {
+   <span class="kw">public static void</span> main(String[] args) {
+      <span class="kw">var</span> service = Executors.newSingleThreadExecutor();
+      service.submit(() -&gt; System.out.println(<span class="str">"Never stops"</span>));
+   } }   <span class="cm">// runs but never terminates</span></code></pre>
+  <p>The fix is a try-with-resources block, which calls <code>close()</code> — shutting down the executor so no more tasks are accepted, then waiting until they all complete. Note that <code>close()</code> was only added in Java 19; older code uses explicit <code>shutdown()</code> or <code>shutdownNow()</code>.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Scenario</th><th>Description</th><th>More tasks allowed</th><th><code>isShutdown()</code></th><th><code>isTerminated()</code></th></tr>
+      <tr><td>Active</td><td>Accepts tasks</td><td class="yes">Yes</td><td><code>false</code></td><td><code>false</code></td></tr>
+      <tr><td><code>shutdown()</code></td><td>Runs waiting tasks to completion, but doesn't accept more</td><td class="no">No</td><td><code>true</code></td><td><code>false</code> while tasks running; <code>true</code> when complete</td></tr>
+      <tr><td><code>close()</code></td><td>Calls <code>shutdown()</code> and then awaits termination of executing tasks</td><td class="no">No</td><td><code>true</code></td><td><code>true</code></td></tr>
+      <tr><td><code>shutdownNow()</code></td><td>Stops executing tasks and cancels waiting tasks</td><td class="no">No</td><td><code>true</code></td><td><code>false</code> while tasks running; <code>true</code> when complete</td></tr>
+    </table>
+  </div>
+
+  <div class="card remember">
+    <span class="card-label">★ Remember</span>
+    <p><code>awaitTermination(2, TimeUnit.SECONDS)</code> waits the specified time and then simply <strong>returns <code>false</code></strong> if tasks are still running — it does not throw. A try-with-resources block, by contrast, waits for the tasks to finish gracefully.</p>
+  </div>
+
+  <h3>Scheduling tasks</h3>
+  <p><code>ScheduledExecutorService</code> is a subinterface of <code>ExecutorService</code>, obtained from <code>Executors.newSingleThreadScheduledExecutor()</code>. Each method returns a <code>ScheduledFuture</code>, which is identical to <code>Future</code> except it adds <code>getDelay()</code>.</p>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Method name</th><th>Description</th></tr>
+      <tr><td><code>schedule(Callable&lt;V&gt; callable, long delay, TimeUnit unit)</code></td><td>Creates and executes <code>Callable</code> task after given delay</td></tr>
+      <tr><td><code>schedule(Runnable command, long delay, TimeUnit unit)</code></td><td>Creates and executes <code>Runnable</code> task after given delay</td></tr>
+      <tr><td><code>scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit)</code></td><td>Creates a new task every <code>period</code> that passes, after the initial delay</td></tr>
+      <tr><td><code>scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit)</code></td><td>Creates a new task with the given delay <strong>between termination of one execution and commencement of the next</strong></td></tr>
+    </table>
+  </div>
+
+  <div class="vs-grid">
+    <div class="left">
+      <h4>scheduleAtFixedRate</h4>
+      <ul>
+        <li>Submits a new task every period <strong>regardless of whether the previous one finished</strong></li>
+        <li>Good for fixed intervals, e.g. a daily health check</li>
+        <li>Danger: if each task takes longer than the interval, tasks pile up until memory runs out</li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>scheduleWithFixedDelay</h4>
+      <ul>
+        <li>Creates a new task <strong>only after the previous task has finished</strong></li>
+        <li>Task at 12:00 taking 5 minutes with a 2-minute period → next starts at <strong>12:07</strong></li>
+        <li>Good when the specific time is unimportant</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>Two frequent compile errors around scheduling:</p>
+    <ul>
+      <li>Assigning a <code>ScheduledExecutorService</code> to an <code>ExecutorService</code> variable and then calling <code>scheduleWithFixedDelay()</code> on it — the reference type must be <code>ScheduledExecutorService</code>.</li>
+      <li><code>scheduleAtFixedRate()</code> and <code>scheduleWithFixedDelay()</code> support only <code>Runnable</code>, <strong>not <code>Callable</code></strong>. A <code>return null;</code> inside that lambda does not compile.</li>
+    </ul>
+    <p>Also note: if the <code>ScheduledExecutorService</code> has completely shut down by the time a scheduled execution arrives, those tasks are simply <strong>discarded</strong>.</p>
+  </div>
+
+  <h3>Increasing concurrency with pools</h3>
+  <p>A <strong>thread pool</strong> is a group of pre-instantiated reusable threads available to perform arbitrary tasks. While a single-thread executor waits for the thread to become available, a pooled-thread executor can execute the next task concurrently; if the pool runs out of threads, the task is <strong>queued</strong> and waits.</p>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Method name</th><th>Description</th></tr>
+      <tr><td><code>ExecutorService newSingleThreadExecutor()</code></td><td>Single-threaded executor using a single worker <strong>platform</strong> thread off an unbounded queue; results processed sequentially in submission order</td></tr>
+      <tr><td><code>ScheduledExecutorService newSingleThreadScheduledExecutor()</code></td><td>Single-threaded executor for platform threads that can schedule commands after a delay or periodically</td></tr>
+      <tr><td><code>ExecutorService newCachedThreadPool()</code></td><td>Platform thread pool that creates new threads as needed but reuses previously constructed threads when available</td></tr>
+      <tr><td><code>ExecutorService newFixedThreadPool(int)</code></td><td>Platform thread pool reusing a fixed number of threads off a shared unbounded queue</td></tr>
+      <tr><td><code>ScheduledExecutorService newScheduledThreadPool(int)</code></td><td>Platform thread pool that can schedule commands after a delay or periodically</td></tr>
+      <tr><td><code>ExecutorService newVirtualThreadPerTaskExecutor()</code></td><td>Creates a new <strong>virtual</strong> thread for each task</td></tr>
+    </table>
+  </div>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ Key Rule</span>
+    <p>Every factory method above is for <strong>platform</strong> threads <em>except</em> <code>newVirtualThreadPerTaskExecutor()</code>. Virtual threads are <strong>not pooled</strong> — they are so lightweight that a new one is used for each task. There is no <code>newPlatformThreadPool()</code> or <code>newPlatformThreadPerTaskExecutor()</code>.</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 3 ============ -->
+<section class="section" id="s3">
+  <div class="sec-num">Section 03</div>
+  <h2>Writing Thread-Safe Code</h2>
+
+  <p><strong>Thread-safety</strong> is the property of an object that guarantees safe execution by multiple threads at the same time. The techniques covered are atomic classes, <code>synchronized</code> blocks, the <code>Lock</code> framework, and <code>CyclicBarrier</code>.</p>
+
+  <h3>The problem: a race condition</h3>
+<pre><code><span class="num">1:</span> <span class="kw">import</span> java.util.concurrent.*;
+<span class="num">2:</span> <span class="kw">public class</span> SheepManager {
+<span class="num">3:</span>     <span class="kw">private int</span> sheepCount = <span class="num">0</span>;
+<span class="num">4:</span>     <span class="kw">private void</span> incrementAndReport() {
+<span class="num">5:</span>        System.out.print((++sheepCount) + <span class="str">" "</span>);
+<span class="num">6:</span>     }
+<span class="num">7:</span>     <span class="kw">public static void</span> main(String[] args) {
+<span class="num">8:</span>        <span class="kw">try</span> (<span class="kw">var</span> service = Executors.newFixedThreadPool(<span class="num">20</span>)) {
+<span class="num">9:</span>           SheepManager manager = <span class="kw">new</span> SheepManager();
+<span class="num">10:</span>          <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">10</span>; i++)
+<span class="num">11:</span>             service.submit(() -&gt; manager.incrementAndReport());
+<span class="num">12:</span> } } }</code></pre>
+  <p>Possible outputs include <code>1 2 3 4 5 6 7 8 9 10</code>, but also <code>1 9 8 7 3 6 6 2 4 5</code> — numbers printed twice, others missing entirely.</p>
+  <ul class="trace">
+    <li>The pre-increment operator <code>++</code> is <strong>not atomic</strong>: it is a separate read and a write.</li>
+    <li>Two threads read the "old" value before either writes the "new" one, so one assignment overwrites the other and an increment is lost.</li>
+    <li>This unexpected result of two or more tasks executing at the same time is a <strong>race condition</strong>.</li>
+  </ul>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>The <code>volatile</code> modifier ensures a thread does not see intermediary values while an operation is performed — but adding it to <code>sheepCount</code> is <strong>insufficient</strong> for thread-safety, because <code>++sheepCount</code> is still two separate read and write operations. Know the difference between an atomic variable and one marked <code>volatile</code>.</p>
+  </div>
+
+  <h3>Atomic classes</h3>
+  <p><strong>Atomic</strong> is the property of an operation being carried out as a single unit of execution without interference from another thread.</p>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Class name</th><th>Description</th></tr>
+      <tr><td><code>AtomicBoolean</code></td><td>A <code>boolean</code> value that may be updated atomically</td></tr>
+      <tr><td><code>AtomicInteger</code></td><td>An <code>int</code> value that may be updated atomically</td></tr>
+      <tr><td><code>AtomicLong</code></td><td>A <code>long</code> value that may be updated atomically</td></tr>
+    </table>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Method name</th><th>Description</th></tr>
+      <tr><td><code>get()</code></td><td>Retrieves current value</td></tr>
+      <tr><td><code>set(type newValue)</code></td><td>Sets given value, equivalent to the assignment <code>=</code> operator</td></tr>
+      <tr><td><code>getAndSet(type newValue)</code></td><td>Atomically sets new value and returns old value</td></tr>
+      <tr><td><code>incrementAndGet()</code></td><td>Atomic pre-increment, equivalent to <code>++value</code></td></tr>
+      <tr><td><code>getAndIncrement()</code></td><td>Atomic post-increment, equivalent to <code>value++</code></td></tr>
+      <tr><td><code>decrementAndGet()</code></td><td>Atomic pre-decrement, equivalent to <code>--value</code></td></tr>
+      <tr><td><code>getAndDecrement()</code></td><td>Atomic post-decrement, equivalent to <code>value--</code></td></tr>
+    </table>
+  </div>
+<pre><code><span class="num">3:</span> <span class="kw">private</span> AtomicInteger sheepCount = <span class="kw">new</span> AtomicInteger(<span class="num">0</span>);
+<span class="num">4:</span> <span class="kw">private void</span> incrementAndReport() {
+<span class="num">5:</span>    System.out.print(sheepCount.incrementAndGet() + <span class="str">" "</span>);
+<span class="num">6:</span> }
+<span class="cm">// 2 3 1 4 5 6 7 8 9 10   |   1 4 3 2 5 6 7 8 9 10</span></code></pre>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ Key Rule</span>
+    <p>Atomic classes guarantee that <strong>1 through 10 will always all be printed</strong> — no values are lost. But the <strong>order is still not guaranteed</strong>. Atomicity fixes correctness of the data, not ordering.</p>
+  </div>
+
+  <h3>synchronized blocks</h3>
+  <p>A <strong>monitor</strong> (also called a lock) is a structure supporting <strong>mutual exclusion</strong> — the property that at most one thread executes a particular segment of code at a given time. In Java, <em>any</em> <code>Object</code> can be used as a monitor.</p>
+<pre><code><span class="kw">var</span> manager = <span class="kw">new</span> SheepManager();
+<span class="kw">synchronized</span>(manager) {
+   <span class="cm">// Work to be completed by one thread at a time</span>
+}</code></pre>
+  <p>Each arriving thread checks whether another thread is already in the block. If the lock is unavailable, the thread transitions to a <code>BLOCKED</code> state until it can acquire the lock.</p>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>This "fix" <strong>does not work</strong>:</p>
+<pre style="margin:8px 0 6px"><code><span class="num">10:</span> <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">10</span>; i++) {
+<span class="num">11:</span>    <span class="kw">synchronized</span>(manager) {
+<span class="num">12:</span>       service.submit(() -&gt; manager.incrementAndReport());
+<span class="num">13:</span>    }
+<span class="num">14:</span> }</code></pre>
+    <p>It synchronizes the <strong>creation</strong> of the threads, not their <strong>execution</strong>. The threads are created one at a time but still execute simultaneously. Also remember: if each thread synchronizes on a <em>different</em> object, the code is not thread-safe at all.</p>
+  </div>
+
+  <p>Moving the block inside the method fixes it and consistently outputs <code>1 2 3 4 5 6 7 8 9 10</code>:</p>
+<pre><code><span class="num">4:</span> <span class="kw">private void</span> incrementAndReport() {
+<span class="num">5:</span>    <span class="kw">synchronized</span>(<span class="kw">this</span>) {
+<span class="num">6:</span>       System.out.print((++sheepCount) + <span class="str">" "</span>);
+<span class="num">7:</span>    }
+<span class="num">8:</span> }</code></pre>
+
+  <h3>Synchronizing methods</h3>
+  <div class="vs-grid">
+    <div class="left">
+      <h4>Instance method</h4>
+<pre style="margin:0"><code><span class="kw">void</span> sing() {
+   <span class="kw">synchronized</span>(<span class="kw">this</span>) {
+      System.out.print(<span class="str">"La la la!"</span>);
+   }
+}
+<span class="kw">synchronized void</span> sing() {
+   System.out.print(<span class="str">"La la la!"</span>);
+}</code></pre>
+      <p style="font-size:.93rem;margin:8px 0 0">Monitor = <strong>the object itself</strong>.</p>
+    </div>
+    <div class="right">
+      <h4>Static method</h4>
+<pre style="margin:0"><code><span class="kw">static void</span> dance() {
+   <span class="kw">synchronized</span>(SheepManager.class) {
+      System.out.print(<span class="str">"Time to dance!"</span>);
+   }
+}
+<span class="kw">static synchronized void</span> dance() {
+   System.out.print(<span class="str">"Time to dance!"</span>);
+}</code></pre>
+      <p style="font-size:.93rem;margin:8px 0 0">Monitor = <strong>the class object</strong>. Use it to order access across all instances.</p>
+    </div>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>A <code>static synchronized</code> method and an instance <code>synchronized(this)</code> block lock on <strong>different objects</strong> — the class object and the instance. They do <em>not</em> exclude each other. Likewise, a class is not thread-safe if even one method touching the shared data is left unsynchronized.</p>
+  </div>
+
+  <h3>The Lock framework</h3>
+  <div class="vs-grid">
+    <div class="left">
+      <h4>synchronized block</h4>
+<pre style="margin:0"><code><span class="kw">var</span> object = <span class="kw">new</span> Object();
+<span class="kw">synchronized</span>(object) {
+   <span class="cm">// Protected code</span>
+}</code></pre>
+    </div>
+    <div class="right">
+      <h4>Lock instance</h4>
+<pre style="margin:0"><code><span class="kw">var</span> myLock = <span class="kw">new</span> ReentrantLock();
+<span class="kw">try</span> {
+   myLock.lock();
+   <span class="cm">// Protected code</span>
+} <span class="kw">finally</span> {
+   myLock.unlock();
+}</code></pre>
+    </div>
+  </div>
+  <p>These are conceptually equivalent. <code>ReentrantLock</code> is a simple monitor implementing <code>Lock</code> that supports mutual exclusion: at most one thread holds the lock at a time. Using <code>try/finally</code> is good practice so acquired locks are always released.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Method name</th><th>Description</th></tr>
+      <tr><td><code>void lock()</code></td><td>Requests lock and <strong>blocks until</strong> lock is acquired</td></tr>
+      <tr><td><code>void unlock()</code></td><td>Releases lock</td></tr>
+      <tr><td><code>boolean tryLock()</code></td><td>Requests lock and <strong>returns immediately</strong> with a boolean indicating whether it was acquired</td></tr>
+      <tr><td><code>boolean tryLock(long timeout, TimeUnit unit)</code></td><td>Requests lock and blocks for the specified time or until the lock is acquired; returns a boolean</td></tr>
+    </table>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>Releasing a lock you do not hold throws at runtime:</p>
+<pre style="margin:8px 0 6px"><code><span class="kw">var</span> lock = <span class="kw">new</span> ReentrantLock();
+lock.unlock();   <span class="err">// IllegalMonitorStateException</span></code></pre>
+    <p>This is why <strong>you must always check the return value of <code>tryLock()</code></strong>. Code that calls <code>tryLock()</code> without checking, then unconditionally <code>unlock()</code>s in a <code>finally</code>, will sometimes work and sometimes throw <code>IllegalMonitorStateException</code> — both outcomes are possible in the same program.</p>
+  </div>
+
+  <h3>Acquiring the same lock twice</h3>
+<pre><code><span class="kw">var</span> myLock = <span class="kw">new</span> ReentrantLock();
+<span class="kw">if</span> (myLock.tryLock()) {
+   <span class="kw">try</span> {
+      myLock.lock();               <span class="cm">// acquired twice...</span>
+      System.out.println(<span class="str">"Lock obtained, entering protected code"</span>);
+   } <span class="kw">finally</span> {
+      myLock.unlock();             <span class="cm">// ...but released only once</span>
+   } }</code></pre>
+  <ul class="trace">
+    <li><code>ReentrantLock</code> maintains a <strong>counter</strong> of how many times the lock has been granted to a thread.</li>
+    <li>To release it for other threads, <code>unlock()</code> must be called <strong>the same number of times</strong> the lock was granted.</li>
+    <li>A later thread calling <code>myLock.tryLock()</code> here prints <code>false</code>.</li>
+    <li>For <code>tryLock()</code>, you call <code>unlock()</code> only if the method returned <code>true</code>.</li>
+  </ul>
+
+  <div class="rules-box">
+    <h4>What ReentrantLock adds over a synchronized block</h4>
+    <ul>
+      <li>Ability to request a lock <strong>without blocking</strong> (<code>tryLock()</code>).</li>
+      <li>Ability to request a lock while blocking for a <strong>specified amount of time</strong>.</li>
+      <li>A <strong>fairness</strong> property — the lock is granted in the order requested. Set via the constructor taking a <code>boolean</code>; it defaults to <code>false</code> and can cause a significant slowdown, so enable it only when ordering is required.</li>
+    </ul>
+  </div>
+
+  <h4>ReentrantReadWriteLock</h4>
+  <p>It includes separate locks for reading and writing. At runtime <strong>only one thread can hold the write lock</strong>, but <strong>many threads can hold the read lock</strong>.</p>
+<pre><code><span class="kw">var</span> lock = <span class="kw">new</span> ReentrantReadWriteLock();
+lock.writeLock().lock();
+lock.readLock().lock();
+System.out.println(lock.isWriteLocked());      <span class="cm">// true</span>
+System.out.println(lock.getReadLockCount());   <span class="cm">// 1</span>
+
+lock.writeLock().unlock();
+System.out.println(lock.isWriteLocked());      <span class="cm">// false</span>
+System.out.println(lock.getReadLockCount());   <span class="cm">// 1</span>
+
+lock.readLock().unlock();
+System.out.println(lock.getReadLockCount());   <span class="cm">// 0</span></code></pre>
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>You can trivially get a <strong>read lock after a write lock</strong>, since reading is a subset of writing. But acquiring the read lock <strong>first</strong> and then the write lock <strong>hangs forever</strong> — you cannot upgrade to a write lock.</p>
+<pre style="margin:8px 0 0"><code><span class="kw">var</span> lock = <span class="kw">new</span> ReentrantReadWriteLock();
+lock.readLock().lock();
+lock.writeLock().lock();   <span class="err">// Wait forever</span></code></pre>
+  </div>
+
+  <h3>Orchestrating tasks with CyclicBarrier</h3>
+  <p><code>CyclicBarrier</code> takes a <strong>limit</strong> value in its constructor indicating the number of threads to wait for. As each thread finishes a phase it calls <code>await()</code>. Once that many threads have called <code>await()</code>, the barrier is released and all threads continue.</p>
+<pre><code><span class="kw">public void</span> performTask(CyclicBarrier c1, CyclicBarrier c2) {
+   <span class="kw">try</span> {
+      removeLions();
+      c1.await();
+      cleanPen();
+      c2.await();
+      addLions();
+   } <span class="kw">catch</span> (InterruptedException | BrokenBarrierException e) {
+      <span class="cm">// Handle checked exceptions here</span>
+   }
+}
+<span class="cm">// in main:</span>
+<span class="kw">try</span> (<span class="kw">var</span> service = Executors.newFixedThreadPool(<span class="num">4</span>)) {
+   <span class="kw">var</span> manager = <span class="kw">new</span> LionPenManager();
+   <span class="kw">var</span> c1 = <span class="kw">new</span> CyclicBarrier(<span class="num">4</span>);
+   <span class="kw">var</span> c2 = <span class="kw">new</span> CyclicBarrier(<span class="num">4</span>, () -&gt; System.out.println(<span class="str">"*** Pen Cleaned!"</span>));
+   <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">4</span>; i++)
+      service.submit(() -&gt; manager.performTask(c1, c2));
+}</code></pre>
+  <p>Output becomes fully organized: four "Removing lions", then four "Cleaning the pen", then <code>*** Pen Cleaned!</code>, then four "Adding lions". The two-argument constructor runs a <code>Runnable</code> upon completion of the barrier.</p>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>If <strong>fewer threads reach the barrier than the limit</strong>, the barrier is never broken and the program <strong>waits forever</strong>. A <code>CyclicBarrier(10)</code> with only 9 threads calling <code>await()</code> hangs — it does not throw and does not print. Even setting the count to exactly 10 on a parallel stream is risky, since the JVM might not allocate 10 threads.</p>
+  </div>
+
+  <div class="card remember">
+    <span class="card-label">★ Remember</span>
+    <p><code>CyclicBarrier</code> is reusable. Once the limit is reached the barrier is broken, all threads are released, and the waiting count returns to zero. A limit of 5 with 15 threads calling <code>await()</code> activates the barrier <strong>three times</strong>.</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 4 ============ -->
+<section class="section" id="s4">
+  <div class="sec-num">Section 04</div>
+  <h2>Using Concurrent Collections</h2>
+
+  <h3>Memory consistency errors</h3>
+  <p>A <strong>memory consistency error</strong> occurs when two threads have inconsistent views of what should be the same data. When two threads modify the same nonconcurrent collection, the JVM may throw a <code>ConcurrentModificationException</code> — and it can even happen with a single thread:</p>
+<pre><code><span class="num">11:</span> <span class="kw">var</span> foodData = <span class="kw">new</span> HashMap&lt;String, Integer&gt;();
+<span class="num">12:</span> foodData.put(<span class="str">"penguin"</span>, <span class="num">1</span>);
+<span class="num">13:</span> foodData.put(<span class="str">"flamingo"</span>, <span class="num">2</span>);
+<span class="num">14:</span> <span class="kw">for</span> (String key : foodData.keySet())
+<span class="num">15:</span>    foodData.remove(key);   <span class="err">// ConcurrentModificationException</span></code></pre>
+  <ul class="trace">
+    <li>The exception is thrown on the <strong>second</strong> iteration, since the iterator on <code>keySet()</code> is not properly updated after the first removal.</li>
+    <li>Changing line 11 to <code>new ConcurrentHashMap&lt;String, Integer&gt;()</code> prevents it — the iterator from <code>keySet()</code> is updated as soon as an object is removed.</li>
+  </ul>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ Key Rule</span>
+    <p>Use a concurrent collection any time multiple threads modify a collection outside a <code>synchronized</code> block or method — <em>even if you don't expect a problem</em>. The exception: if the collection is <strong>immutable</strong> and contains immutable objects, concurrent collections are unnecessary, since nothing changes.</p>
+  </div>
+
+  <h3>The concurrent collection classes</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Class name</th><th>Java Collections interfaces</th><th>Sorted?</th><th>Blocking?</th></tr>
+      <tr><td><code>ConcurrentHashMap</code></td><td><code>Map</code>, <code>ConcurrentMap</code></td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><td><code>ConcurrentLinkedQueue</code></td><td><code>Queue</code></td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><td><code>ConcurrentSkipListMap</code></td><td><code>Map</code>, <code>SequencedMap</code>, <code>SortedMap</code>, <code>NavigableMap</code>, <code>ConcurrentMap</code>, <code>ConcurrentNavigableMap</code></td><td class="yes">Yes</td><td class="no">No</td></tr>
+      <tr><td><code>ConcurrentSkipListSet</code></td><td><code>Set</code>, <code>SequencedSet</code>, <code>SortedSet</code>, <code>NavigableSet</code></td><td class="yes">Yes</td><td class="no">No</td></tr>
+      <tr><td><code>CopyOnWriteArrayList</code></td><td><code>List</code>, <code>SequencedCollection</code></td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><td><code>CopyOnWriteArraySet</code></td><td><code>Set</code></td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><td><code>LinkedBlockingQueue</code></td><td><code>Queue</code>, <code>BlockingQueue</code></td><td class="no">No</td><td class="yes">Yes</td></tr>
+    </table>
+  </div>
+
+  <div class="card remember">
+    <span class="card-label">★ Remember</span>
+    <p>When you see <strong>Skip</strong> in a class name, just think "<strong>sorted</strong> concurrent" collection. <code>LinkedBlockingQueue</code> is the only blocking one — it adds overloaded <code>offer()</code> and <code>poll()</code> methods that take a timeout. For the exam you don't need class-specific concurrent methods, only the inherited ones like <code>get()</code> and <code>set()</code>.</p>
+  </div>
+
+  <h3>The CopyOnWrite classes</h3>
+  <p>These create a <strong>copy of the collection any time a reference is added, removed, or changed</strong>, then update the original reference to point to the copy. They are commonly used to ensure an iterator doesn't see modifications.</p>
+<pre><code>List&lt;Integer&gt; favNumbers = <span class="kw">new</span> CopyOnWriteArrayList&lt;&gt;(List.of(<span class="num">4</span>, <span class="num">3</span>, <span class="num">42</span>));
+<span class="kw">for</span> (<span class="kw">var</span> n : favNumbers) {
+   System.out.print(n + <span class="str">" "</span>);   <span class="cm">// 4 3 42</span>
+   favNumbers.add(n + <span class="num">1</span>);
+}
+System.out.println(<span class="str">"Size: "</span> + favNumbers.size());   <span class="cm">// Size: 6</span></code></pre>
+  <ul class="trace">
+    <li>The iterator is not modified, so the loop executes <strong>exactly three times</strong>.</li>
+    <li>The collection still grows — the final size is 6.</li>
+    <li>With a plain <code>ArrayList</code>, a <code>ConcurrentModificationException</code> would be thrown at runtime.</li>
+    <li>These classes can use a lot of memory, so they suit environments where reads are far more common than writes.</li>
+  </ul>
+
+  <h3>Obtaining synchronized collections</h3>
+  <p>The <code>Collections</code> class has static methods that return a synchronized view of an existing nonconcurrent collection, with the same type as the underlying collection: <code>synchronizedCollection()</code>, <code>synchronizedList()</code>, <code>synchronizedMap()</code>, <code>synchronizedNavigableMap()</code>, <code>synchronizedNavigableSet()</code>, <code>synchronizedSet()</code>, <code>synchronizedSortedMap()</code>, <code>synchronizedSortedSet()</code>.</p>
+
+  <div class="vs-grid">
+    <div class="left">
+      <h4>Writing new code</h4>
+      <ul>
+        <li>You control creation of the collection</li>
+        <li>Use the <strong>concurrent collection classes</strong> (<code>ConcurrentHashMap</code>, etc.)</li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>Handed an existing collection</h4>
+      <ul>
+        <li>A nonconcurrent collection is passed to you</li>
+        <li>Use the <strong><code>Collections.synchronizedXxx()</code></strong> methods</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SECTION 5 ============ -->
+<section class="section" id="s5">
+  <div class="sec-num">Section 05</div>
+  <h2>Identifying Threading Problems</h2>
+
+  <p>A <strong>threading problem</strong> occurs when two or more threads interact in an unexpected and undesirable way. <strong>Liveness</strong> is the ability of an application to execute in a timely manner; liveness problems are often the result of a thread entering a <code>BLOCKED</code> or <code>WAITING</code> state forever, or repeatedly entering and exiting these states. Three types matter for the exam.</p>
+
+  <h3>Deadlock</h3>
+  <p><strong>Deadlock</strong> occurs when two or more threads are <strong>blocked forever, each waiting on the other</strong>.</p>
+<pre><code><span class="kw">public void</span> eatAndDrink(Food food, Water water) {
+   <span class="kw">synchronized</span>(food) {
+      System.out.println(name() + <span class="str">" Got Food!"</span>);
+      move();
+      <span class="kw">synchronized</span>(water) { System.out.println(name() + <span class="str">" Got Water!"</span>); }
+   } }
+<span class="kw">public void</span> drinkAndEat(Food food, Water water) {
+   <span class="kw">synchronized</span>(water) {
+      System.out.println(name() + <span class="str">" Got Water!"</span>);
+      move();
+      <span class="kw">synchronized</span>(food) { System.out.println(name() + <span class="str">" Got Food!"</span>); }
+   } }</code></pre>
+  <ul class="trace">
+    <li>Foxy takes the food and moves toward the water; Tails has already taken the water and waits for the food.</li>
+    <li>The program prints <code>Foxy Got Food!</code> and <code>Tails Got Water!</code>, then <strong>hangs indefinitely</strong>.</li>
+    <li>Both participants are permanently blocked, waiting on resources that will never become available.</li>
+    <li>Crucially, a deadlock <strong>does not throw an exception</strong> — it just hangs.</li>
+  </ul>
+
+  <h3>Starvation and livelock</h3>
+  <div class="vs-grid">
+    <div class="left">
+      <h4>Starvation</h4>
+      <ul>
+        <li>A <strong>single thread</strong> is perpetually denied access to a shared resource or lock</li>
+        <li>The thread is still active but cannot complete its work</li>
+        <li>Other threads constantly take the resource first</li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>Livelock</h4>
+      <ul>
+        <li>Two or more threads are <strong>conceptually blocked forever, but each is still active</strong></li>
+        <li>A special case of resource starvation — threads try to acquire a set of locks, fail, and restart</li>
+        <li>Often the result of failed deadlock recovery, where each releases its locks and grabs the other's</li>
+        <li>Hard to detect: the threads appear responsive</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>Deadlock vs. livelock is a classic fill-in-the-blank. <strong>Both</strong> involve threads blocked forever; the discriminator is that in a <strong>livelock the threads appear active</strong>, while in a deadlock they are genuinely blocked and waiting. If code has two threads that will simply <em>wait</em> on each other's monitors, it is a deadlock, <strong>not</strong> a livelock.</p>
+  </div>
+
+  <h3>Race conditions</h3>
+  <p>A <strong>race condition</strong> is an undesirable result that occurs when two tasks that should be completed sequentially are completed at the same time. Two users, Olivia and Sophia, both request the username <code>ZooFan</code> simultaneously:</p>
+  <div class="rules-box">
+    <h4>Three possible outcomes, worst to best</h4>
+    <ol>
+      <li><strong>Both</strong> create accounts with the username — very bad, leads to corrupt data.</li>
+      <li><strong>Neither</strong> succeeds and both get an error — frustrating, but data integrity is preserved.</li>
+      <li><strong>One</strong> succeeds and the other gets an error — usually considered the best solution; integrity is preserved and at least one user moves forward.</li>
+    </ol>
+    <p style="margin:10px 0 0">For the exam: race conditions lead to invalid data if not handled, and <strong>even failing both participants is preferable to letting invalid data into the system</strong>.</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 6 ============ -->
+<section class="section" id="s6">
+  <div class="sec-num">Section 06</div>
+  <h2>Working with Parallel Streams</h2>
+
+  <p>A <strong>serial stream</strong> is one in which the results are ordered, with only one entry processed at a time. A <strong>parallel stream</strong> is capable of processing results concurrently using multiple threads. Using one can change not only performance but also the <strong>expected results</strong>.</p>
+
+  <div class="card remember">
+    <span class="card-label">★ Remember</span>
+    <p>To generate random numbers in a multithreaded program, use <code>ThreadLocalRandom</code>. Get an instance with <code>current()</code>, then use the instance methods: <code>ints()</code>, <code>ints(low, highExclusive)</code>, <code>ints(count)</code>, <code>ints(count, low, highExclusive)</code>, <code>nextInt(highExclusive)</code>, <code>nextInt(low, highExclusive)</code> — with equivalents for doubles and longs.</p>
+  </div>
+
+  <h3>Creating parallel streams</h3>
+<pre><code>Collection&lt;Integer&gt; collection = List.of(<span class="num">1</span>, <span class="num">2</span>);
+
+Stream&lt;Integer&gt; p1 = collection.stream().parallel();   <span class="cm">// from an existing stream</span>
+Stream&lt;Integer&gt; p2 = collection.parallelStream();      <span class="cm">// from a Collection</span></code></pre>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <ul>
+      <li>There is <strong>no class called <code>ParallelStream</code></strong> — <code>new ParallelStream(c)</code> never compiles.</li>
+      <li><code>parallelStream()</code> is defined on <strong><code>Collection</code></strong>, not on <code>Stream</code>. <code>parallel()</code> is defined on <strong><code>Stream</code></strong>, not on <code>Collection</code>. Mixing them up is the most common distractor.</li>
+      <li>Calling <code>parallel()</code> on an already-parallel stream is <strong>allowed</strong> and may return the same object.</li>
+      <li><code>isParallel()</code> tests whether a stream supports parallel processing. Some operations preserve the parallel attribute; others do not.</li>
+    </ul>
+  </div>
+
+  <h3>Parallel decomposition</h3>
+  <p><strong>Parallel decomposition</strong> is taking a task, breaking it into smaller pieces performed concurrently, then reassembling the results. With <code>doWork()</code> sleeping five seconds:</p>
+<pre><code><span class="num">11:</span> List.of(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>)
+<span class="num">12:</span>    .stream()            <span class="cm">// 1 2 3 4 5      Time: 25 seconds</span>
+<span class="num">12:</span>    .parallelStream()    <span class="cm">// 3 2 1 5 4      Time: 5 seconds</span>
+<span class="num">13:</span>    .map(w -&gt; doWork(w))
+<span class="num">14:</span>    .forEach(s -&gt; System.out.print(s + <span class="str">" "</span>));</code></pre>
+  <p><code>map()</code> and <code>forEach()</code> on a parallel stream are equivalent to submitting multiple <code>Runnable</code> lambdas to a pooled thread executor and waiting for the results. On a machine with fewer processors the time might be 10 or 15 seconds instead.</p>
+  <p>Swapping <code>forEach()</code> for <code>forEachOrdered()</code> restores <code>1 2 3 4 5</code> while keeping the 5-second time — you lose some of the gain, but <code>map()</code> still runs in parallel.</p>
+
+  <h3>Order-based operations</h3>
+  <div class="vs-grid">
+    <div class="left">
+      <h4>Order not guaranteed</h4>
+      <ul>
+        <li><code>findAny()</code> — returns the value from whichever thread returns first; likely random on a parallel stream</li>
+        <li><code>forEach()</code> on a parallel stream</li>
+        <li><code>peek()</code> on a parallel stream</li>
+        <li><code>sorted()</code> then <code>forEach()</code> — the stream is <em>still parallel</em> after sorting, so printing is stochastic</li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>Order preserved</h4>
+      <ul>
+        <li><code>findFirst()</code>, <code>limit()</code>, <code>skip()</code> — order still preserved, but performance may suffer as threads coordinate</li>
+        <li><code>forEachOrdered()</code></li>
+        <li>Results of ordered operations on a parallel stream are consistent with a serial stream — e.g. <code>skip(5).limit(2).findFirst()</code> gives the same result either way</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p><code>findAny()</code> is <strong>never guaranteed</strong> to return the first element — not even on a <em>serial</em> stream, where it merely <em>often</em> does. And calling <code>sorted()</code> before <code>findAny()</code> on a parallel stream does <strong>not</strong> make it return the smallest value.</p>
+  </div>
+
+  <h3>Combining results with reduce()</h3>
+<pre><code>&lt;U&gt; U reduce(U identity,
+   BiFunction&lt;U,? <span class="kw">super</span> T,U&gt; accumulator,
+   BinaryOperator&lt;U&gt; combiner)</code></pre>
+<pre><code>System.out.println(List.of(<span class="str">'w'</span>, <span class="str">'o'</span>, <span class="str">'l'</span>, <span class="str">'f'</span>)
+   .parallelStream()
+   .reduce(<span class="str">""</span>,
+      (s1, c) -&gt; s1 + c,
+      (s2, s3) -&gt; s2 + s3));   <span class="cm">// wolf</span></code></pre>
+  <p>On parallel streams, <code>reduce()</code> applies the reduction to <strong>pairs of elements</strong> to create intermediate values, then combines those. In a serial stream <code>wolf</code> is built one character at a time; in a parallel stream the intermediates <code>wo</code> and <code>lf</code> are created and then combined.</p>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ Key Rule</span>
+    <p>Make sure the <strong>accumulator and combiner produce the same result regardless of the order they are called in</strong>. This requirement applies to serial streams too, but you may never notice a problem there because the result is always ordered.</p>
+  </div>
+
+<pre><code>System.out.println(List.of(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>)
+   .parallelStream()
+   .reduce(<span class="num">0</span>, (a, b) -&gt; (a - b)));   <span class="cm">// PROBLEMATIC ACCUMULATOR: -21, 3, or other</span>
+
+System.out.println(List.of(<span class="str">"w"</span>,<span class="str">"o"</span>,<span class="str">"l"</span>,<span class="str">"f"</span>)
+   .parallelStream()
+   .reduce(<span class="str">"X"</span>, String::concat));   <span class="cm">// XwXoXlXf  (serial gives Xwolf)</span></code></pre>
+  <ul class="trace">
+    <li>Subtraction is order-dependent, so the first snippet can output different values on serial vs parallel streams.</li>
+    <li><code>"X"</code> is not a true identity value. In parallel processing the identity is applied to <strong>multiple elements</strong>, producing <code>XwXoXlXf</code>.</li>
+    <li>Although the one- and two-argument versions of <code>reduce()</code> support parallel processing, prefer the <strong>three-argument version</strong> with parallel streams — an explicit combiner lets the JVM partition the operations more efficiently.</li>
+  </ul>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>Watch the <em>types</em> in a three-argument <code>reduce()</code>. With identity <code>0</code>, the accumulator's first parameter is an <code>Integer</code> and the second is the stream element. So <code>(c1, c2) -&gt; c1.length() + c2.length()</code> <span class="no">does not compile</span> — you cannot call <code>length()</code> on an <code>Integer</code>.</p>
+  </div>
+
+  <h3>Combining results with collect()</h3>
+<pre><code>&lt;R&gt; R collect(Supplier&lt;R&gt; supplier,
+   BiConsumer&lt;R, ? <span class="kw">super</span> T&gt; accumulator,
+   BiConsumer&lt;R, R&gt; combiner)</code></pre>
+<pre><code>Stream&lt;String&gt; stream = Stream.of(<span class="str">"w"</span>, <span class="str">"o"</span>, <span class="str">"l"</span>, <span class="str">"f"</span>).parallel();
+SortedSet&lt;String&gt; set = stream.collect(ConcurrentSkipListSet::<span class="kw">new</span>,
+   Set::add,
+   Set::addAll);
+System.out.println(set);   <span class="cm">// [f, l, o, w]</span></code></pre>
+  <p>Use a <strong>concurrent collection</strong> to combine results, ensuring concurrent threads don't cause a <code>ConcurrentModificationException</code>. Note that if you collect into an ordered structure such as a <code>List</code>, the elements must appear in the same order regardless of serial or parallel — which may reduce performance.</p>
+
+  <div class="rules-box">
+    <h4>Requirements for a parallel reduction with collect()</h4>
+    <ul>
+      <li>The stream is parallel.</li>
+      <li>The parameter of the <code>collect()</code> operation has the <code>Characteristics.CONCURRENT</code> characteristic.</li>
+      <li>Either the stream is unordered <em>or</em> the collector has <code>Characteristics.UNORDERED</code>.</li>
+    </ul>
+    <p style="margin:10px 0 0">If any of these fails, <code>collect()</code> executes in a <strong>single-threaded fashion</strong> — it still works, it just isn't parallel.</p>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p><code>Collectors.toSet()</code> has <code>UNORDERED</code> but <strong>not <code>CONCURRENT</code></strong>. So <code>parallelStream.collect(Collectors.toSet())</code> is <span class="no">not</span> a parallel reduction, even on a parallel stream. The two collector families that <em>are</em> both <code>UNORDERED</code> and <code>CONCURRENT</code> are <code>toConcurrentMap()</code> and <code>groupingByConcurrent()</code>.</p>
+  </div>
+
+<pre><code>Stream&lt;String&gt; ohMy = Stream.of(<span class="str">"lions"</span>, <span class="str">"tigers"</span>, <span class="str">"bears"</span>).parallel();
+ConcurrentMap&lt;Integer, String&gt; map = ohMy
+   .collect(Collectors.toConcurrentMap(String::length, k -&gt; k,
+      (s1, s2) -&gt; s1 + <span class="str">","</span> + s2));
+System.out.println(map);            <span class="cm">// {5=lions,bears, 6=tigers}</span>
+System.out.println(map.getClass()); <span class="cm">// java.util.concurrent.ConcurrentHashMap</span>
+
+<span class="kw">var</span> ohMy2 = Stream.of(<span class="str">"lions"</span>, <span class="str">"tigers"</span>, <span class="str">"bears"</span>).parallel();
+ConcurrentMap&lt;Integer, List&lt;String&gt;&gt; map2 = ohMy2.collect(
+   Collectors.groupingByConcurrent(String::length));
+System.out.println(map2);           <span class="cm">// {5=[lions, bears], 6=[tigers]}</span></code></pre>
+  <p>Assign the result to a <code>ConcurrentMap</code> reference; the particular class is not guaranteed, only that it implements <code>ConcurrentMap</code>.</p>
+
+  <h3>Avoiding stateful streams</h3>
+  <p>A <strong>stateful lambda expression</strong> is one whose result depends on state that might change during execution of the pipeline.</p>
+<pre><code><span class="kw">public</span> List&lt;Integer&gt; addValues(IntStream source) {
+   <span class="kw">var</span> data = Collections.synchronizedList(<span class="kw">new</span> ArrayList&lt;Integer&gt;());
+   source.filter(s -&gt; s % <span class="num">2</span> == <span class="num">0</span>)
+      .forEach(i -&gt; { data.add(i); });   <span class="err">// STATEFUL: DON'T DO THIS!</span>
+   <span class="kw">return</span> data;
+}
+<span class="cm">// serial:   [2, 4, 6, 8, 10]</span>
+<span class="cm">// parallel: [6, 8, 10, 2, 4]</span>
+
+<span class="kw">public</span> List&lt;Integer&gt; addValuesBetter(IntStream source) {
+   <span class="kw">return</span> source.filter(s -&gt; s % <span class="num">2</span> == <span class="num">0</span>)
+      .boxed()
+      .collect(Collectors.toList());     <span class="cm">// same ordered result either way</span>
+}</code></pre>
+  <p>Avoid stateful operations with parallel streams to remove data side effects — and in serial streams too, since they limit the code's ability to be parallelized later.</p>
+</section>
+
+<!-- ============ RECAP ============ -->
+<section class="recap" id="recap">
+  <h2>Short Recap</h2>
+
+  <h4>Introducing threads</h4>
+  <ul>
+    <li>Platform threads map 1:1 to OS threads; virtual threads run on a carrier thread only when needed, are always daemons, and always have priority 5.</li>
+    <li>Six states: <code>NEW</code>, <code>RUNNABLE</code>, <code>BLOCKED</code>, <code>WAITING</code>, <code>TIMED_WAITING</code>, <code>TERMINATED</code>. Priority 1–10 is only a suggestion. <code>run()</code> is synchronous; <code>start()</code> is not.</li>
+  </ul>
+
+  <h4>Concurrency API</h4>
+  <ul>
+    <li><code>execute()</code> returns <code>void</code>; <code>submit()</code> returns a <code>Future</code>. <code>get()</code> on a <code>Runnable</code>'s <code>Future</code> always returns <code>null</code>.</li>
+    <li><code>Callable.call()</code> returns a generic type and can throw checked exceptions; <code>Runnable.run()</code> cannot do either.</li>
+    <li>Always use try-with-resources; an un-shut-down executor keeps the JVM alive. Only <code>newVirtualThreadPerTaskExecutor()</code> makes virtual threads, and virtual threads are never pooled.</li>
+  </ul>
+
+  <h4>Thread-safety</h4>
+  <ul>
+    <li><code>++</code> is not atomic; <code>volatile</code> alone doesn't fix it; atomic classes preserve values but not order; <code>synchronized</code> preserves both.</li>
+    <li><code>ReentrantLock</code>: check <code>tryLock()</code>'s return value, unlock as many times as you locked, and remember <code>IllegalMonitorStateException</code> for unlocking what you don't hold.</li>
+    <li><code>CyclicBarrier</code> releases only when exactly the limit of threads calls <code>await()</code>; otherwise it hangs. It is reusable.</li>
+  </ul>
+
+  <h4>Concurrent collections</h4>
+  <ul>
+    <li><code>ConcurrentModificationException</code> can occur with a single thread; concurrent collections fix memory consistency errors.</li>
+    <li>Skip = sorted concurrent. <code>CopyOnWrite</code> classes copy on every modification, so an active iterator sees the original. <code>LinkedBlockingQueue</code> is the blocking one.</li>
+  </ul>
+
+  <h4>Threading problems</h4>
+  <ul>
+    <li>Deadlock — blocked forever waiting on each other (hangs, no exception). Starvation — one thread perpetually denied. Livelock — blocked forever but still active.</li>
+    <li>Race condition — sequential tasks completed simultaneously, producing invalid data.</li>
+  </ul>
+
+  <h4>Parallel streams</h4>
+  <ul>
+    <li><code>Collection.parallelStream()</code> and <code>Stream.parallel()</code>; there is no <code>ParallelStream</code> class.</li>
+    <li><code>findAny()</code> is never guaranteed; <code>findFirst()</code>, <code>limit()</code>, <code>skip()</code>, <code>forEachOrdered()</code> preserve order.</li>
+    <li>Prefer three-argument <code>reduce()</code>; use a true identity and an order-independent accumulator/combiner. <code>toConcurrentMap()</code> and <code>groupingByConcurrent()</code> enable real parallel reduction; <code>toSet()</code> does not. Avoid stateful lambdas.</li>
+  </ul>
+</section>
+
+<!-- ============ CHEAT SHEET ============ -->
+<section class="section" id="cheat">
+  <div class="sec-num">Cheat Sheet</div>
+  <h2>Exam Traps Cheat Sheet</h2>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Scenario</th><th>What it tests</th><th>Verdict</th></tr>
+      <tr><td><code>new Thread(task).run()</code></td><td><code>run()</code> vs <code>start()</code></td><td class="no">Runs synchronously — no new thread</td></tr>
+      <tr><td><code>Thread.ofVirtual()</code> then <code>setPriority(10)</code></td><td>Virtual thread priority is fixed</td><td class="no">No effect — stays 5</td></tr>
+      <tr><td>Program with only daemon threads left</td><td>JVM exit condition</td><td class="yes">JVM terminates</td></tr>
+      <tr><td><code>interrupt()</code> on a <code>RUNNABLE</code> thread</td><td>Interrupt semantics</td><td class="no">No exception thrown</td></tr>
+      <tr><td><code>r.add(service.execute(task))</code></td><td><code>execute()</code> returns <code>void</code></td><td class="no">Does not compile</td></tr>
+      <tr><td><code>get()</code> on a <code>Future</code> from <code>submit(Runnable)</code></td><td>Runnable has no return value</td><td class="yes">Always <code>null</code></td></tr>
+      <tr><td><code>a -&gt; {return 10;}</code> as a <code>Callable</code></td><td><code>call()</code> takes no parameters</td><td class="no">Not a valid Callable</td></tr>
+      <tr><td><code>() -&gt; {return null}</code></td><td>Missing semicolon inside braces</td><td class="no">Not a valid lambda</td></tr>
+      <tr><td>Executor created without try-with-resources or shutdown</td><td>Non-daemon executor thread</td><td class="no">Program never terminates</td></tr>
+      <tr><td><code>ExecutorService s = Executors.newSingleThreadScheduledExecutor()</code> then <code>scheduleWithFixedDelay()</code></td><td>Reference type must be <code>ScheduledExecutorService</code></td><td class="no">Does not compile</td></tr>
+      <tr><td><code>return null;</code> inside a <code>scheduleWithFixedDelay()</code> lambda</td><td>Only <code>Runnable</code> is supported</td><td class="no">Does not compile</td></tr>
+      <tr><td>Task at 12:00 takes 5 min, <code>scheduleWithFixedDelay</code> period 2 min</td><td>Delay is measured after termination</td><td class="yes">Next starts at 12:07</td></tr>
+      <tr><td><code>awaitTermination(2, SECONDS)</code> with 5-second tasks</td><td>Timeout behavior</td><td class="yes">Returns <code>false</code>, no exception</td></tr>
+      <tr><td><code>Executors.newPlatformThreadPool()</code></td><td>Invented factory method</td><td class="no">Does not exist</td></tr>
+      <tr><td>Pooling virtual threads</td><td>Virtual threads are per-task</td><td class="no">Not pooled</td></tr>
+      <tr><td><code>volatile int</code> with <code>++count</code> across threads</td><td><code>++</code> is read + write</td><td class="no">Still not thread-safe</td></tr>
+      <tr><td>Atomic counter incremented by 10 threads</td><td>Atomicity vs ordering</td><td class="yes">All values present, order not guaranteed</td></tr>
+      <tr><td><code>synchronized</code> around <code>service.submit(...)</code></td><td>Synchronizing creation, not execution</td><td class="no">Does not fix the race</td></tr>
+      <tr><td><code>static synchronized</code> method vs <code>synchronized(this)</code> block</td><td>Class object vs instance monitor</td><td class="no">Different locks — no mutual exclusion</td></tr>
+      <tr><td><code>new ReentrantLock().unlock()</code></td><td>Releasing an unheld lock</td><td class="no"><code>IllegalMonitorStateException</code></td></tr>
+      <tr><td><code>tryLock()</code> called without checking its result</td><td>Unconditional <code>unlock()</code> in <code>finally</code></td><td class="no">May print result <em>or</em> throw</td></tr>
+      <tr><td><code>lock()</code> twice, <code>unlock()</code> once</td><td>Reentrant hold count</td><td class="no">Lock never released</td></tr>
+      <tr><td><code>readLock().lock()</code> then <code>writeLock().lock()</code></td><td>Cannot upgrade a read lock</td><td class="no">Waits forever</td></tr>
+      <tr><td><code>CyclicBarrier(10)</code> with 9 threads calling <code>await()</code></td><td>Barrier limit never reached</td><td class="no">Waits forever</td></tr>
+      <tr><td>Iterating a <code>HashMap</code> keySet while removing</td><td>Iterator not updated</td><td class="no"><code>ConcurrentModificationException</code></td></tr>
+      <tr><td>Adding inside a <code>CopyOnWriteArrayList</code> loop of 3 elements</td><td>Iterator sees the original copy</td><td class="yes">Loops 3 times, final size 6</td></tr>
+      <tr><td>Two threads locking <code>o1</code>/<code>o2</code> in opposite order</td><td>Deadlock, not livelock</td><td class="no">May hang; no exception</td></tr>
+      <tr><td><code>new ParallelStream(collection)</code></td><td>No such class</td><td class="no">Does not compile</td></tr>
+      <tr><td><code>collection.parallel()</code> / <code>stream.parallelStream()</code></td><td>Method belongs to the other type</td><td class="no">Does not compile</td></tr>
+      <tr><td><code>parallel()</code> on an already-parallel stream</td><td>Idempotent call</td><td class="yes">Allowed</td></tr>
+      <tr><td><code>sorted().findAny()</code> on a parallel stream</td><td>findAny ignores order</td><td class="no">Result not guaranteed</td></tr>
+      <tr><td><code>reduce("X", String::concat)</code> in parallel</td><td>"X" is not a true identity</td><td class="no">Gives <code>XwXoXlXf</code></td></tr>
+      <tr><td><code>reduce(0, (c1,c2) -&gt; c1.length() + c2.length(), ...)</code></td><td>Accumulator types</td><td class="no">Does not compile</td></tr>
+      <tr><td><code>parallelStream.collect(Collectors.toSet())</code></td><td>toSet lacks <code>CONCURRENT</code></td><td class="no">Not a parallel reduction</td></tr>
+      <tr><td><code>groupingByConcurrent()</code> / <code>toConcurrentMap()</code></td><td>UNORDERED + CONCURRENT</td><td class="yes">True parallel reduction</td></tr>
+    </table>
+  </div>
+</section>
+
+<footer>OCP Java SE 21 Developer Study Guide · Boyarsky &amp; Selikoff · Chapter 13 — Concurrency · Detailed Handnote</footer>
+</div>
+</body>
+</html>

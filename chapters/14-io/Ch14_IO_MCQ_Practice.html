@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 — Chapter 14: I/O · MCQ Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6f8;   --card:#ffffff;  --ink:#2f3437;   --muted:#7b8a93;
+  --kw:#7c5cbf;   --str:#3a8a5c;   --num:#b8860b;   --err:#c44d3e;  --cm:#a89a8a;
+  --icode-bg:#f3ece4; --icode-fg:#9a5030;
+  --accent:#c96442; --accent2:#d4845e;
+  --purple:#7a5cb8; --purple-top:#9b7fd4; --purple-pill:#b29ad9;
+  --yes:#3b7d57; --no:#c44d3e;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;padding:28px 16px 70px;background:var(--bg);color:var(--ink);
+  font-family:'Source Sans 3',system-ui,sans-serif;font-size:16.5px;line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:860px;margin:0 auto;}
+h1,h2,h3{font-family:'Merriweather',Georgia,serif;line-height:1.34;}
+p{margin:0 0 13px;}
+code,pre,.mono{font-family:'JetBrains Mono',ui-monospace,monospace;}
+code{background:var(--icode-bg);color:var(--icode-fg);padding:1.5px 6px;border-radius:5px;font-size:.85em;}
+pre{background:#fbf9fe;border-radius:12px;padding:15px 17px;margin:12px 0 14px;overflow-x:auto;
+  box-shadow:inset 0 2px 8px rgba(120,100,150,.10);font-size:13.4px;line-height:1.6;}
+pre code{background:none;color:#3b3f42;padding:0;font-size:inherit;}
+.kw{color:var(--kw);font-weight:600;} .str{color:var(--str);} .num{color:var(--num);}
+.err{color:var(--err);font-weight:700;} .cm{color:var(--cm);font-style:italic;}
+
+.header{
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#ffffff 0%,#fdf8f3 100%);
+  border-radius:18px;padding:34px 32px;margin-bottom:30px;
+  box-shadow:0 6px 26px rgba(120,110,100,.10);
+}
+.header::after{
+  content:'';position:absolute;top:-90px;right:-70px;width:280px;height:280px;
+  background:radial-gradient(circle,rgba(201,100,66,.16) 0%,rgba(201,100,66,0) 68%);
+  pointer-events:none;
+}
+.badge{
+  display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;padding:7px 15px;border-radius:999px;
+  box-shadow:0 3px 10px rgba(201,100,66,.28);
+}
+.header h1{font-size:1.95rem;margin:18px 0 6px;font-weight:900;letter-spacing:-.3px;}
+.header .sub{font-style:italic;color:var(--muted);margin-bottom:18px;}
+.pills{display:flex;flex-wrap:wrap;gap:8px;position:relative;}
+.pill{
+  background:var(--icode-bg);color:var(--icode-fg);font-family:'JetBrains Mono',monospace;
+  font-size:11.5px;padding:5px 11px;border-radius:999px;letter-spacing:.3px;
+}
+
+.q-card{
+  background:linear-gradient(135deg,#f4f0fa,#f9f6fd);
+  border-top:4px solid var(--purple-top);border-radius:14px;
+  padding:20px 24px;margin-bottom:20px;
+  box-shadow:0 3px 14px rgba(120,110,140,.10);
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.q-card:hover{transform:translateY(-2px);box-shadow:0 9px 24px rgba(120,110,140,.16);}
+.q-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+.q-num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:1rem;color:var(--purple);}
+.q-tag{
+  background:var(--purple-pill);color:#fff;font-family:'Source Sans 3',sans-serif;
+  font-size:10.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;
+  padding:3px 10px;border-radius:999px;
+}
+.prompt{font-weight:600;margin:0 0 6px;}
+.multi{font-weight:700;color:#8a5b47;font-size:.9rem;margin:0 0 8px;}
+.opts{list-style:none;padding:0;margin:12px 0 0;}
+.opts li{margin-bottom:7px;padding-left:30px;position:relative;}
+.opts li .lbl{
+  position:absolute;left:0;top:0;font-family:'JetBrains Mono',monospace;
+  font-weight:700;color:var(--purple);
+}
+details{margin-top:16px;border-top:1px dashed #cdbfe6;padding-top:12px;}
+summary{
+  cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12.5px;
+  font-weight:700;letter-spacing:.6px;color:var(--purple);text-transform:uppercase;
+  list-style:none;
+}
+summary::-webkit-details-marker{display:none;}
+summary::before{content:'▸ ';}
+details[open] summary::before{content:'▾ ';}
+summary:hover{color:#5f45a0;}
+.ans-key{
+  display:inline-block;background:#eef8f1;color:#3d8a5e;
+  font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;
+  padding:5px 13px;border-radius:8px;margin:12px 0 8px;
+}
+details p{margin:0 0 8px;font-size:.96rem;}
+details p:last-child{margin-bottom:0;}
+
+.revision{
+  background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:4px solid #d4a24c;
+  border-radius:14px;padding:26px 30px;margin-top:34px;
+  box-shadow:0 4px 18px rgba(120,110,100,.10);
+}
+.revision h2{font-size:1.3rem;margin:0 0 14px;color:#a9772a;}
+.revision ul{margin:0;padding-left:20px;}
+.revision li{margin-bottom:9px;}
+
+footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:30px;}
+@media(max-width:520px){.q-card{padding:18px 16px;} .header{padding:26px 20px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="header">
+  <span class="badge">OCP Java SE 21 · 1Z0-830</span>
+  <h1>Chapter 14 · I/O — MCQ Practice</h1>
+  <p class="sub">31 exam-style questions covering every section of the chapter. Answer first, then reveal.</p>
+  <div class="pills">
+    <span class="pill">File vs Path</span>
+    <span class="pill">absolute / relative</span>
+    <span class="pill">resolve / relativize</span>
+    <span class="pill">normalize</span>
+    <span class="pill">Files methods</span>
+    <span class="pill">copy / move / delete</span>
+    <span class="pill">stream wrapping</span>
+    <span class="pill">read / write</span>
+    <span class="pill">serialization</span>
+    <span class="pill">Console</span>
+    <span class="pill">mark / skip</span>
+    <span class="pill">attributes</span>
+    <span class="pill">walk / find</span>
+  </div>
+</div>
+
+<!-- Q1 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q1</span><span class="q-tag">Stream classes</span></div>
+  <p class="prompt">Which class would be best to use to read a binary file into a Java object?</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>BufferedStream</code></li>
+    <li><span class="lbl">B.</span> <code>FileReader</code></li>
+    <li><span class="lbl">C.</span> <code>ObjectInputStream</code></li>
+    <li><span class="lbl">D.</span> <code>ObjectOutputStream</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C</div>
+    <p>Putting data <em>into</em> a structured object means deserializing, so <code>ObjectInputStream</code> is the right choice. <code>BufferedStream</code> is not a real I/O stream class. <code>ObjectOutputStream</code> exists but serializes rather than deserializes. <code>FileReader</code> could read text and build an object by hand, but the question specifies binary data.</p>
+  </details>
+</div>
+
+<!-- Q2 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q2</span><span class="q-tag">Paths</span></div>
+  <p class="prompt">Assuming that <code>/</code> is the root directory within the file system, which of the following are true statements?</p>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>/home/parrot</code> is an absolute path.</li>
+    <li><span class="lbl">B.</span> <code>new File("/home")</code> will throw an exception if <code>/home</code> does not exist.</li>
+    <li><span class="lbl">C.</span> <code>new File("/home").delete()</code> will throw an exception if <code>/home</code> does not exist.</li>
+    <li><span class="lbl">D.</span> A <code>Reader</code> offers character encoding, making it more useful when working with <code>String</code> data than an <code>InputStream</code>.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · D</div>
+    <p>Paths beginning with the root directory are absolute, so A is correct. B is wrong because you can freely create a <code>File</code> reference to something that doesn't exist. C is wrong too — <code>delete()</code> simply returns <code>false</code> when it can't delete. D is correct: character stream classes include convenience methods for <code>String</code> data.</p>
+  </details>
+</div>
+
+<!-- Q3 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q3</span><span class="q-tag">Console</span></div>
+  <p class="prompt">What are possible results of executing the following code?</p>
+<pre><code><span class="kw">public static void</span> main(String[] args) <span class="kw">throws</span> IOException {
+   String line;
+   <span class="kw">var</span> c = System.console();
+   Writer w = c.writer();
+   <span class="kw">try</span> (w) {
+      <span class="kw">if</span> ((line = c.readLine(<span class="str">"Enter your name: "</span>)) != <span class="kw">null</span>)
+         w.append(line);
+      w.flush();
+   }
+}</code></pre>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> The code runs, but nothing is printed.</li>
+    <li><span class="lbl">B.</span> The code prints what was entered by the user.</li>
+    <li><span class="lbl">C.</span> The code behaves the same if <code>throws IOException</code> is removed.</li>
+    <li><span class="lbl">D.</span> A <code>NullPointerException</code> may be thrown.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · D</div>
+    <p>When it works, the code prompts for input and echoes it, so B is right. But <code>System.console()</code> returns <code>null</code> if a console is unavailable, and there is no null check before <code>c.writer()</code> — so D is right as well. C is wrong because the <code>Writer</code> methods throw a checked <code>IOException</code>, which must be declared.</p>
+  </details>
+</div>
+
+<!-- Q4 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q4</span><span class="q-tag">Files methods</span></div>
+  <p class="prompt">For which value of <code>path</code> sent to this method would it be guaranteed to output <code>Success</code>?</p>
+<pre><code><span class="kw">public void</span> removeBadFile(Path path) {
+   <span class="kw">if</span>(Files.isDirectory(path))
+      System.out.println(Files.deleteIfExists(path)
+            ? <span class="str">"Success"</span> : <span class="str">"Try Again"</span>);
+}</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>path</code> refers to an empty directory in the file system.</li>
+    <li><span class="lbl">B.</span> <code>path</code> refers to a directory with content in the file system.</li>
+    <li><span class="lbl">C.</span> <code>path</code> does not refer to a record that exists within the file system.</li>
+    <li><span class="lbl">D.</span> The code does not compile.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">D</div>
+    <p><code>Files.deleteIfExists()</code> declares the checked <code>IOException</code>, which is neither caught nor declared here, so the method does not compile at all. Remember that most <code>Files</code> methods declare <code>IOException</code> — especially the ones that modify a file or directory.</p>
+  </details>
+</div>
+
+<!-- Q5 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q5</span><span class="q-tag">walk / find</span></div>
+  <p class="prompt">Assume that the directory <code>/animals</code> exists and is empty. What is the result of executing the following code?</p>
+<pre><code>Path path = Path.of(<span class="str">"/animals"</span>);
+<span class="kw">try</span> (<span class="kw">var</span> z = Files.walk(path)) {
+   <span class="kw">boolean</span> b = z
+      .filter((p,a) -&gt; a.isDirectory() &amp;&amp; !path.equals(p))   <span class="cm">// x</span>
+      .findFirst().isPresent();                              <span class="cm">// y</span>
+   System.out.print(b ? <span class="str">"No Sub"</span> : <span class="str">"Has Sub"</span>);
+}</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> It prints <code>No Sub</code>.</li>
+    <li><span class="lbl">B.</span> It prints <code>Has Sub</code>.</li>
+    <li><span class="lbl">C.</span> The code will not compile because of line x.</li>
+    <li><span class="lbl">D.</span> The code will not compile because of line y.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C</div>
+    <p><code>Files.walk()</code> returns a <code>Stream&lt;Path&gt;</code>, and <code>filter()</code> on a <code>Stream</code> takes a one-parameter <code>Predicate</code>, not the two-parameter form. The <code>BiPredicate</code> shape belongs to <code>Files.find()</code>. Rewritten with <code>find()</code> (and a <code>maxDepth</code>) the output would be <code>Has Sub</code>, since the directory is empty and the ternary is deliberately reversed.</p>
+  </details>
+</div>
+
+<!-- Q6 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q6</span><span class="q-tag">Serialization</span></div>
+  <p class="prompt">What would be the value of <code>name</code> if the instance of <code>Eagle</code> created in <code>main()</code> were serialized and then deserialized?</p>
+<pre><code><span class="kw">class</span> Bird {
+   <span class="kw">protected transient</span> String name;
+   <span class="kw">public</span> Bird() { <span class="kw">this</span>.name = <span class="str">"Matt"</span>; }
+}
+<span class="kw">public class</span> Eagle <span class="kw">extends</span> Bird <span class="kw">implements</span> Serializable {
+   { <span class="kw">this</span>.name = <span class="str">"Olivia"</span>; }
+   <span class="kw">public</span> Eagle() { <span class="kw">this</span>.name = <span class="str">"Bridget"</span>; }
+   <span class="kw">public static void</span> main(String[] args) {
+      <span class="kw">var</span> e = <span class="kw">new</span> Eagle();
+      e.name = <span class="str">"Adeline"</span>;
+   }
+}</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>Adeline</code></li>
+    <li><span class="lbl">B.</span> <code>Bridget</code></li>
+    <li><span class="lbl">C.</span> <code>Matt</code></li>
+    <li><span class="lbl">D.</span> <code>null</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C</div>
+    <p>The key is that while <code>Eagle</code> is serializable, its parent <code>Bird</code> is not — so none of <code>Bird</code>'s members are serialized. During deserialization Java calls the constructor of the first non-serializable parent, which is <code>Bird</code>, setting <code>name</code> to <code>Matt</code>. None of <code>Eagle</code>'s constructors or instance initializers run.</p>
+  </details>
+</div>
+
+<!-- Q7 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q7</span><span class="q-tag">Symbolic links</span></div>
+  <p class="prompt">Assume <code>/kang</code> exists as a symbolic link to the directory <code>/mammal/kangaroo</code>. Which statements are correct about this snippet?</p>
+<pre><code><span class="kw">var</span> path = Path.of(<span class="str">"/kang"</span>);
+<span class="kw">if</span>(Files.isDirectory(path) &amp;&amp; Files.isSymbolicLink(path))
+   Files.createDirectory(path.resolve(<span class="str">"joey"</span>));</code></pre>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> A new directory will always be created.</li>
+    <li><span class="lbl">B.</span> A new directory may be created.</li>
+    <li><span class="lbl">C.</span> If the code creates a directory, it will be reachable at <code>/kang/joey</code>.</li>
+    <li><span class="lbl">D.</span> If the code creates a directory, it will be reachable at <code>/mammal/joey</code>.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · C</div>
+    <p>The snippet attempts to create the directory only if the link's target exists and is a directory — and <code>createDirectory()</code> throws if the target already exists, so "always" is wrong and B is right. The new directory lands in <code>/mammal/kangaroo/joey</code>, which is also reachable through the symbolic link at <code>/kang/joey</code> — hence C, not D.</p>
+  </details>
+</div>
+
+<!-- Q8 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q8</span><span class="q-tag">Files read</span></div>
+  <p class="prompt">Assuming <code>/fox/food-schedule.csv</code> exists with the contents shown, what is the expected output of calling <code>printData()</code> on it?</p>
+<pre><code><span class="cm">// 6am,Breakfast / 9am,SecondBreakfast / 12pm,Lunch / 6pm,Dinner</span>
+
+<span class="kw">void</span> printData(Path path) <span class="kw">throws</span> IOException {
+   Files.readAllLines(path)                      <span class="cm">// r1</span>
+      .flatMap(p -&gt; Stream.of(p.split(<span class="str">","</span>)))     <span class="cm">// r2</span>
+      .map(q -&gt; q.toUpperCase())                 <span class="cm">// r3</span>
+      .forEach(System.out::println);
+}</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> The code will not compile because of line r1.</li>
+    <li><span class="lbl">B.</span> The code will not compile because of line r2.</li>
+    <li><span class="lbl">C.</span> The code will not compile because of line r3.</li>
+    <li><span class="lbl">D.</span> It throws an exception at runtime.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B</div>
+    <p><code>readAllLines()</code> returns a <code>List</code>, not a <code>Stream</code>, so the call to <code>flatMap()</code> on line r2 is invalid. Had <code>Files.lines()</code> been used instead, the code would print the file's contents one capitalized word per line with the commas removed.</p>
+  </details>
+</div>
+
+<!-- Q9 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q9</span><span class="q-tag">read / write</span></div>
+  <p class="prompt">Given the following method and <code>file1</code> containing <code>ABCDEF</code>, which statements are correct?</p>
+<pre><code><span class="kw">public void</span> copyFile(File file1, File file2) <span class="kw">throws</span> Exception {
+   <span class="kw">var</span> reader = <span class="kw">new</span> InputStreamReader(<span class="kw">new</span> FileInputStream(file1));
+   <span class="kw">try</span> (<span class="kw">var</span> writer = <span class="kw">new</span> FileWriter(file2)) {
+      <span class="kw">char</span>[] buffer = <span class="kw">new char</span>[<span class="num">5</span>];
+      <span class="kw">while</span>(reader.read(buffer) != -<span class="num">1</span>) {
+          writer.write(buffer);
+          <span class="cm">// n1</span>
+      }
+   }
+}</code></pre>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> The contents of the copied file are: <code>ABCDEF</code></li>
+    <li><span class="lbl">B.</span> The contents of the copied file are: <code>ABCDEFBCDE</code></li>
+    <li><span class="lbl">C.</span> If we check <code>file2</code> on line n1 after five iterations, it may be empty.</li>
+    <li><span class="lbl">D.</span> This method contains a resource leak.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · C · D</div>
+    <p>The method compiles, but the return value of <code>read(buffer)</code> is never used, so the final partial read leaves stale characters in the buffer — producing <code>ABCDEFBCDE</code>, and it would only copy correctly for files whose length is a multiple of 5. Without a <code>flush()</code>, data may not have reached disk yet, making C correct. And <code>reader</code> is never closed, which is the resource leak in D.</p>
+  </details>
+</div>
+
+<!-- Q10 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q10</span><span class="q-tag">Creating Path</span></div>
+  <p class="prompt">Which of the following correctly create <code>Path</code> instances?</p>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>new Path("jaguar.txt")</code></li>
+    <li><span class="lbl">B.</span> <code>Path.get("cats","lynx.txt")</code></li>
+    <li><span class="lbl">C.</span> <code>new java.io.File("tiger.txt").toPath()</code></li>
+    <li><span class="lbl">D.</span> <code>Path.of(".")</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C · D</div>
+    <p>A fails because <code>Path</code> is an interface with no constructor. B fails because the static method on the <code>Path</code> interface is <code>of()</code>, not <code>get()</code> — <code>get()</code> lives on the <code>Paths</code> helper class. C and D are both valid ways to obtain a <code>Path</code>.</p>
+  </details>
+</div>
+
+<!-- Q11 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q11</span><span class="q-tag">Wrapping</span></div>
+  <p class="prompt">Which classes will allow the following to compile?</p>
+<pre><code><span class="kw">var</span> is = <span class="kw">new</span> BufferedInputStream(<span class="kw">new</span> FileInputStream(<span class="str">"z.txt"</span>));
+InputStream wrapper = <span class="kw">new</span> ____________________ (is);
+<span class="kw">try</span> (wrapper) {}</code></pre>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>BufferedInputStream</code></li>
+    <li><span class="lbl">B.</span> <code>BufferedReader</code></li>
+    <li><span class="lbl">C.</span> <code>FileInputStream</code></li>
+    <li><span class="lbl">D.</span> <code>ObjectInputStream</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · D</div>
+    <p>The reference type is <code>InputStream</code>, so the class must inherit <code>InputStream</code> — that eliminates <code>BufferedReader</code>. It must also accept another stream as input, which rules out <code>FileInputStream</code> (it operates on a file). Both <code>BufferedInputStream</code> and <code>ObjectInputStream</code> are high-level input streams; there is no rule against wrapping a <code>BufferedInputStream</code> in another one. Note that try-with-resources can use a resource declared beforehand.</p>
+  </details>
+</div>
+
+<!-- Q12 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q12</span><span class="q-tag">Attributes</span></div>
+  <p class="prompt">What is the result of executing the following code?</p>
+<pre><code><span class="num">4:</span> <span class="kw">var</span> p = Path.of(<span class="str">"sloth.schedule"</span>);
+<span class="num">5:</span> <span class="kw">var</span> a = Files.readAttributes(p, BasicFileAttributes.class);
+<span class="num">6:</span> Files.mkdir(p.resolve(<span class="str">".backup"</span>));
+<span class="num">7:</span> <span class="kw">if</span>(a.size() &gt; <span class="num">0</span> &amp;&amp; a.isDirectory()) {
+<span class="num">8:</span>    a.setTimes(<span class="kw">null</span>,<span class="kw">null</span>,<span class="kw">null</span>);
+<span class="num">9:</span> }</code></pre>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> The code will not compile because of line 5.</li>
+    <li><span class="lbl">B.</span> The code will not compile because of line 6.</li>
+    <li><span class="lbl">C.</span> The code will not compile because of line 7.</li>
+    <li><span class="lbl">D.</span> The code will not compile because of line 8.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · D</div>
+    <p>The method to create a directory in the <code>Files</code> class is <code>createDirectory()</code>, not <code>mkdir()</code> — that name belongs to <code>java.io.File</code>, so line 6 fails. And <code>setTimes()</code> is available only on <code>BasicFileAttributeView</code>, never on the read-only <code>BasicFileAttributes</code>, so line 8 fails too.</p>
+  </details>
+</div>
+
+<!-- Q13 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q13</span><span class="q-tag">Serialization</span></div>
+  <p class="prompt">Which of the following are true statements about serialization in Java?</p>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> All non-null instance members of the class must be serializable or marked <code>transient</code>.</li>
+    <li><span class="lbl">B.</span> Records are automatically serializable.</li>
+    <li><span class="lbl">C.</span> The class must declare a static <code>serialVersionUID</code> variable.</li>
+    <li><span class="lbl">D.</span> The class must implement the <code>Serializable</code> interface.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · D</div>
+    <p>A serializable class must implement <code>Serializable</code> and contain instance members that are serializable or <code>transient</code>. B is wrong — even records must implement <code>Serializable</code> explicitly. C is wrong: declaring a <code>serialVersionUID</code> is a good practice but not a requirement.</p>
+  </details>
+</div>
+
+<!-- Q14 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q14</span><span class="q-tag">Path API</span></div>
+  <p class="prompt">What is the output of the following code?</p>
+<pre><code><span class="num">22:</span> <span class="kw">var</span> p1 = Path.of(<span class="str">"/zoo/./bear"</span>,<span class="str">"../food.txt"</span>);
+<span class="num">23:</span> p1.normalize().relativize(Path.of(<span class="str">"/lion"</span>));
+<span class="num">24:</span> System.out.println(p1);
+<span class="num">25:</span>
+<span class="num">26:</span> <span class="kw">var</span> p2 = Path.of(<span class="str">"/zoo/animals/bear/koala/food.txt"</span>);
+<span class="num">27:</span> System.out.println(p2.subpath(<span class="num">1</span>,<span class="num">3</span>).getName(<span class="num">1</span>));
+<span class="num">28:</span>
+<span class="num">29:</span> <span class="kw">var</span> p3 = Path.of(<span class="str">"/pets/../cat.txt"</span>);
+<span class="num">30:</span> <span class="kw">var</span> p4 = Path.of(<span class="str">"./dog.txt"</span>);
+<span class="num">31:</span> System.out.println(p4.resolve(p3));</code></pre>
+  <p class="multi">Choose three.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>/zoo/./bear/../food.txt</code></li>
+    <li><span class="lbl">B.</span> <code>animals</code></li>
+    <li><span class="lbl">C.</span> <code>bear</code></li>
+    <li><span class="lbl">D.</span> <code>/pets/../cat.txt</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · C · D</div>
+    <p><code>Path</code> is immutable, so line 23's result is discarded and line 24 prints the original value (A). On line 27, <code>subpath(1,3)</code> on the absolute path gives the relative path <code>animals/bear</code>, and <code>getName(1)</code> on that — zero-indexed — returns <code>bear</code> (C). On line 31, <code>resolve()</code> with an absolute argument simply returns that argument (D).</p>
+  </details>
+</div>
+
+<!-- Q15 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q15</span><span class="q-tag">File constructors</span></div>
+  <p class="prompt">The working directory is <code>/weather</code> and <code>/weather/winter/snow.dat</code> exists. Which lines create an object that represents the file?</p>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>new File("/weather", "winter", "snow.dat")</code></li>
+    <li><span class="lbl">B.</span> <code>new File("/weather/winter/snow.dat")</code></li>
+    <li><span class="lbl">C.</span> <code>new File(new File("/weather/winter"), "snow.dat")</code></li>
+    <li><span class="lbl">D.</span> <code>Path.of("/weather/winter/snow.dat").toFile()</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · C · D</div>
+    <p>A does not compile — there is no three-parameter <code>File</code> constructor. B is the standard single-<code>String</code> form. C uses the <code>(File, String)</code> constructor, which does exist (note there is no <code>(String, File)</code> version). D creates a <code>File</code> from a <code>Path</code>.</p>
+  </details>
+</div>
+
+<!-- Q16 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q16</span><span class="q-tag">try-with-resources</span></div>
+  <p class="prompt">Assuming <code>zoo-data.txt</code> exists and is not empty, what statements about this method are correct?</p>
+<pre><code><span class="kw">private void</span> echo() <span class="kw">throws</span> IOException {
+   <span class="kw">var</span> o = <span class="kw">new</span> FileWriter(<span class="str">"new-zoo.txt"</span>);
+   <span class="kw">try</span> (<span class="kw">var</span> f = <span class="kw">new</span> FileReader(<span class="str">"zoo-data.txt"</span>);
+      <span class="kw">var</span> b = <span class="kw">new</span> BufferedReader(f); o) {
+
+      o.write(b.readLine());
+   }
+   o.write(<span class="str">""</span>);
+}</code></pre>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> When run, the method creates a new file with one line of text in it.</li>
+    <li><span class="lbl">B.</span> When run, the method creates a new file with the same number of lines as the original.</li>
+    <li><span class="lbl">C.</span> The method compiles but will produce an exception at runtime.</li>
+    <li><span class="lbl">D.</span> The method uses byte stream classes.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · C</div>
+    <p>The method compiles and copies the first line of <code>zoo-data.txt</code> into <code>new-zoo.txt</code>, so A is right. But the try-with-resources closes every declared resource including <code>o</code>, so the <code>o.write("")</code> after the block throws an <code>IOException</code> at runtime — C. D is wrong: <code>FileReader</code>, <code>BufferedReader</code>, and <code>FileWriter</code> are all character stream classes.</p>
+  </details>
+</div>
+
+<!-- Q17 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q17</span><span class="q-tag">NIO.2</span></div>
+  <p class="prompt">Which are true statements?</p>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> NIO.2 includes a method to delete an entire directory tree.</li>
+    <li><span class="lbl">B.</span> NIO.2 includes a method to traverse a directory tree.</li>
+    <li><span class="lbl">C.</span> NIO.2 includes methods that are aware of symbolic links.</li>
+    <li><span class="lbl">D.</span> <code>Files.readAttributes()</code> is often more performant since it reads multiple attributes rather than accessing individual ones.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · C · D</div>
+    <p>B and C are exactly why you'd prefer NIO.2 over <code>java.io.File</code> — <code>walk()</code> traverses trees, and methods like <code>isSymbolicLink()</code> and the <code>LinkOption</code> varargs understand links. D is correct because reading all attributes at once means fewer round-trips to the file system. A is wrong: both APIs can delete only empty directories, never a whole tree.</p>
+  </details>
+</div>
+
+<!-- Q18 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q18</span><span class="q-tag">mark / skip</span></div>
+  <p class="prompt">Assume <code>reader</code> is a valid stream whose next characters are <code>PEACOCKS</code>. Which is true about the output?</p>
+<pre><code><span class="kw">var</span> sb = <span class="kw">new</span> StringBuilder();
+sb.append((<span class="kw">char</span>)reader.read());
+reader.mark(<span class="num">10</span>);
+<span class="kw">for</span>(<span class="kw">int</span> i=<span class="num">0</span>; i&lt;<span class="num">2</span>; i++) {
+   sb.append((<span class="kw">char</span>)reader.read());
+   reader.skip(<span class="num">2</span>);
+}
+reader.reset();
+reader.skip(<span class="num">0</span>);
+sb.append((<span class="kw">char</span>)reader.read());
+System.out.println(sb.toString());</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> The code may print <code>PEAE</code>.</li>
+    <li><span class="lbl">B.</span> The code may print <code>PEOE</code>.</li>
+    <li><span class="lbl">C.</span> The code will always print <code>PEOE</code>.</li>
+    <li><span class="lbl">D.</span> The code will always print <code>PEOA</code>.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B</div>
+    <p><code>P</code> is appended first, then the position is marked before <code>E</code>. <code>E</code> is appended and <code>AC</code> skipped; then <code>O</code> is appended and <code>CK</code> skipped. <code>reset()</code> returns to just before the <code>E</code>, <code>skip(0)</code> does nothing, and the final <code>read()</code> appends <code>E</code> — giving <code>PEOE</code>. C is wrong because <code>mark()</code> may not be supported, so only "may print" is safe.</p>
+  </details>
+</div>
+
+<!-- Q19 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q19</span><span class="q-tag">Path comparison</span></div>
+  <p class="prompt">Assuming the directories and files exist and are not symbolic links, what is the result?</p>
+<pre><code><span class="kw">var</span> p1 = Path.of(<span class="str">"/lizard"</span>,<span class="str">"."</span>).resolve(Path.of(<span class="str">"walking.txt"</span>));
+<span class="kw">var</span> p2 = <span class="kw">new</span> File(<span class="str">"/lizard/././actions/../walking.txt"</span>).toPath();
+System.out.print(Files.isSameFile(p1,p2));
+System.out.print(<span class="str">" "</span>);
+System.out.print(p1.equals(p2));
+System.out.print(<span class="str">" "</span>);
+System.out.print(Files.mismatch(p1,p2));</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>true true -1</code></li>
+    <li><span class="lbl">B.</span> <code>true false -1</code></li>
+    <li><span class="lbl">C.</span> <code>true false 0</code></li>
+    <li><span class="lbl">D.</span> <code>false true -1</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B</div>
+    <p>Simplifying the redundant path symbols, both <code>p1</code> and <code>p2</code> represent <code>/lizard/walking.txt</code>, so <code>isSameFile()</code> returns <code>true</code>. But <code>equals()</code> compares path values literally without reducing symbols, so it returns <code>false</code>. Finally <code>mismatch()</code> sees identical contents and returns <code>-1</code>.</p>
+  </details>
+</div>
+
+<!-- Q20 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q20</span><span class="q-tag">move()</span></div>
+  <p class="prompt">Assume <code>monkey.txt</code> exists in the current working directory. Which statement about this snippet is correct?</p>
+<pre><code>Files.move(Path.of(<span class="str">"monkey.txt"</span>), Path.of(<span class="str">"/animals"</span>),
+   StandardCopyOption.ATOMIC_MOVE);</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> If <code>/animals/monkey.txt</code> exists, it will be overwritten at runtime.</li>
+    <li><span class="lbl">B.</span> If <code>/animals</code> exists as an empty directory, <code>/animals/monkey.txt</code> will be the new location of the file.</li>
+    <li><span class="lbl">C.</span> If the move is successful and another process is monitoring the file system, it will not see an incomplete file at runtime.</li>
+    <li><span class="lbl">D.</span> None of the above.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C</div>
+    <p>The target of the move is <code>/animals</code> itself, not <code>/animals/monkey.txt</code> — so A and B are both wrong, and either scenario would throw at runtime because <code>/animals</code> already exists as a directory. <code>ATOMIC_MOVE</code> means the move is indivisible, so a monitoring process never observes a partially written file.</p>
+  </details>
+</div>
+
+<!-- Q21 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q21</span><span class="q-tag">find()</span></div>
+  <p class="prompt">Assume <code>/monkeys</code> is a directory containing multiple files, symbolic links, and subdirectories. Which statement about this code is correct?</p>
+<pre><code><span class="kw">var</span> f = Path.of(<span class="str">"/monkeys"</span>);
+<span class="kw">try</span> (<span class="kw">var</span> m = Files.find(f, <span class="num">0</span>, (p,a) -&gt; a.isSymbolicLink())) {   <span class="cm">// y1</span>
+      m.map(s -&gt; s.toString())
+         .collect(Collectors.toList())
+         .stream()
+         .filter(s -&gt; s.toString().endsWith(<span class="str">".txt"</span>))            <span class="cm">// y2</span>
+         .forEach(System.out::println);
+}</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> It will print all symbolic links in the directory tree ending in <code>.txt</code>.</li>
+    <li><span class="lbl">B.</span> It will print nothing.</li>
+    <li><span class="lbl">C.</span> It does not compile because of line y1.</li>
+    <li><span class="lbl">D.</span> It compiles but throws an exception at runtime.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B</div>
+    <p>The code compiles and runs fine. The critical detail is the depth of <code>0</code> passed to <code>find()</code>, which means the only record searched is the top-level directory itself. Since we know <code>/monkeys</code> is a directory and not a symbolic link, no paths match and nothing is printed.</p>
+  </details>
+</div>
+
+<!-- Q22 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q22</span><span class="q-tag">Serialization</span></div>
+  <p class="prompt">What is the result of serializing and deserializing the instance created on line 17?</p>
+<pre><code><span class="num">3:</span> <span class="kw">public class</span> Zebra <span class="kw">implements</span> Serializable {
+<span class="num">4:</span>    <span class="kw">private transient</span> String name = <span class="str">"George"</span>;
+<span class="num">5:</span>    <span class="kw">private static</span> String birthPlace = <span class="str">"Africa"</span>;
+<span class="num">6:</span>    <span class="kw">private transient</span> Integer age;
+<span class="num">7:</span>    List&lt;Zebra&gt; friends = <span class="kw">new</span> java.util.ArrayList&lt;&gt;();
+<span class="num">8:</span>    <span class="kw">private</span> Object stripes = <span class="kw">new</span> Object();
+<span class="num">9:</span>    { age = <span class="num">10</span>; }
+<span class="num">10:</span>   <span class="kw">public</span> Zebra() { <span class="kw">this</span>.name = <span class="str">"Sophia"</span>; }
+<span class="num">16:</span>   <span class="kw">public static void</span> main(String[] args) {
+<span class="num">17:</span>       <span class="kw">var</span> zebra = <span class="kw">new</span> Zebra();
+<span class="num">18:</span>       zebra = writeAndRead(zebra);
+<span class="num">19:</span>   } }</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> Only <code>age</code> will be <code>null</code>.</li>
+    <li><span class="lbl">B.</span> Both <code>age</code> and <code>name</code> will be <code>null</code>.</li>
+    <li><span class="lbl">C.</span> The code does not compile.</li>
+    <li><span class="lbl">D.</span> The code compiles but throws an exception at runtime.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">D</div>
+    <p>The code compiles, and <code>Zebra</code> does implement <code>Serializable</code> — but every instance member must be serializable or <code>transient</code>. The field <code>stripes</code> is of type <code>Object</code>, which is <em>not</em> serializable (if it were, every object would be serializable by default). So the class isn't serializable and an exception is thrown at runtime. Remove <code>stripes</code> and B would be the answer, since <code>name</code> and <code>age</code> are both <code>transient</code>.</p>
+  </details>
+</div>
+
+<!-- Q23 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q23</span><span class="q-tag">walk()</span></div>
+  <p class="prompt">What are some possible results of executing the following code?</p>
+<pre><code><span class="kw">var</span> x = Path.of(<span class="str">"/animals/fluffy/.."</span>);
+Files.walk(x.toRealPath().getParent())        <span class="cm">// u1</span>
+   .map(p -&gt; p.toAbsolutePath().toString())   <span class="cm">// u2</span>
+   .filter(s -&gt; s.endsWith(<span class="str">".java"</span>))
+   .forEach(System.out::println);</code></pre>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> It prints some files in the root directory.</li>
+    <li><span class="lbl">B.</span> It prints all files in the root directory.</li>
+    <li><span class="lbl">C.</span> <code>FileSystemLoopException</code> is thrown at runtime.</li>
+    <li><span class="lbl">D.</span> Another exception is thrown at runtime.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · D</div>
+    <p><code>toRealPath()</code> simplifies the path to <code>/animals</code> but throws if it doesn't exist — hence D. If it does exist, <code>getParent()</code> gives the root directory, and walking it with the filter prints only the <code>.java</code> files, which is "some" not "all" — so A, not B. C is wrong because <code>Files.walk()</code> does not follow symbolic links by default; a loop exception requires the <code>FOLLOW_LINKS</code> option.</p>
+  </details>
+</div>
+
+<!-- Q24 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q24</span><span class="q-tag">copy()</span></div>
+  <p class="prompt">Assume <code>source</code> refers to an existing file and <code>/flip/sounds.txt</code> already exists. Which fills the blank to correctly copy the file to <code>/flip/sounds.txt</code>?</p>
+<pre><code><span class="kw">void</span> copyIntoFlipDirectory(Path source) <span class="kw">throws</span> IOException {
+   <span class="kw">var</span> dolphinDir = Path.of(<span class="str">"/flip"</span>);
+   dolphinDir = Files.createDirectories(dolphinDir);
+   <span class="kw">var</span> n = Path.of(<span class="str">"sounds.txt"</span>);
+   Files.copy(source, ______________________________);
+}</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>dolphinDir</code></li>
+    <li><span class="lbl">B.</span> <code>dolphinDir.resolve(n), StandardCopyOption.REPLACE_EXISTING</code></li>
+    <li><span class="lbl">C.</span> <code>dolphinDir, StandardCopyOption.REPLACE_EXISTING</code></li>
+    <li><span class="lbl">D.</span> <code>dolphinDir.resolve(n)</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B</div>
+    <p>The <code>copy()</code> target must be the path of the new <em>file</em>, not the directory to copy into — that eliminates A and C. Since the question states the file already exists, <code>REPLACE_EXISTING</code> is required or an exception is thrown, which eliminates D. Note that <code>createDirectories()</code> does <em>not</em> throw when <code>/flip</code> already exists; <code>createDirectory()</code> would have.</p>
+  </details>
+</div>
+
+<!-- Q25 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q25</span><span class="q-tag">Stream classes</span></div>
+  <p class="prompt">You need to read text data from a file and want good performance on large files. Which two <code>java.io</code> stream classes can be chained together to best achieve this?</p>
+  <p class="multi">Choose two.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>BufferedInputStream</code></li>
+    <li><span class="lbl">B.</span> <code>BufferedReader</code></li>
+    <li><span class="lbl">C.</span> <code>FileInputStream</code></li>
+    <li><span class="lbl">D.</span> <code>FileReader</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B · D</div>
+    <p>Text data means characters, so the <code>Reader</code> classes are appropriate and the <code>InputStream</code> options are out. <code>FileReader</code> is the low-level class that reads from the file, and wrapping it in a <code>BufferedReader</code> buffers for performance and adds <code>readLine()</code>.</p>
+  </details>
+</div>
+
+<!-- Q26 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q26</span><span class="q-tag">Wrapping</span></div>
+  <p class="prompt">Which of the following do <strong>not</strong> compile?</p>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>new BufferedInputStream(new FileReader("z.txt"))</code></li>
+    <li><span class="lbl">B.</span> <code>new BufferedWriter(new FileOutputStream("z.txt"))</code></li>
+    <li><span class="lbl">C.</span> <code>new BufferedInputStream(new InputStream())</code></li>
+    <li><span class="lbl">D.</span> <code>new BufferedReader(new FileReader("z.txt"))</code></li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · B · C</div>
+    <p>A and B mix the character family (<code>Reader</code>/<code>Writer</code>) with the byte family (<code>InputStream</code>/<code>OutputStream</code>). C fails for a different reason: <code>InputStream</code> is abstract, so it cannot be instantiated. D is the correct pairing — a character high-level stream wrapping a character low-level stream.</p>
+  </details>
+</div>
+
+<!-- Q27 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q27</span><span class="q-tag">resolve()</span></div>
+  <p class="prompt">What is printed by the following code?</p>
+<pre><code>Path path3 = Path.of(<span class="str">"/turkey/food"</span>);
+System.out.println(path3.resolve(<span class="str">"/tiger/cage"</span>));</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>/turkey/food/tiger/cage</code></li>
+    <li><span class="lbl">B.</span> <code>/tiger/cage</code></li>
+    <li><span class="lbl">C.</span> <code>/turkey/food</code></li>
+    <li><span class="lbl">D.</span> It throws an <code>IllegalArgumentException</code>.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B</div>
+    <p>When the argument to <code>resolve()</code> is an absolute path, that argument is simply the value returned — you cannot combine two absolute paths. Had the argument been relative, the two would have been concatenated without cleaning up any path symbols.</p>
+  </details>
+</div>
+
+<!-- Q28 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q28</span><span class="q-tag">relativize()</span></div>
+  <p class="prompt">What is the result of the following code?</p>
+<pre><code><span class="kw">var</span> path1 = Path.of(<span class="str">"/primate/chimpanzee"</span>);
+<span class="kw">var</span> path2 = Path.of(<span class="str">"bananas.txt"</span>);
+path1.relativize(path2);</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> It returns <code>../bananas.txt</code>.</li>
+    <li><span class="lbl">B.</span> It returns <code>bananas.txt</code>.</li>
+    <li><span class="lbl">C.</span> It throws an <code>IllegalArgumentException</code>.</li>
+    <li><span class="lbl">D.</span> The code does not compile.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C</div>
+    <p><code>relativize()</code> requires both paths to be absolute or both to be relative; mixing the two types throws <code>IllegalArgumentException</code> at runtime. On Windows there's an extra requirement — two absolute paths must also share the same root or drive letter.</p>
+  </details>
+</div>
+
+<!-- Q29 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q29</span><span class="q-tag">Path API</span></div>
+  <p class="prompt">What is the result of the following code?</p>
+<pre><code><span class="kw">var</span> p = Path.of(<span class="str">"/"</span>);
+System.out.print(p.getNameCount());
+System.out.print(p.getName(<span class="num">0</span>));</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> It prints <code>1</code> then <code>/</code>.</li>
+    <li><span class="lbl">B.</span> It prints <code>0</code> then throws an <code>IllegalArgumentException</code>.</li>
+    <li><span class="lbl">C.</span> It prints <code>0</code> then <code>null</code>.</li>
+    <li><span class="lbl">D.</span> The code does not compile.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">B</div>
+    <p><code>getNameCount()</code> and <code>getName()</code> do not consider the root part of the path, so a path of just <code>/</code> has a name count of <code>0</code>. Calling <code>getName()</code> with an invalid index then throws an <code>IllegalArgumentException</code> at runtime.</p>
+  </details>
+</div>
+
+<!-- Q30 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q30</span><span class="q-tag">copy()</span></div>
+  <p class="prompt">Both <code>food.txt</code> and the directory <code>/enclosure</code> exist. What is the result of the following code?</p>
+<pre><code><span class="kw">var</span> file = Path.of(<span class="str">"food.txt"</span>);
+<span class="kw">var</span> directory = Path.of(<span class="str">"/enclosure"</span>);
+Files.copy(file, directory);</code></pre>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> It creates a new file at <code>/enclosure/food.txt</code>.</li>
+    <li><span class="lbl">B.</span> It creates a new file named <code>/enclosure</code>, replacing the directory.</li>
+    <li><span class="lbl">C.</span> It throws an exception at runtime.</li>
+    <li><span class="lbl">D.</span> It completes without doing anything.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">C</div>
+    <p>The command tries to create a new <em>file</em> named <code>/enclosure</code>, and since that path already exists an exception is thrown. If <code>/enclosure</code> did not exist, it would create a file called <code>/enclosure</code> holding the contents of <code>food.txt</code> — files don't need extensions. The correct target is <code>/enclosure/food.txt</code>, and this behaviour applies to <code>move()</code> as well.</p>
+  </details>
+</div>
+
+<!-- Q31 -->
+<div class="q-card">
+  <div class="q-head"><span class="q-num">Q31</span><span class="q-tag">delete</span></div>
+  <p class="prompt">Which statements about <code>Files.delete()</code> and <code>Files.deleteIfExists()</code> are true?</p>
+  <p class="multi">Choose all that apply.</p>
+  <ul class="opts">
+    <li><span class="lbl">A.</span> <code>delete()</code> throws an exception if the path does not exist.</li>
+    <li><span class="lbl">B.</span> <code>deleteIfExists()</code> returns <code>false</code> if the path does not exist.</li>
+    <li><span class="lbl">C.</span> Both throw an exception when operated on a nonempty directory.</li>
+    <li><span class="lbl">D.</span> If the path is a symbolic link, the target is deleted rather than the link.</li>
+  </ul>
+  <details><summary>Show Answer</summary>
+    <div class="ans-key">A · B · C</div>
+    <p>The two methods differ only in how they handle a missing path: <code>delete()</code> throws (a <code>NoSuchFileException</code>), while <code>deleteIfExists()</code> returns a <code>boolean</code>. Both require a directory to be empty, so C is right. D is reversed — the symbolic link itself is deleted, not the path it points to.</p>
+  </details>
+</div>
+
+<div class="revision">
+  <h2>Quick Revision — the chapter's core traps</h2>
+  <ul>
+    <li><strong>Creation:</strong> <code>Path</code> is an interface (<code>Path.of()</code>, <code>Paths.get()</code>) — never <code>new Path(...)</code> or <code>Path.get(...)</code>. <code>File</code> has no three-arg constructor and no <code>(String, File)</code> form.</li>
+    <li><strong>Checked exceptions:</strong> most <code>Files</code> methods declare <code>IOException</code>, so calling them without <code>throws</code> or a <code>catch</code> is a compile error. <code>Files.exists()</code> is the notable exception.</li>
+    <li><strong>Immutability:</strong> a <code>Path</code> method call whose result isn't assigned changes nothing.</li>
+    <li><strong>Indices:</strong> <code>getNameCount()</code>, <code>getName()</code>, and <code>subpath()</code> exclude the root, are zero-indexed, and throw <code>IllegalArgumentException</code> on bad ranges.</li>
+    <li><strong>resolve / relativize / normalize:</strong> an absolute argument to <code>resolve()</code> wins; <code>relativize()</code> needs matching path types; <code>normalize()</code> is textual while <code>toRealPath()</code> hits the disk and can throw.</li>
+    <li><strong>copy / move:</strong> never place a file "into" a directory — the target is the new file's full path. Without <code>REPLACE_EXISTING</code> an existing target throws. <code>createDirectories()</code> is silent when everything exists; <code>createDirectory()</code> throws.</li>
+    <li><strong>delete:</strong> <code>delete()</code> throws on a missing path, <code>deleteIfExists()</code> returns <code>false</code>; both need directories to be empty; symbolic links delete the link.</li>
+    <li><strong>Wrapping:</strong> never mix <code>Reader</code>/<code>Writer</code> with <code>InputStream</code>/<code>OutputStream</code>, and remember the base classes are abstract. No <code>PrintReader</code> exists.</li>
+    <li><strong>Reading:</strong> honour the return value of <code>read(buffer)</code>; <code>-1</code> ends a stream. <code>readAllLines()</code> gives a <code>List</code> (no <code>filter()</code>/<code>map()</code>), <code>lines()</code> gives a <code>Stream</code> that must be closed.</li>
+    <li><strong>Serialization:</strong> members must be serializable, <code>transient</code>, or <code>null</code> — a bare <code>Object</code> field breaks it. Records need an explicit <code>implements Serializable</code>. On deserialization only the first non-serializable parent's no-arg constructor runs.</li>
+    <li><strong>Console &amp; system streams:</strong> <code>System.console()</code> may be <code>null</code>; <code>new Console()</code> doesn't compile; closing <code>System.out</code>/<code>System.err</code> fails silently while a closed input stream throws.</li>
+    <li><strong>Advanced:</strong> <code>mark()</code> may be unsupported (so "may print"); <code>setTimes()</code> is view-only; <code>walk()</code> takes a <code>Predicate</code> and ignores symbolic links by default; <code>find()</code> takes a <code>BiPredicate</code> and a mandatory depth, where <code>0</code> means the start path alone.</li>
+  </ul>
+</div>
+
+<footer>OCP Java SE 21 Developer Study Guide · Boyarsky &amp; Selikoff · Chapter 14 — I/O · MCQ Practice</footer>
+</div>
+</body>
+</html>

@@ -19,9 +19,8 @@
    and three fragment paths. Any file may be null -> that tab is
    disabled with a "(soon)" state and routing falls back to the
    first available view.
-   PHASE 2: only Chapter 4 has real fragments; the rest are null
-   so you can see both the working tabs and the disabled state.
-   PHASE 3 will fill in the remaining file paths.
+   All 14 chapters currently have real fragments, so nothing is
+   null right now; the "(soon)" path stays for future chapters.
 --------------------------------------------------------------- */
 const chapters = [
   {
@@ -123,10 +122,33 @@ const chapters = [
     banglaFile: "chapters/11-exceptions/Ch11_ExceptionsLocalization_HandNote_Bangla.html",
     questionsFile: "chapters/11-exceptions/Ch11_ExceptionsLocalization_MCQ_Practice.html",
   },
-  { id: "modules", number: 12, title: "Modules", titleBn: "", handnoteFile: null, banglaFile: null, questionsFile: null },
-  { id: "concurrency", number: 13, title: "Concurrency", titleBn: "", handnoteFile: null, banglaFile: null, questionsFile: null },
-  { id: "io", number: 14, title: "I/O", titleBn: "", handnoteFile: null, banglaFile: null, questionsFile: null },
-  { id: "jdbc", number: 15, title: "JDBC", titleBn: "", handnoteFile: null, banglaFile: null, questionsFile: null },
+  {
+    id: "modules",
+    number: 12,
+    title: "Modules",
+    titleBn: "",
+    handnoteFile: "chapters/12-modules/Ch12_Modules_Handnote_EN.html",
+    banglaFile: "chapters/12-modules/Ch12_Modules_HandNote_Bangla.html",
+    questionsFile: "chapters/12-modules/Ch12_Modules_MCQ_Practice.html",
+  },
+  {
+    id: "concurrency",
+    number: 13,
+    title: "Concurrency",
+    titleBn: "",
+    handnoteFile: "chapters/13-concurrency/Ch13_Concurrency_Handnote_EN.html",
+    banglaFile: "chapters/13-concurrency/Ch13_Concurrency_HandNote_Bangla.html",
+    questionsFile: "chapters/13-concurrency/Ch13_Concurrency_MCQ_Practice.html",
+  },
+  {
+    id: "io",
+    number: 14,
+    title: "I/O",
+    titleBn: "",
+    handnoteFile: "chapters/14-io/Ch14_IO_Handnote_EN.html",
+    banglaFile: "chapters/14-io/Ch14_IO_HandNote_Bangla.html",
+    questionsFile: "chapters/14-io/Ch14_IO_MCQ_Practice.html",
+  },
 ];
 
 /* ---- View definitions ----------------------------------------

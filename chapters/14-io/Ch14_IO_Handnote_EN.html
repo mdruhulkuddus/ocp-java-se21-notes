@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCP Java SE 21 — Chapter 14: I/O (Detailed Handnote)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6f8;   --card:#ffffff;  --ink:#2f3437;   --muted:#7b8a93;
+  --kw:#7c5cbf;   --str:#3a8a5c;   --num:#b8860b;   --err:#c44d3e;  --cm:#a89a8a;
+  --icode-bg:#f3ece4; --icode-fg:#9a5030;
+  --accent:#c96442; --accent2:#d4845e;
+  --line:#ece3da;
+  --yes:#3b7d57;  --no:#c44d3e;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; padding:28px 16px 70px;
+  background:var(--bg); color:var(--ink);
+  font-family:'Source Sans 3',system-ui,sans-serif;
+  font-size:16.5px; line-height:1.72;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:980px;margin:0 auto;}
+h1,h2,h3,h4{font-family:'Merriweather',Georgia,serif;line-height:1.34;}
+p{margin:0 0 14px;}
+ul,ol{margin:0 0 15px;padding-left:22px;}
+li{margin-bottom:7px;}
+code,pre,.mono{font-family:'JetBrains Mono',ui-monospace,monospace;}
+code{background:var(--icode-bg);color:var(--icode-fg);padding:1.5px 6px;border-radius:5px;font-size:.86em;}
+pre{
+  background:#fdfaf7;border-radius:12px;padding:16px 18px;margin:0 0 16px;
+  overflow-x:auto;box-shadow:inset 0 2px 8px rgba(140,110,90,.10);
+  font-size:13.6px;line-height:1.62;
+}
+pre code{background:none;color:#3b3f42;padding:0;font-size:inherit;}
+.kw{color:var(--kw);font-weight:600;} .str{color:var(--str);} .num{color:var(--num);}
+.err{color:var(--err);font-weight:700;} .cm{color:var(--cm);font-style:italic;}
+
+.header{
+  background:linear-gradient(135deg,#ffffff 0%,#fbf7f4 100%);
+  border-radius:18px;padding:34px 32px;margin-bottom:26px;
+  box-shadow:0 6px 26px rgba(120,110,100,.10);
+}
+.badge{
+  display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:700;
+  letter-spacing:.9px;text-transform:uppercase;padding:7px 15px;border-radius:999px;
+  box-shadow:0 3px 10px rgba(201,100,66,.28);
+}
+.header h1{font-size:2.05rem;margin:18px 0 6px;font-weight:900;letter-spacing:-.4px;}
+.header h1 .dim{color:var(--muted);font-weight:400;font-size:1.15rem;}
+.header .sub{font-style:italic;color:var(--muted);margin-bottom:20px;}
+.objectives{
+  background:linear-gradient(135deg,#f0f9f3,#f7fcf8);
+  border-left:4px solid #5aab7b;border-radius:12px;padding:16px 20px;
+}
+.objectives h4{margin:0 0 8px;color:#3b7d57;font-size:.94rem;text-transform:uppercase;letter-spacing:.6px;}
+.objectives ul{margin:0;padding-left:20px;}
+.objectives li{margin-bottom:5px;font-size:.95rem;}
+
+.toc{
+  background:var(--card);border-radius:14px;padding:24px 28px;margin-bottom:30px;
+  box-shadow:0 4px 18px rgba(120,110,100,.08);
+}
+.toc h3{margin:0 0 14px;font-size:1.05rem;color:var(--accent);}
+.toc ol{columns:2;column-gap:34px;margin:0;padding-left:20px;}
+.toc li{margin-bottom:8px;break-inside:avoid;}
+.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted #cfc4b8;}
+.toc a:hover{color:var(--accent);}
+@media(max-width:660px){.toc ol{columns:1;}}
+
+.section{
+  background:var(--card);border-radius:14px;padding:28px 30px;margin-bottom:26px;
+  box-shadow:0 4px 18px rgba(120,110,100,.08);
+}
+.sec-num{
+  font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;
+  letter-spacing:1.6px;color:var(--accent);text-transform:uppercase;
+}
+.section h2{font-size:1.5rem;margin:6px 0 20px;padding-bottom:12px;border-bottom:2px solid var(--line);}
+.section h3{font-size:1.13rem;margin:26px 0 10px;color:#43484c;}
+.section h4{font-size:1rem;margin:20px 0 8px;color:#5a6166;}
+
+.card{
+  border-radius:14px;padding:15px 20px;margin:18px 0;
+  box-shadow:0 3px 12px rgba(120,110,100,.09);
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(120,110,100,.15);}
+.card p:last-child,.card ul:last-child{margin-bottom:0;}
+.card-label{
+  font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+  letter-spacing:1.1px;text-transform:uppercase;margin-bottom:7px;display:block;
+}
+.exam-trap{background:linear-gradient(135deg,#fef2f0,#fff8f7);border-left:4px solid #e06b5e;}
+.exam-trap .card-label{color:#c0453a;}
+.key-rule{background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-left:4px solid #5aab7b;}
+.key-rule .card-label{color:#3b7d57;}
+.remember{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-left:4px solid #d4a24c;}
+.remember .card-label{color:#a9772a;}
+
+.rules-box{
+  background:linear-gradient(135deg,#f0f9f3,#f7fcf8);border-top:4px solid #5aab7b;
+  border-radius:12px;padding:18px 22px;margin:18px 0;
+  box-shadow:0 3px 12px rgba(120,110,100,.08);
+}
+.rules-box h4{margin:0 0 10px;color:#3b7d57;font-family:'Source Sans 3',sans-serif;
+  font-size:.86rem;text-transform:uppercase;letter-spacing:.8px;font-weight:700;}
+.rules-box ul,.rules-box ol{margin:0;}
+
+.vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0;}
+.vs-grid > div{
+  background:var(--card);border-radius:12px;padding:16px 18px;
+  box-shadow:0 3px 12px rgba(120,110,100,.10);
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.vs-grid > div:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(120,110,100,.15);}
+.vs-grid h4{margin:0 0 8px;font-size:1rem;}
+.vs-grid .left h4{color:#7c5cbf;}
+.vs-grid .right h4{color:#3b7d57;}
+.vs-grid ul,.vs-grid ol{padding-left:19px;margin:0;font-size:.95rem;}
+@media(max-width:660px){.vs-grid{grid-template-columns:1fr;}}
+
+.tbl-wrap{overflow-x:auto;margin:18px 0;border-radius:12px;box-shadow:0 3px 14px rgba(120,110,100,.10);}
+table{width:100%;border-collapse:collapse;background:var(--card);border-radius:12px;overflow:hidden;font-size:.93rem;}
+th{background:#f0e8de;text-align:left;padding:11px 14px;font-weight:700;color:#4a4038;font-size:.86rem;
+   text-transform:uppercase;letter-spacing:.5px;}
+td{padding:10px 14px;border-top:1px solid #f1eae2;vertical-align:top;}
+tr:hover td{background:#fdfbf9;}
+td code,th code{font-size:.85em;}
+.yes{color:var(--yes);font-weight:700;}
+.no{color:var(--no);font-weight:700;}
+
+.trace{background:#fdfaf7;border-radius:12px;padding:14px 18px 14px 34px;margin:0 0 16px;
+  box-shadow:inset 0 2px 8px rgba(140,110,90,.08);font-size:.95rem;}
+.trace li{margin-bottom:6px;}
+
+.recap{background:linear-gradient(135deg,#fdf6eb,#fffbf4);border-radius:14px;padding:28px 30px;
+  margin-bottom:26px;box-shadow:0 4px 18px rgba(120,110,100,.10);}
+.recap h2{font-size:1.45rem;margin:0 0 18px;padding-bottom:12px;border-bottom:2px solid #f0e2c8;}
+.recap h4{color:#a9772a;margin:18px 0 6px;font-size:1rem;}
+.recap ul{margin:0;padding-left:20px;}
+
+footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:34px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="header">
+  <span class="badge">OCP Java SE 21 Developer — Exam 1Z0-830</span>
+  <h1>Chapter 14 · I/O <span class="dim">(Detailed Handnote)</span></h1>
+  <p class="sub">Files and paths, the NIO.2 API, I/O streams, reading and writing files, serialization, user interaction, and advanced file attributes.</p>
+  <div class="objectives">
+    <h4>Exam objectives covered in this chapter</h4>
+    <ul>
+      <li>Read and write console and file data using I/O streams.</li>
+      <li>Serialize and de-serialize Java objects.</li>
+      <li>Construct, traverse, create, read, and write <code>Path</code> objects and their properties using the <code>java.nio.file</code> API.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="toc">
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#s1">Referencing Files and Directories</a></li>
+    <li><a href="#s2">Operating on File and Path</a></li>
+    <li><a href="#s3">Introducing I/O Streams</a></li>
+    <li><a href="#s4">Reading and Writing Files</a></li>
+    <li><a href="#s5">Serializing Data</a></li>
+    <li><a href="#s6">Interacting with Users</a></li>
+    <li><a href="#s7">Working with Advanced APIs</a></li>
+    <li><a href="#recap">Short Recap</a></li>
+    <li><a href="#cheat">Exam Traps Cheat Sheet</a></li>
+  </ol>
+</div>
+
+<!-- ============ SECTION 1 ============ -->
+<section class="section" id="s1">
+  <div class="sec-num">Section 01</div>
+  <h2>Referencing Files and Directories</h2>
+
+  <h3>Conceptualizing the file system</h3>
+  <p>A <strong>file</strong> within a storage device holds data. Files are organized into hierarchies using <strong>directories</strong> — a location that can contain files as well as other directories. In Java we often treat directories like files, using many of the same classes and methods; in this chapter "file" often means "file or directory."</p>
+  <p>The <strong>file system</strong> is in charge of reading and writing data within a computer; the JVM automatically connects to the local one. The <strong>root directory</strong> is the topmost directory — <code>C:\</code> on Windows, <code>/</code> on Linux. A <strong>path</strong> is a representation of a file or directory; the value to the left of a separator is the parent of the value to the right.</p>
+
+  <div class="rules-box">
+    <h4>Absolute vs. relative — the exam's conventions</h4>
+    <ul>
+      <li>If a path starts with a forward slash (<code>/</code>), it is <strong>absolute</strong>, with <code>/</code> as the root — e.g. <code>/bird/parrot.png</code>.</li>
+      <li>If a path starts with a drive letter (<code>C:</code>), it is <strong>absolute</strong>, with the drive letter as the root — e.g. <code>C:/bird/info</code>.</li>
+      <li>Otherwise, it is a <strong>relative</strong> path — e.g. <code>bird/parrot.png</code>.</li>
+    </ul>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Symbol</th><th>Description</th></tr>
+      <tr><td><code>.</code></td><td>A reference to the current directory</td></tr>
+      <tr><td><code>..</code></td><td>A reference to the parent of the current directory</td></tr>
+    </table>
+  </div>
+  <p>With a current directory of <code>/fish/shark/hammerhead</code>, <code>../swim.txt</code> is equivalent to <code>/fish/shark/swim.txt</code>, and <code>../../clownfish</code> is equivalent to <code>/fish/clownfish</code>. Redundancies like <code>/fish/clownfish/../shark/./swim.txt</code> can be simplified with <code>normalize()</code>.</p>
+
+  <p>A <strong>symbolic link</strong> is a special file that serves as a pointer to another file or directory. With a link from <code>/zoo/user/favorite</code> to <code>/fish/shark</code>, both <code>/fish/shark/swim.txt</code> and <code>/zoo/user/favorite/swim.txt</code> reference the same file.</p>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ Key Rule</span>
+    <p>The legacy <strong>I/O APIs do not support symbolic links</strong>. NIO.2 includes full support for creating, detecting, and navigating them.</p>
+  </div>
+
+  <h3>Creating a File</h3>
+<pre><code>File zooFile1 = <span class="kw">new</span> File(<span class="str">"/home/tiger/data/stripes.txt"</span>);
+File zooFile2 = <span class="kw">new</span> File(<span class="str">"/home/tiger"</span>, <span class="str">"data/stripes.txt"</span>);
+
+File parent = <span class="kw">new</span> File(<span class="str">"/home/tiger"</span>);
+File zooFile3 = <span class="kw">new</span> File(parent, <span class="str">"data/stripes.txt"</span>);
+
+System.out.println(zooFile1.exists());</code></pre>
+  <p>All three point to the same location. If <code>null</code> is passed as the parent to the last constructor, it is ignored and the method behaves like the single-<code>String</code> constructor.</p>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>There is <strong>no three-parameter <code>File</code> constructor</strong> — <code>new File("/weather", "winter", "snow.dat")</code> does not compile. There is a <code>(File, String)</code> constructor but <strong>no <code>(String, File)</code></strong> constructor.</p>
+  </div>
+
+  <h3>Creating a Path</h3>
+  <p><code>Path</code> is an <strong>interface</strong>, so it has no constructors. The usual factory method is:</p>
+<pre><code><span class="kw">public static</span> Path of(String first, String... more)</code></pre>
+<pre><code>Path zooPath1 = Path.of(<span class="str">"/home/tiger/data/stripes.txt"</span>);
+Path zooPath2 = Path.of(<span class="str">"/home"</span>, <span class="str">"tiger"</span>, <span class="str">"data"</span>, <span class="str">"stripes.txt"</span>);
+
+System.out.println(Files.exists(zooPath1));</code></pre>
+  <p>The varargs values are combined and automatically separated by the OS-dependent file separator.</p>
+
+  <div class="rules-box">
+    <h4>Four ways to obtain a Path</h4>
+    <ul>
+      <li><code>Path.of("/home", "tiger", "data")</code> — the preferred factory method.</li>
+      <li><code>Paths.get("/home", "tiger", "data")</code> — the older <code>Paths</code> helper class; same signature, but may be deprecated in the future.</li>
+      <li><code>FileSystems.getDefault().getPath("/home/tiger/data/stripes.txt")</code> — what <code>Path.of()</code> uses behind the scenes.</li>
+      <li><code>Path.of(URI.create("https://www.selikoff.net"))</code> — from a URI, with a scheme such as <code>file://</code> or <code>https://</code>.</li>
+    </ul>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p><code>new Path("jaguar.txt")</code> <span class="no">does not compile</span> — <code>Path</code> is an interface. And the static method on <code>Path</code> is <code>of()</code>, <strong>not</strong> <code>get()</code>; <code>get()</code> belongs to <code>Paths</code>. Swapping those two names is the classic distractor.</p>
+  </div>
+
+  <h3>Switching between File and Path</h3>
+<pre><code>File file = <span class="kw">new</span> File(<span class="str">"rabbit"</span>);
+Path newPath = file.toPath();
+File backToFile = newPath.toFile();</code></pre>
+  <p>Many older libraries use <code>File</code>. For newer applications, rely on NIO.2's <code>Path</code>, which has far more features.</p>
+</section>
+
+<!-- ============ SECTION 2 ============ -->
+<section class="section" id="s2">
+  <div class="sec-num">Section 02</div>
+  <h2>Operating on File and Path</h2>
+
+  <h3>Shared functionality</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Description</th><th>I/O <code>File</code> instance method</th><th>NIO.2 <code>Path</code> instance method</th></tr>
+      <tr><td>Gets name of file/directory</td><td><code>getName()</code></td><td><code>getFileName()</code></td></tr>
+      <tr><td>Retrieves parent directory or <code>null</code></td><td><code>getParent()</code></td><td><code>getParent()</code></td></tr>
+      <tr><td>Checks if path is absolute</td><td><code>isAbsolute()</code></td><td><code>isAbsolute()</code></td></tr>
+      <tr><td>Retrieves absolute path</td><td><code>getAbsolutePath()</code></td><td><code>toAbsolutePath()</code></td></tr>
+    </table>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Description</th><th>I/O <code>File</code> instance method</th><th>NIO.2 <code>Files</code> <em>static</em> method</th></tr>
+      <tr><td>Deletes file/directory</td><td><code>delete()</code></td><td><code>deleteIfExists(Path p)</code> throws <code>IOException</code></td></tr>
+      <tr><td>Checks existence</td><td><code>exists()</code></td><td><code>exists(Path p, LinkOption... o)</code></td></tr>
+      <tr><td>Checks if directory</td><td><code>isDirectory()</code></td><td><code>isDirectory(Path p, LinkOption... o)</code></td></tr>
+      <tr><td>Checks if file</td><td><code>isFile()</code></td><td><code>isRegularFile(Path p, LinkOption... o)</code></td></tr>
+      <tr><td>Last modified time</td><td><code>lastModified()</code></td><td><code>getLastModifiedTime(Path p, LinkOption... o)</code></td></tr>
+      <tr><td>Number of bytes</td><td><code>length()</code></td><td><code>size(Path p)</code></td></tr>
+      <tr><td>Lists directory contents</td><td><code>listFiles()</code></td><td><code>list(Path p)</code></td></tr>
+      <tr><td>Creates directory</td><td><code>mkdir()</code></td><td><code>createDirectory(Path p, FileAttribute... a)</code></td></tr>
+      <tr><td>Creates directory + parents</td><td><code>mkdirs()</code></td><td><code>createDirectories(Path p, FileAttribute... a)</code></td></tr>
+      <tr><td>Renames/moves</td><td><code>renameTo(File dest)</code></td><td><code>move(Path src, Path dest, CopyOption... o)</code></td></tr>
+    </table>
+  </div>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p><code>java.io.File</code> is the I/O class; <code>Files</code> is an NIO.2 <em>helper</em> class whose methods are <strong>static</strong> and operate on <code>Path</code> instances, not <code>File</code> instances. Also watch method names crossing APIs: it is <code>Files.createDirectory()</code>, <strong>not</strong> <code>Files.mkdir()</code>. Writing <code>Files.mkdir(...)</code> does not compile.</p>
+  </div>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ Key Rule</span>
+    <p>Methods that access or change files, especially in <code>Files</code>, usually declare <code>IOException</code> — and that checked exception <strong>must be handled or declared</strong>. A frequent exam trick is a method calling <code>Files.deleteIfExists()</code> or <code>Files.size()</code> without <code>throws IOException</code>: it does not compile. The notable exception is <code>Files.exists()</code>, which does not declare it — if it threw when the file was missing, it could never return <code>false</code>.</p>
+  </div>
+
+  <h3>Optional NIO.2 parameters</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Enum type</th><th>Interface inherited</th><th>Enum value</th><th>Details</th></tr>
+      <tr><td><code>LinkOption</code></td><td><code>CopyOption</code>, <code>OpenOption</code></td><td><code>NOFOLLOW_LINKS</code></td><td>Do not follow symbolic links</td></tr>
+      <tr><td rowspan="3"><code>StandardCopyOption</code></td><td rowspan="3"><code>CopyOption</code></td><td><code>ATOMIC_MOVE</code></td><td>Move file as an atomic file system operation</td></tr>
+      <tr><td><code>COPY_ATTRIBUTES</code></td><td>Copy existing attributes to new file</td></tr>
+      <tr><td><code>REPLACE_EXISTING</code></td><td>Overwrite file if it already exists</td></tr>
+      <tr><td rowspan="6"><code>StandardOpenOption</code></td><td rowspan="6"><code>OpenOption</code></td><td><code>APPEND</code></td><td>If open for write, append to the end</td></tr>
+      <tr><td><code>CREATE</code></td><td>Create new file if it does not exist</td></tr>
+      <tr><td><code>CREATE_NEW</code></td><td>Create only if it does not exist; fail otherwise</td></tr>
+      <tr><td><code>READ</code></td><td>Open for read access</td></tr>
+      <tr><td><code>TRUNCATE_EXISTING</code></td><td>Erase file and append to beginning</td></tr>
+      <tr><td><code>WRITE</code></td><td>Open for write access</td></tr>
+      <tr><td><code>FileVisitOption</code></td><td>N/A</td><td><code>FOLLOW_LINKS</code></td><td>Follow symbolic links</td></tr>
+    </table>
+  </div>
+  <p>Because <code>LinkOption</code> inherits <code>CopyOption</code>, a single call can mix types:</p>
+<pre><code>Files.move(source, target,
+   LinkOption.NOFOLLOW_LINKS,
+   StandardCopyOption.ATOMIC_MOVE);</code></pre>
+
+  <h3>Path is immutable</h3>
+<pre><code>Path p = Path.of(<span class="str">"whale"</span>);
+p.resolve(<span class="str">"krill"</span>);
+System.out.println(p);   <span class="cm">// whale — the result was discarded</span></code></pre>
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>Like <code>String</code>, <code>Path</code> is <strong>immutable</strong>. Any line that calls a <code>Path</code> method without assigning the result is effectively a no-op. The exam loves burying <code>p1.normalize().relativize(x);</code> on its own line and then printing <code>p1</code> unchanged.</p>
+  </div>
+
+  <h3>Viewing and slicing the path</h3>
+<pre><code>Path path = Path.of(<span class="str">"/land/hippo/harry.happy"</span>);
+System.out.println(<span class="str">"The Path is: "</span> + path);
+<span class="kw">for</span>(<span class="kw">int</span> i=<span class="num">0</span>; i&lt;path.getNameCount(); i++)
+   System.out.println(<span class="str">"   Element "</span> + i + <span class="str">" is: "</span> + path.getName(i));</code></pre>
+<pre><code>The Path is: /land/hippo/harry.happy
+   Element 0 is: land
+   Element 1 is: hippo
+   Element 2 is: harry.happy</code></pre>
+  <ul class="trace">
+    <li><code>toString()</code> is the <strong>only</strong> method in <code>Path</code> that returns a <code>String</code>; most others return <code>Path</code>.</li>
+    <li><code>getNameCount()</code> and <code>getName()</code> <strong>do not include the root</strong>, even for an absolute path.</li>
+    <li><code>Path.of("/").getNameCount()</code> is <code>0</code>, and <code>getName(0)</code> on it throws <code>IllegalArgumentException</code>.</li>
+  </ul>
+
+<pre><code><span class="kw">var</span> p = Path.of(<span class="str">"/mammal/omnivore/raccoon.image"</span>);
+p.subpath(<span class="num">0</span>, <span class="num">3</span>);   <span class="cm">// mammal/omnivore/raccoon.image</span>
+p.subpath(<span class="num">1</span>, <span class="num">2</span>);   <span class="cm">// omnivore</span>
+p.subpath(<span class="num">1</span>, <span class="num">3</span>);   <span class="cm">// omnivore/raccoon.image</span>
+
+p.subpath(<span class="num">0</span>, <span class="num">4</span>);   <span class="err">// IllegalArgumentException — max index is 3</span>
+p.subpath(<span class="num">1</span>, <span class="num">1</span>);   <span class="err">// IllegalArgumentException — empty path</span></code></pre>
+  <p><code>subpath()</code> takes an inclusive <code>beginIndex</code> and an exclusive <code>endIndex</code>, is zero-indexed, and excludes the root — and it returns a <strong>relative</strong> path even when applied to an absolute one.</p>
+
+  <h3>Accessing path elements</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Path</th><th><code>getFileName()</code></th><th><code>getRoot()</code></th><th><code>getParent()</code> chain</th></tr>
+      <tr><td><code>zoo</code></td><td><code>zoo</code></td><td class="no"><code>null</code></td><td>(none)</td></tr>
+      <tr><td><code>/zoo/armadillo/shells.txt</code></td><td><code>shells.txt</code></td><td><code>/</code></td><td><code>/zoo/armadillo</code> → <code>/zoo</code> → <code>/</code></td></tr>
+      <tr><td><code>./armadillo/../shells.txt</code></td><td><code>shells.txt</code></td><td class="no"><code>null</code></td><td><code>./armadillo/..</code> → <code>./armadillo</code> → <code>.</code></td></tr>
+    </table>
+  </div>
+  <ul class="trace">
+    <li><code>getRoot()</code> returns <code>null</code> for a relative path.</li>
+    <li><code>getParent()</code> returns <code>null</code> at the root or the top of a relative path, and <strong>does not traverse outside the current working directory</strong>.</li>
+    <li>These methods <strong>do not resolve path symbols</strong> — <code>..</code> and <code>.</code> are treated as ordinary path elements.</li>
+  </ul>
+
+  <h3>resolve() — concatenation</h3>
+<pre><code>Path path1 = Path.of(<span class="str">"/cats/../panther"</span>);
+Path path2 = Path.of(<span class="str">"food"</span>);
+System.out.println(path1.resolve(path2));    <span class="cm">// /cats/../panther/food</span>
+
+Path path3 = Path.of(<span class="str">"/turkey/food"</span>);
+System.out.println(path3.resolve(<span class="str">"/tiger/cage"</span>));   <span class="cm">// /tiger/cage</span></code></pre>
+  <div class="card key-rule">
+    <span class="card-label">✓ Key Rule</span>
+    <p>When you see <code>resolve()</code>, think <strong>concatenation</strong>. It does not clean up path symbols. And if the <strong>argument is an absolute path, that argument is simply returned</strong> — you cannot combine two absolute paths with <code>resolve()</code>.</p>
+  </div>
+
+  <h3>relativize() — the path from one to another</h3>
+<pre><code><span class="kw">var</span> path1 = Path.of(<span class="str">"fish.txt"</span>);
+<span class="kw">var</span> path2 = Path.of(<span class="str">"friendly/birds.txt"</span>);
+System.out.println(path1.relativize(path2));   <span class="cm">// ../friendly/birds.txt</span>
+System.out.println(path2.relativize(path1));   <span class="cm">// ../../fish.txt</span></code></pre>
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p><code>relativize()</code> requires both paths to be <strong>both absolute or both relative</strong>; mixing them throws <code>IllegalArgumentException</code>. On Windows, two absolute paths must also share the same root/drive letter, or it throws too.</p>
+<pre style="margin:8px 0 0"><code>Path.of(<span class="str">"/primate/chimpanzee"</span>).relativize(Path.of(<span class="str">"bananas.txt"</span>));
+   <span class="err">// IllegalArgumentException</span></code></pre>
+  </div>
+
+  <h3>normalize() and toRealPath()</h3>
+<pre><code>Path.of(<span class="str">"./armadillo/../shells.txt"</span>).normalize();   <span class="cm">// shells.txt</span>
+Path.of(<span class="str">"/cats/../panther/food"</span>).normalize();      <span class="cm">// /panther/food</span>
+Path.of(<span class="str">"../../fish.txt"</span>).normalize();             <span class="cm">// ../../fish.txt (unchanged)</span>
+
+<span class="kw">var</span> p1 = Path.of(<span class="str">"/pony/../weather.txt"</span>);
+<span class="kw">var</span> p2 = Path.of(<span class="str">"/weather.txt"</span>);
+p1.equals(p2);                                 <span class="cm">// false</span>
+p1.normalize().equals(p2.normalize());         <span class="cm">// true</span></code></pre>
+  <p><code>normalize()</code> removes only the redundancies it <em>can</em> reduce — its primary purpose is letting you compare equivalent paths.</p>
+
+  <div class="vs-grid">
+    <div class="left">
+      <h4>normalize()</h4>
+      <ul>
+        <li>Purely textual — removes reducible <code>.</code> and <code>..</code></li>
+        <li>Does <strong>not</strong> touch the file system</li>
+        <li>Never throws for a missing file</li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>toRealPath()</h4>
+      <ul>
+        <li>Removes redundant symbols <em>and</em> joins with the working directory if relative</li>
+        <li><strong>Follows symbolic links</strong> (optional <code>LinkOption</code> to ignore)</li>
+        <li><strong>Throws an exception if the path does not exist</strong></li>
+        <li><code>Path.of(".").toRealPath()</code> gives the current working directory</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Description</th><th><code>Path</code> instance method</th></tr>
+      <tr><td>File path as string</td><td><code>String toString()</code></td></tr>
+      <tr><td>Single segment</td><td><code>Path getName(int index)</code></td></tr>
+      <tr><td>Number of segments</td><td><code>int getNameCount()</code></td></tr>
+      <tr><td>Segments in range</td><td><code>Path subpath(int beginIndex, int endIndex)</code></td></tr>
+      <tr><td>Final segment</td><td><code>Path getFileName()</code></td></tr>
+      <tr><td>Immediate parent</td><td><code>Path getParent()</code></td></tr>
+      <tr><td>Top-level segment</td><td><code>Path getRoot()</code></td></tr>
+      <tr><td>Concatenate paths</td><td><code>Path resolve(String p)</code> · <code>Path resolve(Path p)</code></td></tr>
+      <tr><td>Construct path to one provided</td><td><code>Path relativize(Path p)</code></td></tr>
+      <tr><td>Remove redundant parts</td><td><code>Path normalize()</code></td></tr>
+      <tr><td>Follow links to find real path</td><td><code>Path toRealPath()</code></td></tr>
+    </table>
+  </div>
+
+  <h3>Creating, copying, moving, deleting</h3>
+  <div class="vs-grid">
+    <div class="left">
+      <h4>createDirectory()</h4>
+      <ul>
+        <li>Throws if the directory <strong>already exists</strong></li>
+        <li>Throws if the parent directories do not exist</li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>createDirectories()</h4>
+      <ul>
+        <li>Creates the target <strong>and any missing parents</strong></li>
+        <li>If everything already exists, it completes <strong>without doing anything</strong> — no exception</li>
+      </ul>
+    </div>
+  </div>
+
+<pre><code>Files.copy(Path.of(<span class="str">"/panda/bamboo.txt"</span>), Path.of(<span class="str">"/panda-save/bamboo.txt"</span>));
+Files.copy(Path.of(<span class="str">"/turtle"</span>), Path.of(<span class="str">"/turtleCopy"</span>));   <span class="cm">// SHALLOW copy</span>
+
+Files.copy(Path.of(<span class="str">"book.txt"</span>), Path.of(<span class="str">"movie.txt"</span>),
+   StandardCopyOption.REPLACE_EXISTING);</code></pre>
+  <ul class="trace">
+    <li>When directories are copied, the copy is <strong>shallow</strong> — files and subdirectories inside are not copied. A deep copy requires recursion.</li>
+    <li>Without <code>REPLACE_EXISTING</code>, <code>copy()</code> throws if the target already exists.</li>
+    <li>Two overloads work with I/O streams: <code>copy(InputStream in, Path target, CopyOption... o)</code> and <code>copy(Path source, OutputStream out)</code>.</li>
+  </ul>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>Copying a file "into" a directory does not do what you expect:</p>
+<pre style="margin:8px 0 6px"><code><span class="kw">var</span> file = Path.of(<span class="str">"food.txt"</span>);
+<span class="kw">var</span> directory = Path.of(<span class="str">"/enclosure"</span>);   <span class="cm">// both exist</span>
+Files.copy(file, directory);              <span class="err">// throws at runtime</span></code></pre>
+    <p>The command tries to create a new <em>file</em> named <code>/enclosure</code>, and since that path already exists, it throws. If <code>/enclosure</code> did <em>not</em> exist, it would create a file called <code>/enclosure</code> holding the contents of <code>food.txt</code>. The correct target is <code>/enclosure/food.txt</code>. <strong>This applies to <code>move()</code> too.</strong></p>
+  </div>
+
+<pre><code>Files.move(Path.of(<span class="str">"C:\\zoo"</span>), Path.of(<span class="str">"C:\\zoo-new"</span>));
+Files.move(Path.of(<span class="str">"mouse.txt"</span>), Path.of(<span class="str">"gerbil.txt"</span>),
+   StandardCopyOption.ATOMIC_MOVE);</code></pre>
+  <p>An <strong>atomic move</strong> is a single indivisible operation — any process monitoring the file system never sees an incomplete or partially written file. If the file system does not support it, <code>AtomicMoveNotSupportedException</code> is thrown. Note that although <code>ATOMIC_MOVE</code> is a <code>StandardCopyOption</code>, it will likely throw if passed to <code>copy()</code>.</p>
+
+  <div class="vs-grid">
+    <div class="left">
+      <h4>delete(Path)</h4>
+      <ul>
+        <li>Returns <code>void</code></li>
+        <li><strong>Throws</strong> (<code>NoSuchFileException</code>) if the path does not exist</li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>deleteIfExists(Path)</h4>
+      <ul>
+        <li>Returns <code>boolean</code> — <code>true</code> if deleted, <code>false</code> otherwise</li>
+        <li>Does not throw when the path is simply missing</li>
+      </ul>
+    </div>
+  </div>
+  <p>Both throw when operated on a <strong>nonempty directory</strong> — to delete a directory it must be empty. If the path is a symbolic link, <strong>the link is deleted, not its target</strong>. Both declare <code>IOException</code>.</p>
+
+  <h3>isSameFile() and mismatch()</h3>
+<pre><code>Files.isSameFile(Path.of(<span class="str">"/animals/cobra"</span>), Path.of(<span class="str">"/animals/snake"</span>));
+   <span class="cm">// true — snake is a symbolic link to cobra</span>
+
+Files.mismatch(Path.of(<span class="str">"/animals/monkey.txt"</span>), Path.of(<span class="str">"/animals/wolf.txt"</span>));
+   <span class="cm">// 1 — "Harold" vs "Howler" first differ at index 1</span></code></pre>
+  <ul class="trace">
+    <li><code>isSameFile()</code> resolves all path symbols and follows symbolic links — <code>equals()</code> does neither.</li>
+    <li>Special case: if the two paths are equal per <code>equals()</code>, <code>isSameFile()</code> returns <code>true</code> <strong>without checking whether the file exists</strong>.</li>
+    <li><code>mismatch()</code> compares <em>contents</em>: it returns <code>-1</code> if the files are the same, otherwise the index of the first differing position.</li>
+    <li><code>mismatch()</code> is <strong>symmetric</strong> — swapping the arguments gives the same result.</li>
+  </ul>
+</section>
+
+<!-- ============ SECTION 3 ============ -->
+<section class="section" id="s3">
+  <div class="sec-num">Section 03</div>
+  <h2>Introducing I/O Streams</h2>
+
+  <p>An <strong>I/O stream</strong> is a list of data elements presented sequentially — conceptually a nearly never-ending stream of water, read one wave at a time. Because you only hold a small portion at a time, a 1 TB file can be processed by a program with very little memory.</p>
+
+  <div class="card remember">
+    <span class="card-label">★ Remember</span>
+    <p>"I/O streams" here are the ones in <code>java.io</code>. When the book says just "streams," it means the Stream API from Chapter 10. The naming overlap is a deliberate exam trap.</p>
+  </div>
+
+  <div class="rules-box">
+    <h4>Three axes for classifying every I/O stream class</h4>
+    <ul>
+      <li><strong>Byte vs. character:</strong> byte streams read/write binary data and end in <code>InputStream</code>/<code>OutputStream</code>; character streams read/write text and end in <code>Reader</code>/<code>Writer</code>.</li>
+      <li><strong>Input vs. output:</strong> most <code>InputStream</code> classes have a matching <code>OutputStream</code>, and most <code>Reader</code> classes a matching <code>Writer</code>.</li>
+      <li><strong>Low-level vs. high-level:</strong> a low-level stream connects directly to the data source; a high-level stream is built on top of another stream by <em>wrapping</em>.</li>
+    </ul>
+  </div>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ Key Rule</span>
+    <p>Even though character streams don't have "Stream" in their names, <strong>they are still I/O streams</strong>. And for the exam, the only low-level stream classes you need to know are the ones that operate on <strong>files</strong> — every other non-abstract stream class is high-level.</p>
+  </div>
+
+  <h3>Wrapping</h3>
+<pre><code><span class="kw">try</span> (<span class="kw">var</span> br = <span class="kw">new</span> BufferedReader(<span class="kw">new</span> FileReader(<span class="str">"zoo-data.txt"</span>))) {
+   System.out.println(br.readLine());
+}
+
+<span class="kw">try</span> (<span class="kw">var</span> ois = <span class="kw">new</span> ObjectInputStream(
+         <span class="kw">new</span> BufferedInputStream(
+            <span class="kw">new</span> FileInputStream(<span class="str">"zoo-data.ser"</span>)))) {
+   System.out.print(ois.readObject());
+}</code></pre>
+  <p>High-level streams can wrap other high-level streams. Here the low-level <code>FileInputStream</code> interacts with the file, a <code>BufferedInputStream</code> improves performance, and an <code>ObjectInputStream</code> interprets the data as a Java object.</p>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>Mismatched wrapping is the single most common compile trap in this chapter:</p>
+<pre style="margin:8px 0 6px"><code><span class="kw">new</span> BufferedInputStream(<span class="kw">new</span> FileReader(<span class="str">"z.txt"</span>));     <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">new</span> BufferedWriter(<span class="kw">new</span> FileOutputStream(<span class="str">"z.txt"</span>));    <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">new</span> ObjectInputStream(<span class="kw">new</span> FileOutputStream(<span class="str">"z.txt"</span>));  <span class="err">// DOES NOT COMPILE</span>
+<span class="kw">new</span> BufferedInputStream(<span class="kw">new</span> InputStream());          <span class="err">// DOES NOT COMPILE</span></code></pre>
+    <p>The first two mix <code>Reader</code>/<code>Writer</code> with <code>InputStream</code>/<code>OutputStream</code>. The third mixes an <code>OutputStream</code> into an input stream. The fourth fails because <code>InputStream</code> is <strong>abstract</strong>.</p>
+  </div>
+
+  <div class="card remember">
+    <span class="card-label">★ Remember</span>
+    <p>The exceptions to the pairing rules: <code>InputStreamReader</code> is a <code>Reader</code> that takes an <code>InputStream</code>, and <code>OutputStreamWriter</code> is a <code>Writer</code> that takes an <code>OutputStream</code> — the only classes with both naming halves. <code>PrintWriter</code> can take either an <code>OutputStream</code> or a <code>Writer</code>. There is <strong>no <code>PrintReader</code></strong>, and <code>PrintStream</code> is an <code>OutputStream</code> that lacks "Output" in its name.</p>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Abstract class</th><th>Description</th></tr>
+      <tr><td><code>InputStream</code></td><td>Abstract class for all input byte streams</td></tr>
+      <tr><td><code>OutputStream</code></td><td>Abstract class for all output byte streams</td></tr>
+      <tr><td><code>Reader</code></td><td>Abstract class for all input character streams</td></tr>
+      <tr><td><code>Writer</code></td><td>Abstract class for all output character streams</td></tr>
+    </table>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Class name</th><th>Level</th><th>Description</th></tr>
+      <tr><td><code>FileInputStream</code></td><td>Low</td><td>Reads file data as bytes</td></tr>
+      <tr><td><code>FileOutputStream</code></td><td>Low</td><td>Writes file data as bytes</td></tr>
+      <tr><td><code>FileReader</code></td><td>Low</td><td>Reads file data as characters</td></tr>
+      <tr><td><code>FileWriter</code></td><td>Low</td><td>Writes file data as characters</td></tr>
+      <tr><td><code>BufferedInputStream</code></td><td>High</td><td>Reads bytes from an existing <code>InputStream</code> in buffered manner</td></tr>
+      <tr><td><code>BufferedOutputStream</code></td><td>High</td><td>Writes bytes to an existing <code>OutputStream</code> in buffered manner</td></tr>
+      <tr><td><code>BufferedReader</code></td><td>High</td><td>Reads characters from an existing <code>Reader</code> in buffered manner</td></tr>
+      <tr><td><code>BufferedWriter</code></td><td>High</td><td>Writes characters to an existing <code>Writer</code> in buffered manner</td></tr>
+      <tr><td><code>ObjectInputStream</code></td><td>High</td><td>Deserializes primitives and object graphs from an existing <code>InputStream</code></td></tr>
+      <tr><td><code>ObjectOutputStream</code></td><td>High</td><td>Serializes primitives and object graphs to an existing <code>OutputStream</code></td></tr>
+      <tr><td><code>PrintStream</code></td><td>High</td><td>Writes formatted representations of Java objects to a binary stream</td></tr>
+      <tr><td><code>PrintWriter</code></td><td>High</td><td>Writes formatted representations of Java objects to a character stream</td></tr>
+    </table>
+  </div>
+
+  <div class="card remember">
+    <span class="card-label">★ Remember</span>
+    <p>Character encoding determines how characters are stored as bytes. Specify one with <code>Charset.forName("UTF-8")</code>, <code>Charset.forName("US-ASCII")</code>, or <code>Charset.forName("UTF-16")</code>. You don't need to memorize encodings, only recognize the names.</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 4 ============ -->
+<section class="section" id="s4">
+  <div class="sec-num">Section 04</div>
+  <h2>Reading and Writing Files</h2>
+
+  <h3>The low-level way</h3>
+<pre><code><span class="kw">void</span> copyStream(InputStream in, OutputStream out) <span class="kw">throws</span> IOException {
+   <span class="kw">int</span> b;
+   <span class="kw">while</span> ((b = in.read()) != -<span class="num">1</span>) {
+      out.write(b);
+   }
+}</code></pre>
+  <div class="card key-rule">
+    <span class="card-label">✓ Key Rule</span>
+    <p><code>read()</code> returns <code>int</code>, not <code>byte</code>, because <code>byte</code> has no spare value left to signal the end of the stream. <strong><code>-1</code> indicates the end of the stream.</strong> Output streams use <code>int</code> too, for consistency.</p>
+  </div>
+
+<pre><code><span class="num">10:</span> <span class="kw">void</span> copyStream(InputStream in, OutputStream out) <span class="kw">throws</span> IOException {
+<span class="num">11:</span>    <span class="kw">int</span> batchSize = <span class="num">1024</span>;
+<span class="num">12:</span>    <span class="kw">var</span> buffer = <span class="kw">new byte</span>[batchSize];
+<span class="num">13:</span>    <span class="kw">int</span> lengthRead;
+<span class="num">14:</span>    <span class="kw">while</span> ((lengthRead = in.read(buffer, <span class="num">0</span>, batchSize)) &gt; <span class="num">0</span>) {
+<span class="num">15:</span>       out.write(buffer, <span class="num">0</span>, lengthRead);
+<span class="num">16:</span>       out.flush();
+<span class="num">17:</span>    }
+<span class="num">18:</span> }</code></pre>
+  <ul class="trace">
+    <li>The offset and length apply to the <em>array</em>: offset 3, length 5 means read up to five values into the array starting at position 3.</li>
+    <li>The return value <code>lengthRead</code> is <strong>critical</strong>. Ignoring it and always writing the full buffer would append leftover bytes from the previous iteration.</li>
+    <li><code>flush()</code> requests that accumulated data be written to disk immediately. It has a cost, so use it only intermittently — not after every write.</li>
+  </ul>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>Code like <code>while(reader.read(buffer) != -1) { writer.write(buffer); }</code> compiles but is <strong>wrong</strong>: it ignores how many characters were actually read, so it only copies correctly when the file length is an exact multiple of the buffer size. Otherwise the final write duplicates leftover characters.</p>
+  </div>
+
+  <h3>The high-level way</h3>
+<pre><code><span class="num">26:</span> <span class="kw">void</span> copyTextFile(File src, File dest) <span class="kw">throws</span> IOException {
+<span class="num">27:</span>    <span class="kw">try</span> (<span class="kw">var</span> reader = <span class="kw">new</span> BufferedReader(<span class="kw">new</span> FileReader(src));
+<span class="num">28:</span>       <span class="kw">var</span> writer = <span class="kw">new</span> BufferedWriter(<span class="kw">new</span> FileWriter(dest))) {
+<span class="num">29:</span>       String line = <span class="kw">null</span>;
+<span class="num">30:</span>       <span class="kw">while</span> ((line = reader.readLine()) != <span class="kw">null</span>) {
+<span class="num">31:</span>          writer.write(line);
+<span class="num">32:</span>          writer.newLine();
+<span class="num">33:</span>       } } }</code></pre>
+  <ul class="trace">
+    <li>If the source does not exist, a <code>FileNotFoundException</code> (which inherits <code>IOException</code>) is thrown.</li>
+    <li>If the destination exists, it is <strong>overwritten</strong>. Pass an optional <code>boolean</code> second parameter to <code>FileWriter</code> to append instead.</li>
+    <li><code>readLine()</code> strips line breaks, so <code>newLine()</code> puts them back.</li>
+    <li>The try-with-resources closes every object in the chain.</li>
+  </ul>
+
+  <p>For byte data you would instead pick <code>BufferedInputStream</code>, <code>BufferedOutputStream</code>, <code>FileInputStream</code>, and <code>FileOutputStream</code>, calling <code>readAllBytes()</code> rather than <code>readLine()</code> and storing the result in a <code>byte[]</code>.</p>
+
+  <h3>PrintStream and PrintWriter</h3>
+<pre><code><span class="kw">try</span> (<span class="kw">var</span> reader = <span class="kw">new</span> BufferedReader(<span class="kw">new</span> FileReader(src));
+   <span class="kw">var</span> writer = <span class="kw">new</span> PrintWriter(<span class="kw">new</span> FileWriter(dest))) {
+   String line = <span class="kw">null</span>;
+   <span class="kw">while</span> ((line = reader.readLine()) != <span class="kw">null</span>)
+      writer.println(line);
+}</code></pre>
+  <p>The four key methods are <code>print()</code>, <code>println()</code>, <code>format()</code>, and <code>printf()</code>.</p>
+  <div class="card key-rule">
+    <span class="card-label">✓ Key Rule</span>
+    <p>The print stream classes' methods <strong>do not throw checked exceptions</strong> — otherwise you'd have to catch one every time you called <code>System.out.print()</code>. They report problems via <code>checkError()</code> and otherwise fail silently. <code>System.out</code> and <code>System.err</code> are <code>PrintStream</code> objects; <code>System.in</code> is an <code>InputStream</code>.</p>
+  </div>
+  <p>The line separator is <code>\n</code> or <code>\r\n</code> depending on the OS; <code>println()</code> handles it. To get it directly, use <code>System.lineSeparator()</code> or <code>System.getProperty("line.separator")</code>.</p>
+
+  <h3>Enhancing with Files</h3>
+<pre><code>String string = Files.readString(input);        Files.writeString(output, string);
+<span class="kw">byte</span>[] bytes = Files.readAllBytes(input);       Files.write(output, bytes);
+List&lt;String&gt; lines = Files.readAllLines(input); Files.write(output, lines);</code></pre>
+  <p>All three read the <strong>entire file at once</strong>, storing all contents in memory — a large file may trigger an <code>OutOfMemoryError</code>. The lazy alternative:</p>
+<pre><code><span class="kw">try</span> (Stream&lt;String&gt; s = Files.lines(path)) {
+   s.filter(f -&gt; f.startsWith(<span class="str">"WARN:"</span>))
+      .map(f -&gt; f.substring(<span class="num">5</span>))
+      .forEach(System.out::println);
+}</code></pre>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p><code>readAllLines()</code> returns a <code>List</code>; <code>lines()</code> returns a <code>Stream</code>. So Stream API methods are <strong>not available</strong> on the result of <code>readAllLines()</code>:</p>
+<pre style="margin:8px 0 6px"><code>Files.readAllLines(Path.of(<span class="str">"birds.txt"</span>))
+   <span class="err">.filter</span>(s -&gt; s.length() &gt; <span class="num">2</span>)      <span class="cm">// DOES NOT COMPILE</span>
+   .forEach(System.out::println);</code></pre>
+    <p><code>forEach()</code> works on both (a <code>List</code> is an <code>Iterable</code>), but <code>filter()</code>, <code>map()</code>, and <code>flatMap()</code> are Stream-only.</p>
+  </div>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ Key Rule</span>
+    <p>NIO.2 stream-based methods (<code>Files.list()</code>, <code>Files.lines()</code>, <code>Files.walk()</code>, <code>Files.find()</code>) open a connection to the file system that <strong>must be closed</strong> with try-with-resources; a terminal operation does <em>not</em> close them. Streams from Chapter 10 need no closing.</p>
+  </div>
+
+<pre><code><span class="kw">try</span> (<span class="kw">var</span> reader = Files.newBufferedReader(input);
+     <span class="kw">var</span> writer = Files.newBufferedWriter(output)) {
+   String line = <span class="kw">null</span>;
+   <span class="kw">while</span> ((line = reader.readLine()) != <span class="kw">null</span>) {
+      writer.write(line);
+      writer.newLine();
+   } }</code></pre>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Class</th><th>Method</th><th>Description</th></tr>
+      <tr><td>All input streams</td><td><code>int read()</code></td><td>Reads a single byte or returns <code>-1</code> if none available</td></tr>
+      <tr><td><code>InputStream</code> / <code>Reader</code></td><td><code>int read(byte[] b)</code> / <code>int read(char[] c)</code></td><td>Reads values into a buffer, returns count read</td></tr>
+      <tr><td><code>InputStream</code> / <code>Reader</code></td><td><code>int read(b, int offset, int length)</code></td><td>Reads up to <code>length</code> values starting at <code>offset</code></td></tr>
+      <tr><td>All output streams</td><td><code>void write(int b)</code></td><td>Writes a single byte</td></tr>
+      <tr><td><code>OutputStream</code> / <code>Writer</code></td><td><code>void write(byte[] b)</code> / <code>write(char[] c)</code></td><td>Writes an array of values</td></tr>
+      <tr><td><code>InputStream</code></td><td><code>byte[] readAllBytes()</code></td><td>Reads data in bytes</td></tr>
+      <tr><td><code>BufferedReader</code></td><td><code>String readLine()</code></td><td>Reads a line of data</td></tr>
+      <tr><td><code>Writer</code></td><td><code>void write(String line)</code></td><td>Writes a line of data</td></tr>
+      <tr><td><code>BufferedWriter</code></td><td><code>void newLine()</code></td><td>Writes a new line</td></tr>
+      <tr><td>All output streams</td><td><code>void flush()</code></td><td>Flushes buffered data through the stream</td></tr>
+      <tr><td>All streams</td><td><code>void close()</code></td><td>Closes the stream and releases resources</td></tr>
+    </table>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th><code>Files</code> static method</th><th>Description</th></tr>
+      <tr><td><code>byte[] readAllBytes(Path path)</code></td><td>Reads all data as bytes</td></tr>
+      <tr><td><code>String readString(Path path)</code></td><td>Reads all data into a <code>String</code></td></tr>
+      <tr><td><code>List&lt;String&gt; readAllLines(Path path)</code></td><td>Reads all data into a <code>List</code></td></tr>
+      <tr><td><code>Stream&lt;String&gt; lines(Path path)</code></td><td><strong>Lazily</strong> reads data</td></tr>
+      <tr><td><code>void write(Path path, byte[] bytes)</code></td><td>Writes an array of bytes</td></tr>
+      <tr><td><code>void writeString(Path path, String string)</code></td><td>Writes a <code>String</code></td></tr>
+      <tr><td><code>void write(Path path, List&lt;String&gt; list)</code></td><td>Writes a list of lines</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============ SECTION 5 ============ -->
+<section class="section" id="s5">
+  <div class="sec-num">Section 05</div>
+  <h2>Serializing Data</h2>
+
+  <p><strong>Serialization</strong> is the process of converting an in-memory object to a byte stream; <strong>deserialization</strong> is converting from a byte stream back into an object.</p>
+
+  <h3>The Serializable interface</h3>
+  <p><code>java.io.Serializable</code> is a <strong>marker interface</strong> — it has no methods, so any class can implement it. Its purpose is to inform any serializing process that you have taken the proper steps.</p>
+<pre><code><span class="kw">import</span> java.io.Serializable;
+<span class="kw">public class</span> Gorilla <span class="kw">implements</span> Serializable {
+   <span class="kw">private static final long</span> serialVersionUID = <span class="num">1L</span>;
+   <span class="kw">private</span> String name;
+   <span class="kw">private int</span> age;
+   <span class="kw">private</span> Boolean friendly;
+   <span class="kw">private transient</span> String favoriteFood;
+}</code></pre>
+
+  <div class="rules-box">
+    <h4>How to make a class serializable</h4>
+    <ul>
+      <li>The class must be marked <code>Serializable</code>.</li>
+      <li>Every instance member must be <strong>serializable</strong>, marked <strong><code>transient</code></strong>, or have a <strong><code>null</code> value</strong> at the time of serialization.</li>
+      <li>Apply the second rule <strong>recursively</strong> — a serializable field whose own fields are not serializable breaks the chain.</li>
+    </ul>
+  </div>
+
+<pre><code><span class="kw">public class</span> Cat <span class="kw">implements</span> Serializable { <span class="kw">private</span> Tail tail = <span class="kw">new</span> Tail(); }
+<span class="kw">public class</span> Tail <span class="kw">implements</span> Serializable { <span class="kw">private</span> Fur fur = <span class="kw">new</span> Fur(); }
+<span class="kw">public class</span> Fur {}    <span class="err">// not Serializable → Cat is not serializable</span></code></pre>
+  <p>Fix it by marking <code>fur</code> <code>transient</code> or by making <code>Fur</code> implement <code>Serializable</code>. Attempting to serialize an improperly built class throws <code>NotSerializableException</code>.</p>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <ul>
+      <li>A field declared as plain <code>Object</code> (e.g. <code>private Object stripes = new Object();</code>) makes the whole class <strong>not serializable</strong> — <code>Object</code> does not implement <code>Serializable</code>. The code compiles but throws at runtime.</li>
+      <li><strong>Records are not automatically serializable.</strong> <code>record R(String name) {}</code> is not; <code>record R(String name) implements Serializable {}</code> is.</li>
+      <li>A <code>serialVersionUID</code> is <strong>recommended, not required</strong>.</li>
+      <li>Marking <code>static</code> fields <code>transient</code> has little effect — other than <code>serialVersionUID</code>, only <strong>instance</strong> members are serialized.</li>
+    </ul>
+  </div>
+
+  <h3>ObjectOutputStream and ObjectInputStream</h3>
+<pre><code><span class="cm">// ObjectInputStream</span>
+<span class="kw">public</span> Object readObject() <span class="kw">throws</span> IOException, ClassNotFoundException
+<span class="cm">// ObjectOutputStream</span>
+<span class="kw">public void</span> writeObject(Object obj) <span class="kw">throws</span> IOException</code></pre>
+
+<pre><code><span class="kw">void</span> saveToFile(List&lt;Gorilla&gt; gorillas, File dataFile) <span class="kw">throws</span> IOException {
+   <span class="kw">try</span> (<span class="kw">var</span> out = <span class="kw">new</span> ObjectOutputStream(
+           <span class="kw">new</span> BufferedOutputStream(<span class="kw">new</span> FileOutputStream(dataFile)))) {
+      <span class="kw">for</span> (Gorilla gorilla : gorillas)
+         out.writeObject(gorilla);
+   }
+}
+
+List&lt;Gorilla&gt; readFromFile(File dataFile) <span class="kw">throws</span> IOException, ClassNotFoundException {
+   <span class="kw">var</span> gorillas = <span class="kw">new</span> ArrayList&lt;Gorilla&gt;();
+   <span class="kw">try</span> (<span class="kw">var</span> in = <span class="kw">new</span> ObjectInputStream(
+         <span class="kw">new</span> BufferedInputStream(<span class="kw">new</span> FileInputStream(dataFile)))) {
+      <span class="kw">while</span> (<span class="kw">true</span>) {
+         <span class="kw">var</span> object = in.readObject();
+         <span class="kw">if</span> (object <span class="kw">instanceof</span> Gorilla g)
+            gorillas.add(g);
+      }
+   } <span class="kw">catch</span> (EOFException e) {
+      <span class="cm">// File end reached</span>
+   }
+   <span class="kw">return</span> gorillas;
+}</code></pre>
+  <ul class="trace">
+    <li>When calling <code>readObject()</code>, <strong><code>null</code> and <code>-1</code> have no special meaning</strong> — someone may have serialized those values. So an infinite loop is used, terminated by <code>EOFException</code>.</li>
+    <li><code>readObject()</code> declares a checked <code>ClassNotFoundException</code> since the class might not be available at deserialization.</li>
+    <li><code>available()</code> cannot be used to detect the end — it only reports blocks readable without blocking, and can return <code>0</code> even when bytes remain.</li>
+  </ul>
+
+  <h3>The deserialization creation process</h3>
+  <div class="card key-rule">
+    <span class="card-label">✓ Key Rule</span>
+    <p>On deserialization, the constructor <strong>and</strong> instance initializers of the serialized class are <strong>not called</strong>. Java calls the <strong>no-arg constructor of the first non-serializable parent class</strong> it finds in the hierarchy. Static and transient fields are ignored, and missing values take their Java defaults (<code>null</code>, <code>0</code>).</p>
+  </div>
+
+<pre><code><span class="cm">// Mammal.java — NOT Serializable</span>
+<span class="kw">public class</span> Mammal {
+   <span class="kw">private int</span> id;
+   <span class="kw">public</span> Mammal() { <span class="kw">this</span>.id = <span class="num">4</span>; }
+}
+
+<span class="cm">// Chimpanzee.java</span>
+<span class="kw">public class</span> Chimpanzee <span class="kw">extends</span> Mammal <span class="kw">implements</span> Serializable {
+   <span class="kw">private static final long</span> serialVersionUID = <span class="num">2L</span>;
+   <span class="kw">private transient</span> String name;
+   <span class="kw">private transient int</span> age = <span class="num">10</span>;
+   <span class="kw">private static char</span> type = <span class="str">'C'</span>;
+   { <span class="kw">this</span>.age = <span class="num">14</span>; }
+   <span class="kw">public</span> Chimpanzee() { <span class="kw">this</span>(<span class="str">"Unknown"</span>, <span class="num">12</span>, <span class="str">'Q'</span>); }
+   <span class="kw">public</span> Chimpanzee(String name, <span class="kw">int</span> age, <span class="kw">char</span> type) {
+      <span class="kw">this</span>.name = name; <span class="kw">this</span>.age = age; <span class="kw">this</span>.type = type; setId(<span class="num">9</span>);
+   }
+}</code></pre>
+<pre><code>Original:  [name=Ham,  age=2, type=B, id=9], [name=Enos, age=3, type=B, id=9]
+From Disk: [name=null, age=0, type=B, id=4], [name=null, age=0, type=B, id=4]</code></pre>
+  <ul class="trace">
+    <li><code>name</code> and <code>age</code> are <code>transient</code> → not written; they come back as <code>null</code> and <code>0</code>.</li>
+    <li><code>type</code> is <code>static</code> → not written; it shows whatever value was set last in the JVM.</li>
+    <li>Neither <code>Chimpanzee</code> constructor runs, and the instance initializer setting <code>age = 14</code> does not run either.</li>
+    <li><code>Mammal</code> is not <code>Serializable</code>, so <strong>its</strong> no-arg constructor runs and <code>id</code> becomes <code>4</code>.</li>
+    <li>A subclass of a <code>Serializable</code> class is itself serializable, inheriting the interface.</li>
+  </ul>
+
+  <div class="card remember">
+    <span class="card-label">★ Remember</span>
+    <p>You can customize serialization by declaring <strong>private</strong> <code>readObject(ObjectInputStream)</code> and <code>writeObject(ObjectOutputStream)</code> methods. These are not overrides — they are called automatically. Start <code>readObject()</code> with <code>in.defaultReadObject()</code> and end <code>writeObject()</code> with <code>out.defaultWriteObject()</code>.</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 6 ============ -->
+<section class="section" id="s6">
+  <div class="sec-num">Section 06</div>
+  <h2>Interacting with Users</h2>
+
+  <h3>The system streams</h3>
+  <p><code>System.out</code> and <code>System.err</code> are both <code>PrintStream</code> instances; <code>System.in</code> is an <code>InputStream</code>. <code>System.err</code> reports errors on a separate stream — an IDE might colour it differently, and a server might route it to a different log file.</p>
+<pre><code><span class="kw">var</span> reader = <span class="kw">new</span> BufferedReader(<span class="kw">new</span> InputStreamReader(System.in));
+String userInput = reader.readLine();
+System.out.println(<span class="str">"You entered: "</span> + userInput);</code></pre>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>System streams are the only streams in this chapter <strong>not</strong> used in try-with-resources. They are static and shared by the whole application; closing them makes them permanently unavailable to all threads. Watch what happens:</p>
+<pre style="margin:8px 0 6px"><code><span class="kw">try</span> (<span class="kw">var</span> out = System.out) {}
+System.out.println(<span class="str">"Hello"</span>);      <span class="cm">// prints NOTHING — fails silently</span>
+
+<span class="kw">try</span> (<span class="kw">var</span> err = System.err) {}
+System.err.println(<span class="str">"Hello"</span>);      <span class="cm">// prints NOTHING — fails silently</span>
+
+<span class="kw">var</span> reader = <span class="kw">new</span> BufferedReader(<span class="kw">new</span> InputStreamReader(System.in));
+<span class="kw">try</span> (reader) {}
+String data = reader.readLine();     <span class="err">// IOException at runtime</span></code></pre>
+    <p>The <code>PrintStream</code> cases fail silently because their methods throw no checked exceptions. Most <code>InputStream</code> implementations <strong>do</strong> throw if you operate on a closed stream.</p>
+  </div>
+
+  <h3>The Console class</h3>
+  <p><code>java.io.Console</code> is a <strong>singleton</strong>, accessible only through a factory method:</p>
+<pre><code>Console c = <span class="kw">new</span> Console();          <span class="err">// DOES NOT COMPILE — constructors are private</span>
+
+Console console = System.console();
+<span class="kw">if</span> (console != <span class="kw">null</span>) {
+   String userInput = console.readLine();
+   console.writer().println(<span class="str">"You entered: "</span> + userInput);
+   console.flush();
+} <span class="kw">else</span> {
+   System.err.println(<span class="str">"Console not available"</span>);
+}</code></pre>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ Key Rule</span>
+    <p><code>System.console()</code> returns <strong><code>null</code></strong> when a console is not available, depending on where the code runs. <strong>Always check for null before using it</strong> — code that calls <code>c.readLine()</code> straight after <code>var c = System.console();</code> <em>may</em> throw a <code>NullPointerException</code>.</p>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Method</th><th>Notes</th></tr>
+      <tr><td><code>Reader reader()</code></td><td>Character-stream analogue of <code>System.in</code></td></tr>
+      <tr><td><code>PrintWriter writer()</code></td><td>Character-stream analogue of <code>System.out</code></td></tr>
+      <tr><td><code>String readLine()</code><br><code>String readLine(String fmt, Object... args)</code></td><td>Reads until Enter; the overload displays a formatted prompt first</td></tr>
+      <tr><td><code>char[] readPassword()</code><br><code>char[] readPassword(String fmt, Object... args)</code></td><td>Input is <strong>not echoed</strong>, and returns <code>char[]</code> — not <code>String</code></td></tr>
+      <tr><td><code>format(String, Object...)</code> · <code>format(Locale, String, Object...)</code> · <code>printf(...)</code></td><td><code>printf()</code> is interchangeable with <code>format()</code></td></tr>
+      <tr><td><code>flush()</code></td><td>Ensures output actually gets written</td></tr>
+    </table>
+  </div>
+
+  <div class="card remember">
+    <span class="card-label">★ Remember</span>
+    <p><code>readPassword()</code> returns a <code>char[]</code> for two reasons: the text isn't echoed on screen (though it isn't encrypted), and the password never enters the <code>String</code> pool. Note that the <code>Console</code> writer methods <strong>do</strong> throw a checked <code>IOException</code>, unlike <code>PrintStream</code>.</p>
+  </div>
+
+<pre><code>console.writer().println(<span class="str">"Welcome to Our Zoo!"</span>);
+console.format(<span class="str">"It has %d animals and employs %d people"</span>, <span class="num">391</span>, <span class="num">25</span>);
+console.writer().println();
+console.printf(<span class="str">"The zoo spans %5.1f acres"</span>, <span class="num">128.91</span>);
+console.flush();
+<span class="cm">// Welcome to Our Zoo!</span>
+<span class="cm">// It has 391 animals and employs 25 people</span>
+<span class="cm">// The zoo spans 128.9 acres</span></code></pre>
+</section>
+
+<!-- ============ SECTION 7 ============ -->
+<section class="section" id="s7">
+  <div class="sec-num">Section 07</div>
+  <h2>Working with Advanced APIs</h2>
+
+  <h3>Manipulating input streams</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Method</th><th>Description</th></tr>
+      <tr><td><code>boolean markSupported()</code></td><td>Returns <code>true</code> if the stream class supports <code>mark()</code></td></tr>
+      <tr><td><code>void mark(int readLimit)</code></td><td>Marks the current position in the stream</td></tr>
+      <tr><td><code>void reset()</code></td><td>Attempts to reset the stream to the <code>mark()</code> position</td></tr>
+      <tr><td><code>long skip(long n)</code></td><td>Reads and <strong>discards</strong> the specified number of characters</td></tr>
+    </table>
+  </div>
+
+<pre><code><span class="cm">// next values are LION</span>
+System.out.print((<span class="kw">char</span>) is.read());     <span class="cm">// L</span>
+<span class="kw">if</span> (is.markSupported()) {
+   is.mark(<span class="num">100</span>);
+   System.out.print((<span class="kw">char</span>) is.read());  <span class="cm">// I</span>
+   System.out.print((<span class="kw">char</span>) is.read());  <span class="cm">// O</span>
+   is.reset();
+}
+System.out.print((<span class="kw">char</span>) is.read());     <span class="cm">// I</span>
+System.out.print((<span class="kw">char</span>) is.read());     <span class="cm">// O</span>
+System.out.print((<span class="kw">char</span>) is.read());     <span class="cm">// N</span>
+<span class="cm">// Prints LIOION if mark() is supported, LION otherwise</span></code></pre>
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p>Because not all classes support <code>mark()</code>, any question involving it usually has "<strong>may</strong> print" as the correct answer rather than "will always print." The <code>readLimit</code> passed to <code>mark()</code> says how many bytes you expect to read before <code>reset()</code>; exceeding it may throw. Calling <code>mark()</code>/<code>reset()</code> without checking <code>markSupported()</code> can throw at runtime.</p>
+  </div>
+
+<pre><code><span class="cm">// next values are TIGERS</span>
+System.out.print((<span class="kw">char</span>)is.read());   <span class="cm">// T</span>
+is.skip(<span class="num">2</span>);                          <span class="cm">// skips I and G</span>
+is.read();                            <span class="cm">// reads E but doesn't output it</span>
+System.out.print((<span class="kw">char</span>)is.read());   <span class="cm">// R</span>
+System.out.print((<span class="kw">char</span>)is.read());   <span class="cm">// S</span>
+<span class="cm">// Prints TRS</span></code></pre>
+  <p><code>skip()</code> returns how many values were actually skipped — near the end of a stream, <code>skip(1000)</code> might return <code>20</code>.</p>
+
+  <h3>Discovering file attributes</h3>
+  <p>Beyond <code>isDirectory()</code> and <code>isRegularFile()</code>, <code>Files</code> adds <code>isSymbolicLink()</code>, which <code>File</code> cannot do. Note that <code>isDirectory()</code> or <code>isRegularFile()</code> can return <code>true</code> for a symbolic link, as long as the link <em>resolves</em> to that type.</p>
+  <p><code>Files</code> also exposes <code>isHidden()</code>, <code>isReadable()</code>, <code>isWritable()</code>, and <code>isExecutable()</code>. With the exception of <code>isHidden()</code>, these declare no checked exceptions and <strong>return <code>false</code> if the file does not exist</strong>.</p>
+
+  <h3>Attribute views</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Attributes interface</th><th>View interface</th><th>Description</th></tr>
+      <tr><td><code>BasicFileAttributes</code></td><td><code>BasicFileAttributeView</code></td><td>Basic set supported by all file systems</td></tr>
+      <tr><td><code>DosFileAttributes</code></td><td><code>DosFileAttributeView</code></td><td>Basic plus DOS/Windows-specific attributes</td></tr>
+      <tr><td><code>PosixFileAttributes</code></td><td><code>PosixFileAttributeView</code></td><td>Basic plus POSIX attributes (Unix, Linux, Mac)</td></tr>
+    </table>
+  </div>
+
+<pre><code><span class="cm">// Read-only</span>
+<span class="kw">var</span> path = Path.of(<span class="str">"/turtles/sea.txt"</span>);
+BasicFileAttributes data = Files.readAttributes(path, BasicFileAttributes.class);
+data.isDirectory();  data.isRegularFile();  data.isSymbolicLink();
+data.size();         data.lastModifiedTime();
+
+<span class="cm">// Updatable view</span>
+BasicFileAttributeView view =
+   Files.getFileAttributeView(path, BasicFileAttributeView.class);
+BasicFileAttributes attributes = view.readAttributes();
+FileTime lastModifiedTime = FileTime.fromMillis(
+   attributes.lastModifiedTime().toMillis() + <span class="num">10_000</span>);
+view.setTimes(lastModifiedTime, <span class="kw">null</span>, <span class="kw">null</span>);</code></pre>
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p><code>setTimes(lastModifiedTime, lastAccessTime, createTime)</code> is available only on <strong><code>BasicFileAttributeView</code></strong>, never on the read-only <code>BasicFileAttributes</code>. Calling <code>a.setTimes(...)</code> on a <code>BasicFileAttributes</code> variable does not compile. Pass <code>null</code> for any value you don't want to modify.</p>
+  </div>
+  <p>Reading all attributes in one call means fewer round-trips to the file system, which is <strong>more performant</strong> than calling several individual methods — and views can expose file-system-specific attributes the <code>Files</code> methods cannot.</p>
+
+  <h3>Traversing a directory tree</h3>
+  <div class="vs-grid">
+    <div class="left">
+      <h4>Depth-first search</h4>
+      <ul>
+        <li>Goes from root to an arbitrary leaf, then back up, filling in skipped paths</li>
+        <li>Uses a <strong>search depth</strong> limit to prevent endless searching</li>
+        <li><strong>This is what the NIO.2 Stream API methods use</strong></li>
+      </ul>
+    </div>
+    <div class="right">
+      <h4>Breadth-first search</h4>
+      <ul>
+        <li>Processes all elements of each depth before the next</li>
+        <li>Balanced and predictable</li>
+        <li>Requires more memory — a list of visited nodes is maintained</li>
+      </ul>
+    </div>
+  </div>
+
+<pre><code><span class="kw">public static</span> Stream&lt;Path&gt; walk(Path start, FileVisitOption... options)
+<span class="kw">public static</span> Stream&lt;Path&gt; walk(Path start, <span class="kw">int</span> maxDepth, FileVisitOption... options)</code></pre>
+<pre><code><span class="kw">public long</span> getPathSize(Path source) <span class="kw">throws</span> IOException {
+   <span class="kw">try</span> (<span class="kw">var</span> s = Files.walk(source)) {
+      <span class="kw">return</span> s.parallel()
+            .filter(p -&gt; !Files.isDirectory(p))
+            .mapToLong(<span class="kw">this</span>::getSize)
+            .sum();
+   }
+}</code></pre>
+  <ul class="trace">
+    <li><code>walk()</code> uses <strong>lazy evaluation</strong>, so memory stays low even for huge trees.</li>
+    <li>The one-argument version uses a default max depth of <code>Integer.MAX_VALUE</code>. A depth of <code>0</code> means the current path itself.</li>
+    <li>The helper <code>getSize()</code> wraps <code>Files.size()</code>'s <code>IOException</code> in an <code>UncheckedIOException</code> so it can be used inside a lambda.</li>
+  </ul>
+
+  <div class="card key-rule">
+    <span class="card-label">✓ Key Rule</span>
+    <p><code>walk()</code> is the odd one out: most NIO.2 methods <strong>follow</strong> symbolic links by default and are disabled with <code>NOFOLLOW_LINKS</code>, but <code>walk()</code> does <strong>not</strong> follow them unless you pass <code>FileVisitOption.FOLLOW_LINKS</code>. When that option is used, <code>walk()</code> tracks visited paths and throws <code>FileSystemLoopException</code> if a path is visited twice (a <strong>cycle</strong>).</p>
+  </div>
+
+  <h3>Searching a directory with find()</h3>
+<pre><code><span class="kw">public static</span> Stream&lt;Path&gt; find(Path start,
+   <span class="kw">int</span> maxDepth,
+   BiPredicate&lt;Path, BasicFileAttributes&gt; matcher,
+   FileVisitOption... options) <span class="kw">throws</span> IOException</code></pre>
+<pre><code><span class="kw">var</span> path = Path.of(<span class="str">"/bigcats"</span>);
+<span class="kw">long</span> minSize = <span class="num">1_000</span>;
+<span class="kw">try</span> (<span class="kw">var</span> s = Files.find(path, <span class="num">10</span>,
+      (p, a) -&gt; a.isRegularFile()
+         &amp;&amp; p.toString().endsWith(<span class="str">".java"</span>)
+         &amp;&amp; a.size() &gt; minSize)) {
+   s.forEach(System.out::println);
+}</code></pre>
+  <ul class="trace">
+    <li><code>find()</code> behaves like <code>walk()</code> but takes a <code>BiPredicate</code> and <strong>requires</strong> a depth limit.</li>
+    <li>The two <code>BiPredicate</code> parameters are a <code>Path</code> and a <code>BasicFileAttributes</code> — Java retrieves the attributes for you.</li>
+    <li>A <code>maxDepth</code> of <strong><code>0</code> searches only the starting path itself</strong>, so a search for symbolic links under a directory would print nothing.</li>
+  </ul>
+
+  <div class="card exam-trap">
+    <span class="card-label">⚠ Exam Trap</span>
+    <p><code>Files.walk()</code> returns a <code>Stream&lt;Path&gt;</code>, so <code>filter()</code> on it takes a <strong>one-parameter</strong> <code>Predicate</code>. A lambda like <code>.filter((p, a) -&gt; ...)</code> after <code>walk()</code> <span class="no">does not compile</span> — the two-parameter <code>BiPredicate</code> form belongs to <code>find()</code>.</p>
+  </div>
+
+  <div class="card remember">
+    <span class="card-label">★ Remember</span>
+    <p>An older way to list a directory is <code>Files.newDirectoryStream(path, "*.{txt,java}")</code>, returning a <code>DirectoryStream&lt;Path&gt;</code> you iterate with a for-each loop. Prefer <code>Files.find()</code> in new code, but recognise either on the exam.</p>
+  </div>
+
+  <h3>Review of key APIs</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Class</th><th>Purpose</th></tr>
+      <tr><td><code>File</code></td><td>I/O representation of a location in the file system</td></tr>
+      <tr><td><code>Files</code></td><td>Helper methods for working with <code>Path</code></td></tr>
+      <tr><td><code>Path</code></td><td>NIO.2 representation of a location in the file system</td></tr>
+      <tr><td><code>Paths</code></td><td>Contains factory methods to get a <code>Path</code></td></tr>
+      <tr><td><code>InputStream</code></td><td>Superclass for reading files based on bytes</td></tr>
+      <tr><td><code>OutputStream</code></td><td>Superclass for writing files based on bytes</td></tr>
+      <tr><td><code>Reader</code></td><td>Superclass for reading files based on characters</td></tr>
+      <tr><td><code>Writer</code></td><td>Superclass for writing files based on characters</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============ RECAP ============ -->
+<section class="recap" id="recap">
+  <h2>Short Recap</h2>
+
+  <h4>Files and paths</h4>
+  <ul>
+    <li>Absolute paths start with <code>/</code> or a drive letter; everything else is relative. Path symbols: <code>.</code> = current, <code>..</code> = parent.</li>
+    <li><code>File</code> uses constructors; <code>Path</code> is an interface created via <code>Path.of()</code>, <code>Paths.get()</code>, <code>FileSystems</code>, or a <code>URI</code>. Convert with <code>toPath()</code> / <code>toFile()</code>.</li>
+  </ul>
+
+  <h4>Operating on paths</h4>
+  <ul>
+    <li><code>Path</code> is immutable — unassigned method calls do nothing. <code>toString()</code> is the only method returning a <code>String</code>.</li>
+    <li><code>getNameCount()</code>, <code>getName()</code>, and <code>subpath()</code> exclude the root and throw <code>IllegalArgumentException</code> on bad indexes.</li>
+    <li><code>resolve()</code> = concatenation (an absolute argument wins). <code>relativize()</code> needs both paths the same kind. <code>normalize()</code> is textual; <code>toRealPath()</code> hits the file system and throws if missing.</li>
+    <li><code>createDirectory()</code> vs <code>createDirectories()</code>; <code>delete()</code> vs <code>deleteIfExists()</code>; <code>copy()</code>/<code>move()</code> need <code>REPLACE_EXISTING</code> and never place a file "into" a directory.</li>
+  </ul>
+
+  <h4>I/O streams</h4>
+  <ul>
+    <li>Byte (<code>InputStream</code>/<code>OutputStream</code>) vs character (<code>Reader</code>/<code>Writer</code>); input vs output; low-level (file classes only) vs high-level (everything else).</li>
+    <li>Never mix families when wrapping. <code>InputStream</code>/<code>Reader</code>/etc. are abstract. No <code>PrintReader</code> exists.</li>
+    <li><code>read()</code> returns <code>int</code>, with <code>-1</code> for end of stream; always honour the return value of the buffered overload.</li>
+  </ul>
+
+  <h4>Files convenience methods</h4>
+  <ul>
+    <li><code>readString()</code>, <code>readAllBytes()</code>, <code>readAllLines()</code> load everything into memory; <code>lines()</code> is lazy and returns a <code>Stream</code>.</li>
+    <li>NIO.2 stream methods must be closed with try-with-resources.</li>
+  </ul>
+
+  <h4>Serialization</h4>
+  <ul>
+    <li><code>Serializable</code> is a marker interface; every instance member must be serializable, <code>transient</code>, or <code>null</code>. Records must implement it explicitly.</li>
+    <li>On deserialization no constructor or instance initializer of the serialized class runs — only the no-arg constructor of the first non-serializable parent.</li>
+    <li><code>readObject()</code> is looped until <code>EOFException</code>; it declares <code>ClassNotFoundException</code>.</li>
+  </ul>
+
+  <h4>Users and advanced APIs</h4>
+  <ul>
+    <li><code>System.out</code>/<code>System.err</code> are <code>PrintStream</code> (silent failures); <code>System.in</code> is an <code>InputStream</code>. Don't close them.</li>
+    <li><code>Console</code> is a singleton from <code>System.console()</code> that may be <code>null</code>; <code>readPassword()</code> returns <code>char[]</code>.</li>
+    <li><code>mark()</code>/<code>reset()</code>/<code>skip()</code>; check <code>markSupported()</code> first.</li>
+    <li><code>readAttributes()</code> is read-only, <code>getFileAttributeView()</code> is updatable (<code>setTimes()</code>). <code>walk()</code> doesn't follow links by default; <code>find()</code> takes a <code>BiPredicate</code> and requires a depth.</li>
+  </ul>
+</section>
+
+<!-- ============ CHEAT SHEET ============ -->
+<section class="section" id="cheat">
+  <div class="sec-num">Cheat Sheet</div>
+  <h2>Exam Traps Cheat Sheet</h2>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Scenario</th><th>What it tests</th><th>Verdict</th></tr>
+      <tr><td><code>new Path("jaguar.txt")</code></td><td><code>Path</code> is an interface</td><td class="no">Does not compile</td></tr>
+      <tr><td><code>Path.get("cats","lynx.txt")</code></td><td><code>of()</code> on <code>Path</code>, <code>get()</code> on <code>Paths</code></td><td class="no">Does not compile</td></tr>
+      <tr><td><code>new File("/w", "winter", "snow.dat")</code></td><td>No three-arg <code>File</code> constructor</td><td class="no">Does not compile</td></tr>
+      <tr><td><code>new File("/dir", new File("f.txt"))</code></td><td>Only <code>(File, String)</code> exists, not <code>(String, File)</code></td><td class="no">Does not compile</td></tr>
+      <tr><td><code>Files.mkdir(p)</code></td><td>NIO.2 name is <code>createDirectory()</code></td><td class="no">Does not compile</td></tr>
+      <tr><td>Method calling <code>Files.deleteIfExists()</code> without <code>throws IOException</code></td><td>Checked exception must be handled</td><td class="no">Does not compile</td></tr>
+      <tr><td><code>p.resolve("krill");</code> then printing <code>p</code></td><td><code>Path</code> immutability</td><td class="no">Unchanged — result discarded</td></tr>
+      <tr><td><code>Path.of("/").getName(0)</code></td><td>Root excluded from name count</td><td class="no"><code>IllegalArgumentException</code></td></tr>
+      <tr><td><code>p.subpath(1, 1)</code></td><td>Empty range</td><td class="no"><code>IllegalArgumentException</code></td></tr>
+      <tr><td><code>Path.of("/turkey/food").resolve("/tiger/cage")</code></td><td>Absolute argument wins</td><td class="yes"><code>/tiger/cage</code></td></tr>
+      <tr><td><code>relativize()</code> with one absolute and one relative path</td><td>Both must be the same kind</td><td class="no"><code>IllegalArgumentException</code></td></tr>
+      <tr><td><code>toRealPath()</code> on a nonexistent path</td><td>Touches the file system</td><td class="no">Throws</td></tr>
+      <tr><td><code>Files.copy(file, existingDirectory)</code></td><td>Target is the new file path, not a folder</td><td class="no">Throws at runtime</td></tr>
+      <tr><td><code>copy()</code>/<code>move()</code> onto an existing target without <code>REPLACE_EXISTING</code></td><td>Default overwrite behaviour</td><td class="no">Throws</td></tr>
+      <tr><td><code>createDirectories()</code> when everything already exists</td><td>Idempotent</td><td class="yes">Completes silently</td></tr>
+      <tr><td><code>Files.delete()</code> on a missing path</td><td><code>delete</code> vs <code>deleteIfExists</code></td><td class="no">Throws; the other returns <code>false</code></td></tr>
+      <tr><td>Deleting a symbolic link</td><td>Link vs target</td><td class="yes">The link is deleted</td></tr>
+      <tr><td><code>equals()</code> vs <code>isSameFile()</code> on <code>/a/./b</code> and <code>/a/b</code></td><td>Symbol resolution</td><td class="no"><code>equals()</code> false, <code>isSameFile()</code> true</td></tr>
+      <tr><td><code>Files.mismatch()</code> on identical files</td><td>Return contract</td><td class="yes">Returns <code>-1</code></td></tr>
+      <tr><td><code>new BufferedInputStream(new FileReader(f))</code></td><td>Mixing byte and character families</td><td class="no">Does not compile</td></tr>
+      <tr><td><code>new BufferedInputStream(new InputStream())</code></td><td><code>InputStream</code> is abstract</td><td class="no">Does not compile</td></tr>
+      <tr><td><code>PrintReader</code></td><td>Class does not exist</td><td class="no">Does not compile</td></tr>
+      <tr><td><code>while(reader.read(buffer) != -1) writer.write(buffer);</code></td><td>Ignoring the read count</td><td class="no">Corrupts non-multiple-length files</td></tr>
+      <tr><td><code>Files.readAllLines(p).filter(...)</code></td><td><code>List</code> vs <code>Stream</code></td><td class="no">Does not compile</td></tr>
+      <tr><td><code>Files.lines()</code> without try-with-resources</td><td>NIO.2 streams hold a file handle</td><td class="no">Resource leak</td></tr>
+      <tr><td><code>record R(String n) {}</code> serialized</td><td>Records aren't automatically serializable</td><td class="no">Must implement <code>Serializable</code></td></tr>
+      <tr><td>A <code>private Object x = new Object();</code> field in a <code>Serializable</code> class</td><td><code>Object</code> isn't serializable</td><td class="no">Throws at runtime</td></tr>
+      <tr><td>Constructors/initializers on deserialization</td><td>Creation process</td><td class="no">Only the first non-serializable parent's no-arg constructor runs</td></tr>
+      <tr><td><code>transient</code> and <code>static</code> fields after deserialization</td><td>What gets written</td><td class="no">Defaults / last JVM value</td></tr>
+      <tr><td><code>try (var out = System.out) {}</code> then printing</td><td>Closing a system stream</td><td class="no">Prints nothing, silently</td></tr>
+      <tr><td>Reading from a closed <code>System.in</code> wrapper</td><td>InputStreams do throw</td><td class="no"><code>IOException</code></td></tr>
+      <tr><td><code>new Console()</code></td><td>Singleton with private constructors</td><td class="no">Does not compile</td></tr>
+      <tr><td>Using <code>System.console()</code> without a null check</td><td>Console may be unavailable</td><td class="no">Possible <code>NullPointerException</code></td></tr>
+      <tr><td><code>mark()</code>/<code>reset()</code> question phrased "will always print"</td><td><code>markSupported()</code> may be false</td><td class="no">Only "may print" is safe</td></tr>
+      <tr><td><code>a.setTimes(...)</code> on <code>BasicFileAttributes</code></td><td>View vs read-only attributes</td><td class="no">Does not compile</td></tr>
+      <tr><td><code>Files.walk(p).filter((p, a) -&gt; ...)</code></td><td><code>Predicate</code> vs <code>BiPredicate</code></td><td class="no">Does not compile</td></tr>
+      <tr><td><code>Files.find(dir, 0, ...)</code></td><td>Depth 0 = starting path only</td><td class="no">Searches nothing below</td></tr>
+      <tr><td><code>Files.walk()</code> and symbolic links</td><td>Default link behaviour</td><td class="no">Not followed without <code>FOLLOW_LINKS</code></td></tr>
+    </table>
+  </div>
+</section>
+
+<footer>OCP Java SE 21 Developer Study Guide · Boyarsky &amp; Selikoff · Chapter 14 — I/O · Detailed Handnote</footer>
+</div>
+</body>
+</html>

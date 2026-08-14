@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Context for AI agents working on this repository. Read this before making changes.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## What this is
 
@@ -16,34 +16,31 @@ bilingual (English + Bengali) and ships with a light/dark theme.
 - Must run as plain static files served over HTTP and deploy to GitHub Pages
   with zero config.
 
-## Project structure
+## Running locally
 
-```
-ocp-book-site/
-├── index.html        # App shell: header, sidebar, tab strip, breadcrumb, footer
-├── style.css         # Design system: theme tokens, layout, components
-├── script.js         # All app logic: chapter data, routing, fetch+inject, theme
-├── README.md         # Short project description
-├── CLAUDE.md         # This file
-└── chapters/
-    └── <nn>-<slug>/  # One folder per chapter (e.g. 04-core-apis/)
-        ├── Ch<n>_<Slug>_Handnote_EN.html       # English handnote fragment
-        ├── Ch<n>_<Slug>_HandNote_Bangla.html   # Bangla handnote fragment
-        └── Ch<n>_<Slug>_MCQ_Practice.html       # MCQ practice fragment
+`fetch()` does not work on the `file://` protocol, so the folder **must** be
+served over HTTP:
+
+```bash
+python -m http.server 8000   # or: npx serve .
 ```
 
-Chapter folders currently present: `01-building-blocks`, `04-core-apis`,
-`05-methods`. The rest are declared in `script.js` but have no files yet
-(their tabs show a disabled "(soon)" state).
+Then open <http://localhost:8000>. Double-clicking `index.html` will fail to load
+chapter content.
 
-> Note: fragment files follow a descriptive convention, e.g.
-> `Ch4_CoreAPIs_Handnote_EN.html` / `Ch4_CoreAPIs_HandNote_Bangla.html` /
-> `Ch4_CoreAPIs_MCQ_Practice.html`. Casing is not perfectly uniform (EN uses
-> `Handnote`, Bangla uses `HandNote`), so the actual path always comes from the
-> `chapters` array in `script.js` — that array is the source of truth, not any
-> naming convention.
+There is no build, lint, or test command — the three root files (`index.html`,
+`style.css`, `script.js`) are shipped as-is. Verification is manual: load the
+page, switch chapters/views, toggle theme and focus mode.
 
-## How it works
+## Deploy
+
+Push to GitHub and enable Pages on the branch root. Everything is static, so no
+configuration or build is required.
+
+## Architecture
+
+Three root files plus a `chapters/` tree. `index.html` is the shell markup,
+`style.css` the design system, `script.js` all app logic.
 
 ### Single source of truth
 `script.js` holds a `chapters` array. Each entry:
@@ -53,7 +50,7 @@ Chapter folders currently present: `01-building-blocks`, `04-core-apis`,
   id: "core-apis",        // hash slug used in the URL
   number: 4,              // display number / ordering
   title: "Core APIs",     // sidebar + breadcrumb label
-  titleBn: "",            // optional Bengali title (unused so far)
+  titleBn: "",            // optional Bengali subtitle in the tab strip
   handnoteFile: "chapters/04-core-apis/Ch4_CoreAPIs_Handnote_EN.html",      // or null
   banglaFile:   "chapters/04-core-apis/Ch4_CoreAPIs_HandNote_Bangla.html",  // or null
   questionsFile:"chapters/04-core-apis/Ch4_CoreAPIs_MCQ_Practice.html",     // or null
@@ -64,6 +61,9 @@ Any `*File` set to `null` disables that view's tab and shows a "(soon)" state.
 
 The `views` array defines the three tabs and maps each to its chapter field
 (`handnoteFile`, `banglaFile`, `questionsFile`). Tab order follows this array.
+
+Sidebar, tabs, breadcrumb, and the tab-strip chapter label are all rendered from
+these two arrays — edit the data, not the DOM, to change navigation.
 
 ### Routing
 - URL hash format: `#<chapter-id>/<view>` — e.g. `#core-apis/handnote`.
@@ -78,19 +78,42 @@ own `<head>`/`<style>`. The shell loads it into an **`<iframe>`** so the
 fragment's CSS and JS stay isolated and never leak into the shell. `script.js`
 auto-sizes the iframe to its content height so the page scrolls as one (no nested
 scrollbar). It re-fits on window resize, after the fragment's web fonts finish
-loading (`document.fonts.ready`), and on any later content height change (a
-`ResizeObserver` on the iframe body). It also forces `overflow:hidden` on the
-iframe document so sub-pixel rounding can never leave a residual inner scrollbar
-— the only scrollbar is the shell's `.reading-scroll` region.
+loading (`document.fonts.ready`), on any later content height change (a
+`ResizeObserver` on the iframe body), and after a focus-mode toggle (which
+changes the column width — hence the `setTimeout` matching the ~180ms CSS
+transition). It also forces `overflow:hidden` on the iframe document so
+sub-pixel rounding can never leave a residual inner scrollbar — the only
+scrollbar is the shell's `.reading-scroll` region.
 
 Before swapping in the iframe, the shell does a `fetch(path, {method:"HEAD"})`
 probe so a missing file shows a themed error instead of the server's raw 404.
 
-### Theme
-Light is primary. `data-theme` on `<html>` toggles light/dark; preference is
-persisted in `localStorage` under `ocp-theme`. All theme tokens are CSS custom
-properties defined on `:root` (light) and `[data-theme="dark"]` in `style.css`
-— change colors there, never hard-code hex values in components.
+Reading width is set per view: `route()` toggles `.reading--wide` for the MCQ
+view (wide tables) and `.reading--prose` for the two handnote views.
+
+### Scroll behavior
+The header auto-hides on scroll-down and returns on scroll-up, and a reading
+progress bar (`#progress-fill`, rAF-throttled) tracks position. **The scrolling
+element differs by viewport**: `.reading-scroll` on desktop, the window/document
+below the 820px breakpoint. Both handlers are registered and `onScroll` reads
+whichever fired — any new scroll-driven feature must do the same.
+
+### Theme and focus mode
+Two persisted UI states, both keyed off `<html>`:
+
+| State | Storage key | Applied as |
+| --- | --- | --- |
+| Theme | `ocp-theme` (`"light"` \| `"dark"`) | `data-theme` attribute |
+| Focus mode | `ocp-focus` (`"1"` \| `"0"`) | `.focus-mode` class |
+
+Both are restored **before first paint** by an inline boot script in the `<head>`
+of `index.html` to avoid a flash. That script duplicates the key names and
+defaults from `script.js` — **change one, change both**. Focus mode collapses the
+sidebar to a numbered rail and centers the reading column.
+
+Light is primary. All theme tokens are CSS custom properties on `:root` (light)
+and `[data-theme="dark"]` in `style.css` — change colors there, never hard-code
+hex values in components.
 
 The look is a warm, paper-like reading surface with a muted green accent:
 
@@ -102,35 +125,34 @@ The look is a warm, paper-like reading surface with a muted green accent:
   `--accent-soft #6f9a7a`. Dark mode lightens these (`--accent #79b08a`).
 - **Type:** `--font-serif` Merriweather (headings), `--font-sans` Inter
   (body), `--font-bn` Noto Sans Bengali (Bengali text), `--font-mono`
-  JetBrains Mono (code).
+  JetBrains Mono (code). Loaded from Google Fonts in `index.html`.
 
-Note the **chapter fragments carry their own independent palette and fonts**
-(e.g. Source Sans 3, a `--sect` terracotta accent) inside their own `<style>`,
-because they render in isolated iframes. The shell tokens above do **not**
-reach into fragments, and fragment styles do not leak out.
+Chapter fragments carry their **own independent palette and fonts** inside their
+own `<style>`, because they render in isolated iframes. The shell tokens above do
+not reach into fragments, and fragment styles do not leak out — a fragment will
+not follow the shell's dark mode unless it implements its own.
 
-### Header behavior
-The header auto-hides on scroll-down and returns on scroll-up (listens to both
-the reading region and the window, for desktop vs. mobile scroll containers).
+## Chapters
 
-## Running locally
-
-`fetch()` does not work on the `file://` protocol, so the folder **must** be
-served over HTTP:
-
-```bash
-python -m http.server 8000   # or: npx serve .
+```
+chapters/<nn>-<slug>/                    # lowercase, e.g. 04-core-apis/
+├── Ch<n>_<Slug>_Handnote_EN.html        # English handnote
+├── Ch<n>_<Slug>_HandNote_Bangla.html    # Bangla handnote
+└── Ch<n>_<Slug>_MCQ_Practice.html       # MCQ practice
 ```
 
-Then open <http://localhost:8000>. Double-clicking `index.html` will fail to load
-chapter content.
+Folders `01`–`14` exist on disk and all three views are wired up for each, so no
+chapter currently has a `null` path. The "(soon)" disabled-tab path still exists
+in the shell for chapters added later.
 
-## Deploy
+Note the **casing is deliberately inconsistent** between the two handnotes: EN
+uses `Handnote`, Bangla uses `HandNote`. The `<Slug>` is not mechanically derived
+from the folder name either (`11-exceptions` holds `Ch11_ExceptionsLocalization_*`,
+`08-lambda-and-functional-interface` holds `Ch8_Lambdas_*`). The `chapters` array
+in `script.js` is the **only** authority on paths — read a path from there or list
+the directory; never construct one from the convention.
 
-Push to GitHub and enable Pages on the branch root. Everything is static, so no
-configuration or build is required.
-
-## How to add a chapter
+### How to add a chapter
 
 1. Create `chapters/<nn>-<slug>/` and add the fragment HTML file(s). Each
    fragment must be a full standalone HTML document (own `<head>`/`<style>`),
@@ -143,13 +165,8 @@ configuration or build is required.
 
 ## Conventions & gotchas
 
-- The shell renders sidebar, tabs, breadcrumb, and page indicator entirely from
-  data — edit the `chapters`/`views` arrays, not the DOM, to change navigation.
 - `script.js` is **shell-only**: it does not implement MCQ scoring, content
   generation, or per-view logic. Any interactivity (e.g. quiz behavior) lives
   inside the individual fragment files.
-- Fonts are loaded from Google Fonts in `index.html`: Merriweather (serif
-  headings), Inter (sans body), JetBrains Mono (code), Noto Sans Bengali
-  (Bengali text).
 - Keep new code dependency-free and framework-free to preserve the zero-build,
   GitHub-Pages-ready guarantee.
